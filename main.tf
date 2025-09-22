@@ -22,8 +22,7 @@ variable "APP_ENV_NAME" {
 }
 
 variable "APP_CZIDLO_API_SERVICE_URL" {
-  type    = string
-  default = "https://czidlo-web-api.trinera.cloud/czidlo-web-api/api"
+  type = string
 }
 
 variable "docker_host_uri" {
