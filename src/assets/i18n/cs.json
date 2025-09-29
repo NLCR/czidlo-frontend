@@ -1,0 +1,21 @@
+{
+    "menu": {
+        "logo": "ČIDLO",
+        "desc": "Český IDentifikační a LOkalizační nástroj",
+        "version": "verze",
+        "information": "Informace",
+        "rules": "Pravidla",
+        "searching": "Vyhledávání",
+        "registrators": "Registrátoři",
+        "statistics": "Statistiky",
+        "import-record": "Vložení záznamu",
+        "admin": "Správa účtu",
+        "processes": "Procesy",
+        "logs": "Logy",
+        "login": "Přihlásit se",
+        "powered-by": "Vzniklo za podpory",
+        "cs": "Čeština",
+        "en": "English"
+    },
+    "czidlo": "Čidlo"
+}

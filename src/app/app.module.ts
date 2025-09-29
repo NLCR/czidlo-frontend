@@ -1,11 +1,39 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
+import { HttpClient, provideHttpClient } from '@angular/common/http';
+
+// COMPONENTS
 import { AppComponent } from './app.component';
 import { MenuComponent } from './menu/menu.component';
 import { BodyComponent } from './body/body.component';
+import { InformationComponent } from './body/information/information.component';
+import { RulesComponent } from './body/rules/rules.component';
+import { SearchComponent } from './body/search/search.component';
+import { RegistratorsComponent } from './body/registrators/registrators.component';
+import { StatisticsComponent } from './body/statistics/statistics.component';
+import { ImportRecordComponent } from './body/import-record/import-record.component';
+import { AdminComponent } from './body/admin/admin.component';
+import { ProcessesComponent } from './body/processes/processes.component';
+import { LogsComponent } from './body/logs/logs.component';
+
+// SERVICES
 import { EnvironmentService } from './services/environment.service';
+import { ApiService } from './services/api.service';
+
+// LOCALE & I18N
+import { registerLocaleData } from '@angular/common';
+import localeCs from '@angular/common/locales/cs';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translate/http-loader';
+
+
+// Funkce pro načtení překladových souborů
+export function HttpLoaderFactory() {
+    return new TranslateHttpLoader();
+}
+
+registerLocaleData(localeCs);
 
 export function initializeApp(envService: EnvironmentService): () => Promise<any> {
     return async () => {
@@ -17,18 +45,34 @@ export function initializeApp(envService: EnvironmentService): () => Promise<any
 }
 
 @NgModule({
-    declarations: [AppComponent, MenuComponent, BodyComponent],
-    imports: [BrowserModule, AppRoutingModule],
-    providers: [
-        provideAppInitializer(() => {
-            const configService = inject(ConfigService);
-            return configService.loadConfig();
+    declarations: [AppComponent, MenuComponent, BodyComponent, InformationComponent, RulesComponent, SearchComponent, RegistratorsComponent, StatisticsComponent, ImportRecordComponent, AdminComponent, ProcessesComponent, LogsComponent],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        TranslateModule.forRoot({
+            fallbackLang: 'cs',
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory
+            },
         }),
+    ],
+    providers: [
+        provideHttpClient(),
+        ApiService,
         {
             provide: APP_INITIALIZER,
             useFactory: initializeApp,
             deps: [EnvironmentService],
             multi: true,
+        },
+        { provide: LOCALE_ID, useValue: 'cs' },
+        {
+            provide: TRANSLATE_HTTP_LOADER_CONFIG,
+            useValue: {
+                prefix: './assets/i18n/',
+                suffix: '.json',
+            },
         },
     ],
     bootstrap: [AppComponent],

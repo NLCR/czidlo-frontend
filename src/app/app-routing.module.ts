@@ -1,7 +1,28 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { BodyComponent } from './body/body.component';
+import { InformationComponent } from './body/information/information.component';
+import { RegistratorsComponent } from './body/registrators/registrators.component';
+import { RulesComponent } from './body/rules/rules.component';
+import { SearchComponent } from './body/search/search.component';
+import { StatisticsComponent } from './body/statistics/statistics.component';
+import { ImportRecordComponent } from './body/import-record/import-record.component';
+import { AdminComponent } from './body/admin/admin.component';
+import { ProcessesComponent } from './body/processes/processes.component';
+import { LogsComponent } from './body/logs/logs.component';
 
-const routes: Routes = [];
+const routes: Routes = [
+    { path: '', component: BodyComponent },
+    { path: 'information', component: InformationComponent },
+    { path: 'registrators', component: RegistratorsComponent },
+    { path: 'rules', component: RulesComponent },
+    { path: 'search', component: SearchComponent },
+    { path: 'statistics', component: StatisticsComponent },
+    { path: 'import', component: ImportRecordComponent },
+    { path: 'admin', component: AdminComponent },
+    { path: 'processes', component: ProcessesComponent },
+    { path: 'logs', component: LogsComponent }
+];
 
 @NgModule({
     imports: [RouterModule.forRoot(routes)],
