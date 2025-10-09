@@ -1,1 +1,234 @@
-<p>processes works!</p>
+<div class="app-processes-container">
+    <div class="app-processes">
+        <div class="app-processes-header">
+            <div class="app-tabs">
+                <div class="app-tab app-tab-first" [ngClass]="{ 'app-tab-active': isActive === 'instances' }" routerLink="/processes/instances">
+                    {{ 'processes.instances' | translate }}
+                </div>
+                <div class="app-tab app-tab-last" [ngClass]="{ 'app-tab-active': isActive === 'definitions' }" routerLink="/processes/definitions">
+                    {{ 'processes.definitions' | translate }}
+                </div>
+            </div>
+        </div>
+
+        <!-- INSTANCES -->
+        <div class="app-instances" *ngIf="isActive === 'instances'">
+            <div class="app-toggle">
+                <app-toggle [disabled]="loading()" size="s" [checked]="showMyProcesses" (click)="toggleShowMyProcesses()"></app-toggle>
+                {{ 'processes.show-my-processes' | translate }}
+            </div>
+            <div class="app-table app-table-instances">
+                <div class="app-row app-row-header">
+                    <div class="app-col app-col-40px app-table-header-item">
+                        {{ 'ID' | translate }}
+                    </div>
+                    <div class="app-col app-table-header-item app-col-process-type">
+                        {{ 'processes.type' | translate }}
+                    </div>
+                    <div class="app-col app-col-180px app-table-header-item">
+                        {{ 'processes.ownerLogin' | translate }}
+                    </div>
+                    <div class="app-col app-col-100px app-table-header-item">
+                        {{ 'processes.state' | translate }}
+                    </div>
+                    <div class="app-col app-col-120px app-table-header-item">
+                        {{ 'processes.scheduled' | translate }}
+                    </div>
+                    <div class="app-col app-col-120px app-table-header-item">
+                        {{ 'processes.started' | translate }}
+                    </div>
+                    <div class="app-col app-col-120px app-table-header-item">
+                        {{ 'processes.finished' | translate }}
+                    </div>
+                    <div class="app-col app-col-120px app-table-header-item">
+                        {{ 'processes.duration' | translate }}
+                    </div>
+                    <div class="app-col app-col-72px app-table-header-item">
+                        {{ 'actions' | translate }}
+                    </div>
+                </div>
+                <div class="no-processes" *ngIf="!loading() && processes().length === 0">
+                    {{ 'processes.no-processes' | translate }}
+                </div>
+                <div class="app-table-body">
+                    <div
+                        *ngFor="let process of processes()"
+                        class="app-row app-table-row app-row-clicable"
+                        [ngClass]="{ 'app-row-active': activeProcess === process }"
+                        (click)="openSidebar(process)"
+                    >
+                        <div class="app-col app-col-40px app-table-item">
+                            {{ process.id }}
+                        </div>
+                        <div class="app-col app-table-item app-col-process-type">
+                            {{ process.type }}
+                        </div>
+                        <div class="app-col app-col-180px app-table-item">
+                            {{ process.ownerLogin }}
+                        </div>
+                        <div class="app-col app-col-100px app-table-item app-col-state">
+                            <div class="app-state-indicator" [ngClass]="'app-state-' + process.state.toLowerCase()">
+                                {{ process.state }}
+                            </div>
+                        </div>
+                        <div class="app-col app-col-120px app-table-item">
+                            {{ process.scheduled }}
+                        </div>
+                        <div class="app-col app-col-120px app-table-item">
+                            {{ process.started }}
+                        </div>
+                        <div class="app-col app-col-120px app-table-item">
+                            {{ process.finished }}
+                        </div>
+                        <div class="app-col app-col-120px app-table-item">
+                            {{ process.duration }}
+                        </div>
+                        <div class="app-col app-col-72px app-table-item">
+                            <app-button
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                [iconLeft]="process.state === 'SCHEDULED' || process.state === 'RUNNING' ? 'download-disabled.svg' : 'download-blue.svg'"
+                                (click)="downloadProcess(process); $event.stopPropagation()"
+                                [disabled]="process.state === 'SCHEDULED' || process.state === 'RUNNING'"
+                            ></app-button>
+                            <app-button
+                                *ngIf="
+                                    process.state === 'FAILED' ||
+                                    process.state === 'COMPLETED' ||
+                                    process.state === 'CANCELED' ||
+                                    process.state === 'KILLED' ||
+                                    process.state === 'FINISHED'
+                                "
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="trash-blue.svg"
+                                (click)="deleteProcess(process); $event.stopPropagation()"
+                            ></app-button>
+                            <app-button
+                                *ngIf="process.state === 'RUNNING'"
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="close.svg"
+                                (click)="killProcess(process); $event.stopPropagation()"
+                            ></app-button>
+                            <app-button
+                                *ngIf="process.state === 'SCHEDULED'"
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="close.svg"
+                                (click)="cancelProcess(process); $event.stopPropagation()"
+                            ></app-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEFINITIONS -->
+        <div class="app-definitions" *ngIf="isActive === 'definitions'">
+            <div class="app-table app-table-definitions">
+                <div class="app-row app-row-header app-row-non-clicable app-row-definition">
+                    <div class="app-col app-table-header-item">
+                        {{ 'processes.title' | translate }}
+                    </div>
+                    <div class="app-col app-table-header-item app-col-def-actions">
+                        {{ 'actions' | translate }}
+                    </div>
+                </div>
+                <div class="no-processes" *ngIf="!loading() && definitions().length === 0">
+                    {{ 'processes.no-definitions' | translate }}
+                </div>
+                <div class="app-table-body">
+                    <div
+                        *ngFor="let definition of definitions()"
+                        class="app-row app-table-row app-row-non-clicable app-row-definition"
+                        [ngClass]="{ 'app-row-active': activeProcess === definition }"
+                    >
+                        <div class="app-col app-table-item app-col-definition">
+                            {{ definition }}
+                        </div>
+                        <div class="app-col app-col-buttons app-table-item">
+                            <app-button variant="tertiary" size="s" iconRight="clock.svg" (click)="planProcess(definition); $event.stopPropagation()">
+                                <div>{{ 'processes.plan-process' | translate }}</div>
+                            </app-button>
+                            <app-button
+                                variant="tertiary"
+                                size="s"
+                                iconRight="settings.svg"
+                                (click)="setProcess(definition); $event.stopPropagation()"
+                            >
+                                <div>{{ 'processes.settings' | translate }}</div>
+                            </app-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
+    <!-- Sidebar Instances -->
+    <div class="app-sidebar-instances" *ngIf="activeProcess && isActive === 'instances'">
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">{{ activeProcess?.id }} - {{ activeProcess?.type }}</div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+        <div class="app-sidebar-content">{{ activeProcess | json }}</div>
+        <div class="app-sidebar-footer">
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadProcess(activeProcess)">
+                    <span>{{ 'buttons.download' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyProcess(activeProcess)">
+                    <span>{{ 'buttons.copy' | translate }}</span>
+                </app-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Definitions - Process Planning -->
+    <div class="app-sidebar-definitions" *ngIf="isActive === 'definitions'">
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">{{ 'processes.action-' + activeAction | translate }} - {{ activeDefinition }}</div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+        <div class="app-sidebar-content">
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.basic-settings' | translate }}</div>
+            </div>
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.registration-rules' | translate }}</div>
+            </div>
+
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.diff-tolerance' | translate }}</div>
+            </div>
+        </div>
+        <div class="app-sidebar-footer">
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" (click)="planProcess(activeProcess)">
+                    <span>{{ 'buttons.plan-process' | translate }}</span>
+                </app-button>
+            </div>
+        </div>
+    </div>
+</div>

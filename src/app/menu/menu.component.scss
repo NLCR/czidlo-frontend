@@ -5,6 +5,7 @@
     height: 100%;
     border-right: 1px solid var(--Boarder-Bright, #dfe5ec);
     box-sizing: border-box;
+    overflow: hidden;
     .app-header {
         display: flex;
         padding: 24px;

@@ -16,16 +16,26 @@ import { ImportRecordComponent } from './body/import-record/import-record.compon
 import { AdminComponent } from './body/admin/admin.component';
 import { ProcessesComponent } from './body/processes/processes.component';
 import { LogsComponent } from './body/logs/logs.component';
+import { ButtonComponent } from './shared/button/button.component';
+import { UsersComponent } from './body/users/users.component';
+
+// MATERIAL
+
+
 
 // SERVICES
 import { EnvironmentService } from './services/environment.service';
 import { ApiService } from './services/api.service';
+import { ProcessesService } from './services/processes.service';
 
 // LOCALE & I18N
 import { registerLocaleData } from '@angular/common';
 import localeCs from '@angular/common/locales/cs';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translate/http-loader';
+import { ToggleComponent } from './shared/toggle/toggle.component';
+import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
+
 
 
 // Funkce pro načtení překladových souborů
@@ -45,7 +55,7 @@ export function initializeApp(envService: EnvironmentService): () => Promise<any
 }
 
 @NgModule({
-    declarations: [AppComponent, MenuComponent, BodyComponent, InformationComponent, RulesComponent, SearchComponent, RegistratorsComponent, StatisticsComponent, ImportRecordComponent, AdminComponent, ProcessesComponent, LogsComponent],
+    declarations: [AppComponent, MenuComponent, BodyComponent, InformationComponent, RulesComponent, SearchComponent, RegistratorsComponent, StatisticsComponent, ImportRecordComponent, AdminComponent, ProcessesComponent, LogsComponent, ButtonComponent, UsersComponent, ToggleComponent, ConfirmDialogComponent],
     imports: [
         BrowserModule,
         AppRoutingModule,
@@ -60,6 +70,7 @@ export function initializeApp(envService: EnvironmentService): () => Promise<any
     providers: [
         provideHttpClient(),
         ApiService,
+        ProcessesService,
         {
             provide: APP_INITIALIZER,
             useFactory: initializeApp,

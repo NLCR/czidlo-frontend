@@ -10,6 +10,7 @@ import { ImportRecordComponent } from './body/import-record/import-record.compon
 import { AdminComponent } from './body/admin/admin.component';
 import { ProcessesComponent } from './body/processes/processes.component';
 import { LogsComponent } from './body/logs/logs.component';
+import { UsersComponent } from './body/users/users.component';
 
 const routes: Routes = [
     { path: '', component: BodyComponent },
@@ -19,8 +20,11 @@ const routes: Routes = [
     { path: 'search', component: SearchComponent },
     { path: 'statistics', component: StatisticsComponent },
     { path: 'import', component: ImportRecordComponent },
-    { path: 'admin', component: AdminComponent },
+    { path: 'users', component: UsersComponent },
     { path: 'processes', component: ProcessesComponent },
+    { path: 'processes/:tab', component: ProcessesComponent },
+    { path: 'processes/instances/:id', component: ProcessesComponent },
+    { path: 'processes/definitions/:id/:action', component: ProcessesComponent },
     { path: 'logs', component: LogsComponent }
 ];
 

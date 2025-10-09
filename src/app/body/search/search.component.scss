@@ -1,0 +1,15 @@
+.app-search-container {
+    display: flex;
+    width: 800px;
+    padding: 24px 0 40px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    flex-shrink: 0;
+    .app-search {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        align-self: stretch;
+    }
+}

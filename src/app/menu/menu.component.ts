@@ -10,7 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 export class MenuComponent {
     isLangDropdownOpen = signal(false);
     currentLang = 'cs';
-    loggedIn = signal(false);
+    loggedIn = signal(true);
     user = 'Pavla';
     atTop = true;
     atBottom = false;

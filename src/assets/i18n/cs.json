@@ -1,4 +1,8 @@
 {
+    "czidlo": "Čidlo",
+    "search": "Hledat",
+    "actions": "Akce",
+    "ID": "ID",
     "menu": {
         "logo": "ČIDLO",
         "desc": "Český IDentifikační a LOkalizační nástroj",
@@ -9,7 +13,7 @@
         "registrators": "Registrátoři",
         "statistics": "Statistiky",
         "import-record": "Vložení záznamu",
-        "admin": "Správa účtu",
+        "users": "Správa účtů",
         "processes": "Procesy",
         "logs": "Logy",
         "login": "Přihlásit se",
@@ -17,5 +21,52 @@
         "cs": "Čeština",
         "en": "English"
     },
-    "czidlo": "Čidlo"
+    "users": {
+        "list-of-users": "Seznam uživatelských účtů",
+        "add-new-user": "Přidat nového uživatele"
+    },
+    "buttons": {
+        "rights": "Práva",
+        "edit": "Upravit",
+        "delete": "Smazat",
+        "change-password": "Změnit heslo",
+        "cancel": "Zavřít",
+        "save": "Uložit",
+        "copy": "Zkopírovat",
+        "download": "Stáhnout",
+        "confirm": "Potvrdit",
+        "confirm-delete": "Ano, smazat",
+        "confirm-cancel": "Ano, zrušit",
+        "confirm-kill": "Ano, ukončit",
+        "plan-process":"Naplánovat proces"
+    },
+    "messages": {
+        "user-saved": "Uživatel byl uložen",
+        "user-deleted": "Uživatel byl smazán",
+        "copied-to-clipboard": "Zkopírováno do schránky",
+        "confirm-delete-title": "Opravdu chcete smazat proces",
+        "confirm-cancel-title": "Opravdu chcete zrušit proces",
+        "confirm-kill-title": "Opravdu chcete ukončit proces"
+    },
+    "processes": {
+        "instances": "Instance procesů",
+        "definitions": "Definice procesů",
+        "show-my-processes": "Jen mé procesy",
+        "type": "Typ procesu",
+        "ownerLogin": "Uživatel",
+        "state": "Stav",
+        "scheduled": "Naplánován",
+        "started": "Spuštěn",
+        "finished": "Ukončen",
+        "duration": "Trvání",
+        "no-processes": "Žádné procesy",
+        "title": "Název",
+        "plan-process": "Plánovat proces",
+        "settings": "Nastavit proces",
+        "action-plan": "Plánování nového procesu",
+        "basic-settings": "Základní nastavení",
+        "registration-rules": "Pravidla registrace",
+        "diff-tolerance": "Tolerance rozdílů"
+    }
+
 }

@@ -10,8 +10,93 @@ body {
 }
 
 :root {
+    --BG-Main-Base: #ffffff;
+
     --Text-Base: #0a0d10;
     --Text-Secondary: #263340;
+    --Font-Family: 'IBM Plex Sans', sans-serif;
+    --Font-Size-Base: 16px;
+    --Font-Weight-Normal: 400;
+    --Font-Size-Small: 14px;
+    --Font-Size-Large: 18px;
+
+    --Text-Disable: #9fb2c6;
+
+    // Buttons
+    --Color-Btn-Primary: #0080a8;
+    --Color-Btn-Primary-Hover: #1e657b;
+    --Color-Btn-Primary-Pressed: #144452;
+    --Color-Btn-Primary-Text: #ffffff;
+
+    --Color-Btn-Secondary: #eaf6fa;
+    --Color-Btn-Secondary-Hover: #d6eef5;
+    --Color-Btn-Secondary-Pressed: #adddeb;
+    --Text-Btn-Secondary-Default: #0080a8;
+    --Text-Btn-Secondary-Hover: #1e657b;
+    --Text-Btn-Secondary-Pressed: #144452;
+
+    --Text-Btn-Tertiary-Default: #263340;
+    --Text-Btn-Tertiary-Hover: #0a0d10;
+    --Text-Btn-Tertiary-Pressed: #0a0d10;
+    --Text-Btn-Disabled: #BFCCD9;
+    --Color-Btn-Tertiary-Default: #ffffff;
+    --Border-Btn-Tertiary-Default: #dfe5ec;
+    --Border-Btn-Tertiary-Hover: #9fb2c6;
+    --Border-Btn-Tertiary-Pressed: #8099b3;
+    --Border-Btn-Tertiary-Disabled: #EFF2F5;
+
+
+    // Table
+    --Border-Primary-Default: #0080a8;
+
+    // Process states
+    --State-Scheduled-Background: rgba(48, 176, 199, 0.1);
+    --State-Scheduled-Border: #0080a8;
+    --State-Running-Background: rgba(255, 149, 0, 0.1);
+    --State-Running-Border: #ff9500;
+    --State-Finished-Background: rgba(52, 199, 89, 0.1);
+    --State-Finished-Border: #34c759;
+    --State-Canceled-Background: rgba(255, 59, 48, 0.1);
+    --State-Canceled-Border: #ff3a30;
+    --State-Failed-Background: rgba(255, 59, 48, 0.1);
+    --State-Failed-Border: #ff3a30;
+    --State-Killed-Background: rgba(255, 59, 48, 0.1);
+    --State-Killed-Border: #ff3a30;
+}
+
+app-button {
+    display: flex;
+    outline: none;
+}
+input {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 0 0;
+    padding: var(--Spacing-x3, 12px) var(--Spacing-x4, 16px);
+    align-items: center;
+    gap: var(--Spacing-x3, 12px);
+    align-self: stretch;
+    border-radius: var(--Spacing-x1, 4px);
+    border: 1px solid var(--Boarder-Primary-Default, #0080a8);
+    background: var(--BG-Main-Base, #fff);
+    color: var(--Text-Base, #0a0d10);
+    font-family: 'IBM Plex Sans';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+    box-sizing: border-box;
+
+    &:focus {
+        border: 1px solid var(--Color-Btn-Primary, #0080a8);
+        box-shadow: 0 0 0 3px var(--Color-Shadow-Focus, rgba(0, 128, 168, 0.3));
+        outline: none;
+    }
+
+    &::placeholder {
+        color: var(--Text-Disable, #9fb2c6);
+    }
 }
 
 h1 {
@@ -31,4 +116,173 @@ h4 {
     font-weight: 500;
     line-height: 40px;
     margin: 0;
+}
+.app-table {
+    display: flex;
+    // width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    align-self: stretch;
+    font-size: 14px;
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    .app-table-body {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+        width: 100%;
+        flex-direction: column;
+        gap: 4px;
+        align-self: stretch;
+    }
+    .app-row {
+        display: flex;
+        min-width: max-content;
+        padding: 8px 24px;
+        align-items: center;
+        gap: 16px;
+        align-self: stretch;
+        border-radius: 4px;
+        border: 1px solid var(--Boarder-Primary-Default, #f6f7f9);
+        background: var(--BG-Main-Light, #f6f7f9);
+        &.app-row-clicable {
+            &:hover {
+                border: 1px solid var(--Boarder-Primary-Default, #0080a8);
+                cursor: pointer;
+            }
+        }
+        &.app-row-active {
+            border: 1px solid var(--Boarder-Primary-Default, #0080a8);
+            background: var(--BG-Main-Base, #ffffff);
+        }
+        &.app-row-header {
+            padding: 12px 24px;
+            line-height: 16px;
+            align-self: stretch;
+            background: var(--BG-Main-Contrast, #dfe5ec);
+            border: none;
+            app-button {
+                display: flex;
+                align-items: flex-start;
+            }
+        }
+        &.app-row-header-with-button {
+            padding: 3px 24px;
+        }
+        .app-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+    }
+    .app-col {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        &.app-col-state {
+            .app-state-indicator {
+                color: var(--Text-Secondary, #263340);
+                font-family: Karla;
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 16px; /* 133.333% */
+                text-transform: uppercase;
+                // display: flex;
+                padding: var(--Spacing-x1, 4px) var(--Spacing-x2, 8px);
+                justify-content: center;
+                align-items: center;
+                gap: var(--Spacing-x1, 4px);
+                border-radius: var(--Spacing-x1, 4px);
+                &.app-state-running {
+                    background: var(--State-Running-Background);
+                    border: 1px solid var(--State-Running-Border);
+                }
+                &.app-state-scheduled {
+                    background: var(--State-Scheduled-Background);
+                    border: 1px solid var(--State-Scheduled-Border);
+                }
+                &.app-state-canceled {
+                    background: var(--State-Canceled-Background);
+                    border: 1px solid var(--State-Canceled-Border);
+                }
+                &.app-state-finished {
+                    background: var(--State-Finished-Background);
+                    border: 1px solid var(--State-Finished-Border);
+                }
+                &.app-state-failed {
+                    background: var(--State-Failed-Background);
+                    border: 1px solid var(--State-Failed-Border);
+                }
+                &.app-state-killed {
+                    background: var(--State-Killed-Background);
+                    border: 1px solid var(--State-Killed-Border);
+                }
+            }
+        }
+        &.app-col-actions {
+            width: 300px;
+            justify-content: flex-end;
+        }
+        &.app-col-actions-title {
+            width: 290px;
+            justify-content: flex-start;
+        }
+        &.app-col-user {
+            flex: 1;
+        }
+        &.app-col-process-type {
+            flex: 1 1 auto;
+            min-width: 250px;
+        }
+        &.app-col-40px {
+            width: 40px;
+        }
+        &.app-col-72px {
+            width: 72px;
+        }
+        &.app-col-100px {
+            width: 100px;
+        }
+        &.app-col-120px {
+            width: 120px;
+        }
+        &.app-col-180px {
+            width: 180px;
+        }
+        &.app-col-300px {
+            width: 300px;
+        }
+    }
+}
+
+// OVERFLOW IN TABLE PROCESSES
+.app-body,
+// .app-body-container,
+app-processes,
+// .app-processes,
+// .app-processes-container,
+.app-instances {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0; /* aby se vnořený child mohl zmenšit a scrollovat */
+    overflow: hidden; /* zabrání scrollu tady */
+}
+
+// DIALOG BORDER RADIUS
+.mat-mdc-dialog-surface {
+    border-radius: 4px;
+}
+
+
+@media (max-width: 1620px) {
+    .app-col-type {
+        width: 200px;
+        overflow: hidden;
+    }
 }

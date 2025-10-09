@@ -1,31 +1,261 @@
-import { Component } from '@angular/core';
-import { ApiService } from '../../services/api.service';
+import { Component, signal, inject } from '@angular/core';
+import { ProcessesService } from '../../services/processes.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
+import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 
 @Component({
-  selector: 'app-processes',
-  standalone: false,
-  templateUrl: './processes.component.html',
-  styleUrl: './processes.component.scss'
+    selector: 'app-processes',
+    standalone: false,
+    templateUrl: './processes.component.html',
+    styleUrl: './processes.component.scss',
 })
 export class ProcessesComponent {
+    processes = signal<Array<any>>([]);
+    definitions = signal<Array<any>>(['REGISTRARS_URN_NBN_CSV_EXPORT', 'OAI_ADAPTER', 'DI_URL_AVAILABILITY_CHECK', 'INDEXATION', 'TEST']);
+    isActive = 'instances';
+    loading = signal(false);
+    isSidebarOpen = signal(false);
+    activeProcess: any = null;
+    activeDefinition: string | null = null;
+    activeAction: string | null = null;
 
-    processes: any[] = [];
+    private _snackBar = inject(MatSnackBar);
+    private _dialog = inject(MatDialog);
 
-    constructor(private apiService: ApiService) {}
+    showMyProcesses = false;
+
+    constructor(
+        private processesService: ProcessesService,
+        private route: ActivatedRoute,
+        private router: Router,
+        private translate: TranslateService
+    ) {}
 
     ngOnInit() {
-        this.loadProcesses();
-    }
-    loadProcesses() {
-        this.apiService.getProcesses().subscribe({
-            next: (data) => {
-                this.processes = data;
-                console.log('Processes loaded:', this.processes);
-            },
-            error: (error) => {
-                console.error('Error loading processes:', error);
+        this.route.url.subscribe((url) => {
+            this.isActive = url[1]?.path || 'instances';
+            // REDIRECT TO INSTANCES IF NO SUBPATH
+            if (url.length < 2) {
+                this.router.navigate(['/processes', 'instances']);
+            }
+            // INSTANCES
+            if (this.isActive === 'instances') {
+                if (this.processesService.processes().length === 0) {
+                    console.log('Loading processes...');
+                    this.loadProcesses();
+                } else {
+                    this.processes.set(this.processesService.processes());
+                }
+                if (url.length === 3) {
+                    const processId = url[2]?.path;
+                    this.loadProcessDetails(processId);
+                }
+            }
+            // DEFINITIONS
+            if (this.isActive === 'definitions') {
+                this.activeDefinition = null;
+                if (url.length > 3) {
+                    const definition = url[2]?.path;
+                    const action = url[3]?.path;
+                    if (this.definitions().includes(definition)) {
+                        console.log('Setting active definition to:', definition);
+                        this.activeDefinition = definition;
+                        this.activeAction = action;
+                        this.isSidebarOpen.set(true);
+                    } else {
+                        console.warn('Definition not found:', definition);
+                        this.isSidebarOpen.set(false);
+                    }
+                }
             }
         });
     }
 
+    loadProcesses() {
+        this.processesService.getProcesses().subscribe({
+            next: () => {
+                this.processes.set(this.processesService.processes());
+            },
+            error: (error) => {
+                console.error('Error loading processes:', error);
+            },
+        });
+    }
+
+    loadProcessDetails(id: string) {
+        this.processesService.getProcess(id).subscribe({
+            next: (data) => {
+                console.log('Process details loaded:', data);
+                this.processesService.getLog(id).subscribe({
+                    next: (logData) => {
+                        console.log('Process log loaded:', logData);
+                        data.log = logData;
+                    },
+                    error: (error) => {
+                        console.error('Error loading process log:', error);
+                        data.log = error || 'Error loading log';
+                    },
+                });
+                this.activeProcess = data;
+                this.isSidebarOpen.set(true);
+            },
+        });
+    }
+
+    openSidebar(process: any) {
+        if (this.isActive === 'instances') {
+            this.router.navigate(['/processes', 'instances', process.id]);
+            this.isSidebarOpen.set(true);
+        }
+    }
+
+    closeSidebar() {
+        this.router.navigate(['/processes', this.isActive]);
+        this.isSidebarOpen.set(false);
+    }
+
+    downloadProcess(process: any) {
+        console.log('Downloading process:', process);
+        const jsonStr = JSON.stringify(process, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        // otevře v novém okně
+        window.open(url, '_blank');
+    }
+
+    copyProcess(process: any) {
+        console.log('Copying process:', process);
+        const jsonStr = JSON.stringify(process, null, 2);
+        navigator.clipboard
+            .writeText(jsonStr)
+            .then(() => {
+                console.log('JSON byl zkopírován do schránky.');
+            })
+            .catch((err) => {
+                console.error('Chyba při kopírování JSONu:', err);
+            });
+        this.openSnackBar(this.translate.instant('messages.copied-to-clipboard'), 'OK');
+    }
+
+    deleteProcess(process: any) {
+        console.log('Deleting process:', process);
+        this._dialog
+            .open(ConfirmDialogComponent, {
+                data: {
+                    data: process,
+                    title: this.translate.instant('messages.confirm-delete-title'),
+                    confirm: this.translate.instant('buttons.confirm-delete'),
+                    // message: this.translate.instant('messages.confirm-delete-message', { name: process.name }),
+                },
+                maxWidth: '800px',
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                if (result === true) {
+                    this.processesService.deleteProcess(process.id).subscribe({
+                        next: () => {
+                            console.log('Process deleted successfully');
+                            this.loadProcesses();
+                        },
+                        error: (error) => {
+                            console.error('Error deleting process:', error);
+                        },
+                    });
+                }
+            });
+    }
+    killProcess(process: any) {
+        console.log('Killing process:', process);
+        this._dialog
+            .open(ConfirmDialogComponent, {
+                data: {
+                    data: process,
+                    title: this.translate.instant('messages.confirm-kill-title'),
+                    confirm: this.translate.instant('buttons.confirm-kill'),
+                    // message: this.translate.instant('messages.confirm-delete-message', { name: process.name }),
+                },
+                maxWidth: '800px',
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                if (result === true) {
+                    this.processesService.killProcess(process.id).subscribe({
+                        next: () => {
+                            console.log('Process killed successfully');
+                            this.loadProcesses();
+                        },
+                        error: (error) => {
+                            console.error('Error killing process:', error);
+                        },
+                    });
+                }
+            });
+    }
+    cancelProcess(process: any) {
+        console.log('Canceling process:', process);
+        this._dialog
+            .open(ConfirmDialogComponent, {
+                data: {
+                    data: process,
+                    title: this.translate.instant('messages.confirm-cancel-title'),
+                    confirm: this.translate.instant('buttons.confirm-cancel'),
+                    // message: this.translate.instant('messages.confirm-delete-message', { name: process.name }),
+                },
+                maxWidth: '800px',
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                if (result === true) {
+                    this.processesService.cancelProcess(process.id).subscribe({
+                        next: () => {
+                            console.log('Process canceled successfully');
+                            this.loadProcesses();
+                        },
+                        error: (error) => {
+                            console.error('Error canceling process:', error);
+                        },
+                    });
+                }
+            });
+    }
+
+    toggleShowMyProcesses() {
+        this.showMyProcesses = !this.showMyProcesses;
+        if (this.showMyProcesses) {
+            // TODO
+            const currentUserLogin = 'pavla'; // TODO: Nahradit skutečným přihlašovacím jménem
+            this.processesService.getProcessesByOwner(currentUserLogin).subscribe({
+                next: () => {
+                    this.processes.set(this.processesService.processes());
+                },
+                error: (error) => {
+                    console.error('Error loading user processes:', error);
+                },
+            });
+        } else {
+            // Načíst všechny procesy
+            this.loadProcesses();
+        }
+    }
+
+    openSnackBar(message: string, action: string) {
+        console.log('Opening snackbar with message:', message);
+        this._snackBar.open(message, action, { duration: 1500 });
+    }
+
+    planProcess(definition: string) {
+        console.log('Planning process:', definition);
+        this.router.navigate(['/processes', 'definitions', definition, 'plan']);
+        this.isSidebarOpen.set(true);
+    }
+
+    setProcess(definition: string) {
+        console.log('Setting process:', definition);
+        this.router.navigate(['/processes', 'definitions', definition, 'set']);
+        this.isSidebarOpen.set(true);
+    }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { environment as staticEnv } from '../../environments/environment';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError, delay, tap } from 'rxjs/operators';
@@ -30,5 +30,33 @@ export class ApiService {
     getProcesses(): Observable<any> {
         const url = `${this.apiUrl}/processes`;
         return this.doGet(url);
+    }
+    getProcessesByOwner(owner: string): Observable<any> {
+        const url = `${this.apiUrl}/processes/by-owner/${owner}`;
+        return this.doGet(url);
+    }
+    getProcess(id: string): Observable<any> {
+        const url = `${this.apiUrl}/processes/${id}`;
+        return this.doGet(url);
+    }
+    getProcessLog(id: string): Observable<any> {
+        const url = `${this.apiUrl}/processes/${id}/log`;
+        return this.doGet(url);
+    }
+    getProcessOutput(id: string): Observable<any> {
+        const url = `${this.apiUrl}/processes/${id}/output`;
+        return this.doGet(url);
+    }
+    deleteProcess(id: string): Observable<any> {
+        const url = `${this.apiUrl}/processes/${id}`;
+        return this.http.delete(url).pipe(catchError(this.handleError));
+    }
+    createProcess(type: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/processes/${type}`;
+        return this.http.post(url, body).pipe(catchError(this.handleError));
+    }
+    cancelProcess(id: string): Observable<any> {
+        const url = `${this.apiUrl}/processes/${id}/cancel`;
+        return this.http.post(url, {}).pipe(catchError(this.handleError));
     }
 }

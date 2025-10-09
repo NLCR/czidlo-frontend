@@ -1,0 +1,18 @@
+<button
+    [ngClass]="['btn', 'btn-' + variant, size !== 'm' ? 'btn-' + size : '', iconLeft || iconRight ? 'btn-icon' : '', icon ? 'btn-icon-only' : '']"
+    [disabled]="disabled"
+>
+    <!-- Ikona před textem -->
+    <ng-container *ngIf="iconLeft">
+        <img class="btn-icon-left" [src]="'assets/icons/' + iconLeft" alt="icon-left" width="16" height="16" />
+    </ng-container>
+
+    <!-- Text tlačítka -->
+    <!-- <span><ng-content></ng-content></span> -->
+    <ng-content></ng-content>
+
+    <!-- Ikona za textem -->
+    <ng-container *ngIf="iconRight">
+        <img class="btn-icon-right" [src]="'assets/icons/' + iconRight" alt="icon-right" width="16" height="16" />
+    </ng-container>
+</button>

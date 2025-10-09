@@ -1,0 +1,9 @@
+.app-admin-container {
+    display: flex;
+    width: 800px;
+    padding: 24px 16px 40px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    flex-shrink: 0;
+}
