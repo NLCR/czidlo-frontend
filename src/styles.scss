@@ -38,13 +38,12 @@ body {
     --Text-Btn-Tertiary-Default: #263340;
     --Text-Btn-Tertiary-Hover: #0a0d10;
     --Text-Btn-Tertiary-Pressed: #0a0d10;
-    --Text-Btn-Disabled: #BFCCD9;
+    --Text-Btn-Disabled: #bfccd9;
     --Color-Btn-Tertiary-Default: #ffffff;
     --Border-Btn-Tertiary-Default: #dfe5ec;
     --Border-Btn-Tertiary-Hover: #9fb2c6;
     --Border-Btn-Tertiary-Pressed: #8099b3;
-    --Border-Btn-Tertiary-Disabled: #EFF2F5;
-
+    --Border-Btn-Tertiary-Disabled: #eff2f5;
 
     // Table
     --Border-Primary-Default: #0080a8;
@@ -279,6 +278,66 @@ app-processes,
     border-radius: 4px;
 }
 
+// INPUTS
+.app-base-input-container {
+    display: flex;
+    gap: 8px;
+}
+.app-base-input {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    align-self: stretch;
+    &.app-multiselect {
+        width: 300px;
+        .mat-mdc-form-field {
+            width: 100%;
+        }
+    }
+}
+.app-base-input-label {
+    color: var(--Text-Light, #4c6580);
+    /* Typesettings/S/Medium2 */
+    font-family: 'IBM Plex Sans';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px; /* 114.286% */
+}
+
+/* Změna pozadí a zaoblení inputu */
+.mat-mdc-form-field .mdc-text-field {
+    background-color: #fff;
+    border-radius: 4px;
+    width: 100%;
+    height: 48px;
+    box-sizing: border-box;
+    align-items: center;
+}
+.mat-mdc-form-field.mat-mdc-form-field-has-icon-suffix .mat-mdc-text-field-wrapper {
+    padding-right: 8px;
+    height: 48px;
+    align-items: center;
+}
+
+/* Změna barvy textu uvnitř inputu */
+.mat-mdc-input-element {
+    color: #333;
+    font-weight: 500;
+}
+
+/* Barva labelu */
+.mat-mdc-floating-label {
+    color: #666 !important;
+}
+
+/* Barva podtržení (outline styl) */
+.mat-mdc-form-field .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-notched-outline__notch,
+.mat-mdc-form-field .mdc-notched-outline__trailing {
+    border-color: #bfccd9 !important;
+}
 
 @media (max-width: 1620px) {
     .app-col-type {

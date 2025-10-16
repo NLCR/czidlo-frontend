@@ -38,7 +38,9 @@
         "confirm-delete": "Ano, smazat",
         "confirm-cancel": "Ano, zrušit",
         "confirm-kill": "Ano, ukončit",
-        "plan-process":"Naplánovat proces"
+        "plan-process":"Naplánovat proces",
+        "set-process": "Nastavit proces",
+        "add": "Přidat"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
@@ -64,9 +66,39 @@
         "plan-process": "Plánovat proces",
         "settings": "Nastavit proces",
         "action-plan": "Plánování nového procesu",
+        "action-set": "Nastavení",
         "basic-settings": "Základní nastavení",
         "registration-rules": "Pravidla registrace",
-        "diff-tolerance": "Tolerance rozdílů"
+        "diff-tolerance": "Tolerance rozdílů",
+        "transform-rdd": "Transformace pro operaci Registrace digitálního dokumentu",
+        "transform-ids": "Transformace pro operaci Import digitální instance",
+        "filter-by-date": "Filtrovat podle data registrace",
+        "filter-by-registrator": "Filtrovat podle Registrátora",
+        "filter-by-entity": "Filtrovat podle typu Intelektuální Entity",
+        "filter-by-missing-id": "Filtrovat podle chybějícího identifikátoru",
+        "filter-by-state": "Filtrovat podle stavu URN:NBN",
+        "count-digital-instances": "Zahrnout počet Digitálních Instancí",
+        "from": "Datum od",
+        "to": "Datum do",
+        "registrators": "Registrátoři",
+        "registrator": "Registrátor",
+        "intellectual-entity": "Intelektuální entita",
+        "digital-document": "Digitální dokument",
+        "digital-instance": "Digitální instance",
+        "urn-nbn-state": "Stav URN:NBN",
+        "created-deactivated": "Vytvořeno / Deaktivováno",
+        "di-state": "Stav DI",
+        "ALL": "Vše",
+        "ACTIVE": "Aktivní",
+        "DEACTIVATED": "Deaktivované",
+        "true": "Ano",
+        "false": "Ne"
+    },
+    "definitions": {
+        "OAI_ADAPTER": "OAI adapter",
+        "REGISTRARS_URN_NBN_CSV_EXPORT": "Export URN:NBN",
+        "DI_URL_AVAILABILITY_CHECK": "Kontrola dostupnosti DI",
+        "INDEXATION": "Indexace dokumentů"
     }
 
 }

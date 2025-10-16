@@ -7,6 +7,10 @@ import { ApiService } from './api.service';
 @Injectable({ providedIn: 'root' })
 export class ProcessesService {
     public processes = signal<Array<any>>([]);
+    public registrators = signal<Array<string>>(['aba001', 'aba004', 'aba006', 'aba007']);
+    public intellectualEntities = signal<Array<string>>(['MONOGRAPH', 'MONOGRAPH_VOLUME', 'PERIODICAL', 'PERIODICAL_VOLUME', 'PERIODICAL_ISSUE', 'THESIS', 'ANALYTICAL', 'OTHER']);
+    public identifiers = signal<Array<string>>(['CNB', 'ISSN', 'ISBN']);
+
     constructor(private apiService: ApiService) {}
 
     getProcesses(): Observable<any> {

@@ -85,12 +85,18 @@
                         </div>
                         <div class="app-col app-col-72px app-table-item">
                             <app-button
+                                *ngIf="
+                                    process.state === 'FAILED' ||
+                                    process.state === 'COMPLETED' ||
+                                    process.state === 'CANCELED' ||
+                                    process.state === 'KILLED' ||
+                                    process.state === 'FINISHED'
+                                "
                                 variant="tertiary"
                                 size="s"
                                 [icon]="true"
-                                [iconLeft]="process.state === 'SCHEDULED' || process.state === 'RUNNING' ? 'download-disabled.svg' : 'download-blue.svg'"
-                                (click)="downloadProcess(process); $event.stopPropagation()"
-                                [disabled]="process.state === 'SCHEDULED' || process.state === 'RUNNING'"
+                                iconLeft="download-blue.svg"
+                                (click)="downloadOutput(process); $event.stopPropagation()"
                             ></app-button>
                             <app-button
                                 *ngIf="
@@ -111,7 +117,7 @@
                                 variant="tertiary"
                                 size="s"
                                 [icon]="true"
-                                iconLeft="close.svg"
+                                iconLeft="close-blue.svg"
                                 (click)="killProcess(process); $event.stopPropagation()"
                             ></app-button>
                             <app-button
@@ -119,7 +125,7 @@
                                 variant="tertiary"
                                 size="s"
                                 [icon]="true"
-                                iconLeft="close.svg"
+                                iconLeft="close-blue.svg"
                                 (click)="cancelProcess(process); $event.stopPropagation()"
                             ></app-button>
                         </div>
@@ -149,19 +155,25 @@
                         [ngClass]="{ 'app-row-active': activeProcess === definition }"
                     >
                         <div class="app-col app-table-item app-col-definition">
-                            {{ definition }}
+                            {{ 'definitions.' + definition.type | translate }}
                         </div>
                         <div class="app-col app-col-buttons app-table-item">
-                            <app-button variant="tertiary" size="s" iconRight="clock.svg" (click)="planProcess(definition); $event.stopPropagation()">
-                                <div>{{ 'processes.plan-process' | translate }}</div>
+                            <app-button
+                                *ngIf="definition.type === 'OAI_ADAPTER'"
+                                variant="tertiary"
+                                size="s"
+                                iconRight="settings.svg"
+                                (click)="openProcess('set', definition.type); $event.stopPropagation()"
+                            >
+                                <div>{{ 'processes.settings' | translate }}</div>
                             </app-button>
                             <app-button
                                 variant="tertiary"
                                 size="s"
-                                iconRight="settings.svg"
-                                (click)="setProcess(definition); $event.stopPropagation()"
+                                iconRight="clock.svg"
+                                (click)="openProcess('plan', definition.type); $event.stopPropagation()"
                             >
-                                <div>{{ 'processes.settings' | translate }}</div>
+                                <div>{{ 'processes.plan-process' | translate }}</div>
                             </app-button>
                         </div>
                     </div>
@@ -184,7 +196,7 @@
                 <img src="assets/icons/close.svg" />
             </div>
         </div>
-        <div class="app-sidebar-content">{{ activeProcess | json }}</div>
+        <div class="app-sidebar-content">{{ activeProcess.log | json }}</div>
         <div class="app-sidebar-footer">
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
@@ -202,15 +214,40 @@
 
     <!-- Sidebar Definitions - Process Planning -->
     <div class="app-sidebar-definitions" *ngIf="isActive === 'definitions'">
+        <!-- HEADER -->
         <div class="app-sidebar-header">
-            <div class="app-sidebar-title">{{ 'processes.action-' + activeAction | translate }} - {{ activeDefinition }}</div>
+            <div class="app-sidebar-title">
+                {{ 'processes.action-' + activeAction | translate }} - {{ 'definitions.' + activeDefinition | translate }}
+            </div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>
         </div>
-        <div class="app-sidebar-content">
+
+        <!-- SETTINGS OAI ADAPTER -->
+        <div class="app-sidebar-content" *ngIf="activeAction === 'set' && activeDefinition === 'OAI_ADAPTER'">
+            <div class="app-part app-set-oai-adapter">
+                <div class="app-part-title">{{ 'processes.transform-rdd' | translate }}</div>
+                <div class="app-part-buttons">
+                    <app-button variant="primary" size="s" iconLeft="add-white.svg">
+                        <div>{{ 'buttons.add' | translate }}</div>
+                    </app-button>
+                </div>
+            </div>
+            <div class="app-part app-set-oai-adapter">
+                <div class="app-part-title">{{ 'processes.transform-ids' | translate }}</div>
+                <div class="app-part-buttons">
+                    <app-button variant="primary" size="s" iconLeft="add-white.svg">
+                        <div>{{ 'buttons.add' | translate }}</div>
+                    </app-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLAN OAI ADAPTER -->
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition === 'OAI_ADAPTER'">
             <div class="app-part">
-                <div class="app-part-title">{{ 'processes.basic-settings' | translate }}</div>
+                <div class="app-part-title">{{ 'processes.basic-settings' | translate }} OAI</div>
             </div>
             <div class="app-part">
                 <div class="app-part-title">{{ 'processes.registration-rules' | translate }}</div>
@@ -220,13 +257,191 @@
                 <div class="app-part-title">{{ 'processes.diff-tolerance' | translate }}</div>
             </div>
         </div>
+
+        <!-- PLAN EXPORT URN:NBN -->
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition === 'REGISTRARS_URN_NBN_CSV_EXPORT'">
+            <div class="app-part">
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.filter-by-date' | translate }} URN:NBN</div>
+                    <div class="app-base-input-container app-datepicker-container">
+                        <div class="app-base-input app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
+                                <input matInput [matDatepicker]="startDatePicker" [formControl]="startDateControl" />
+                                <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                                <mat-datepicker #startDatePicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-base-input app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker">
+                                <input matInput [matDatepicker]="endDatePicker" [formControl]="endDateControl" />
+                                <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                                <mat-datepicker #endDatePicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.filter-by-registrator' | translate }} URN:NBN</div>
+                    <div class="app-base-input app-multiselect">
+                        <mat-form-field appearance="outline">
+                            <mat-select [formControl]="registators" multiple>
+                                @for (registrator of registatorList(); track registrator) {
+                                <mat-option [value]="registrator">{{ registrator }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.filter-by-entity' | translate }}</div>
+                    <div class="app-base-input app-multiselect">
+                        <mat-form-field appearance="outline">
+                            <mat-select [formControl]="intellectualEntities" multiple>
+                                @for (entity of intellectualEntitiesList(); track entity) {
+                                <mat-option [value]="entity">{{ entity }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.filter-by-missing-id' | translate }}</div>
+                    <div class="app-base-input app-multiselect">
+                        <mat-form-field appearance="outline">
+                            <mat-select [formControl]="identifiers" multiple>
+                                @for (identifier of identifiersList(); track identifier) {
+                                <mat-option [value]="identifier">{{ identifier }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.filter-by-state' | translate }}</div>
+                    <mat-radio-group class="app-radio-group" [(ngModel)]="selectedState">
+                        @for (state of states; track state) {
+                        <mat-radio-button class="example-radio-button" [value]="state">{{ 'processes.' + state | translate }}</mat-radio-button>
+                        }
+                    </mat-radio-group>
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.count-digital-instances' | translate }}</div>
+                    <mat-radio-group class="app-radio-group" [(ngModel)]="selectedIncludeCount">
+                        @for (includeCount of includeCounts; track includeCount) {
+                        <mat-radio-button class="example-radio-button" [value]="includeCount">
+                            {{ 'processes.' + includeCount | translate }}
+                        </mat-radio-button>
+                        }
+                    </mat-radio-group>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLAN DI URL AVAILABILITY CHECK -->
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition === 'DI_URL_AVAILABILITY_CHECK'">
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.digital-document' | translate }}</div>
+                <div class="app-part-content">
+                    <div class="app-base-input app-multiselect">
+                        <div class="app-base-input-label">{{ 'processes.registrator' | translate }}</div>
+                        <mat-form-field appearance="outline">
+                            <mat-select [formControl]="registators" multiple>
+                                @for (reg of registatorList(); track reg) {
+                                <mat-option [value]="reg">{{ reg }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="app-base-input app-multiselect">
+                        <div class="app-base-input-label">{{ 'processes.intellectual-entity' | translate }}</div>
+                        <mat-form-field appearance="outline">
+                            <mat-select [formControl]="intellectualEntities" multiple>
+                                @for (entity of intellectualEntitiesList(); track entity) {
+                                <mat-option [value]="entity">{{ entity }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="app-base-input">
+                        <div class="app-base-input-label">{{ 'processes.urn-nbn-state' | translate }}</div>
+                        <mat-radio-group class="app-radio-group" [(ngModel)]="selectedUrnNbnState">
+                            @for (state of states; track state) {
+                            <mat-radio-button class="example-radio-button" [value]="state">{{ 'processes.' + state | translate }}</mat-radio-button>
+                            }
+                        </mat-radio-group>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.digital-instance' | translate }}</div>
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.created-deactivated' | translate }}</div>
+                    <div class="app-datepicker-container">
+                        <div class="app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
+                                <input matInput [matDatepicker]="startDatePicker" [formControl]="startDateControl" />
+                                <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                                <mat-datepicker #startDatePicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker">
+                                <input matInput [matDatepicker]="endDatePicker" [formControl]="endDateControl" />
+                                <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                                <mat-datepicker #endDatePicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.di-state' | translate }}</div>
+                    <div class="app-base-input">
+                        <mat-radio-group class="app-radio-group" [(ngModel)]="selectedDIState">
+                            @for (state of states; track state) {
+                            <mat-radio-button class="example-radio-button" [value]="state">{{ 'processes.' + state | translate }}</mat-radio-button>
+                            }
+                        </mat-radio-group>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- PLAN INDEXATION -->
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition === 'INDEXATION'">
+            <div class="app-part">
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.filter-by-date' | translate }}</div>
+                    <div class="app-datepicker-container">
+                        <div class="app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
+                                <input matInput [matDatepicker]="startDatePicker" [formControl]="startDateControl" />
+                                <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                                <mat-datepicker #startDatePicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker">
+                                <input matInput [matDatepicker]="endDatePicker" [formControl]="endDateControl" />
+                                <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                                <mat-datepicker #endDatePicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
         <div class="app-sidebar-footer">
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" (click)="planProcess(activeProcess)">
+                <app-button *ngIf="activeAction === 'plan'" variant="primary" size="l" (click)="planProcess(activeDefinition)">
                     <span>{{ 'buttons.plan-process' | translate }}</span>
+                </app-button>
+                <app-button *ngIf="activeAction === 'set'" variant="primary" size="l" (click)="setProcess(activeDefinition)">
+                    <span>{{ 'buttons.set-process' | translate }}</span>
                 </app-button>
             </div>
         </div>

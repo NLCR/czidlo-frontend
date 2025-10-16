@@ -66,11 +66,6 @@
         border: 1px solid var(--Border-Btn-Tertiary-Default, #dfe5ec);
         background: var(--Color-Btn-Tertiary-Default);
         color: var(--Text-Secondary, #263340);
-        /* Typesettings/S/XS/Medium */
-        font-family: Karla;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 16px; /* 133.333% */
         &:hover {
             border: 1px solid var(--Border-Btn-Tertiary-Hover);
             background: var(--Color-Btn-Tertiary-Default);
@@ -93,14 +88,14 @@
             }
         }
         &:disabled {
-            border: 1px solid var(--Border-Btn-Tertiary-Disabled, #EFF2F5);
+            border: 1px solid var(--Border-Btn-Tertiary-Disabled, #eff2f5);
             background: var(--Color-Btn-Tertiary-Default, #fff);
-            color: var(--Text-Btn-Disabled, #BFCCD9);
+            color: var(--Text-Btn-Disabled, #bfccd9);
             .btn-icon-left,
             .btn-icon-right {
                 svg {
                     path {
-                        fill: var(--Text-Btn-Disabled, #BFCCD9);
+                        fill: var(--Text-Btn-Disabled, #bfccd9);
                     }
                 }
             }
@@ -115,6 +110,11 @@
         &.btn-icon-only {
             padding: 8px;
         }
+        /* Typesettings/S/XS/Medium */
+        font-family: Karla;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 16px; /* 133.333% */
     }
 
     &.btn-l {

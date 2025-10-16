@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClient, provideHttpClient } from '@angular/common/http';
 
+
 // COMPONENTS
 import { AppComponent } from './app.component';
 import { MenuComponent } from './menu/menu.component';
@@ -20,8 +21,14 @@ import { ButtonComponent } from './shared/button/button.component';
 import { UsersComponent } from './body/users/users.component';
 
 // MATERIAL
-
-
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatRadioModule } from '@angular/material/radio';
 
 // SERVICES
 import { EnvironmentService } from './services/environment.service';
@@ -35,8 +42,6 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translate/http-loader';
 import { ToggleComponent } from './shared/toggle/toggle.component';
 import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
-
-
 
 // Funkce pro načtení překladových souborů
 export function HttpLoaderFactory() {
@@ -55,7 +60,24 @@ export function initializeApp(envService: EnvironmentService): () => Promise<any
 }
 
 @NgModule({
-    declarations: [AppComponent, MenuComponent, BodyComponent, InformationComponent, RulesComponent, SearchComponent, RegistratorsComponent, StatisticsComponent, ImportRecordComponent, AdminComponent, ProcessesComponent, LogsComponent, ButtonComponent, UsersComponent, ToggleComponent, ConfirmDialogComponent],
+    declarations: [
+        AppComponent,
+        MenuComponent,
+        BodyComponent,
+        InformationComponent,
+        RulesComponent,
+        SearchComponent,
+        RegistratorsComponent,
+        StatisticsComponent,
+        ImportRecordComponent,
+        AdminComponent,
+        ProcessesComponent,
+        LogsComponent,
+        ButtonComponent,
+        UsersComponent,
+        ToggleComponent,
+        ConfirmDialogComponent,
+    ],
     imports: [
         BrowserModule,
         AppRoutingModule,
@@ -63,9 +85,18 @@ export function initializeApp(envService: EnvironmentService): () => Promise<any
             fallbackLang: 'cs',
             loader: {
                 provide: TranslateLoader,
-                useFactory: HttpLoaderFactory
+                useFactory: HttpLoaderFactory,
             },
         }),
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatFormFieldModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        MatSelectModule,
+        MatSnackBarModule,
+        FormsModule,
+        MatRadioModule,
     ],
     providers: [
         provideHttpClient(),
@@ -78,6 +109,7 @@ export function initializeApp(envService: EnvironmentService): () => Promise<any
             multi: true,
         },
         { provide: LOCALE_ID, useValue: 'cs' },
+        { provide: MAT_DATE_LOCALE, useValue: 'cs-CZ' },
         {
             provide: TRANSLATE_HTTP_LOADER_CONFIG,
             useValue: {
