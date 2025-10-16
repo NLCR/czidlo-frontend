@@ -108,6 +108,24 @@ h1 {
     margin: 0;
 }
 
+h2 {
+    font-family: 'IBM Plex Sans';
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 44px; /* 137.5% */
+    margin: 0;
+}
+
+h3 {
+    font-family: 'IBM Plex Sans';
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 48px; /* 171.429% */
+    margin: 0;
+}
+
 h4 {
     font-family: 'IBM Plex Sans';
     font-size: 24px;
@@ -115,6 +133,10 @@ h4 {
     font-weight: 500;
     line-height: 40px;
     margin: 0;
+}
+
+hr {
+    display: none;
 }
 .app-table {
     display: flex;
@@ -259,6 +281,54 @@ h4 {
     }
 }
 
+// TABS
+.app-tabs {
+    display: flex;
+    width: 800px;
+    align-items: flex-start;
+    .app-tab {
+        display: flex;
+        padding: var(--Spacing-x3, 12px) var(--Spacing-x4, 16px);
+        justify-content: center;
+        align-items: center;
+        gap: var(--Spacing-x2, 8px);
+        flex: 1 0 0;
+        border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
+        border-bottom: 1px solid var(--Boarder-Bright, #dfe5ec);
+        border-right: 1px solid var(--Boarder-Bright, #dfe5ec);
+        background: var(--BG-Main-Base, #fff);
+        font-size: 14px;
+        line-height: 16px;
+        font-weight: 500;
+        &:hover {
+            cursor: pointer;
+            color: #1e657b;
+        }
+        &:active {
+            color: #144452;
+        }
+        &.app-tab-first {
+            border-radius: 4px 0 0 4px;
+            border-left: 1px solid var(--Boarder-Bright, #dfe5ec);
+        }
+        &.app-tab-last {
+            border-radius: 0 4px 4px 0;
+        }
+        &.app-tab-active {
+            border: 1px solid var(--Boarder-Primary-Default, #0080a8);
+            color: var(--Text-Btn-Secondary-Default, #0080a8);
+            &:hover {
+                border: 1px solid #1e657b;
+                color: #1e657b;
+            }
+            &:active {
+                border: 1px solid #144452;
+                color: #144452;
+            }
+        }
+    }
+}
+
 // OVERFLOW IN TABLE PROCESSES
 .app-body,
 // .app-body-container,
@@ -271,6 +341,9 @@ app-processes,
     flex-direction: column;
     min-height: 0; /* aby se vnořený child mohl zmenšit a scrollovat */
     overflow: hidden; /* zabrání scrollu tady */
+}
+app-information {
+    display: flex;
 }
 
 // DIALOG BORDER RADIUS

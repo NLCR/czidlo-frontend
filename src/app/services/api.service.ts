@@ -7,9 +7,15 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({ providedIn: 'root' })
 export class ApiService {
     private apiUrl: string;
+    private infoUrl: string;
+    private rulesUrl: string;
 
     constructor(private http: HttpClient) {
         this.apiUrl = staticEnv.czidloApiServiceBaseUrl || 'http://localhost:3000/api'; // Defaultní hodnota
+        this.infoUrl =
+            staticEnv.czidloApiServiceInfoUrl || 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Informace.md'; // Defaultní hodnota
+        this.rulesUrl =
+            staticEnv.czidloApiServiceRulesUrl || 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Pravidla.md'; // Defaultní hodnota
         console.log('API URL:', this.apiUrl);
     }
 
@@ -58,5 +64,11 @@ export class ApiService {
     cancelProcess(id: string): Observable<any> {
         const url = `${this.apiUrl}/processes/${id}/cancel`;
         return this.http.post(url, {}).pipe(catchError(this.handleError));
+    }
+    getInfo(): Observable<any> {
+        return this.http.get(this.infoUrl, { responseType: 'text' });
+    }
+    getRules(): Observable<any> {
+        return this.http.get(this.rulesUrl, { responseType: 'text' });
     }
 }

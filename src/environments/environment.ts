@@ -8,5 +8,7 @@ export const environment = {
     environmentCode: 'd_d', // pro produkci ziskej z promenne APP_ENV_CODE (přes env.json)
 
     czidloApiServiceBaseUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_API_SERVICE_URL (přes env.json)
-        
+    czidloApiServiceInfoUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_API_SERVICE_INFO_URL (přes env.json)
+    czidloApiServiceRulesUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_API_SERVICE_LOG_URL (přes env.json)
+
 }

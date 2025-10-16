@@ -5,4 +5,19 @@
     align-items: flex-start;
     gap: 40px;
     flex: 1 0 0;
+    .app-info-part {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        align-self: stretch;
+        &.app-scrollable {
+            overflow-y: auto;
+        }
+        .app-nav-container {
+            display: flex;
+            align-items: flex-start;
+            align-self: stretch;
+        }
+    }
 }

@@ -15,6 +15,7 @@ import { UsersComponent } from './body/users/users.component';
 const routes: Routes = [
     { path: '', component: BodyComponent },
     { path: 'information', component: InformationComponent },
+    { path: 'information/:tab', component: InformationComponent },
     { path: 'registrators', component: RegistratorsComponent },
     { path: 'rules', component: RulesComponent },
     { path: 'search', component: SearchComponent },
