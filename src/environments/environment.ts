@@ -14,6 +14,10 @@ export const environment = {
     //TODO: presunout do konfigurace
     pageInfoCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Informace.md',
     pageRulesCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Pravidla.md',
-    
+    pageContactsCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Kontakty.md',
 
+    pageInfoEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Information.md',
+    pageRulesEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Rules.md',
+    pageContactsEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Contacts.md',
+    
 }

@@ -25,6 +25,14 @@ export class AppComponent {
 
             czidloApiServiceBaseUrl: this.envService.get('czidloApiServiceBaseUrl'),
 
+            pageInfoCzUrl: this.envService.get('pageInfoCzUrl'),
+            pageRulesCzUrl: this.envService.get('pageRulesCzUrl'),
+            pageContactsCzUrl: this.envService.get('pageContactsCzUrl'),
+
+            pageInfoEnUrl: this.envService.get('pageInfoEnUrl'),
+            pageRulesEnUrl: this.envService.get('pageRulesEnUrl'),
+            pageContactsEnUrl: this.envService.get('pageContactsEnUrl'),
+
             gitCommitHash: this.envService.get('git_commit_hash'),
             gitTag: this.envService.get('git_tag'),
             buildDate: this.envService.get('build_date'),

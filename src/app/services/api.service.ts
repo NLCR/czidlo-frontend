@@ -7,13 +7,24 @@ import { EnvironmentService } from './environment.service';
 @Injectable({ providedIn: 'root' })
 export class ApiService {
     private apiUrl: string;
-    private infoUrl: string;
-    private rulesUrl: string;
+    private infoUrlCz: string; //cz info
+    private rulesUrlCz: string; //cz rules
+    private contactsUrlCz: string; //cz contacts
+    private infoUrlEn: string; //en info
+    private rulesUrlEn: string; //en rules
+    private contactsUrlEn: string; //en contacts
 
     constructor(private http: HttpClient, private envService: EnvironmentService) {
         this.apiUrl = this.envService.get('czidloApiServiceBaseUrl')
-        this.infoUrl=  this.envService.get('pageInfoCzUrl');
-        this.rulesUrl= this.envService.get('pageRulesCzUrl');
+
+        this.infoUrlCz = this.envService.get('pageInfoCzUrl');//cz info
+        this.rulesUrlCz = this.envService.get('pageRulesCzUrl');//cz rules
+        this.contactsUrlCz = this.envService.get('pageContactsCzUrl');//cz contacts
+
+        this.infoUrlEn = this.envService.get('pageInfoEnUrl');//en info
+        this.rulesUrlEn = this.envService.get('pageRulesEnUrl');//en rules
+        this.contactsUrlEn = this.envService.get('pageContactsEnUrl');//en contacts
+
         console.log('API URL:', this.apiUrl);
     }
 
@@ -64,9 +75,9 @@ export class ApiService {
         return this.http.post(url, {}).pipe(catchError(this.handleError));
     }
     getInfo(): Observable<any> {
-        return this.http.get(this.infoUrl, { responseType: 'text' });
+        return this.http.get(this.infoUrlCz, { responseType: 'text' });
     }
     getRules(): Observable<any> {
-        return this.http.get(this.rulesUrl, { responseType: 'text' });
+        return this.http.get(this.rulesUrlCz, { responseType: 'text' });
     }
 }
