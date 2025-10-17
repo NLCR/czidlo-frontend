@@ -19,5 +19,13 @@ export const environment = {
     pageInfoEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Information.md',
     pageRulesEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Rules.md',
     pageContactsEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Contacts.md',
+
+    pageEditInfoCzUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Informace.md',
+    pageEditRulesCzUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Pravidla.md',
+    pageEditContactsCzUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Kontakty.md',
+
+    pageEditInfoEnUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Information.md',
+    pageEditRulesEnUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Rules.md',
+    pageEditContactsEnUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Contacts.md',
     
 }

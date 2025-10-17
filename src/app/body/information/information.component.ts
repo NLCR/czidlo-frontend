@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { marked } from 'marked'; // nainstalujeme níže
+import { EnvironmentService } from '../../services/environment.service';
 
 @Component({
     selector: 'app-information',
@@ -15,7 +16,7 @@ export class InformationComponent {
     htmlContent: any = '';
     loggedIn: boolean = true;
 
-    constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService) {}
+    constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService, private envService: EnvironmentService) { }
 
     ngOnInit() {
         this.route.url.subscribe((url) => {
@@ -48,10 +49,13 @@ export class InformationComponent {
     editInfo(active: any) {
         console.log('Editace:', active);
         if (active === 'info') {
-            window.open('https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Informace.md');
+            window.open(this.envService.get('pageEditInfoCzUrl'));
         }
         if (active === 'rules') {
-            window.open('https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Pravidla.md');
+            window.open(this.envService.get('pageEditRulesCzUrl'));
+        }
+        if (active === 'contact') {
+            window.open(this.envService.get('pageEditContactsCzUrl'));
         }
     }
 }
