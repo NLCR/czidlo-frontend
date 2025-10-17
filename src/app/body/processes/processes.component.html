@@ -96,7 +96,7 @@
                                 size="s"
                                 [icon]="true"
                                 iconLeft="download-blue.svg"
-                                (click)="downloadOutput(process); $event.stopPropagation()"
+                                (click)="downloadProcessOutput(process.id); $event.stopPropagation()"
                             ></app-button>
                             <app-button
                                 *ngIf="

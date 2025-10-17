@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError, delay, tap } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { EnvironmentService } from './environment.service';
 
 @Injectable({ providedIn: 'root' })
@@ -15,21 +15,21 @@ export class ApiService {
     private contactsUrlEn: string; //en contacts
 
     constructor(private http: HttpClient, private envService: EnvironmentService) {
-        this.apiUrl = this.envService.get('czidloApiServiceBaseUrl')
+        this.apiUrl = this.envService.get('czidloApiServiceBaseUrl');
 
-        this.infoUrlCz = this.envService.get('pageInfoCzUrl');//cz info
-        this.rulesUrlCz = this.envService.get('pageRulesCzUrl');//cz rules
-        this.contactsUrlCz = this.envService.get('pageContactsCzUrl');//cz contacts
+        this.infoUrlCz = this.envService.get('pageInfoCzUrl'); //cz info
+        this.rulesUrlCz = this.envService.get('pageRulesCzUrl'); //cz rules
+        this.contactsUrlCz = this.envService.get('pageContactsCzUrl'); //cz contacts
 
-        this.infoUrlEn = this.envService.get('pageInfoEnUrl');//en info
-        this.rulesUrlEn = this.envService.get('pageRulesEnUrl');//en rules
-        this.contactsUrlEn = this.envService.get('pageContactsEnUrl');//en contacts
+        this.infoUrlEn = this.envService.get('pageInfoEnUrl'); //en info
+        this.rulesUrlEn = this.envService.get('pageRulesEnUrl'); //en rules
+        this.contactsUrlEn = this.envService.get('pageContactsEnUrl'); //en contacts
 
         console.log('API URL:', this.apiUrl);
     }
 
-    doGet(url: string): Observable<Object> {
-        return this.http.get(encodeURI(url)).pipe(catchError(this.handleError));
+    doGet(url: string, options: any = {}): Observable<Object> {
+        return this.http.get(encodeURI(url), options).pipe(catchError(this.handleError));
     }
 
     private handleError(error: Response) {
@@ -56,12 +56,29 @@ export class ApiService {
     }
     getProcessLog(id: string): Observable<any> {
         const url = `${this.apiUrl}/processes/${id}/log`;
-        return this.doGet(url);
+        return this.doGet(url, { responseType: 'text' });
     }
-    getProcessOutput(id: string): Observable<any> {
+    getProcessOutput(id: string): Observable<HttpResponse<Blob>> {
         const url = `${this.apiUrl}/processes/${id}/output`;
-        return this.doGet(url);
+        return this.http
+            .get(url, {
+                responseType: 'blob', // chceme binární data (CSV)
+                observe: 'response', // potřebujeme hlavičky
+            })
+            .pipe(catchError(this.handleError));
     }
+
+    // ✅ univerzální metoda pro stahování souborů
+    downloadFile(endpoint: string): Observable<HttpResponse<Blob>> {
+        const url = `${this.apiUrl}/${endpoint}`;
+        return this.http
+            .get(url, {
+                responseType: 'blob',
+                observe: 'response',
+            })
+            .pipe(catchError(this.handleError));
+    }
+
     deleteProcess(id: string): Observable<any> {
         const url = `${this.apiUrl}/processes/${id}`;
         return this.http.delete(url).pipe(catchError(this.handleError));

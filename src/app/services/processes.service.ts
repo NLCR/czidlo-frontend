@@ -8,7 +8,16 @@ import { ApiService } from './api.service';
 export class ProcessesService {
     public processes = signal<Array<any>>([]);
     public registrators = signal<Array<string>>(['aba001', 'aba004', 'aba006', 'aba007']);
-    public intellectualEntities = signal<Array<string>>(['MONOGRAPH', 'MONOGRAPH_VOLUME', 'PERIODICAL', 'PERIODICAL_VOLUME', 'PERIODICAL_ISSUE', 'THESIS', 'ANALYTICAL', 'OTHER']);
+    public intellectualEntities = signal<Array<string>>([
+        'MONOGRAPH',
+        'MONOGRAPH_VOLUME',
+        'PERIODICAL',
+        'PERIODICAL_VOLUME',
+        'PERIODICAL_ISSUE',
+        'THESIS',
+        'ANALYTICAL',
+        'OTHER',
+    ]);
     public identifiers = signal<Array<string>>(['CNB', 'ISSN', 'ISBN']);
 
     constructor(private apiService: ApiService) {}
@@ -19,32 +28,33 @@ export class ProcessesService {
                 next: (data) => {
                     console.log('Processes data received:', data);
                     this.processes.set(
-                    data.items.map((item: any) => ({
-                        id: item.id,
-                        type: item.type,
-                        ownerLogin: item.ownerLogin,
-                        state: item.state,
-                        scheduled: item.scheduled ? new Date(item.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                        started: item.started ? new Date(item.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                        finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                        duration: item.finished
-                            ? Math.round(
-                                  (new Date(item.finished.replace(/\[UTC\]$/, '')).getTime() -
-                                      new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) /
-                                      1000
-                              ) + ' s'
-                            : '---',
-                    }))
-                );
-                console.log('Processes loaded:', this.processes());
-            },
-            error: (error) => {
-                console.error('Error loading processes:', error);
-            },
-            complete: () => {
-                console.log('Process loading complete');
-            },
-        }));
+                        data.items.map((item: any) => ({
+                            id: item.id,
+                            type: item.type,
+                            ownerLogin: item.ownerLogin,
+                            state: item.state,
+                            scheduled: item.scheduled ? new Date(item.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                            started: item.started ? new Date(item.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                            finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                            duration: item.finished
+                                ? Math.round(
+                                      (new Date(item.finished.replace(/\[UTC\]$/, '')).getTime() -
+                                          new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) /
+                                          1000
+                                  ) + ' s'
+                                : '---',
+                        }))
+                    );
+                    console.log('Processes loaded:', this.processes());
+                },
+                error: (error) => {
+                    console.error('Error loading processes:', error);
+                },
+                complete: () => {
+                    console.log('Process loading complete');
+                },
+            })
+        );
     }
 
     getProcess(id: string): Observable<any> {
@@ -56,7 +66,7 @@ export class ProcessesService {
     }
 
     getOutput(id: string): Observable<any> {
-        return this.apiService.getProcessOutput(id);
+        return this.apiService.downloadFile(`processes/${id}/output`);
     }
 
     getProcessesByOwner(owner: string): Observable<any> {
@@ -70,32 +80,33 @@ export class ProcessesService {
                         return;
                     }
                     this.processes.set(
-                    data.map((item: any) => ({
-                        id: item.id,
-                        type: item.type,
-                        ownerLogin: item.ownerLogin,
-                        state: item.state,
-                        scheduled: item.scheduled ? new Date(item.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                        started: item.started ? new Date(item.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                        finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                        duration: item.finished
-                            ? Math.round(
-                                  (new Date(item.finished.replace(/\[UTC\]$/, '')).getTime() -
-                                      new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) /
-                                      1000
-                              ) + ' s'
-                            : '---',
-                    }))
-                );
-                console.log(`Processes for owner ${owner} loaded:`, this.processes());
-            },
-            error: (error) => {
-                console.error(`Error loading processes for owner ${owner}:`, error);
-            },
-            complete: () => {
-                console.log(`Process loading for owner ${owner} complete`);
-            },
-        }));
+                        data.map((item: any) => ({
+                            id: item.id,
+                            type: item.type,
+                            ownerLogin: item.ownerLogin,
+                            state: item.state,
+                            scheduled: item.scheduled ? new Date(item.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                            started: item.started ? new Date(item.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                            finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                            duration: item.finished
+                                ? Math.round(
+                                      (new Date(item.finished.replace(/\[UTC\]$/, '')).getTime() -
+                                          new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) /
+                                          1000
+                                  ) + ' s'
+                                : '---',
+                        }))
+                    );
+                    console.log(`Processes for owner ${owner} loaded:`, this.processes());
+                },
+                error: (error) => {
+                    console.error(`Error loading processes for owner ${owner}:`, error);
+                },
+                complete: () => {
+                    console.log(`Process loading for owner ${owner} complete`);
+                },
+            })
+        );
     }
 
     deleteProcess(id: string): Observable<any> {
@@ -144,5 +155,4 @@ export class ProcessesService {
             })
         );
     }
-
 }

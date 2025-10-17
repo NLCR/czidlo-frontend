@@ -6,6 +6,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 import { FormControl } from '@angular/forms';
+import { switchMap, catchError, map } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-processes',
@@ -115,28 +117,74 @@ export class ProcessesComponent {
     }
 
     loadProcessDetails(id: string) {
-        this.processesService.getProcess(id).subscribe({
-            next: (data) => {
-                console.log('Process details loaded:', data);
-                this.processesService.getLog(id).subscribe({
-                    next: (logData) => {
-                        console.log('Process log loaded:', logData);
-                        data.log = logData;
-                    },
-                    error: (error) => {
-                        console.error('Error loading process log:', error);
-                        data.log = error || 'Error loading log';
-                    },
-                });
-                this.activeProcess = data;
-                this.isSidebarOpen.set(true);
-            },
-        });
+        this.processesService
+            .getProcess(id)
+            .pipe(
+                switchMap((data) =>
+                    this.processesService.getLog(id).pipe(
+                        map((logData) => ({ ...data, log: logData })),
+                        catchError((error) => of({ ...data, log: error || 'Error loading log' }))
+                    )
+                )
+            )
+            .subscribe({
+                next: (combinedData) => {
+                    console.log('Process + log loaded:', combinedData);
+                    this.activeProcess = combinedData;
+                    this.isSidebarOpen.set(true);
+                },
+                error: (error) => {
+                    console.error('Error loading process details:', error);
+                },
+            });
     }
 
-    downloadOutput(process: any) {
-        console.log('Downloading output for process:', process);
-        return this.processesService.getOutput(process.id);
+    // downloadOutput(process: any) {
+    //     console.log('Downloading output for process:', process);
+    //     return this.processesService.getOutput(process.id).subscribe({
+    //         next: (data) => {
+    //             const jsonStr = JSON.stringify(data, null, 2);
+    //             const blob = new Blob([jsonStr], { type: 'application/json' });
+    //             const url = URL.createObjectURL(blob);
+
+    //             // otevře v novém okně
+    //             window.open(url, '_blank');
+    //         },
+    //         error: (error) => {
+    //             console.error('Error downloading output:', error);
+    //         },
+    //     });
+    // }
+
+    downloadProcessOutput(id: string) {
+        this.processesService.getOutput(id).subscribe({
+            next: (response) => {
+                // Název souboru z hlavičky
+                const contentDisposition = response.headers.get('content-disposition');
+                let filename = 'download';
+
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename="?([^"]+)"?/);
+                    if (match) filename = match[1];
+                }
+
+                // Blob a odkaz pro stažení
+                const blob = new Blob([response.body!], { type: response.body!.type || 'application/octet-stream' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                console.log(`File downloaded: ${filename}`);
+            },
+            error: (err) => {
+                console.error('Error downloading file:', err);
+            },
+        });
     }
 
     openSidebar(process: any) {
@@ -305,7 +353,6 @@ export class ProcessesComponent {
             console.log('With identifiers:', identifiers);
             console.log('With state:', this.selectedState);
             console.log('With includeCount:', this.selectedIncludeCount);
-
         }
         if (activeProcess === 'DI_URL_AVAILABILITY_CHECK') {
             console.log('Planning DI_URL_AVAILABILITY_CHECK process...');
