@@ -3,6 +3,7 @@ import { environment as staticEnv } from '../../environments/environment';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError, delay, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { EnvironmentService } from './environment.service';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -10,12 +11,11 @@ export class ApiService {
     private infoUrl: string;
     private rulesUrl: string;
 
-    constructor(private http: HttpClient) {
-        this.apiUrl = staticEnv.czidloApiServiceBaseUrl || 'http://localhost:3000/api'; // Defaultní hodnota
-        this.infoUrl =
-            staticEnv.czidloApiServiceInfoUrl || 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Informace.md'; // Defaultní hodnota
-        this.rulesUrl =
-            staticEnv.czidloApiServiceRulesUrl || 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Pravidla.md'; // Defaultní hodnota
+    constructor(private http: HttpClient, private envService: EnvironmentService) {
+        this.apiUrl = this.envService.get('czidloApiServiceBaseUrl')
+        //staticEnv.czidloApiServiceBaseUrl || 'http://localhost:3000/api'; // Defaultní hodnota
+        this.infoUrl =  'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Informace.md'; // Defaultní hodnota
+        this.rulesUrl ='https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Pravidla.md'; // Defaultní hodnota
         console.log('API URL:', this.apiUrl);
     }
 
