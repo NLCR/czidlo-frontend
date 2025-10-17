@@ -11,4 +11,9 @@ export const environment = {
     czidloApiServiceInfoUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_API_SERVICE_INFO_URL (přes env.json)
     czidloApiServiceRulesUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_API_SERVICE_LOG_URL (přes env.json)
 
+    //TODO: presunout do konfigurace
+    pageInfoCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Informace.md',
+    pageRulesCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Pravidla.md',
+    
+
 }
