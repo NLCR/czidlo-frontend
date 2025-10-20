@@ -97,4 +97,7 @@ export class ApiService {
     getRules(): Observable<any> {
         return this.http.get(this.rulesUrlCz, { responseType: 'text' });
     }
+    getContact(): Observable<any> {
+        return this.http.get(this.contactsUrlCz, { responseType: 'text' });
+    }
 }

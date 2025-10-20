@@ -1,0 +1,53 @@
+<div class="app-dialog app-login-dialog">
+    <div class="app-dialog-header">
+        <div class="app-dialog-title">
+            {{ 'users.login.title' | translate }}
+        </div>
+        <div class="app-close" (click)="onCancel()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M0.46967 0.46967C0.762563 0.176777 1.23744 0.176777 1.53033 0.46967L7 5.93934L12.4697 0.46967C12.7626 0.176777 13.2374 0.176777 13.5303 0.46967C13.8232 0.762563 13.8232 1.23744 13.5303 1.53033L8.06066 7L13.5303 12.4697C13.8232 12.7626 13.8232 13.2374 13.5303 13.5303C13.2374 13.8232 12.7626 13.8232 12.4697 13.5303L7 8.06066L1.53033 13.5303C1.23744 13.8232 0.762563 13.8232 0.46967 13.5303C0.176777 13.2374 0.176777 12.7626 0.46967 12.4697L5.93934 7L0.46967 1.53033C0.176777 1.23744 0.176777 0.762563 0.46967 0.46967Z"
+                    fill="#4C6580"
+                />
+                <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M0.46967 0.46967C0.762563 0.176777 1.23744 0.176777 1.53033 0.46967L7 5.93934L12.4697 0.46967C12.7626 0.176777 13.2374 0.176777 13.5303 0.46967C13.8232 0.762563 13.8232 1.23744 13.5303 1.53033L8.06066 7L13.5303 12.4697C13.8232 12.7626 13.8232 13.2374 13.5303 13.5303C13.2374 13.8232 12.7626 13.8232 12.4697 13.5303L7 8.06066L1.53033 13.5303C1.23744 13.8232 0.762563 13.8232 0.46967 13.5303C0.176777 13.2374 0.176777 12.7626 0.46967 12.4697L5.93934 7L0.46967 1.53033C0.176777 1.23744 0.176777 0.762563 0.46967 0.46967Z"
+                    fill="#4C6580"
+                />
+            </svg>
+        </div>
+    </div>
+    <div class="app-dialog-body">
+        <div class="app-part-content">
+            <div class="app-base-input-label">{{ 'users.login.username' | translate }}</div>
+            <div class="app-base-input app-login-input">
+                <mat-form-field appearance="outline">
+                    <input matInput [(ngModel)]="username" />
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="app-part-content">
+            <div class="app-base-input-label">{{ 'users.login.password' | translate }}</div>
+            <div class="app-base-input app-login-input">
+                <mat-form-field appearance="outline">
+                    <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password"  />
+                    <img *ngIf="!showPassword" (click)="showPassword = true" matSuffix src="assets/icons/eye-not.svg" width="16" height="16" padding="16px" />
+                    <img *ngIf="showPassword" (click)="showPassword = false" matSuffix src="assets/icons/eye.svg" width="16" height="16" padding="16px" />
+                </mat-form-field>
+            </div>
+            <div class="app-base-input-hint app-base-input-error" *ngIf="errorMessage" >{{ errorMessage | translate }}</div>
+            <div class="app-base-input-hint">{{ 'users.login.hint' | translate }} <a href="mailto:resolver-podpora@nkp.cz">resolver-podpora&#64;nkp.cz</a></div>
+        </div>
+    </div>
+    <div class="app-dialog-footer">
+        <app-button size="l" variant="tertiary" (click)="onCancel()">
+            {{ 'buttons.cancel' | translate }}
+        </app-button>
+        <app-button size="l" variant="primary" [disabled]="!username || !password" (click)="onConfirm()">
+            {{ 'users.login.login' | translate }}
+        </app-button>
+    </div>
+</div>

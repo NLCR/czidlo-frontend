@@ -27,6 +27,9 @@ body {
     --Color-Btn-Primary-Hover: #1e657b;
     --Color-Btn-Primary-Pressed: #144452;
     --Color-Btn-Primary-Text: #ffffff;
+    --Color-Btn-Primary-Disabled: #D6EEF5;
+    --Border-Btn-Primary-Disabled: #D6EEF5;
+    --Text-Btn-Primary-Disable: #FFF;
 
     --Color-Btn-Secondary: #eaf6fa;
     --Color-Btn-Secondary-Hover: #d6eef5;
@@ -89,7 +92,6 @@ input {
 
     &:focus {
         border: 1px solid var(--Color-Btn-Primary, #0080a8);
-        box-shadow: 0 0 0 3px var(--Color-Shadow-Focus, rgba(0, 128, 168, 0.3));
         outline: none;
     }
 
@@ -135,8 +137,19 @@ h4 {
     margin: 0;
 }
 
-hr {
-    display: none;
+.app-info-content {
+    hr {
+        display: none;
+    }
+    p,
+    ul,
+    li {
+        font-family: 'IBM Plex Sans';
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 28px;
+    }
 }
 .app-table {
     display: flex;
@@ -348,7 +361,7 @@ app-information {
 
 // DIALOG BORDER RADIUS
 .mat-mdc-dialog-surface {
-    border-radius: 4px;
+    border-radius: 4px !important;
 }
 
 // INPUTS
@@ -368,6 +381,20 @@ app-information {
             width: 100%;
         }
     }
+    &.app-login-input {
+        width: 364px;
+        .mat-mdc-form-field {
+            width: 100%;
+        }
+        .mat-mdc-form-field-subscript-wrapper,
+        .mat-mdc-form-field-bottom-align::before {
+            display: none;
+        }
+        img {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+    }
 }
 .app-base-input-label {
     color: var(--Text-Light, #4c6580);
@@ -377,6 +404,34 @@ app-information {
     font-style: normal;
     font-weight: 500;
     line-height: 16px; /* 114.286% */
+}
+.app-base-input-hint {
+    color: var(--Text-Secondary, #263340);
+    flex: 1 0 0;
+    /* Typesettings/S/Regular */
+    font-family: 'IBM Plex Sans';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 142.857% */
+    a {
+        color: var(--Text-Link, #0080a8);
+        /* Typesettings/S/Medium */
+        font-family: 'IBM Plex Sans';
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px;
+        text-decoration-line: underline;
+        text-decoration-style: solid;
+        text-decoration-skip-ink: none;
+        text-decoration-thickness: auto;
+        text-underline-offset: auto;
+        text-underline-position: from-font;
+    }
+    &.app-base-input-error {
+        color: #ff3a30;
+    }
 }
 
 /* Změna pozadí a zaoblení inputu */

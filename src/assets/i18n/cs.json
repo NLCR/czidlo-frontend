@@ -1,11 +1,12 @@
 {
-    "czidlo": "Čidlo",
+    "czidlo": "ČIDLO",
     "search": "Hledat",
     "actions": "Akce",
     "ID": "ID",
     "menu": {
         "logo": "ČIDLO",
-        "desc": "Český IDentifikační a LOkalizační nástroj",
+        "desc-cz": "Český systém pro IDentifikaci a LOkalizaci digitálních dokumentů českého kulturního dědictví",
+        "desc": "CZech IDentification and LOcalization tool",
         "version": "verze",
         "information": "Informace",
         "rules": "Pravidla",
@@ -23,7 +24,16 @@
     },
     "users": {
         "list-of-users": "Seznam uživatelských účtů",
-        "add-new-user": "Přidat nového uživatele"
+        "add-new-user": "Přidat nového uživatele",
+        "login": {
+            "title": "Přihlášení",
+            "username": "Uživatelské jméno",
+            "password": "Heslo",
+            "cancel": "Zavřít",
+            "login": "Přihlásit se",
+            "hint": "Zapomněli jste heslo? Obraťte se na technickou podporu:",
+            "error": "Chyba při přihlášení. Zkontrolujte uživatelské jméno a heslo."
+        }
     },
     "buttons": {
         "rights": "Práva",

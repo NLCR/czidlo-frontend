@@ -1,7 +1,21 @@
 {
-    "menu": {
+        "menu": {
         "logo": "CZIDLO",
+        "desc-cz": "Český systém pro IDentifikaci a LOkalizaci digitálních dokumentů českého kulturního dědictví",
         "desc": "CZech IDentification and LOcalization tool",
-        "version": "version"
+        "version": "version",
+        "information": "Information",
+        "rules": "Rules",
+        "searching": "Search",
+        "registrators": "Registrators",
+        "statistics": "Statistics",
+        "import-record": "Import Record",
+        "users": "User Management",
+        "processes": "Processes",
+        "logs": "Logs",
+        "login": "Log In",
+        "powered-by": "Powered by",
+        "cs": "Czech",
+        "en": "English"
     }
 }

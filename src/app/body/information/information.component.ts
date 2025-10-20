@@ -37,8 +37,10 @@ export class InformationComponent {
                     });
                 }
                 if (this.isActive === 'contact') {
-                    this.markdownText = 'Pro kontaktujte nás, prosím, použijte email:';
-                    this.htmlContent = marked.parse(this.markdownText);
+                    this.apiService.getContact().subscribe((text) => {
+                        this.markdownText = text;
+                        this.htmlContent = marked.parse(this.markdownText);
+                    });
                 }
             } else {
                 this.router.navigate(['/information', 'info']);

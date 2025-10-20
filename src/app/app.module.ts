@@ -35,6 +35,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { EnvironmentService } from './services/environment.service';
 import { ApiService } from './services/api.service';
 import { ProcessesService } from './services/processes.service';
+import { AuthService } from './services/auth.service';
 
 // LOCALE & I18N
 import { registerLocaleData } from '@angular/common';
@@ -43,6 +44,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translate/http-loader';
 import { ToggleComponent } from './shared/toggle/toggle.component';
 import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
+import { LoginDialogComponent } from './dialogs/login-dialog/login-dialog.component';
 
 // Funkce pro načtení překladových souborů
 export function HttpLoaderFactory() {
@@ -78,6 +80,7 @@ export function initializeApp(envService: EnvironmentService): () => Promise<any
         UsersComponent,
         ToggleComponent,
         ConfirmDialogComponent,
+        LoginDialogComponent,
     ],
     imports: [
         BrowserModule,
@@ -103,6 +106,7 @@ export function initializeApp(envService: EnvironmentService): () => Promise<any
         provideHttpClient(),
         ApiService,
         ProcessesService,
+        AuthService,
         {
             provide: APP_INITIALIZER,
             useFactory: initializeApp,

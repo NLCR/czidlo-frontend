@@ -1,5 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { AuthService } from '../services/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { LoginDialogComponent } from '../dialogs/login-dialog/login-dialog.component';
 
 @Component({
     selector: 'app-menu',
@@ -9,23 +12,29 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class MenuComponent {
     isLangDropdownOpen = signal(false);
-    currentLang = 'cs';
-    loggedIn = signal(true);
-    user = 'Pavla';
+    loggedIn = signal(false);
+    currentLang: string = '';
+    user = '';
     atTop = true;
     atBottom = false;
 
-    constructor(private translate: TranslateService) {
-        // this.currentLang = this.translate.getCurrentLang() || 'cs';
-        this.currentLang = 'en';
+    constructor(private translate: TranslateService, private authService: AuthService, private dialog: MatDialog) {
+        this.currentLang = this.translate.getCurrentLang() || localStorage.getItem('lang') || 'cs';
+        this.translate.use(this.currentLang);
+        console.log('CurrentLang', this.currentLang);
     }
 
     ngOnInit() {
         const savedLang = localStorage.getItem('lang');
-        console.log('savedLang', savedLang);
         if (savedLang) {
             this.currentLang = savedLang;
         }
+
+        this.user = this.authService.getUsername() || '';
+        this.authService.isLoggedIn().subscribe((loggedIn) => {
+            this.loggedIn.set(loggedIn);
+            this.user = this.authService.getUsername() || '';
+        });
     }
 
     toggleLangDropdown() {
@@ -40,11 +49,25 @@ export class MenuComponent {
         console.log(this.isLangDropdownOpen());
     }
     onLoginClick() {
-        this.loggedIn.set(true);
+        this.dialog
+            .open(LoginDialogComponent, {
+                minWidth: '600px',
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                if (result === true) {
+                    this.loggedIn.set(true);
+                    this.user = this.authService.getUsername() || '';
+                }
+            });
     }
+
     onLogoutClick() {
+        this.authService.logout();
         this.loggedIn.set(false);
+        this.user = '';
     }
+
     onScroll(menu: HTMLElement) {
         const { scrollTop, scrollHeight, clientHeight } = menu;
         this.atTop = scrollTop === 0;

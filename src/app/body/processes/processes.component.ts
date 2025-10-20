@@ -34,7 +34,7 @@ export class ProcessesComponent {
     endDateControl = new FormControl();
 
     private _snackBar = inject(MatSnackBar);
-    private _dialog = inject(MatDialog);
+    // private _dialog = inject(MatDialog);
 
     showMyProcesses = false;
 
@@ -55,7 +55,8 @@ export class ProcessesComponent {
         private processesService: ProcessesService,
         private route: ActivatedRoute,
         private router: Router,
-        private translate: TranslateService
+        private translate: TranslateService,
+        private dialog: MatDialog
     ) {}
 
     ngOnInit() {
@@ -225,7 +226,7 @@ export class ProcessesComponent {
 
     deleteProcess(process: any) {
         console.log('Deleting process:', process);
-        this._dialog
+        this.dialog
             .open(ConfirmDialogComponent, {
                 data: {
                     data: process,
@@ -252,7 +253,7 @@ export class ProcessesComponent {
     }
     killProcess(process: any) {
         console.log('Killing process:', process);
-        this._dialog
+        this.dialog
             .open(ConfirmDialogComponent, {
                 data: {
                     data: process,
@@ -279,7 +280,7 @@ export class ProcessesComponent {
     }
     cancelProcess(process: any) {
         console.log('Canceling process:', process);
-        this._dialog
+        this.dialog
             .open(ConfirmDialogComponent, {
                 data: {
                     data: process,

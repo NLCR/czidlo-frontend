@@ -46,6 +46,19 @@
         &:active {
             background-color: var(--Color-Btn-Primary-Pressed);
         }
+        &:disabled {
+            border: 1px solid var(--Border-Btn-Primary-Disabled, #D6EEF5);
+            color: var(--Text-Btn-Primary-Disable, #FFF);
+            background: var(--Color-Btn-Primary-Disabled, #D6EEF5);
+            .btn-icon-left,
+            .btn-icon-right {
+                svg {
+                    path {
+                        fill: var(--Text-Btn-Disabled, #bfccd9);
+                    }
+                }
+            }
+        }
     }
 
     &.btn-secondary {
