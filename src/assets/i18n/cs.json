@@ -3,6 +3,7 @@
     "search": "Hledat",
     "actions": "Akce",
     "ID": "ID",
+    "not-logged-in-message": "Pro přístup k této části aplikace se prosím přihlaste.",
     "menu": {
         "logo": "ČIDLO",
         "desc-cz": "Český systém pro IDentifikaci a LOkalizaci digitálních dokumentů českého kulturního dědictví",

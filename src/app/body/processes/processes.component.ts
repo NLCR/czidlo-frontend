@@ -1,4 +1,4 @@
-import { Component, signal, inject, Signal } from '@angular/core';
+import { Component, signal, inject, computed } from '@angular/core';
 import { ProcessesService } from '../../services/processes.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -8,6 +8,7 @@ import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dia
 import { FormControl } from '@angular/forms';
 import { switchMap, catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-processes',
@@ -50,13 +51,14 @@ export class ProcessesComponent {
     states = ['ALL', 'ACTIVE', 'DEACTIVATED'];
     selectedIncludeCount = true;
     includeCounts = [true, false];
-
+    loggedIn = computed(() => this.authService.loggedIn());
     constructor(
         private processesService: ProcessesService,
         private route: ActivatedRoute,
         private router: Router,
         private translate: TranslateService,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private authService: AuthService
     ) {}
 
     ngOnInit() {

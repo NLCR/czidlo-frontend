@@ -1,4 +1,12 @@
-<div class="app-processes-container">
+
+<div class="app-not-logged-in" *ngIf="!loggedIn()">
+    <div class="app-not-logged-in-content">
+        <div class="app-not-logged-in-message">
+            {{ 'not-logged-in-message' | translate }}
+        </div>
+    </div>
+</div>
+<div class="app-processes-container" *ngIf="loggedIn()">
     <div class="app-processes">
         <div class="app-tabs-header app-processes-header">
             <div class="app-tabs">

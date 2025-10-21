@@ -7,7 +7,6 @@ import { RulesComponent } from './body/rules/rules.component';
 import { SearchComponent } from './body/search/search.component';
 import { StatisticsComponent } from './body/statistics/statistics.component';
 import { ImportRecordComponent } from './body/import-record/import-record.component';
-import { AdminComponent } from './body/admin/admin.component';
 import { ProcessesComponent } from './body/processes/processes.component';
 import { LogsComponent } from './body/logs/logs.component';
 import { UsersComponent } from './body/users/users.component';
@@ -28,7 +27,7 @@ const routes: Routes = [
     { path: 'processes/:tab', component: ProcessesComponent },
     { path: 'processes/:tab/:id', component: ProcessesComponent },
     { path: 'processes/:tab/:id/:action', component: ProcessesComponent },
-    { path: 'logs', component: LogsComponent }
+    { path: 'logs', component: LogsComponent },
 ];
 
 @NgModule({

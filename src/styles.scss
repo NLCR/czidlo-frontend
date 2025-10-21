@@ -479,6 +479,17 @@ app-information {
     display: flex;
 }
 
+// NOT LOGGED IN VIEW
+.app-not-logged-in {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-direction: column;
+    color: var(--Text-Secondary, #263340);
+}
+
 // DIALOG BORDER RADIUS
 .mat-mdc-dialog-surface {
     border-radius: 4px !important;
