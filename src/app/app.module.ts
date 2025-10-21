@@ -36,6 +36,7 @@ import { EnvironmentService } from './services/environment.service';
 import { ApiService } from './services/api.service';
 import { ProcessesService } from './services/processes.service';
 import { AuthService } from './services/auth.service';
+import { RegistratorsService } from './services/registrators.service';
 
 // LOCALE & I18N
 import { registerLocaleData } from '@angular/common';
@@ -107,6 +108,7 @@ export function initializeApp(envService: EnvironmentService): () => Promise<any
         ApiService,
         ProcessesService,
         AuthService,
+        RegistratorsService,
         {
             provide: APP_INITIALIZER,
             useFactory: initializeApp,

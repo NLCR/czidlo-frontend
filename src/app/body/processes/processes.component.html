@@ -1,6 +1,6 @@
 <div class="app-processes-container">
     <div class="app-processes">
-        <div class="app-processes-header">
+        <div class="app-tabs-header app-processes-header">
             <div class="app-tabs">
                 <div class="app-tab app-tab-first" [ngClass]="{ 'app-tab-active': isActive === 'instances' }" routerLink="/processes/instances">
                     {{ 'processes.instances' | translate }}
@@ -14,7 +14,7 @@
         <!-- INSTANCES -->
         <div class="app-instances" *ngIf="isActive === 'instances'">
             <div class="app-toggle">
-                <app-toggle [disabled]="loading()" size="s" [checked]="showMyProcesses" (click)="toggleShowMyProcesses()"></app-toggle>
+                <app-toggle [disabled]="loadingProcesses()" size="s" [checked]="showMyProcesses" (click)="toggleShowMyProcesses()"></app-toggle>
                 {{ 'processes.show-my-processes' | translate }}
             </div>
             <div class="app-table app-table-instances">
@@ -47,7 +47,7 @@
                         {{ 'actions' | translate }}
                     </div>
                 </div>
-                <div class="no-processes" *ngIf="!loading() && processes().length === 0">
+                <div class="no-processes" *ngIf="!loadingProcesses() && processes().length === 0">
                     {{ 'processes.no-processes' | translate }}
                 </div>
                 <div class="app-table-body">
@@ -145,7 +145,7 @@
                         {{ 'actions' | translate }}
                     </div>
                 </div>
-                <div class="no-processes" *ngIf="!loading() && definitions().length === 0">
+                <div class="no-processes" *ngIf="!loadingProcesses() && definitions().length === 0">
                     {{ 'processes.no-definitions' | translate }}
                 </div>
                 <div class="app-table-body">

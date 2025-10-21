@@ -24,7 +24,7 @@ export class ProcessesComponent {
         { type: 'INDEXATION' },
     ]);
     isActive = 'instances';
-    loading = signal(false);
+    loadingProcesses = signal(false);
     isSidebarOpen = signal(false);
     activeProcess: any = null;
     activeDefinition: string | null = null;
@@ -77,11 +77,13 @@ export class ProcessesComponent {
             }
             // INSTANCES
             if (this.isActive === 'instances') {
+                this.loadingProcesses.set(true);
                 if (this.processesService.processes().length === 0) {
                     console.log('Loading processes...');
                     this.loadProcesses();
                 } else {
                     this.processes.set(this.processesService.processes());
+                    this.loadingProcesses.set(false);
                 }
                 if (url.length === 3) {
                     const processId = url[2]?.path;
@@ -113,6 +115,11 @@ export class ProcessesComponent {
             },
             error: (error) => {
                 console.error('Error loading processes:', error);
+                this.loadingProcesses.set(false);
+            },
+            complete: () => {
+                console.log('Processes loading complete');
+                this.loadingProcesses.set(false);
             },
         });
     }
@@ -139,23 +146,6 @@ export class ProcessesComponent {
                 },
             });
     }
-
-    // downloadOutput(process: any) {
-    //     console.log('Downloading output for process:', process);
-    //     return this.processesService.getOutput(process.id).subscribe({
-    //         next: (data) => {
-    //             const jsonStr = JSON.stringify(data, null, 2);
-    //             const blob = new Blob([jsonStr], { type: 'application/json' });
-    //             const url = URL.createObjectURL(blob);
-
-    //             // otevře v novém okně
-    //             window.open(url, '_blank');
-    //         },
-    //         error: (error) => {
-    //             console.error('Error downloading output:', error);
-    //         },
-    //     });
-    // }
 
     downloadProcessOutput(id: string) {
         this.processesService.getOutput(id).subscribe({

@@ -1,1 +1,159 @@
-<p>registrators works!</p>
+<div class="app-registrators-container">
+    <div class="app-registrators-page">
+        <div class="app-tabs-header app-registrators-header">
+            <div class="app-tabs">
+                <div
+                    class="app-tab app-tab-first"
+                    [ngClass]="{ 'app-tab-active': isActive === 'registrators' }"
+                    routerLink="/registrators/registrators"
+                >
+                    {{ 'registrators.registrators-list' | translate }}
+                </div>
+                <div class="app-tab app-tab-last" [ngClass]="{ 'app-tab-active': isActive === 'archivers' }" routerLink="/registrators/archivers">
+                    {{ 'registrators.archivers-list' | translate }}
+                </div>
+            </div>
+        </div>
+
+        <!-- REGISTRATORS -->
+
+        <div class="app-registrators" *ngIf="isActive === 'registrators'">
+            <div class="app-table app-table-registrators">
+                <!-- table header -->
+                <div class="app-row app-row-header">
+                    <div class="app-col app-col-name app-table-header-item">
+                        {{ 'registrators.name' | translate }}
+                    </div>
+                    <div class="app-col app-col-code app-table-header-item">
+                        {{ 'registrators.code' | translate }}
+                    </div>
+                    <div class="app-col app-col-actions app-table-header-item">
+                        {{ 'registrators.actions' | translate }}
+                    </div>
+                </div>
+                <!-- no registrators -->
+                <div class="no-processes" *ngIf="!loadingRegistrators() && registrators().length === 0">
+                    {{ 'registrators.no-registrators' | translate }}
+                </div>
+                <!-- table body -->
+                <div class="app-table-body">
+                    <div
+                        *ngFor="let registrator of registrators()"
+                        class="app-row app-table-row app-row-clicable"
+                        [ngClass]="{ 'app-row-active': activeRegistrator === registrator }"
+                        (click)="openSidebar(registrator)"
+                    >
+                        <div class="app-col app-col-name">{{ registrator.name }}</div>
+                        <div class="app-col app-col-code">{{ registrator.code }}</div>
+                        <div class="app-col app-col-actions">
+                            <app-button
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="trash-blue.svg"
+                                (click)="deleteRegistrator(registrator); $event.stopPropagation()"
+                            ></app-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TODO -->
+
+        <!-- ARCHIVERS -->
+
+        <div class="app-archivers" *ngIf="isActive === 'archivers'">
+            <div class="app-table app-table-archivers">
+                <!-- table header -->
+                <div class="app-row app-row-header">
+                    <div class="app-col app-col-name app-table-header-item">
+                        {{ 'registrators.name' | translate }}
+                    </div>
+                    <div class="app-col app-col-actions app-table-header-item" *ngIf="loggedIn()">
+                        {{ 'registrators.actions' | translate }}
+                    </div>
+                </div>
+                <!-- no archivers -->
+                <div class="no-records" *ngIf="!loadingArchivers() && archivers().length === 0">
+                    {{ 'registrators.no-archivers' | translate }}
+                </div>
+                <!-- table body -->
+                <div class="app-table-body">
+                    <div
+                        *ngFor="let archiver of archivers()"
+                        class="app-row app-table-row app-row-clicable"
+                        [ngClass]="{ 'app-row-active': activeArchiver === archiver }"
+                        [ngClass]="{ 'app-actions-invisible': !loggedIn() }"
+                        (click)="openSidebar(archiver)"
+                    >
+                        <div class="app-col app-col-name">{{ archiver.name }}</div>
+                        <div class="app-col app-col-code">{{ archiver.code }}</div>
+                        <div class="app-col app-col-actions" *ngIf="loggedIn()">
+                            <app-button
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="trash-blue.svg"
+                                (click)="deleteArchiver(archiver); $event.stopPropagation()"
+                            ></app-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
+    <!-- Sidebar Registrator -->
+    <div class="app-sidebar-registrator" *ngIf="activeRegistrator && isActive === 'registrators'">
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">{{ activeRegistrator?.name }}</div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+        <div class="app-sidebar-content">{{ activeRegistrator?.log | json }}</div>
+        <div class="app-sidebar-footer">
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
+                <!-- <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadProcess(activeProcess)">
+                    <span>{{ 'buttons.download' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyProcess(activeProcess)">
+                    <span>{{ 'buttons.copy' | translate }}</span>
+                </app-button> -->
+            </div>
+        </div>
+    </div>
+    <!-- Sidebar Archiver -->
+    <div class="app-sidebar-archiver" *ngIf="activeArchiver && isActive === 'archivers'">
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">{{ activeArchiver?.name }}</div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+        <div class="app-sidebar-content">{{ activeArchiver?.log | json }}</div>
+        <div class="app-sidebar-footer">
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
+                <!-- <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadProcess(activeProcess)">
+                    <span>{{ 'buttons.download' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyProcess(activeProcess)">
+                    <span>{{ 'buttons.copy' | translate }}</span>
+                </app-button> -->
+            </div>
+        </div>
+    </div>
+</div>

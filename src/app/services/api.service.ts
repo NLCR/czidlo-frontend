@@ -100,4 +100,8 @@ export class ApiService {
     getContact(): Observable<any> {
         return this.http.get(this.contactsUrlCz, { responseType: 'text' });
     }
+    getArchivers(): Observable<any> {
+        const url = `${this.apiUrl}/archivers`;
+        return this.doGet(url);
+    }
 }

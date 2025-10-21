@@ -49,6 +49,9 @@ export class MenuComponent {
         console.log(this.isLangDropdownOpen());
     }
     onLoginClick() {
+        if (this.loggedIn()) {
+            return;
+        }
         this.dialog
             .open(LoginDialogComponent, {
                 minWidth: '600px',

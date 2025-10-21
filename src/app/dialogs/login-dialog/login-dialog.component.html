@@ -33,7 +33,7 @@
             <div class="app-base-input-label">{{ 'users.login.password' | translate }}</div>
             <div class="app-base-input app-login-input">
                 <mat-form-field appearance="outline">
-                    <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password"  />
+                    <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" (keyup.enter)="onConfirm()"/>
                     <img *ngIf="!showPassword" (click)="showPassword = true" matSuffix src="assets/icons/eye-not.svg" width="16" height="16" padding="16px" />
                     <img *ngIf="showPassword" (click)="showPassword = false" matSuffix src="assets/icons/eye.svg" width="16" height="16" padding="16px" />
                 </mat-form-field>

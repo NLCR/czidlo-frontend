@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { marked } from 'marked'; // nainstalujeme níže
 import { EnvironmentService } from '../../services/environment.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-information',
@@ -14,11 +15,15 @@ export class InformationComponent {
     isActive: 'info' | 'rules' | 'contact' = 'info';
     markdownText: string = '';
     htmlContent: any = '';
-    loggedIn: boolean = true;
+    loggedIn = signal(false);
+    isLoggedIn = computed(() => this.authService.loggedIn());
 
-    constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService, private envService: EnvironmentService) { }
+    constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService, private envService: EnvironmentService, private authService: AuthService) { }
 
     ngOnInit() {
+        // this.authService.isLoggedIn().subscribe((loggedIn) => {
+        //     this.loggedIn.set(loggedIn);
+        // });
         this.route.url.subscribe((url) => {
             console.log('URL:', url);
             const tab = url[1]?.path;

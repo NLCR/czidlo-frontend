@@ -114,6 +114,16 @@
         "info": "Informace",
         "rules": "Pravidla",
         "contact": "Kontakt",
-        "edit": "Upravit"    }
+        "edit": "Upravit"
+    },
+    "registrators": {
+        "registrators-list": "Seznam registrátorů",
+        "archivers-list": "Seznam archivátorů",
+        "name": "Název",
+        "code": "Kód",
+        "actions": "Akce",
+        "no-registrators": "Žádní registrátoři",
+        "no-archivers": "Žádní archivátoři"
+    }
 
 }

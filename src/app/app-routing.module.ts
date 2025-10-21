@@ -17,6 +17,8 @@ const routes: Routes = [
     { path: 'information', component: InformationComponent },
     { path: 'information/:tab', component: InformationComponent },
     { path: 'registrators', component: RegistratorsComponent },
+    { path: 'registrators/:tab', component: RegistratorsComponent },
+    { path: 'registrators/:tab/:id', component: RegistratorsComponent },
     { path: 'rules', component: RulesComponent },
     { path: 'search', component: SearchComponent },
     { path: 'statistics', component: StatisticsComponent },
@@ -24,8 +26,8 @@ const routes: Routes = [
     { path: 'users', component: UsersComponent },
     { path: 'processes', component: ProcessesComponent },
     { path: 'processes/:tab', component: ProcessesComponent },
-    { path: 'processes/instances/:id', component: ProcessesComponent },
-    { path: 'processes/definitions/:id/:action', component: ProcessesComponent },
+    { path: 'processes/:tab/:id', component: ProcessesComponent },
+    { path: 'processes/:tab/:id/:action', component: ProcessesComponent },
     { path: 'logs', component: LogsComponent }
 ];
 

@@ -10,14 +10,14 @@
         align-items: flex-start;
         gap: 16px;
         align-self: stretch;
-        &:not(.app-info-footer, .app-scrollable) {
-            margin-bottom: 40px;
-        }
         padding: 0 16px 0px 16px;
         &.app-scrollable {
             overflow-y: auto;
             padding-bottom: 28px;
             flex: 1 0 0;
+        }
+        &.app-info-nav {
+            margin-top: 40px;
         }
         .app-nav-container {
             display: flex;
