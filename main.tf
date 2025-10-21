@@ -74,6 +74,7 @@ resource "docker_container" "czidlo_frontend" {
   count             = 1
   image             = docker_image.czidlo_frontend.image_id
   name              = var.docker_container_name
+  memory            = 256
   must_run          = true
   publish_all_ports = true
   restart           = "always" # default "no"
