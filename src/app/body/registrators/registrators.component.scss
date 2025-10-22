@@ -20,8 +20,18 @@
             padding: 0 0 0 16px;
             // IN STYLES.SCSS
         }
-        .app-table {
+        .app-registrators, .app-archivers {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
             padding: 0 0 0 16px;
+            .app-add {
+                width: 200px;
+            }
+        }
+        .app-table-registrators,
+        .app-table-archivers {
+            width: 800px;
         }
     }
 }

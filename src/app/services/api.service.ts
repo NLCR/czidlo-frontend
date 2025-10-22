@@ -91,6 +91,7 @@ export class ApiService {
         const url = `${this.apiUrl}/processes/${id}/cancel`;
         return this.http.post(url, {}).pipe(catchError(this.handleError));
     }
+    // INFO PAGES
     getInfo(): Observable<any> {
         return this.http.get(this.infoUrlCz, { responseType: 'text' });
     }
@@ -100,8 +101,25 @@ export class ApiService {
     getContact(): Observable<any> {
         return this.http.get(this.contactsUrlCz, { responseType: 'text' });
     }
+    // ARCHIVERS
     getArchivers(): Observable<any> {
         const url = `${this.apiUrl}/archivers`;
         return this.doGet(url);
+    }
+    getArchiver(id: string): Observable<any> {
+        const url = `${this.apiUrl}/archivers/${id}`;
+        return this.doGet(url);
+    }
+    deleteArchiver(id: string): Observable<any> {
+        const url = `${this.apiUrl}/archivers/${id}`;
+        return this.http.delete(url).pipe(catchError(this.handleError));
+    }
+    createArchiver(body: any): Observable<any> {
+        const url = `${this.apiUrl}/archivers`;
+        return this.http.post(url, body).pipe(catchError(this.handleError));
+    }
+    editArchiver(id: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/archivers/${id}`;
+        return this.http.put(url, body).pipe(catchError(this.handleError));
     }
 }

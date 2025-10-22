@@ -51,15 +51,21 @@
         "confirm-kill": "Ano, ukončit",
         "plan-process":"Naplánovat proces",
         "set-process": "Nastavit proces",
-        "add": "Přidat"
+        "add": "Přidat",
+        "close": "Zavřít",
+        "add-registrator": "Přidat registrátora",
+        "add-archiver": "Přidat archivátora"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
         "user-deleted": "Uživatel byl smazán",
         "copied-to-clipboard": "Zkopírováno do schránky",
-        "confirm-delete-title": "Opravdu chcete smazat proces",
+        "confirm-delete-process-title": "Opravdu chcete smazat proces",
         "confirm-cancel-title": "Opravdu chcete zrušit proces",
-        "confirm-kill-title": "Opravdu chcete ukončit proces"
+        "confirm-kill-title": "Opravdu chcete ukončit proces",
+        "confirm-delete-archiver-title": "Opravdu chcete smazat archivátora",
+        "boooooom": "Boooom! Sis to jakože smazal. Gratuluji!"
+
     },
     "processes": {
         "instances": "Instance procesů",
@@ -120,11 +126,21 @@
     "registrators": {
         "registrators-list": "Seznam registrátorů",
         "archivers-list": "Seznam archivátorů",
-        "name": "Název",
-        "code": "Kód",
+        "name": "název",
+        "Name": "Název",
+        "code": "kód",
         "actions": "Akce",
         "no-registrators": "Žádní registrátoři",
-        "no-archivers": "Žádní archivátoři"
+        "no-archivers": "Žádní archivátoři",
+        "detail": "Podrobnosti",
+        "description": "popis",
+        "Description": "Popis",
+        "created": "vloženo",
+        "modified": "naposledy změněno",
+        "id": "id",
+        "archiver": "Archivátor",
+        "add-archiver-title": "vložení nového záznamu",
+        "edit-archiver-title": "úprava záznamu"
     }
 
 }

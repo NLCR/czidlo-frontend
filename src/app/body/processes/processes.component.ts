@@ -79,15 +79,15 @@ export class ProcessesComponent {
             }
             // INSTANCES
             if (this.isActive === 'instances') {
-                this.loadingProcesses.set(true);
                 if (this.processesService.processes().length === 0) {
                     console.log('Loading processes...');
                     this.loadProcesses();
                 } else {
                     this.processes.set(this.processesService.processes());
-                    this.loadingProcesses.set(false);
+                    console.log('Processes loaded from service:', this.processes());
                 }
                 if (url.length === 3) {
+                    console.log('Loading process details...', this.processes());
                     const processId = url[2]?.path;
                     this.loadProcessDetails(processId);
                 }
@@ -113,15 +113,14 @@ export class ProcessesComponent {
     loadProcesses() {
         this.processesService.getProcesses().subscribe({
             next: () => {
+                console.log('Processes loaded:', this.processesService.processes());
                 this.processes.set(this.processesService.processes());
             },
             error: (error) => {
                 console.error('Error loading processes:', error);
-                this.loadingProcesses.set(false);
             },
             complete: () => {
                 console.log('Processes loading complete');
-                this.loadingProcesses.set(false);
             },
         });
     }
@@ -141,6 +140,7 @@ export class ProcessesComponent {
                 next: (combinedData) => {
                     console.log('Process + log loaded:', combinedData);
                     this.activeProcess = combinedData;
+                    console.log('Current processes:', this.processes());
                     this.isSidebarOpen.set(true);
                 },
                 error: (error) => {

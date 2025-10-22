@@ -62,7 +62,7 @@
                     <div
                         *ngFor="let process of processes()"
                         class="app-row app-table-row app-row-clicable"
-                        [ngClass]="{ 'app-row-active': activeProcess === process }"
+                        [ngClass]="{ 'app-row-active': activeProcess?.id.toString() === process.id.toString() }"
                         (click)="openSidebar(process)"
                     >
                         <div class="app-col app-col-40px app-table-item">

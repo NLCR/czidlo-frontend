@@ -46,6 +46,7 @@ import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translat
 import { ToggleComponent } from './shared/toggle/toggle.component';
 import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { LoginDialogComponent } from './dialogs/login-dialog/login-dialog.component';
+import { EditArchiverDialogComponent } from './dialogs/edit-archiver-dialog/edit-archiver-dialog.component';
 
 // Funkce pro načtení překladových souborů
 export function HttpLoaderFactory() {
@@ -82,6 +83,7 @@ export function initializeApp(envService: EnvironmentService): () => Promise<any
         ToggleComponent,
         ConfirmDialogComponent,
         LoginDialogComponent,
+        EditArchiverDialogComponent,
     ],
     imports: [
         BrowserModule,

@@ -11,6 +11,7 @@ export class RegistratorsService {
 
     constructor(private apiService: ApiService) {}
 
+    // ARCHIVERS
     getArchivers(): Observable<any> {
         return this.apiService.getArchivers().pipe(
             tap({
@@ -28,6 +29,45 @@ export class RegistratorsService {
             })
         );
     }
+    getArchiver(archiverId: string): Observable<any> {
+        return this.apiService.getArchiver(archiverId).pipe(
+            tap({
+                next: (data) => {
+                    console.log(`Archiver details for ID ${archiverId} received:`, data);
+                },
+                error: (error) => {
+                    console.error(`Error loading archiver details for ID ${archiverId}:`, error);
+                },
+                complete: () => {
+                    console.log(`Archiver details loading complete for ID ${archiverId}`);
+                },
+            })
+        );
+    }
+    deleteArchiver(archiverId: string): Observable<any> {
+        return this.apiService.deleteArchiver(archiverId).pipe(
+            tap({
+                next: () => {
+                    console.log(`Archiver with ID ${archiverId} deleted successfully`);
+                },
+                error: (error) => {
+                    console.error(`Error deleting archiver with ID ${archiverId}:`, error);
+                },
+                complete: () => {
+                    console.log(`Archiver deletion complete for ID ${archiverId}`);
+                },
+            })
+        );
+    }
+    createArchiver(body: any): Observable<any> {
+        return this.apiService.createArchiver(body);
+    }
+    editArchiver(id: string, body: any): Observable<any> {
+        return this.apiService.editArchiver(id, body);
+    }
+
+    // REGISTRATORS
+
     getRegistrators(): Observable<any> {
         // Implement similarly to getArchivers if needed
         return of([]);
