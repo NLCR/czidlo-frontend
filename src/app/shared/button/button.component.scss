@@ -59,6 +59,17 @@
                 }
             }
         }
+        &.btn-warning {
+            background-color: var(--Color-Btn-Warning, #d93025);
+            border: 1px solid var(--Color-Btn-Warning);
+            &:hover {
+                background-color: var(--Color-Btn-Warning-Hover, #b1271b);
+                border: 1px solid var(--Color-Btn-Warning-Hover);
+            }
+            &:active {
+                background-color: var(--Color-Btn-Warning-Pressed, #8c1b15);
+            }
+        }
     }
 
     &.btn-secondary {

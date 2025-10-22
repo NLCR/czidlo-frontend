@@ -61,8 +61,8 @@
         "user-deleted": "Uživatel byl smazán",
         "copied-to-clipboard": "Zkopírováno do schránky",
         "confirm-delete-process-title": "Opravdu chcete smazat proces",
-        "confirm-cancel-title": "Opravdu chcete zrušit proces",
-        "confirm-kill-title": "Opravdu chcete ukončit proces",
+        "confirm-cancel-process-title": "Opravdu chcete zrušit proces",
+        "confirm-kill-process-title": "Opravdu chcete ukončit proces",
         "confirm-delete-archiver-title": "Opravdu chcete smazat archivátora",
         "boooooom": "Boooom! Sis to jakože smazal. Gratuluji!"
 

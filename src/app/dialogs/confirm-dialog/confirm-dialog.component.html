@@ -29,8 +29,11 @@
         <app-button size="l" variant="tertiary" (click)="onCancel()">
             {{ 'buttons.cancel' | translate }}
         </app-button>
-        <app-button size="l" variant="primary" (click)="onConfirm()">
+        <app-button *ngIf="data.confirm" size="l" variant="primary" (click)="onConfirm()">
             {{ data.confirm | translate}}
+        </app-button>
+        <app-button *ngIf="data.warning" size="l" variant="primary" [warning]="true" (click)="onConfirm()">
+            {{ data.warning | translate}}
         </app-button>
     </div>
 </div>

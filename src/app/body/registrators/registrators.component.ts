@@ -93,6 +93,8 @@ export class RegistratorsComponent {
     loadArchiverDetails(archiverId: any): void {
         this.registratorsService.getArchiver(archiverId).subscribe({
             next: (data) => {
+                data.created = data.created ? new Date(data.created.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
+                data.modified = data.modified ? new Date(data.modified.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
                 this.activeArchiver = data;
                 this.isSidebarOpen.set(true);
             },
@@ -138,7 +140,7 @@ export class RegistratorsComponent {
                 data: {
                     data: archiver,
                     title: this.translate.instant('messages.confirm-delete-archiver-title', { name: archiver.name }),
-                    confirm: this.translate.instant('buttons.confirm-delete'),
+                    warning: this.translate.instant('buttons.confirm-delete'),
                     // message: this.translate.instant('messages.confirm-delete-message', { name: archiver.name }),
                 },
                 maxWidth: '800px',
