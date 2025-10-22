@@ -132,7 +132,7 @@ export class ProcessesComponent {
                 switchMap((data) =>
                     this.processesService.getLog(id).pipe(
                         map((logData) => ({ ...data, log: logData })),
-                        catchError((error) => of({ ...data, log: error || 'Error loading log' }))
+                        catchError((error) => of({ ...data, logError: error || 'Error loading log' }))
                     )
                 )
             )
@@ -192,8 +192,8 @@ export class ProcessesComponent {
         this.isSidebarOpen.set(false);
     }
 
-    downloadProcess(process: any) {
-        console.log('Downloading process:', process);
+    downloadLog(process: any) {
+        console.log('Downloading process log:', process);
         const jsonStr = JSON.stringify(process, null, 2);
         const blob = new Blob([jsonStr], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -202,9 +202,9 @@ export class ProcessesComponent {
         window.open(url, '_blank');
     }
 
-    copyProcess(process: any) {
-        console.log('Copying process:', process);
-        const jsonStr = JSON.stringify(process, null, 2);
+    copyLog(process: any) {
+        console.log('Copying process log:', process);
+        const jsonStr = JSON.stringify(process.log, null, 2);
         navigator.clipboard
             .writeText(jsonStr)
             .then(() => {
@@ -371,5 +371,16 @@ export class ProcessesComponent {
 
     setProcess(activeProcess: any) {
         console.log('Setting process:', activeProcess);
+    }
+    displayLogError(process: any) {
+        if (process) {
+           console.log('Displaying log error for process:', process);
+           if (process.state === 'SCHEDULED') {
+               return this.translate.instant('processes.log-scheduled');
+           } else {
+               return 'stav: ' + process.state;
+           }
+
+        }
     }
 }

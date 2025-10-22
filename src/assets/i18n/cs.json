@@ -109,7 +109,8 @@
         "ACTIVE": "Aktivní",
         "DEACTIVATED": "Deaktivované",
         "true": "Ano",
-        "false": "Ne"
+        "false": "Ne",
+        "log-scheduled": "Naplánované procesy neobsahují logy."
     },
     "definitions": {
         "OAI_ADAPTER": "OAI adapter",

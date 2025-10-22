@@ -1,4 +1,3 @@
-
 <div class="app-not-logged-in" *ngIf="!loggedIn()">
     <div class="app-not-logged-in-content">
         <div class="app-not-logged-in-message">
@@ -204,16 +203,21 @@
                 <img src="assets/icons/close.svg" />
             </div>
         </div>
-        <div class="app-sidebar-content">{{ activeProcess.log | json }}</div>
+        <div class="app-sidebar-content" *ngIf="activeProcess?.log">{{ activeProcess.log | json }}</div>
+        <div class="app-sidebar-content" *ngIf="activeProcess?.logError">
+            <div class="app-base-input-hint app-base-input-error">
+                error: {{ activeProcess.logError | translate }} ({{ displayLogError(activeProcess) | translate }})
+            </div>
+        </div>
         <div class="app-sidebar-footer">
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadProcess(activeProcess)">
+                <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadLog(activeProcess)">
                     <span>{{ 'buttons.download' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyProcess(activeProcess)">
+                <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyLog(activeProcess)">
                     <span>{{ 'buttons.copy' | translate }}</span>
                 </app-button>
             </div>
