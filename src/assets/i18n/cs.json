@@ -64,8 +64,21 @@
         "confirm-cancel-process-title": "Opravdu chcete zrušit proces",
         "confirm-kill-process-title": "Opravdu chcete ukončit proces",
         "confirm-delete-archiver-title": "Opravdu chcete smazat archivátora",
-        "boooooom": "Boooom! Sis to jakože smazal. Gratuluji!"
+        "boooooom": "Boooom! Sis to jakože smazal. Gratuluji!",
+        "required-date": "Povinné datum",
+        "invalid-date": "Neplatné datum",
+        "required-field": "Povinné pole",
+        "process-planned-successfully": "Proces byl úspěšně naplánován",
+        "process-set-successfully": "Proces byl úspěšně nastaven",
+        "error-planning-process": "Chyba při plánování procesu"
 
+    },
+    "inputs": {
+        "pick-start-date": "Vyberte od",
+        "pick-end-date": "Vyberte do",
+        "select-registrator": "Vyberte registrátora",
+        "select-entity": "Vyberte entitu",
+        "selected-items": "Vybrané položky"
     },
     "processes": {
         "instances": "Instance procesů",

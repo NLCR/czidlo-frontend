@@ -83,8 +83,8 @@ export class ApiService {
         const url = `${this.apiUrl}/processes/${id}`;
         return this.http.delete(url).pipe(catchError(this.handleError));
     }
-    createProcess(type: string, body: any): Observable<any> {
-        const url = `${this.apiUrl}/processes/${type}`;
+    createProcess(body: any): Observable<any> {
+        const url = `${this.apiUrl}/processes/`;
         return this.http.post(url, body).pipe(catchError(this.handleError));
     }
     cancelProcess(id: string): Observable<any> {

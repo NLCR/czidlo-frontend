@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
 
 html,
 body {
@@ -101,7 +102,7 @@ input {
 }
 
 textarea {
-    border: 1px solid var(--Boarder-Primary-Default, #BFCCD9);
+    border: 1px solid var(--Boarder-Primary-Default, #bfccd9);
     background: var(--BG-Main-Base, #fff);
 
     &:focus {
@@ -410,6 +411,7 @@ h4 {
 }
 .app-sidebar-content {
     display: flex;
+    // width: 100%;
     padding: 0 24px 24px 24px;
     flex-direction: column;
     align-items: flex-start;
@@ -424,8 +426,12 @@ h4 {
     font-weight: 400;
     line-height: 24px; /* 150% */
     overflow: auto;
+    .app-sidebar-content-item {
+        font-size: 14px;
+    }
     .app-part {
         display: flex;
+        width: 100%;
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
@@ -453,12 +459,17 @@ h4 {
         }
         .app-part-content {
             display: flex;
+            flex: 1;
+            width: 100%;
             flex-direction: column;
             align-items: flex-start;
             gap: 8px;
             .app-datepicker-container {
                 display: flex;
                 gap: 16px;
+                .app-datepicker-spacer {
+                    margin-top: 12px;
+                }
             }
             .app-radio-group {
                 display: flex;
@@ -558,7 +569,52 @@ app-information {
 // INPUTS
 .app-base-input-container {
     display: flex;
+    flex: 1;
+    width: 100%;
     gap: 8px;
+    .app-selected-items {
+        display: flex;
+        padding: 8px;
+        margin: 24px 0;
+        align-items: center;
+        align-content: center;
+        gap: 8px;
+        flex: 1 0 0;
+        align-self: stretch;
+        flex-wrap: wrap;
+        border-radius: 4px;
+        background: var(--BG-Main-Light, #f6f7f9);
+        .app-selected-item {
+            display: flex;
+            padding: var(--Spacing-x1, 4px) var(--Spacing-x3, 12px);
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border-radius: var(--Spacing-x1, 4px);
+            border: 1px solid var(--Boarder-Bright, #dfe5ec);
+            background: var(--BG-Main-Base, #fff);
+            color: var(--Text-Base, #0a0d10);
+            /* Typesettings/M/Regular */
+            font-family: 'IBM Plex Sans';
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 24px; /* 150% */
+            .app-selected-item-remove {
+                display: flex;
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+
+            img {
+                width: 20px;
+                height: 20px;
+                align-self: stretch;
+                cursor: pointer;
+            }
+        }
+    }
 }
 .app-base-input {
     display: flex;
@@ -567,7 +623,7 @@ app-information {
     gap: 8px;
     align-self: stretch;
     &.app-multiselect {
-        width: 300px;
+        width: 212px;
         .mat-mdc-form-field {
             width: 100%;
         }
@@ -637,7 +693,7 @@ app-information {
 
 .mat-mdc-form-field .mdc-text-field {
     background-color: #fff;
-    border: 1px solid #BFCCD9;
+    border: 1px solid #bfccd9;
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
@@ -648,9 +704,17 @@ app-information {
     }
 }
 
+.mat-mdc-form-field-flex {
+    font-family: 'IBM Plex Sans';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+}
+
 /* INPUT při focusu */
 .mat-mdc-form-field .mdc-text-field.mdc-text-field--focused {
-    border: 1px solid #0080A8;
+    border: 1px solid #0080a8;
     box-shadow: none;
     outline: none;
     border-radius: 4px;
@@ -682,6 +746,89 @@ app-information {
 .mat-mdc-form-field .mdc-notched-outline__trailing {
     border-color: #bfccd9 !important;
 }
+
+// SELECT
+.mat-mdc-select-placeholder {
+    color: #4c6580 !important;
+}
+.mat-mdc-select-value-text {
+    font-family: 'IBM Plex Sans' !important;
+    color: var(--Text-Secondary, #263340);
+}
+.mat-mdc-select-panel {
+    background-color: #fff !important;
+}
+.mat-mdc-option {
+    font-family: 'IBM Plex Sans' !important;
+    font-size: 14px !important;
+    font-style: normal !important;
+    font-weight: 500 !important;
+    line-height: 16px !important;
+}
+.mat-mdc-option.mat-mdc-option-active.mdc-list-item {
+    background-color: #f6f7f9 !important;
+}
+.mat-mdc-option:hover:not(.mdc-list-item--disabled) {
+    background-color: #f6f7f9 !important;
+}
+.mat-pseudo-checkbox {
+    border-radius: 4px !important;
+    border: 1px solid var(--Boarder-Contrast, #bfccd9) !important;
+}
+.mat-pseudo-checkbox.mat-pseudo-checkbox-checked {
+    background-color: var(--Color-Btn-Primary, #0080a8) !important;
+    border: none !important;
+}
+
+// CALENDAR
+.mat-datepicker-content .mat-calendar {
+    width: 296px;
+    height: 354px;
+    background-color: #fff;
+    border: 1px solid #dfe5ec;
+    border-radius: 4px;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+.mat-calendar-body-selected {
+    background-color: var(--Border-Primary-Defaultl, #0080a8) !important;
+}
+.mat-calendar-body-selected.mat-calendar-body-today {
+    background-color: var(--Border-Primary-Defaultl, #0080a8) !important;
+    border: 1px solid #0080a8 !important;
+    box-shadow: none !important;
+}
+.mat-calendar-body-today:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+    border-color: var(--Border-Primary-Defaultl, #0080a8) !important;
+}
+.mat-calendar-body-cell {
+    font-family: 'IBM Plex Sans' !important;
+}
+.mat-calendar-period-button {
+    font-family: 'IBM Plex Sans' !important;
+}
+
+// RADIOBUTTONS
+.mat-mdc-radio-button .mdc-radio__native-control:checked + .mdc-radio__background > .mdc-radio__inner-circle {
+    transform: scale(0.4) !important;
+}
+@include mat.radio-overrides(
+    (
+        checked-ripple-color: none,
+        disabled-label-color: none,
+        ripple-color: none,
+        selected-icon-color: var(--Color-Btn-Primary, #0080a8),
+        unselected-icon-color: #bfccd9,
+        selected-focus-icon-color: var(--Color-Btn-Primary, #1E657B),
+        unselected-focus-icon-color: #bfccd9,
+        selected-hover-icon-color: var(--Color-Btn-Primary, #1E657B),
+        unselected-hover-icon-color: #bfccd9,
+        selected-pressed-icon-color: var(--Color-Btn-Primary, #1E657B),
+        unselected-pressed-icon-color: #bfccd9,
+        disabled-selected-icon-color: #EAF6FA,
+        disabled-unselected-icon-color: #EAF6FA,
+
+    )
+);
 
 @media (max-width: 1620px) {
     .app-col-type {

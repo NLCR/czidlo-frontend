@@ -1,14 +1,15 @@
-import { Component, signal, inject, computed } from '@angular/core';
+import { Component, signal, inject, computed, Inject } from '@angular/core';
 import { ProcessesService } from '../../services/processes.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { switchMap, catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 
 @Component({
     selector: 'app-processes',
@@ -28,11 +29,15 @@ export class ProcessesComponent {
     loadingProcesses = signal(false);
     isSidebarOpen = signal(false);
     activeProcess: any = null;
-    activeDefinition: string | null = null;
+    activeDefinition = signal<string | null>(null);
     activeAction: string | null = null;
 
-    startDateControl = new FormControl();
-    endDateControl = new FormControl();
+    startDateControl = new FormControl<Date | null>(null, [Validators.required, this.dateValidator]);
+    endDateControl = new FormControl<Date | null>(null, [Validators.required, this.dateValidator]);
+
+    // 🟢 Signály, které sledují změny formulářů
+    startDateValue = signal<Date | null>(null);
+    endDateValue = signal<Date | null>(null);
 
     private _snackBar = inject(MatSnackBar);
     // private _dialog = inject(MatDialog);
@@ -52,14 +57,39 @@ export class ProcessesComponent {
     selectedIncludeCount = true;
     includeCounts = [true, false];
     loggedIn = computed(() => this.authService.loggedIn());
+
+    isPlanButtonDisabled = computed(() => {
+        const def = this.activeDefinition();
+        const start = this.startDateValue();
+        const end = this.endDateValue();
+
+        const startInvalid = this.startDateControl.invalid || !start;
+        const endInvalid = this.endDateControl.invalid || !end;
+
+        if (def === 'OAI_ADAPTER') return false;
+        if (def === 'REGISTRARS_URN_NBN_CSV_EXPORT' || def === 'DI_URL_AVAILABILITY_CHECK') {
+            return startInvalid || endInvalid;
+        }
+        if (def === 'INDEXATION') {
+            return !start || !end;
+        }
+        return true;
+    });
+
     constructor(
         private processesService: ProcessesService,
         private route: ActivatedRoute,
         private router: Router,
         private translate: TranslateService,
         private dialog: MatDialog,
-        private authService: AuthService
-    ) {}
+        private authService: AuthService,
+        private dateAdapter: DateAdapter<Date>,
+        @Inject(MAT_DATE_FORMATS) private dateFormats: any
+    ) {
+        // 🧩 Propojení valueChanges → signal
+        this.startDateControl.valueChanges.subscribe((value) => this.startDateValue.set(value));
+        this.endDateControl.valueChanges.subscribe((value) => this.endDateValue.set(value));
+    }
 
     ngOnInit() {
         const today = new Date();
@@ -98,7 +128,7 @@ export class ProcessesComponent {
                     const definition = url[2]?.path;
                     const action = url[3]?.path;
                     if (this.definitions().find((def) => def.type === definition)) {
-                        this.activeDefinition = definition;
+                        this.activeDefinition.set(definition);
                         this.activeAction = action;
                         this.isSidebarOpen.set(true);
                     } else {
@@ -347,40 +377,135 @@ export class ProcessesComponent {
             console.log('With state:', this.selectedState);
             console.log('With includeCount:', this.selectedIncludeCount);
         }
+        // PLAN URL AVAILABILITY CHECK
         if (activeProcess === 'DI_URL_AVAILABILITY_CHECK') {
             console.log('Planning DI_URL_AVAILABILITY_CHECK process...');
-            const registrators = this.registators.value;
-            console.log('With registrators:', registrators);
-            const intellectualEntities = this.intellectualEntities.value;
-            console.log('With intellectual entities:', intellectualEntities);
-            console.log('With UrnNbnState:', this.selectedUrnNbnState);
-            const startDate = this.startDateControl.value;
-            const endDate = this.endDateControl.value;
-            console.log('With start date:', startDate);
-            console.log('With end date:', endDate);
-            console.log('With DIState:', this.selectedDIState);
+            const registrarCodes = this.registators.value;
+            const intEntTypes = this.intellectualEntities.value;
+            const urnNbnStatesIncludeActive: boolean = this.selectedUrnNbnState === 'ALL' || this.selectedUrnNbnState === 'ACTIVE';
+            const urnNbnStatesIncludeDeactivated: boolean = this.selectedUrnNbnState === 'ALL' || this.selectedUrnNbnState === 'DEACTIVATED';
+            const diStatesIncludeActive: boolean = this.selectedDIState === 'ALL' || this.selectedDIState === 'ACTIVE';
+            const diStatesIncludeDeactivated: boolean = this.selectedDIState === 'ALL' || this.selectedDIState === 'DEACTIVATED';
+            const diDsFrom = this.startDateControl.value?.toISOString();
+            const diDsTo = this.endDateControl.value?.toISOString();
+
+            let body = {
+                type: 'DI_URL_AVAILABILITY_CHECK',
+                params: {
+                    registrarCodes: registrarCodes?.join(',') || '',
+                    intEntTypes: intEntTypes?.join(',') || '',
+                    urnNbnStatesIncludeActive: urnNbnStatesIncludeActive,
+                    urnNbnStatesIncludeDeactivated: urnNbnStatesIncludeDeactivated,
+                    diStatesIncludeActive: diStatesIncludeActive,
+                    diStatesIncludeDeactivated: diStatesIncludeDeactivated,
+                    diDsFrom: diDsFrom,
+                    diDsTo: diDsTo
+                }
+            };
+
+            this.processesService.planProcess(body).subscribe({
+                next: (data) => {
+                    console.log('DI URL Availability Check process planned successfully:', data);
+                    this.openSnackBar(this.translate.instant('messages.process-planned-successfully'), 'OK');
+                    this.closeSidebar();
+                    this.loadProcesses();
+                },
+                error: (error) => {
+                    console.error('Error planning DI URL Availability Check process:', error);
+                    this.openSnackBar(this.translate.instant('messages.error-planning-process'), 'OK');
+                },
+            });
         }
+        // PLAN INDEXATION
         if (activeProcess === 'INDEXATION') {
             console.log('Planning INDEXATION process...');
             const startDate = this.startDateControl.value;
             const endDate = this.endDateControl.value;
-            console.log('With start date:', startDate);
-            console.log('With end date:', endDate);
+            let body = {};
+            if (startDate && endDate) {
+                body = {
+                    type: 'INDEXATION',
+                    params: {
+                        mod_date_from: startDate.toISOString(),
+                        mod_date_to: endDate.toISOString(),
+                    },
+                };
+            }
+            this.processesService.planProcess(body).subscribe({
+                next: (data) => {
+                    console.log('Indexation process planned successfully:', data);
+                    this.openSnackBar(this.translate.instant('messages.process-planned-successfully'), 'OK');
+                    this.closeSidebar();
+                    this.loadProcesses();
+                },
+                error: (error) => {
+                    console.error('Error planning indexation process:', error);
+                    this.openSnackBar(this.translate.instant('messages.error-planning-process'), 'OK');
+                },
+            });
         }
     }
 
     setProcess(activeProcess: any) {
         console.log('Setting process:', activeProcess);
     }
+
     displayLogError(process: any) {
         if (process) {
-           console.log('Displaying log error for process:', process);
-           if (process.state === 'SCHEDULED') {
-               return this.translate.instant('processes.log-scheduled');
-           } else {
-               return 'stav: ' + process.state;
-           }
+            console.log('Displaying log error for process:', process);
+            if (process.state === 'SCHEDULED') {
+                return this.translate.instant('processes.log-scheduled');
+            } else {
+                return 'stav: ' + process.state;
+            }
+        }
+    }
 
+    dateValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+
+            // 1) Material už dal parse error (uživatel píše nesmysl) → neplatné
+            //    Např. { text: 'abc' } nebo podobná struktura dle adapteru
+            const matParseErr = (control as any).getError?.('matDatepickerParse');
+            if (matParseErr) return { invalidDate: true };
+
+            // 2) prázdná hodnota necháme na Validators.required
+            if (value === null || value === '') return null;
+
+            // 3) validní je jen skutečný Date s platným časem
+            if (value instanceof Date) {
+                return isNaN(value.getTime()) ? { invalidDate: true } : null;
+            }
+
+            // 4) pokud je to string → zkusíme převést adapterem podle formátu,
+            //    a když to není validní Date, označíme za chybu
+            if (typeof value === 'string') {
+                const parsed = this.dateAdapter.parse(value, this.dateFormats?.parse?.dateInput);
+                if (parsed instanceof Date && !isNaN(parsed.getTime())) {
+                    return null;
+                }
+                return { invalidDate: true };
+            }
+
+            // 5) cokoliv jiného (např. objekt) je neplatné
+            return { invalidDate: true };
+        };
+    }
+    removeSelectedRegistrator(item: string) {
+        const currentItems = this.registators.value || [];
+        const index = currentItems.indexOf(item);
+        if (index >= 0) {
+            currentItems.splice(index, 1);
+            this.registators.setValue(currentItems);
+        }
+    }
+    removeSelectedEntity(item: string) {
+        const currentItems = this.intellectualEntities.value || [];
+        const index = currentItems.indexOf(item);
+        if (index >= 0) {
+            currentItems.splice(index, 1);
+            this.intellectualEntities.setValue(currentItems);
         }
     }
 }

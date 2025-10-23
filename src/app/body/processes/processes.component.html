@@ -203,12 +203,17 @@
                 <img src="assets/icons/close.svg" />
             </div>
         </div>
-        <div class="app-sidebar-content" *ngIf="activeProcess?.log">{{ activeProcess.log | json }}</div>
-        <div class="app-sidebar-content" *ngIf="activeProcess?.logError">
-            <div class="app-base-input-hint app-base-input-error">
-                error: {{ activeProcess.logError | translate }} ({{ displayLogError(activeProcess) | translate }})
+
+        <div class="app-sidebar-content">
+            <pre class="app-sidebar-content-item" *ngIf="activeProcess">{{ activeProcess | json }}</pre>
+            <div class="app-sidebar-content-item" *ngIf="activeProcess?.log">{{ activeProcess.log | json }}</div>
+            <div class="app-sidebar-content-item" *ngIf="activeProcess?.logError">
+                <div class="app-base-input-hint app-base-input-error">
+                    error: {{ activeProcess.logError | translate }} ({{ displayLogError(activeProcess) | translate }})
+                </div>
             </div>
         </div>
+
         <div class="app-sidebar-footer">
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
@@ -229,7 +234,7 @@
         <!-- HEADER -->
         <div class="app-sidebar-header">
             <div class="app-sidebar-title">
-                {{ 'processes.action-' + activeAction | translate }} - {{ 'definitions.' + activeDefinition | translate }}
+                {{ 'processes.action-' + activeAction | translate }} - {{ 'definitions.' + activeDefinition() | translate }}
             </div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
@@ -237,7 +242,7 @@
         </div>
 
         <!-- SETTINGS OAI ADAPTER -->
-        <div class="app-sidebar-content" *ngIf="activeAction === 'set' && activeDefinition === 'OAI_ADAPTER'">
+        <div class="app-sidebar-content" *ngIf="activeAction === 'set' && activeDefinition() === 'OAI_ADAPTER'">
             <div class="app-part app-set-oai-adapter">
                 <div class="app-part-title">{{ 'processes.transform-rdd' | translate }}</div>
                 <div class="app-part-buttons">
@@ -257,7 +262,7 @@
         </div>
 
         <!-- PLAN OAI ADAPTER -->
-        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition === 'OAI_ADAPTER'">
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition() === 'OAI_ADAPTER'">
             <div class="app-part">
                 <div class="app-part-title">{{ 'processes.basic-settings' | translate }} OAI</div>
             </div>
@@ -271,7 +276,7 @@
         </div>
 
         <!-- PLAN EXPORT URN:NBN -->
-        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition === 'REGISTRARS_URN_NBN_CSV_EXPORT'">
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition() === 'REGISTRARS_URN_NBN_CSV_EXPORT'">
             <div class="app-part">
                 <div class="app-part-content">
                     <div class="app-base-input-label">{{ 'processes.filter-by-date' | translate }} URN:NBN</div>
@@ -350,35 +355,72 @@
         </div>
 
         <!-- PLAN DI URL AVAILABILITY CHECK -->
-        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition === 'DI_URL_AVAILABILITY_CHECK'">
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition() === 'DI_URL_AVAILABILITY_CHECK'">
             <div class="app-part">
                 <div class="app-part-title">{{ 'processes.digital-document' | translate }}</div>
                 <div class="app-part-content">
-                    <div class="app-base-input app-multiselect">
-                        <div class="app-base-input-label">{{ 'processes.registrator' | translate }}</div>
-                        <mat-form-field appearance="outline">
-                            <mat-select [formControl]="registators" multiple>
-                                @for (reg of registatorList(); track reg) {
-                                <mat-option [value]="reg">{{ reg }}</mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
+                    <!-- REGISTRATORS -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-multiselect">
+                            <div class="app-base-input-label">{{ 'processes.registrator' | translate }}</div>
+                            <mat-form-field appearance="outline">
+                                <mat-select [formControl]="registators" multiple [placeholder]="'inputs.select-registrator' | translate">
+                                    <mat-select-trigger>
+                                        @if ((registators.value?.length || 0) > 0) {
+                                        {{ 'inputs.selected-items' | translate }}:
+                                        <span>{{ registators.value?.length }}</span>
+                                        }
+                                    </mat-select-trigger>
+                                    @for (reg of registatorList(); track reg) {
+                                    <mat-option [value]="reg">{{ reg }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-selected-items" *ngIf="registators.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let item of registators.value">
+                                {{ item }}
+                                <div class="app-selected-item-remove" (click)="removeSelectedRegistrator(item)">
+                                    <img src="assets/icons/close.svg" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="app-base-input app-multiselect">
-                        <div class="app-base-input-label">{{ 'processes.intellectual-entity' | translate }}</div>
-                        <mat-form-field appearance="outline">
-                            <mat-select [formControl]="intellectualEntities" multiple>
-                                @for (entity of intellectualEntitiesList(); track entity) {
-                                <mat-option [value]="entity">{{ entity }}</mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
+                    <!-- INTELLECTUAL ENTITIES -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-multiselect">
+                            <div class="app-base-input-label">{{ 'processes.intellectual-entity' | translate }}</div>
+                            <mat-form-field appearance="outline">
+                                <mat-select [formControl]="intellectualEntities" multiple [placeholder]="'inputs.select-entity' | translate">
+                                    <mat-select-trigger>
+                                        @if ((intellectualEntities.value?.length || 0) > 0) {
+                                        {{ 'inputs.selected-items' | translate }}:
+                                        <span>{{ intellectualEntities.value?.length }}</span>
+                                        }
+                                    </mat-select-trigger>
+                                    @for (entity of intellectualEntitiesList(); track entity) {
+                                    <mat-option [value]="entity">{{ entity }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-selected-items" *ngIf="intellectualEntities.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let entity of intellectualEntities.value">
+                                {{ entity }}
+                                <div class="app-selected-item-remove" (click)="removeSelectedEntity(entity)">
+                                    <img src="assets/icons/close.svg" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <!-- URN:NBN STATE -->
                     <div class="app-base-input">
                         <div class="app-base-input-label">{{ 'processes.urn-nbn-state' | translate }}</div>
                         <mat-radio-group class="app-radio-group" [(ngModel)]="selectedUrnNbnState">
                             @for (state of states; track state) {
-                            <mat-radio-button class="example-radio-button" [value]="state">{{ 'processes.' + state | translate }}</mat-radio-button>
+                            <mat-radio-button checked-ripple-color class="example-radio-button" [value]="state">
+                                {{ 'processes.' + state | translate }}
+                            </mat-radio-button>
                             }
                         </mat-radio-group>
                     </div>
@@ -392,16 +434,53 @@
                     <div class="app-datepicker-container">
                         <div class="app-datepicker-item">
                             <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
-                                <input matInput [matDatepicker]="startDatePicker" [formControl]="startDateControl" />
-                                <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                                <input
+                                    matInput
+                                    [matDatepicker]="startDatePicker"
+                                    [formControl]="startDateControl"
+                                    [placeholder]="'inputs.pick-start-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
                                 <mat-datepicker #startDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        startDateControl.hasError('matDatepickerParse') ||
+                                        startDateControl.hasError('invalidDate') ||
+                                        startDateControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
                             </mat-form-field>
                         </div>
+                        <div class="app-datepicker-spacer">-</div>
                         <div class="app-datepicker-item">
                             <mat-form-field appearance="outline" class="app-datepicker">
-                                <input matInput [matDatepicker]="endDatePicker" [formControl]="endDateControl" />
-                                <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                                <input
+                                    matInput
+                                    [matDatepicker]="endDatePicker"
+                                    [formControl]="endDateControl"
+                                    [placeholder]="'inputs.pick-end-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
                                 <mat-datepicker #endDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        endDateControl.hasError('matDatepickerParse') ||
+                                        endDateControl.hasError('invalidDate') ||
+                                        endDateControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
                             </mat-form-field>
                         </div>
                     </div>
@@ -419,23 +498,60 @@
             </div>
         </div>
         <!-- PLAN INDEXATION -->
-        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition === 'INDEXATION'">
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition() === 'INDEXATION'">
             <div class="app-part">
                 <div class="app-part-content">
-                    <div class="app-base-input-label">{{ 'processes.filter-by-date' | translate }}</div>
+                    <div class="app-base-input-label">{{ 'processes.filter-by-date' | translate }} *</div>
                     <div class="app-datepicker-container">
                         <div class="app-datepicker-item">
                             <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
-                                <input matInput [matDatepicker]="startDatePicker" [formControl]="startDateControl" />
-                                <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                                <input
+                                    matInput
+                                    [matDatepicker]="startDatePicker"
+                                    [formControl]="startDateControl"
+                                    [placeholder]="'inputs.pick-start-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
                                 <mat-datepicker #startDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        startDateControl.hasError('matDatepickerParse') ||
+                                        startDateControl.hasError('invalidDate') ||
+                                        startDateControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
                             </mat-form-field>
                         </div>
+                        <div class="app-datepicker-spacer">-</div>
                         <div class="app-datepicker-item">
                             <mat-form-field appearance="outline" class="app-datepicker">
-                                <input matInput [matDatepicker]="endDatePicker" [formControl]="endDateControl" />
-                                <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                                <input
+                                    matInput
+                                    [matDatepicker]="endDatePicker"
+                                    [formControl]="endDateControl"
+                                    [placeholder]="'inputs.pick-end-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
                                 <mat-datepicker #endDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        endDateControl.hasError('matDatepickerParse') ||
+                                        endDateControl.hasError('invalidDate') ||
+                                        endDateControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
                             </mat-form-field>
                         </div>
                     </div>
@@ -449,10 +565,16 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
-                <app-button *ngIf="activeAction === 'plan'" variant="primary" size="l" (click)="planProcess(activeDefinition)">
+                <app-button
+                    *ngIf="activeAction === 'plan'"
+                    variant="primary"
+                    size="l"
+                    (click)="planProcess(activeDefinition())"
+                    [disabled]="isPlanButtonDisabled()"
+                >
                     <span>{{ 'buttons.plan-process' | translate }}</span>
                 </app-button>
-                <app-button *ngIf="activeAction === 'set'" variant="primary" size="l" (click)="setProcess(activeDefinition)">
+                <app-button *ngIf="activeAction === 'set'" variant="primary" size="l" (click)="setProcess(activeDefinition())">
                     <span>{{ 'buttons.set-process' | translate }}</span>
                 </app-button>
             </div>

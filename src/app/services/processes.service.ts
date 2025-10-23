@@ -155,4 +155,19 @@ export class ProcessesService {
             })
         );
     }
+    planProcess(body: any): Observable<any> {
+        return this.apiService.createProcess(body).pipe(
+            tap({
+                next: (data) => {
+                    console.log(`Indexation process planned:`, data);
+                },
+                error: (error) => {
+                    console.error(`Error planning indexation process:`, error);
+                },
+                complete: () => {
+                    console.log(`Indexation process planning complete`);
+                },
+            })
+        );
+    }
 }
