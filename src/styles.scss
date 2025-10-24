@@ -530,6 +530,10 @@ h4 {
     align-self: stretch;
     border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
     background: var(--BG-Main-Base, #fff);
+    &.snack-bar-visible {
+        flex-direction: column;
+        padding: 16px 24px;
+    }
     .app-button-container {
         display: flex;
         align-items: center;
@@ -831,31 +835,6 @@ app-information {
 .mat-calendar-period-button {
     font-family: 'IBM Plex Sans' !important;
 }
-
-// RADIOBUTTONS
-.mat-mdc-radio-button .mdc-radio__native-control:checked + .mdc-radio__background > .mdc-radio__inner-circle {
-    transform: scale(0.4) !important;
-}
-.mat-mdc-radio-button .mdc-radio {
-    padding: 0 !important;
-}
-@include mat.radio-overrides(
-    (
-        checked-ripple-color: none,
-        disabled-label-color: none,
-        ripple-color: none,
-        selected-icon-color: var(--Color-Btn-Primary, #0080a8),
-        unselected-icon-color: #bfccd9,
-        selected-focus-icon-color: var(--Color-Btn-Primary, #1e657b),
-        unselected-focus-icon-color: #bfccd9,
-        selected-hover-icon-color: var(--Color-Btn-Primary, #1e657b),
-        unselected-hover-icon-color: #bfccd9,
-        selected-pressed-icon-color: var(--Color-Btn-Primary, #1e657b),
-        unselected-pressed-icon-color: #bfccd9,
-        disabled-selected-icon-color: #eaf6fa,
-        disabled-unselected-icon-color: #eaf6fa,
-    )
-);
 
 @media (max-width: 1620px) {
     .app-col-type {

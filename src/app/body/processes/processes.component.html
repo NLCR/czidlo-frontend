@@ -550,13 +550,13 @@
                     <!-- URN:NBN STATE -->
                     <div class="app-base-input">
                         <div class="app-base-input-label">{{ 'processes.urn-nbn-state' | translate }}</div>
-                        <mat-radio-group class="app-radio-group" [(ngModel)]="selectedUrnNbnState">
-                            @for (state of states; track state) {
-                            <mat-radio-button checked-ripple-color class="example-radio-button" [value]="state">
-                                {{ 'processes.' + state | translate }}
-                            </mat-radio-button>
-                            }
-                        </mat-radio-group>
+                        <div class="app-base-input-container app-radio-toggle-checkboxes">
+                            <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedUrnNbnState" (valueChange)="onStateChange($event)">
+                                @for (state of states; track state) {
+                                <app-radio-button label="{{ 'processes.' + state | translate }}" value="{{ state }}"></app-radio-button>
+                                }
+                            </app-radio-group>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -622,11 +622,11 @@
                 <div class="app-part-content">
                     <div class="app-base-input-label">{{ 'processes.di-state' | translate }}</div>
                     <div class="app-base-input">
-                        <mat-radio-group class="app-radio-group" [(ngModel)]="selectedDIState">
+                        <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedDIState" (valueChange)="onStateChange($event)">
                             @for (state of states; track state) {
-                            <mat-radio-button class="example-radio-button" [value]="state">{{ 'processes.' + state | translate }}</mat-radio-button>
+                            <app-radio-button [value]="state" label="{{ 'processes.' + state | translate }}"></app-radio-button>
                             }
-                        </mat-radio-group>
+                        </app-radio-group>
                     </div>
                 </div>
             </div>
@@ -694,7 +694,10 @@
         </div>
 
         <!-- FOOTER -->
-        <div class="app-sidebar-footer">
+        <div class="app-sidebar-footer" [ngClass]="{ 'snack-bar-visible': processPlannedSnackBarVisible() }">
+            <div class="app-process-planned-snack-bar" *ngIf="processPlannedSnackBarVisible()">
+                {{ 'messages.process-planned-successfully' | translate }}
+            </div>
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>

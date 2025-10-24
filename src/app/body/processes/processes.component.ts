@@ -26,6 +26,7 @@ export class ProcessesComponent {
         { type: 'INDEXATION' },
     ]);
     isActive = 'instances';
+    processPlannedSnackBarVisible = signal(false);
     loadingProcesses = signal(false);
     isSidebarOpen = signal(false);
     activeProcess: any = null;
@@ -371,6 +372,7 @@ export class ProcessesComponent {
         console.log('Planning process:', activeProcess);
         if (activeProcess === 'OAI_ADAPTER') {
             console.log('Planning OAI_ADAPTER process...');
+            this.processPlannedSnackBarVisible.set(true);
         }
         // PLAN REGISTRARS URN NBN CSV EXPORT
         if (activeProcess === 'REGISTRARS_URN_NBN_CSV_EXPORT') {
@@ -407,18 +409,18 @@ export class ProcessesComponent {
                 },
             };
             console.log('REGISTRARS_URN_NBN_CSV_EXPORT', body);
-            // this.processesService.planProcess(body).subscribe({
-            //     next: (data) => {
-            //         console.log('Registrars URN NBN CSV Export process planned successfully:', data);
-            //         this.openSnackBar(this.translate.instant('messages.process-planned-successfully'), 'OK');
-            //         this.closeSidebar();
-            //         this.loadProcesses();
-            //     },
-            //     error: (error) => {
-            //         console.error('Error planning Registrars URN NBN CSV Export process:', error);
-            //         this.openSnackBar(this.translate.instant('messages.error-planning-process'), 'OK');
-            //     },
-            // });
+            this.processesService.planProcess(body).subscribe({
+                next: (data) => {
+                    console.log('Registrars URN NBN CSV Export process planned successfully:', data);
+                    this.openSnackBar(this.translate.instant('messages.process-planned-successfully'), 'OK');
+                    this.closeSidebar();
+                    this.loadProcesses();
+                },
+                error: (error) => {
+                    console.error('Error planning Registrars URN NBN CSV Export process:', error);
+                    this.openSnackBar(this.translate.instant('messages.error-planning-process'), 'OK');
+                },
+            });
         }
         // PLAN URL AVAILABILITY CHECK
         if (activeProcess === 'DI_URL_AVAILABILITY_CHECK') {
