@@ -35,9 +35,14 @@ export class ProcessesComponent {
     startDateControl = new FormControl<Date | null>(null, [Validators.required, this.dateValidator]);
     endDateControl = new FormControl<Date | null>(null, [Validators.required, this.dateValidator]);
 
+    deactivationStartControl = new FormControl<Date | null>(null, [this.dateValidator]);
+    deactivationEndControl = new FormControl<Date | null>(null, [this.dateValidator]);
+
     // 🟢 Signály, které sledují změny formulářů
     startDateValue = signal<Date | null>(null);
     endDateValue = signal<Date | null>(null);
+    deactivationStartValue = signal<Date | null>(null);
+    deactivationEndValue = signal<Date | null>(null);
 
     private _snackBar = inject(MatSnackBar);
     // private _dialog = inject(MatDialog);
@@ -48,14 +53,14 @@ export class ProcessesComponent {
     registatorList = signal(<Array<string>>[]);
     intellectualEntities = new FormControl();
     intellectualEntitiesList = signal(<Array<string>>[]);
-    identifiers = new FormControl();
-    identifiersList = signal(<Array<string>>[]);
+    missingCNB = false;
+    missingISSN = false;
+    missingISBN = false;
     selectedUrnNbnState = 'ALL';
     selectedDIState = 'ALL';
     selectedState = 'ALL';
     states = ['ALL', 'ACTIVE', 'DEACTIVATED'];
-    selectedIncludeCount = true;
-    includeCounts = [true, false];
+    selectedIncludeCount = false;
     loggedIn = computed(() => this.authService.loggedIn());
 
     isPlanButtonDisabled = computed(() => {
@@ -89,6 +94,8 @@ export class ProcessesComponent {
         // 🧩 Propojení valueChanges → signal
         this.startDateControl.valueChanges.subscribe((value) => this.startDateValue.set(value));
         this.endDateControl.valueChanges.subscribe((value) => this.endDateValue.set(value));
+        this.deactivationStartControl.valueChanges.subscribe((value) => this.deactivationStartValue.set(value));
+        this.deactivationEndControl.valueChanges.subscribe((value) => this.deactivationEndValue.set(value));
     }
 
     ngOnInit() {
@@ -96,10 +103,13 @@ export class ProcessesComponent {
         const startDate = new Date(2012, 8, 1); // Měsíc je 0-indexovaný, takže 8 = září
         this.startDateControl.setValue(startDate);
         this.endDateControl.setValue(today);
+        this.deactivationStartControl.setValue(startDate);
+        this.deactivationEndControl.setValue(today);
+        this.deactivationStartControl.disable();
+        this.deactivationEndControl.disable();
 
         this.registatorList.set(this.processesService.registrators() || []);
         this.intellectualEntitiesList.set(this.processesService.intellectualEntities() || []);
-        this.identifiersList.set(this.processesService.identifiers() || []);
 
         this.route.url.subscribe((url) => {
             this.isActive = url[1]?.path || 'instances';
@@ -362,26 +372,59 @@ export class ProcessesComponent {
         if (activeProcess === 'OAI_ADAPTER') {
             console.log('Planning OAI_ADAPTER process...');
         }
+        // PLAN REGISTRARS URN NBN CSV EXPORT
         if (activeProcess === 'REGISTRARS_URN_NBN_CSV_EXPORT') {
             console.log('Planning REGISTRARS_URN_NBN_CSV_EXPORT process...');
-            const startDate = this.startDateControl.value;
-            const endDate = this.endDateControl.value;
-            console.log('With start date:', startDate);
-            console.log('With end date:', endDate);
-            const registrators = this.registators.value;
-            console.log('With registrators:', registrators);
-            const intellectualEntities = this.intellectualEntities.value;
-            console.log('With intellectual entities:', intellectualEntities);
-            const identifiers = this.identifiers.value;
-            console.log('With identifiers:', identifiers);
-            console.log('With state:', this.selectedState);
-            console.log('With includeCount:', this.selectedIncludeCount);
+            const registrationStart = this.startDateControl.value;
+            const registrationEnd = this.endDateControl.value;
+            const registrars = this.registators.value?.join(',');
+            const entityTypes = this.intellectualEntities.value?.join(',');
+            const withMissingCnbOnly = this.missingCNB;
+            const withMissingIssnOnly = this.missingISSN;
+            const withMissingIsbnOnly = this.missingISBN;
+            const returnActive = this.selectedState === 'ALL' || this.selectedState === 'ACTIVE';
+            const returnDeactivated = this.selectedState === 'ALL' || this.selectedState === 'DEACTIVATED';
+            let enabledDeactivationDates = this.selectedState === 'DEACTIVATED';
+            const deactivationStart = enabledDeactivationDates ? this.deactivationStartControl.value?.toISOString() || null : null;
+            const deactivationEnd = enabledDeactivationDates ? this.deactivationEndControl.value?.toISOString() || null : null;
+            const exportNumOfDigInstances = this.selectedIncludeCount || false;
+
+            let body = {
+                type: 'REGISTRARS_URN_NBN_CSV_EXPORT',
+                params: {
+                    registrationDateFrom: registrationStart?.toISOString(),
+                    registrationDateTo: registrationEnd?.toISOString(),
+                    registrars: registrars,
+                    intEntTypes: entityTypes,
+                    withMissingCnbOnly: withMissingCnbOnly,
+                    withMissingIssnOnly: withMissingIssnOnly,
+                    withMissingIsbnOnly: withMissingIsbnOnly,
+                    returnActive: returnActive,
+                    returnDeactivated: returnDeactivated,
+                    deactivationDateFrom: deactivationStart,
+                    deactivationDateTo: deactivationEnd,
+                    exportNumOfDigInstances: exportNumOfDigInstances,
+                },
+            };
+            console.log('REGISTRARS_URN_NBN_CSV_EXPORT', body);
+            // this.processesService.planProcess(body).subscribe({
+            //     next: (data) => {
+            //         console.log('Registrars URN NBN CSV Export process planned successfully:', data);
+            //         this.openSnackBar(this.translate.instant('messages.process-planned-successfully'), 'OK');
+            //         this.closeSidebar();
+            //         this.loadProcesses();
+            //     },
+            //     error: (error) => {
+            //         console.error('Error planning Registrars URN NBN CSV Export process:', error);
+            //         this.openSnackBar(this.translate.instant('messages.error-planning-process'), 'OK');
+            //     },
+            // });
         }
         // PLAN URL AVAILABILITY CHECK
         if (activeProcess === 'DI_URL_AVAILABILITY_CHECK') {
             console.log('Planning DI_URL_AVAILABILITY_CHECK process...');
-            const registrarCodes = this.registators.value;
-            const intEntTypes = this.intellectualEntities.value;
+            const registrarCodes = this.registators.value?.join(',') || '';
+            const intEntTypes = this.intellectualEntities.value?.join(',') || '';
             const urnNbnStatesIncludeActive: boolean = this.selectedUrnNbnState === 'ALL' || this.selectedUrnNbnState === 'ACTIVE';
             const urnNbnStatesIncludeDeactivated: boolean = this.selectedUrnNbnState === 'ALL' || this.selectedUrnNbnState === 'DEACTIVATED';
             const diStatesIncludeActive: boolean = this.selectedDIState === 'ALL' || this.selectedDIState === 'ACTIVE';
@@ -392,15 +435,15 @@ export class ProcessesComponent {
             let body = {
                 type: 'DI_URL_AVAILABILITY_CHECK',
                 params: {
-                    registrarCodes: registrarCodes?.join(',') || '',
-                    intEntTypes: intEntTypes?.join(',') || '',
+                    registrarCodes: registrarCodes,
+                    intEntTypes: intEntTypes,
                     urnNbnStatesIncludeActive: urnNbnStatesIncludeActive,
                     urnNbnStatesIncludeDeactivated: urnNbnStatesIncludeDeactivated,
                     diStatesIncludeActive: diStatesIncludeActive,
                     diStatesIncludeDeactivated: diStatesIncludeDeactivated,
                     diDsFrom: diDsFrom,
-                    diDsTo: diDsTo
-                }
+                    diDsTo: diDsTo,
+                },
             };
 
             this.processesService.planProcess(body).subscribe({
@@ -507,5 +550,23 @@ export class ProcessesComponent {
             currentItems.splice(index, 1);
             this.intellectualEntities.setValue(currentItems);
         }
+    }
+
+    onStateChange(state: string) {
+        this.selectedState = state as any;
+
+        if (this.selectedState === 'DEACTIVATED') {
+            this.deactivationStartControl.enable();
+            this.deactivationEndControl.enable();
+        } else {
+            this.deactivationStartControl.disable();
+            this.deactivationEndControl.disable();
+            // volitelně: vymaž hodnoty
+            // this.deactivationStartControl.reset();
+            // this.deactivationEndControl.reset();
+        }
+    }
+    toggleIncludeCount() {
+        this.selectedIncludeCount = !this.selectedIncludeCount;
     }
 }

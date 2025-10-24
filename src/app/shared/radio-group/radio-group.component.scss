@@ -1,0 +1,15 @@
+.app-radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap, 12px);
+
+    &.app-radio-group-vertical {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    &.app-radio-group-horizontal {
+        flex-direction: row;
+        align-items: center;
+    }
+}

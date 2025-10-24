@@ -1,0 +1,11 @@
+<div
+    class="app-radio"
+    [ngClass]="{
+        'app-radio-checked': checked,
+        'app-radio-disabled': disabled
+    }"
+    (click)="onSelect()"
+>
+    <div class="app-radio-circle"></div>
+    <div class="app-radio-label">{{ label }}</div>
+</div>

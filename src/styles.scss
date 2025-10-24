@@ -464,6 +464,9 @@ h4 {
             flex-direction: column;
             align-items: flex-start;
             gap: 8px;
+            &.app-radio-toggle-checkboxes {
+                gap: 16px;
+            }
             .app-datepicker-container {
                 display: flex;
                 gap: 16px;
@@ -572,10 +575,13 @@ app-information {
     flex: 1;
     width: 100%;
     gap: 8px;
+    &.app-radio-toggle-checkboxes {
+        margin-bottom: 20px;
+    }
     .app-selected-items {
         display: flex;
         padding: 8px;
-        margin: 24px 0;
+        margin: 0 0 24px 0;
         align-items: center;
         align-content: center;
         gap: 8px;
@@ -615,6 +621,10 @@ app-information {
             }
         }
     }
+    .app-checkbox-container {
+        display: flex;
+        gap: 16px;
+    }
 }
 .app-base-input {
     display: flex;
@@ -640,6 +650,21 @@ app-information {
         img {
             margin-right: 8px;
             cursor: pointer;
+        }
+    }
+    &.app-toggle-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        .app-toggle-label {
+            color: var(--Text-Secondary, #263340);
+            /* Typesettings/S/Medium */
+            font-family: 'IBM Plex Sans';
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 20px; /* 142.857% */
         }
     }
 }
@@ -811,6 +836,9 @@ app-information {
 .mat-mdc-radio-button .mdc-radio__native-control:checked + .mdc-radio__background > .mdc-radio__inner-circle {
     transform: scale(0.4) !important;
 }
+.mat-mdc-radio-button .mdc-radio {
+    padding: 0 !important;
+}
 @include mat.radio-overrides(
     (
         checked-ripple-color: none,
@@ -818,15 +846,14 @@ app-information {
         ripple-color: none,
         selected-icon-color: var(--Color-Btn-Primary, #0080a8),
         unselected-icon-color: #bfccd9,
-        selected-focus-icon-color: var(--Color-Btn-Primary, #1E657B),
+        selected-focus-icon-color: var(--Color-Btn-Primary, #1e657b),
         unselected-focus-icon-color: #bfccd9,
-        selected-hover-icon-color: var(--Color-Btn-Primary, #1E657B),
+        selected-hover-icon-color: var(--Color-Btn-Primary, #1e657b),
         unselected-hover-icon-color: #bfccd9,
-        selected-pressed-icon-color: var(--Color-Btn-Primary, #1E657B),
+        selected-pressed-icon-color: var(--Color-Btn-Primary, #1e657b),
         unselected-pressed-icon-color: #bfccd9,
-        disabled-selected-icon-color: #EAF6FA,
-        disabled-unselected-icon-color: #EAF6FA,
-
+        disabled-selected-icon-color: #eaf6fa,
+        disabled-unselected-icon-color: #eaf6fa,
     )
 );
 

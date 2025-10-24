@@ -280,76 +280,210 @@
             <div class="app-part">
                 <div class="app-part-content">
                     <div class="app-base-input-label">{{ 'processes.filter-by-date' | translate }} URN:NBN</div>
-                    <div class="app-base-input-container app-datepicker-container">
-                        <div class="app-base-input app-datepicker-item">
+                    <!-- DATEPICKER -->
+                    <div class="app-datepicker-container">
+                        <div class="app-datepicker-item">
                             <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
-                                <input matInput [matDatepicker]="startDatePicker" [formControl]="startDateControl" />
-                                <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                                <input
+                                    matInput
+                                    [matDatepicker]="startDatePicker"
+                                    [formControl]="startDateControl"
+                                    [placeholder]="'inputs.pick-start-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
                                 <mat-datepicker #startDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        startDateControl.hasError('matDatepickerParse') ||
+                                        startDateControl.hasError('invalidDate') ||
+                                        startDateControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
                             </mat-form-field>
                         </div>
-                        <div class="app-base-input app-datepicker-item">
+                        <div class="app-datepicker-spacer">-</div>
+                        <div class="app-datepicker-item">
                             <mat-form-field appearance="outline" class="app-datepicker">
-                                <input matInput [matDatepicker]="endDatePicker" [formControl]="endDateControl" />
-                                <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                                <input
+                                    matInput
+                                    [matDatepicker]="endDatePicker"
+                                    [formControl]="endDateControl"
+                                    [placeholder]="'inputs.pick-end-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
                                 <mat-datepicker #endDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        endDateControl.hasError('matDatepickerParse') ||
+                                        endDateControl.hasError('invalidDate') ||
+                                        endDateControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
                             </mat-form-field>
                         </div>
                     </div>
                 </div>
                 <div class="app-part-content">
                     <div class="app-base-input-label">{{ 'processes.filter-by-registrator' | translate }} URN:NBN</div>
-                    <div class="app-base-input app-multiselect">
-                        <mat-form-field appearance="outline">
-                            <mat-select [formControl]="registators" multiple>
-                                @for (registrator of registatorList(); track registrator) {
-                                <mat-option [value]="registrator">{{ registrator }}</mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
+                    <!-- REGISTRATORS FILTER -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-multiselect">
+                            <mat-form-field appearance="outline">
+                                <mat-select [formControl]="registators" multiple [placeholder]="'inputs.select-registrator' | translate">
+                                    <mat-select-trigger>
+                                        @if ((registators.value?.length || 0) > 0) {
+                                        {{ 'inputs.selected-items' | translate }}:
+                                        <span>{{ registators.value?.length }}</span>
+                                        }
+                                    </mat-select-trigger>
+                                    @for (reg of registatorList(); track reg) {
+                                    <mat-option [value]="reg">{{ reg }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-selected-items" *ngIf="registators.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let item of registators.value">
+                                {{ item }}
+                                <div class="app-selected-item-remove" (click)="removeSelectedRegistrator(item)">
+                                    <img src="assets/icons/close.svg" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <!-- INTELLECTUAL ENTITIES FILTER -->
                 <div class="app-part-content">
                     <div class="app-base-input-label">{{ 'processes.filter-by-entity' | translate }}</div>
-                    <div class="app-base-input app-multiselect">
-                        <mat-form-field appearance="outline">
-                            <mat-select [formControl]="intellectualEntities" multiple>
-                                @for (entity of intellectualEntitiesList(); track entity) {
-                                <mat-option [value]="entity">{{ entity }}</mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-multiselect">
+                            <mat-form-field appearance="outline">
+                                <mat-select [formControl]="intellectualEntities" multiple [placeholder]="'inputs.select-entity' | translate">
+                                    <mat-select-trigger>
+                                        @if ((intellectualEntities.value?.length || 0) > 0) {
+                                        {{ 'inputs.selected-items' | translate }}:
+                                        <span>{{ intellectualEntities.value?.length }}</span>
+                                        }
+                                    </mat-select-trigger>
+                                    @for (entity of intellectualEntitiesList(); track entity) {
+                                    <mat-option [value]="entity">{{ entity }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-selected-items" *ngIf="intellectualEntities.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let entity of intellectualEntities.value">
+                                {{ entity }}
+                                <div class="app-selected-item-remove" (click)="removeSelectedEntity(entity)">
+                                    <img src="assets/icons/close.svg" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="app-part-content">
+                <!-- IDENTIFIERS FILTER -->
+                <div class="app-part-content app-radio-toggle-checkboxes">
                     <div class="app-base-input-label">{{ 'processes.filter-by-missing-id' | translate }}</div>
-                    <div class="app-base-input app-multiselect">
-                        <mat-form-field appearance="outline">
-                            <mat-select [formControl]="identifiers" multiple>
-                                @for (identifier of identifiersList(); track identifier) {
-                                <mat-option [value]="identifier">{{ identifier }}</mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
+                    <div class="app-base-input-container app-radio-toggle-checkboxes">
+                        <div class="app-checkbox-container">
+                            <app-checkbox [(checked)]="missingCNB" label="{{ 'processes.cnb' | translate }}"></app-checkbox>
+                            <app-checkbox [(checked)]="missingISSN" label="{{ 'processes.issn' | translate }}"></app-checkbox>
+                            <app-checkbox [(checked)]="missingISBN" label="{{ 'processes.isbn' | translate }}"></app-checkbox>
+                        </div>
                     </div>
                 </div>
-                <div class="app-part-content">
+                <!-- STATES FILTER -->
+                <div class="app-part-content app-radio-toggle-checkboxes">
                     <div class="app-base-input-label">{{ 'processes.filter-by-state' | translate }}</div>
-                    <mat-radio-group class="app-radio-group" [(ngModel)]="selectedState">
-                        @for (state of states; track state) {
-                        <mat-radio-button class="example-radio-button" [value]="state">{{ 'processes.' + state | translate }}</mat-radio-button>
-                        }
-                    </mat-radio-group>
+                    <div class="app-base-input-container app-radio-toggle-checkboxes">
+                        <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedState" (valueChange)="onStateChange($event)">
+                            @for (state of states; track state) {
+                            <app-radio-button label="{{ 'processes.' + state | translate }}" value="{{ state }}"></app-radio-button>
+                            }
+                        </app-radio-group>
+                    </div>
                 </div>
+                <!-- DEACTIVATION DATE FILTER -->
                 <div class="app-part-content">
-                    <div class="app-base-input-label">{{ 'processes.count-digital-instances' | translate }}</div>
-                    <mat-radio-group class="app-radio-group" [(ngModel)]="selectedIncludeCount">
-                        @for (includeCount of includeCounts; track includeCount) {
-                        <mat-radio-button class="example-radio-button" [value]="includeCount">
-                            {{ 'processes.' + includeCount | translate }}
-                        </mat-radio-button>
-                        }
-                    </mat-radio-group>
+                    <div class="app-base-input-label">{{ 'processes.filter-by-deactivation-date' | translate }}</div>
+                    <div class="app-datepicker-container">
+                        <div class="app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
+                                <input
+                                    matInput
+                                    [matDatepicker]="deactivationStartDatePicker"
+                                    [formControl]="deactivationStartControl"
+                                    [placeholder]="'inputs.pick-start-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="deactivationStartDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #deactivationStartDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        deactivationStartControl.hasError('matDatepickerParse') ||
+                                        deactivationStartControl.hasError('invalidDate') ||
+                                        deactivationStartControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-datepicker-spacer">-</div>
+                        <div class="app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker">
+                                <input
+                                    matInput
+                                    [matDatepicker]="deactivationEndDatePicker"
+                                    [formControl]="deactivationEndControl"
+                                    [placeholder]="'inputs.pick-end-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="deactivationEndDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #deactivationEndDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        deactivationEndControl.hasError('matDatepickerParse') ||
+                                        deactivationEndControl.hasError('invalidDate') ||
+                                        deactivationEndControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <!-- COUNT DIGITAL INSTANCES FILTER -->
+                <div class="app-part">
+                    <div class="app-part-content app-radio-toggle-checkboxes">
+                        <div class="app-base-input-container app-radio-toggle-checkboxes">
+                            <div class="app-base-input app-toggle-container">
+                                <app-toggle size="s" [checked]="selectedIncludeCount" (click)="toggleIncludeCount()">
+                                    {{ 'processes.include-counts' | translate }}
+                                </app-toggle>
+                                <div class="app-toggle-label">{{ 'processes.count-digital-instances' | translate }}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

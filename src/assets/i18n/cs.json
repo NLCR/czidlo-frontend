@@ -78,7 +78,8 @@
         "pick-end-date": "Vyberte do",
         "select-registrator": "Vyberte registrátora",
         "select-entity": "Vyberte entitu",
-        "selected-items": "Vybrané položky"
+        "selected-items": "Vybrané položky",
+        "select-identifier": "Vyberte identifikátor"
     },
     "processes": {
         "instances": "Instance procesů",
@@ -107,6 +108,7 @@
         "filter-by-entity": "Filtrovat podle typu Intelektuální Entity",
         "filter-by-missing-id": "Filtrovat podle chybějícího identifikátoru",
         "filter-by-state": "Filtrovat podle stavu URN:NBN",
+        "filter-by-deactivation-date": "Filtrovat podle data deaktivace",
         "count-digital-instances": "Zahrnout počet Digitálních Instancí",
         "from": "Datum od",
         "to": "Datum do",
@@ -123,7 +125,10 @@
         "DEACTIVATED": "Deaktivované",
         "true": "Ano",
         "false": "Ne",
-        "log-scheduled": "Naplánované procesy neobsahují logy."
+        "log-scheduled": "Naplánované procesy neobsahují logy.",
+        "cnb": "CNB",
+        "issn": "ISSN",
+        "isbn": "ISBN"
     },
     "definitions": {
         "OAI_ADAPTER": "OAI adapter",

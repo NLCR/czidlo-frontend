@@ -46,6 +46,9 @@ import { registerLocaleData } from '@angular/common';
 import localeCs from '@angular/common/locales/cs';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translate/http-loader';
+import { CheckboxComponent } from './shared/checkbox/checkbox.component';
+import { RadioGroupComponent } from './shared/radio-group/radio-group.component';
+import { RadioButtonComponent } from './shared/radio-button/radio-button.component';
 
 // Překladač
 export function HttpLoaderFactory() {
@@ -93,6 +96,9 @@ export const MY_DATE_FORMATS = {
     ConfirmDialogComponent,
     LoginDialogComponent,
     EditArchiverDialogComponent,
+    CheckboxComponent,
+    RadioGroupComponent,
+    RadioButtonComponent,
   ],
   imports: [
     BrowserModule,
