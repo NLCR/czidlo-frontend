@@ -1,1 +1,24 @@
-<p>logs works!</p>
+<div class="app-not-logged-in" *ngIf="!loggedIn()">
+    <div class="app-not-logged-in-content">
+        <div class="app-not-logged-in-message">
+            {{ 'not-logged-in-message' | translate }}
+        </div>
+    </div>
+</div>
+<div class="app-logs-container" *ngIf="loggedIn()">
+    <div class="app-logs-header">
+        <div class="app-logs-title">
+            {{ 'logs.title' | translate }}
+        </div>
+    </div>
+    <div class="app-logs-actions">
+        <app-button size="s" variant="primary" (click)="onDownloadLogs()">
+            {{ 'buttons.download-logs' | translate }}
+        </app-button>
+    </div>
+    <div class="app-logs-body">
+        <div class="app-logs-content">
+            <pre>{{ logs }}</pre>
+        </div>
+    </div>
+</div>

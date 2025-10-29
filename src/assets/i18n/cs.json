@@ -54,7 +54,8 @@
         "add": "Přidat",
         "close": "Zavřít",
         "add-registrator": "Přidat registrátora",
-        "add-archiver": "Přidat archivátora"
+        "add-archiver": "Přidat archivátora",
+        "download-logs": "Stáhnout celý soubor s logy"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
@@ -160,6 +161,9 @@
         "archiver": "Archivátor",
         "add-archiver-title": "vložení nového záznamu",
         "edit-archiver-title": "úprava záznamu"
+    },
+    "logs": {
+        "title": "Seznam posledních 30 logů"
     }
 
 }

@@ -41,6 +41,28 @@ export class ApiService {
         return throwError(() => 'Server error');
     }
 
+    // ✅ univerzální metoda pro stahování souborů
+    downloadFile(endpoint: string): Observable<HttpResponse<Blob>> {
+        const url = `${this.apiUrl}/${endpoint}`;
+        console.log(`Downloading file from URL: ${url}`);
+        return this.http
+            .get(url, {
+                responseType: 'blob',
+                observe: 'response',
+            })
+            .pipe(catchError(this.handleError));
+    }
+    downloadLogFile(url: string) {
+        this.http.get(url, { responseType: 'blob' }).subscribe((blob) => {
+            const a = document.createElement('a');
+            const objectUrl = URL.createObjectURL(blob);
+            a.href = objectUrl;
+            a.download = 'system_logs.txt';
+            a.click();
+            URL.revokeObjectURL(objectUrl);
+        });
+    }
+
     // PROCESSES
     getProcesses(): Observable<any> {
         const url = `${this.apiUrl}/processes`;
@@ -67,18 +89,6 @@ export class ApiService {
             })
             .pipe(catchError(this.handleError));
     }
-
-    // ✅ univerzální metoda pro stahování souborů
-    downloadFile(endpoint: string): Observable<HttpResponse<Blob>> {
-        const url = `${this.apiUrl}/${endpoint}`;
-        return this.http
-            .get(url, {
-                responseType: 'blob',
-                observe: 'response',
-            })
-            .pipe(catchError(this.handleError));
-    }
-
     deleteProcess(id: string): Observable<any> {
         const url = `${this.apiUrl}/processes/${id}`;
         return this.http.delete(url).pipe(catchError(this.handleError));
@@ -91,6 +101,7 @@ export class ApiService {
         const url = `${this.apiUrl}/processes/${id}/cancel`;
         return this.http.post(url, {}).pipe(catchError(this.handleError));
     }
+
     // INFO PAGES
     getInfo(): Observable<any> {
         return this.http.get(this.infoUrlCz, { responseType: 'text' });
@@ -101,6 +112,7 @@ export class ApiService {
     getContact(): Observable<any> {
         return this.http.get(this.contactsUrlCz, { responseType: 'text' });
     }
+
     // ARCHIVERS
     getArchivers(): Observable<any> {
         const url = `${this.apiUrl}/archivers`;
@@ -121,5 +133,19 @@ export class ApiService {
     editArchiver(id: string, body: any): Observable<any> {
         const url = `${this.apiUrl}/archivers/${id}`;
         return this.http.put(url, body).pipe(catchError(this.handleError));
+    }
+
+    // LOGS
+    getLogs(lines?: number): Observable<any> {
+        console.log('Fetching logs, lines:', lines);
+
+        if (!lines) {
+            const url = `${this.apiUrl}/system_logs`;
+            this.downloadLogFile(url);
+            return of(null);
+        }
+
+        const url = `${this.apiUrl}/system_logs?maxLines=${lines}`;
+        return this.doGet(url, { responseType: 'text' });
     }
 }
