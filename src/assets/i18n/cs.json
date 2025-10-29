@@ -30,11 +30,21 @@
             "title": "Přihlášení",
             "username": "Uživatelské jméno",
             "password": "Heslo",
+            "email": "E-mail",
+            "is-admin": "Administrátor",
             "cancel": "Zavřít",
             "login": "Přihlásit se",
             "hint": "Zapomněli jste heslo? Obraťte se na technickou podporu:",
-            "error": "Chyba při přihlášení. Zkontrolujte uživatelské jméno a heslo."
-        }
+            "error": "Chyba při přihlášení. Zkontrolujte uživatelské jméno a heslo.",
+            "password-hint": "Zkopírujte heslo a předejte ho uživateli. Ten si ho může  změnit. Po zavření okna už nebude znovu dostupné."
+        },
+        "username": "uživatelské jméno",
+        "admin": "administrátor",
+        "email": "e-mail",
+        "created": "vloženo",
+        "modified": "naposledy změněno",
+        "id": "id",
+        "add-new-user-title": "Uživatelský účet – vložení nového záznamu"
     },
     "buttons": {
         "rights": "Práva",
@@ -49,7 +59,7 @@
         "confirm-delete": "Ano, smazat",
         "confirm-cancel": "Ano, zrušit",
         "confirm-kill": "Ano, ukončit",
-        "plan-process":"Naplánovat proces",
+        "plan-process": "Naplánovat proces",
         "set-process": "Nastavit proces",
         "add": "Přidat",
         "close": "Zavřít",
@@ -72,7 +82,6 @@
         "process-planned-successfully": "Proces byl úspěšně naplánován",
         "process-set-successfully": "Proces byl úspěšně nastaven",
         "error-planning-process": "Chyba při plánování procesu"
-
     },
     "inputs": {
         "pick-start-date": "Vyberte od",
@@ -165,5 +174,4 @@
     "logs": {
         "title": "Seznam posledních 30 logů"
     }
-
 }

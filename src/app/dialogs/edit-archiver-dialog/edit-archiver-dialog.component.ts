@@ -21,8 +21,6 @@ export class EditArchiverDialogComponent {
     }
 
     onConfirm(): void {
-        // Implement archiver editing logic here
-        console.log('Editing archiver:', this.name);
         this.dialogRef.close({
             name: this.name,
             description: this.description,
@@ -30,7 +28,6 @@ export class EditArchiverDialogComponent {
     }
 
     onCancel(): void {
-        // Close the dialog, return false
         this.dialogRef.close(false);
     }
 

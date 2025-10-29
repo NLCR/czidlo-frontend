@@ -1,7 +1,6 @@
 import { Injectable, signal } from '@angular/core';
-import { environment as staticEnv } from '../../environments/environment';
-import { Observable, of, throwError } from 'rxjs';
-import { map, catchError, delay, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
 @Injectable({ providedIn: 'root' })

@@ -148,4 +148,42 @@ export class ApiService {
         const url = `${this.apiUrl}/system_logs?maxLines=${lines}`;
         return this.doGet(url, { responseType: 'text' });
     }
+
+    // USERS
+    getUsers(): Observable<any> {
+        const url = `${this.apiUrl}/users`;
+        return this.doGet(url);
+    }
+    getUser(id: string): Observable<any> {
+        const url = `${this.apiUrl}/users/${id}`;
+        return this.doGet(url);
+    }
+    createUser(body: any): Observable<any> {
+        const url = `${this.apiUrl}/users`;
+        return this.http.post(url, body).pipe(catchError(this.handleError));
+    }
+    updateUser(id: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/users/${id}`;
+        return this.http.put(url, body).pipe(catchError(this.handleError));
+    }
+    deleteUser(id: string): Observable<any> {
+        const url = `${this.apiUrl}/users/${id}`;
+        return this.http.delete(url).pipe(catchError(this.handleError));
+    }
+    updateUserPassword(id: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/users/${id}/password`;
+        return this.http.put(url, body).pipe(catchError(this.handleError));
+    }
+    assignUserRights(id: string, registrarId: string) {
+        const url = `${this.apiUrl}/users/${id}/registrar_rights/${registrarId}`;
+        return this.http.post(url, {}).pipe(catchError(this.handleError));
+    }
+    removeUserRights(id: string, registrarId: string) {
+        const url = `${this.apiUrl}/users/${id}/registrar_rights/${registrarId}`;
+        return this.http.delete(url).pipe(catchError(this.handleError));
+    }
+    listUserRights(id: string): Observable<any> {
+        const url = `${this.apiUrl}/users/${id}/registrar_rights`;
+        return this.doGet(url);
+    }
 }

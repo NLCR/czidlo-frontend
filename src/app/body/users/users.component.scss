@@ -1,9 +1,42 @@
 .app-users-container {
     display: flex;
-    width: 800px;
-    padding: 24px 16px 40px 16px;
+    flex: 1;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 24px;
-    flex-shrink: 0;
+    min-width: 0;
+    min-height: 0;
+    .app-users {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 16px;
+        align-self: stretch;
+        padding: 24px 16px 40px 16px;
+        .app-table-users {
+            width: 800px;
+        }
+    }
+}
+.app-sidebar {
+    display: none;
+    height: 100%;
+    align-self: flex-end;
+    &.app-sidebar-active {
+        display: flex;
+        // position: absolute;
+    }
+    .app-sidebar-user {
+        display: flex;
+        background-color: #fff;
+        flex-direction: column;
+        align-items: flex-start;
+        z-index: 101;
+        width: 800px;
+        // STYLES SCSS
+    }
+}
+.app-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100;
 }

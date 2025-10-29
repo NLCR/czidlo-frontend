@@ -23,6 +23,7 @@ const routes: Routes = [
     { path: 'statistics', component: StatisticsComponent },
     { path: 'import', component: ImportRecordComponent },
     { path: 'users', component: UsersComponent },
+    { path: 'users/:id', component: UsersComponent },
     { path: 'processes', component: ProcessesComponent },
     { path: 'processes/:tab', component: ProcessesComponent },
     { path: 'processes/:tab/:id', component: ProcessesComponent },

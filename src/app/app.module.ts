@@ -22,6 +22,10 @@ import { ToggleComponent } from './shared/toggle/toggle.component';
 import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { LoginDialogComponent } from './dialogs/login-dialog/login-dialog.component';
 import { EditArchiverDialogComponent } from './dialogs/edit-archiver-dialog/edit-archiver-dialog.component';
+import { CheckboxComponent } from './shared/checkbox/checkbox.component';
+import { RadioGroupComponent } from './shared/radio-group/radio-group.component';
+import { RadioButtonComponent } from './shared/radio-button/radio-button.component';
+import { EditUserComponent } from './dialogs/edit-user/edit-user.component';
 
 // MATERIAL
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -40,114 +44,114 @@ import { ApiService } from './services/api.service';
 import { ProcessesService } from './services/processes.service';
 import { AuthService } from './services/auth.service';
 import { RegistratorsService } from './services/registrators.service';
+import { UsersService } from './services/users.service';
 
 // LOCALE & I18N
 import { registerLocaleData } from '@angular/common';
 import localeCs from '@angular/common/locales/cs';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translate/http-loader';
-import { CheckboxComponent } from './shared/checkbox/checkbox.component';
-import { RadioGroupComponent } from './shared/radio-group/radio-group.component';
-import { RadioButtonComponent } from './shared/radio-button/radio-button.component';
 
 // Překladač
 export function HttpLoaderFactory() {
-  return new TranslateHttpLoader();
+    return new TranslateHttpLoader();
 }
 
 registerLocaleData(localeCs);
 
 export function initializeApp(envService: EnvironmentService): () => Promise<any> {
-  return async () => {
-    return envService.load();
-  };
+    return async () => {
+        return envService.load();
+    };
 }
 
 // 🎯 Vlastní české formáty (Moment DateAdapter rozumí 'D.M.YYYY')
 export const MY_DATE_FORMATS = {
-  parse: {
-    dateInput: 'D.M.YYYY',
-  },
-  display: {
-    dateInput: 'D.M.YYYY',
-    monthYearLabel: 'MMMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
+    parse: {
+        dateInput: 'D.M.YYYY',
+    },
+    display: {
+        dateInput: 'D.M.YYYY',
+        monthYearLabel: 'MMMM YYYY',
+        dateA11yLabel: 'LL',
+        monthYearA11yLabel: 'MMMM YYYY',
+    },
 };
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    MenuComponent,
-    BodyComponent,
-    InformationComponent,
-    RulesComponent,
-    SearchComponent,
-    RegistratorsComponent,
-    StatisticsComponent,
-    ImportRecordComponent,
-    AdminComponent,
-    ProcessesComponent,
-    LogsComponent,
-    ButtonComponent,
-    UsersComponent,
-    ToggleComponent,
-    ConfirmDialogComponent,
-    LoginDialogComponent,
-    EditArchiverDialogComponent,
-    CheckboxComponent,
-    RadioGroupComponent,
-    RadioButtonComponent,
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    TranslateModule.forRoot({
-      fallbackLang: 'cs',
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-      },
-    }),
-    MatDatepickerModule,
-    MatMomentDateModule, // 👈 Moment místo Native
-    MatFormFieldModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    MatSelectModule,
-    MatSnackBarModule,
-    FormsModule,
-    MatRadioModule,
-  ],
-  providers: [
-    provideHttpClient(),
-    ApiService,
-    ProcessesService,
-    AuthService,
-    RegistratorsService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializeApp,
-      deps: [EnvironmentService],
-      multi: true,
-    },
-    { provide: LOCALE_ID, useValue: 'cs' },
-    { provide: MAT_DATE_LOCALE, useValue: 'cs' },
-    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
-    {
-      provide: TRANSLATE_HTTP_LOADER_CONFIG,
-      useValue: {
-        prefix: './assets/i18n/',
-        suffix: '.json',
-      },
-    },
-  ],
-  bootstrap: [AppComponent],
+    declarations: [
+        AppComponent,
+        MenuComponent,
+        BodyComponent,
+        InformationComponent,
+        RulesComponent,
+        SearchComponent,
+        RegistratorsComponent,
+        StatisticsComponent,
+        ImportRecordComponent,
+        AdminComponent,
+        ProcessesComponent,
+        LogsComponent,
+        ButtonComponent,
+        UsersComponent,
+        ToggleComponent,
+        ConfirmDialogComponent,
+        LoginDialogComponent,
+        EditArchiverDialogComponent,
+        CheckboxComponent,
+        RadioGroupComponent,
+        RadioButtonComponent,
+        EditUserComponent,
+    ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        TranslateModule.forRoot({
+            fallbackLang: 'cs',
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+            },
+        }),
+        MatDatepickerModule,
+        MatMomentDateModule, // 👈 Moment místo Native
+        MatFormFieldModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        MatSelectModule,
+        MatSnackBarModule,
+        FormsModule,
+        MatRadioModule,
+    ],
+    providers: [
+        provideHttpClient(),
+        ApiService,
+        ProcessesService,
+        AuthService,
+        RegistratorsService,
+        UsersService,
+        {
+            provide: APP_INITIALIZER,
+            useFactory: initializeApp,
+            deps: [EnvironmentService],
+            multi: true,
+        },
+        { provide: LOCALE_ID, useValue: 'cs' },
+        { provide: MAT_DATE_LOCALE, useValue: 'cs' },
+        { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
+        {
+            provide: TRANSLATE_HTTP_LOADER_CONFIG,
+            useValue: {
+                prefix: './assets/i18n/',
+                suffix: '.json',
+            },
+        },
+    ],
+    bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(private adapter: DateAdapter<any>) {
-    // 🔥 Tohle zajistí správné parsování i formátování českých dat
-    this.adapter.setLocale('cs');
-  }
+    constructor(private adapter: DateAdapter<any>) {
+        // 🔥 Tohle zajistí správné parsování i formátování českých dat
+        this.adapter.setLocale('cs');
+    }
 }

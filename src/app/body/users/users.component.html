@@ -1,29 +1,102 @@
-<div class="app-users-container">
-    <div class="app-table app-table-users">
-        <div class="app-row app-row-header app-row-header-with-button">
-            <div class="app-col app-col-user app-col-user-title">
-                {{ 'users.list-of-users' | translate }}
-                <app-button size="s" [icon]="true" iconLeft="add.png"></app-button>
-            </div>
-            <div class="app-col app-col-actions app-col-actions-title">
-                <div>{{ 'actions' | translate }}</div>
-            </div>
+<div class="app-not-logged-in" *ngIf="!loggedIn()">
+    <div class="app-not-logged-in-content">
+        <div class="app-not-logged-in-message">
+            {{ 'not-logged-in-message' | translate }}
         </div>
-        <div class="app-table-body">
-            <div class="app-row" *ngFor="let user of users">
-                <div class="app-col app-col-user">{{ user }}</div>
-                <div class="app-col app-col-actions">
-                    <app-button size="s" variant="tertiary" iconRight="setting.png">
-                        {{ 'buttons.rights' | translate }}
-                    </app-button>
-                    <app-button size="s" variant="tertiary" iconRight="lock.png">
-                        {{ 'buttons.change-password' | translate }}
-                    </app-button>
-                    <div class="app-buttons">
-                        <app-button size="s" variant="tertiary" [icon]="true" iconRight="edit.png"></app-button>
-                        <app-button size="s" variant="tertiary" [icon]="true" iconRight="trash.png"></app-button>
+    </div>
+</div>
+
+<div class="app-users-container" *ngIf="loggedIn()">
+    <div class="app-users">
+        <div class="app-table app-table-users">
+            <div class="app-row app-row-header app-row-header-with-button">
+                <div class="app-col app-col-user app-col-user-title">
+                    {{ 'users.list-of-users' | translate }}
+                    <app-button size="s" [icon]="true" iconLeft="add.png" (click)="openAddUserDialog()"></app-button>
+                </div>
+                <div class="app-col app-col-actions app-col-actions-title">
+                    <div>{{ 'actions' | translate }}</div>
+                </div>
+            </div>
+            <div class="app-table-body">
+                <div
+                    class="app-row app-table-row app-row-clicable"
+                    *ngFor="let user of users()"
+                    [ngClass]="{ 'app-row-active': activeUser?.id.toString() === user.id.toString() }"
+                    (click)="openSidebar(user)"
+                >
+                    <div class="app-col app-col-user">{{ user?.login }}</div>
+                    <div class="app-col app-col-actions">
+                        <app-button size="s" variant="tertiary" iconRight="setting.png">
+                            {{ 'buttons.rights' | translate }}
+                        </app-button>
+                        <app-button size="s" variant="tertiary" iconRight="lock.png">
+                            {{ 'buttons.change-password' | translate }}
+                        </app-button>
+                        <div class="app-buttons">
+                            <app-button size="s" variant="tertiary" [icon]="true" iconRight="edit.png"></app-button>
+                            <app-button size="s" variant="tertiary" [icon]="true" iconRight="trash.png"></app-button>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
+    <div class="app-sidebar-user" *ngIf="activeUser">
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">{{ 'registrators.detail' | translate }} - {{ activeUser?.login }}</div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+        <div class="app-sidebar-content">
+            <div class="app-sections">
+                <div class="app-section">
+                    <div class="app-items">
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'users.id' | translate }}:</span>
+                            <span class="app-item-value">{{ activeUser?.id }}</span>
+                        </div>
+                        <div class="app-item" *ngIf="activeUser?.login">
+                            <span class="app-item-label">{{ 'users.username' | translate }}:</span>
+                            <span class="app-item-value">{{ activeUser?.login }}</span>
+                        </div>
+                        <div class="app-item" *ngIf="activeUser?.email">
+                            <span class="app-item-label">{{ 'users.email' | translate }}:</span>
+                            <span class="app-item-value">{{ activeUser?.email }}</span>
+                        </div>
+                        <div class="app-item" *ngIf="activeUser?.admin !== undefined">
+                            <span class="app-item-label">{{ 'users.admin' | translate }}:</span>
+                            <span class="app-item-value">{{ activeUser?.admin ? 'ano' : 'ne' }}</span>
+                        </div>
+                        <div class="app-item" *ngIf="activeUser?.description">
+                            <span class="app-item-label">{{ 'users.description' | translate }}:</span>
+                            <span class="app-item-value">{{ activeUser?.description }}</span>
+                        </div>
+                        <div class="app-item" *ngIf="activeUser?.created">
+                            <span class="app-item-label">{{ 'users.created' | translate }}:</span>
+                            <span class="app-item-value">{{ activeUser?.created }}</span>
+                        </div>
+                        <div class="app-item" *ngIf="activeUser?.modified">
+                            <span class="app-item-label">{{ 'users.modified' | translate }}:</span>
+                            <span class="app-item-value">{{ activeUser?.modified }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-sidebar-footer">
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
             </div>
         </div>
     </div>
