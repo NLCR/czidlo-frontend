@@ -674,6 +674,18 @@ app-information {
         }
     }
 }
+.app-base-input-field {
+    width: 100%;
+    mat-button {
+        margin-left: 12px;
+        cursor: pointer;
+        &:hover {
+            path {
+                fill: var(--Text-Primary, #0080a8);
+            }
+        }
+    }
+}
 .app-base-input-label {
     color: var(--Text-Light, #4c6580);
     /* Typesettings/S/Medium2 */
@@ -722,11 +734,14 @@ app-information {
 //     align-items: center;
 // }
 
+.mat-mdc-form-field {
+    width: 100%;
+}
+
 .mat-mdc-form-field .mdc-text-field {
     background-color: #fff;
     border: 1px solid #bfccd9;
     border-radius: 4px;
-    width: 100%;
     box-sizing: border-box;
     align-items: center;
     height: 48px;
@@ -750,12 +765,16 @@ app-information {
     outline: none;
     border-radius: 4px;
 }
+.mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+}
+
 .mat-mdc-form-field .mdc-notched-outline {
     display: none !important;
 }
 
 .mat-mdc-form-field.mat-mdc-form-field-has-icon-suffix .mat-mdc-text-field-wrapper {
-    padding-right: 8px;
+    padding-right: 16px;
     height: 48px;
     align-items: center;
 }
@@ -810,6 +829,7 @@ app-information {
     background-color: var(--Color-Btn-Primary, #0080a8) !important;
     border: none !important;
 }
+
 
 // CALENDAR
 .mat-datepicker-content .mat-calendar {

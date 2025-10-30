@@ -26,17 +26,24 @@
     "users": {
         "list-of-users": "Seznam uživatelských účtů",
         "add-new-user": "Přidat nového uživatele",
-        "login": {
-            "title": "Přihlášení",
-            "username": "Uživatelské jméno",
-            "password": "Heslo",
-            "email": "E-mail",
-            "is-admin": "Administrátor",
+        "title": "Přihlášení",
+        "Username": "Uživatelské jméno",
+        "Password": "Heslo",
+        "Email": "E-mail",
+        "Admin": "Administrátor",
+        "hints": {
+            "username": "Zadejte uživatelské jméno.",
+            "username-hint": "Uživatelské jméno musí být 5-15 znaků dlouhé.",
             "cancel": "Zavřít",
-            "login": "Přihlásit se",
-            "hint": "Zapomněli jste heslo? Obraťte se na technickou podporu:",
+            "forgot": "Zapomněli jste heslo? Obraťte se na technickou podporu:",
             "error": "Chyba při přihlášení. Zkontrolujte uživatelské jméno a heslo.",
-            "password-hint": "Zkopírujte heslo a předejte ho uživateli. Ten si ho může  změnit. Po zavření okna už nebude znovu dostupné."
+            "password-hint": "Zkopírujte heslo a předejte ho uživateli. Ten si ho může  změnit. Po zavření okna už nebude znovu dostupné.",
+            "required": "Toto pole je povinné.",
+            "username-length": "Uživatelské jméno musí mít minimálně 5 a maximálně 15 znaků.",
+            "username-format": "Uživatelské jméno může obsahovat pouze písmena, číslice, podtržítka a pomlčky.",
+            "generate-password": "Přegenerovat heslo",
+            "copy-password": "Zkopírovat heslo do schránky",
+            "email-format": "Zadejte platnou e-mailovou adresu."
         },
         "username": "uživatelské jméno",
         "admin": "administrátor",
@@ -65,7 +72,8 @@
         "close": "Zavřít",
         "add-registrator": "Přidat registrátora",
         "add-archiver": "Přidat archivátora",
-        "download-logs": "Stáhnout celý soubor s logy"
+        "download-logs": "Stáhnout celý soubor s logy",
+        "login": "Přihlásit se"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",

@@ -39,8 +39,8 @@
             align-items: flex-start;
             gap: var(--Spacing-x2, 8px);
             align-self: stretch;
-            &.app-part-description {
-                width: 700px;
+            &.app-part-username, &.app-part-email, &.app-part-password {
+                width: 400px;
                 .app-base-textarea {
                     width: 100%;
                 }

@@ -29,7 +29,7 @@ export class LoginDialogComponent {
                 },
                 error: (error) => {
                     console.error('Login failed', error);
-                    this.errorMessage = 'users.login.error';
+                    this.errorMessage = 'users.hints.error';
                 }
                 });
             }

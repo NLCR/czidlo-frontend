@@ -37,6 +37,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 // SERVICES
 import { EnvironmentService } from './services/environment.service';
@@ -122,6 +123,7 @@ export const MY_DATE_FORMATS = {
         MatSnackBarModule,
         FormsModule,
         MatRadioModule,
+        MatTooltipModule
     ],
     providers: [
         provideHttpClient(),

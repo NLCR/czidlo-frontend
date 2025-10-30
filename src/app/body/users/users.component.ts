@@ -73,7 +73,7 @@ export class UsersComponent {
     openAddUserDialog() {
         this.dialog.open(EditUserComponent, {
             data: {
-                username: '',
+                login: '',
                 email: '',
                 isAdmin: false,
                 password: ''
