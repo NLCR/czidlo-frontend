@@ -52,6 +52,7 @@ import { registerLocaleData } from '@angular/common';
 import localeCs from '@angular/common/locales/cs';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translate/http-loader';
+import { EditPasswordDialogComponent } from './dialogs/edit-password-dialog/edit-password-dialog.component';
 
 // Překladač
 export function HttpLoaderFactory() {
@@ -103,6 +104,7 @@ export const MY_DATE_FORMATS = {
         RadioGroupComponent,
         RadioButtonComponent,
         EditUserComponent,
+        EditPasswordDialogComponent,
     ],
     imports: [
         BrowserModule,

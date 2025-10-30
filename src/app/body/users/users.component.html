@@ -27,15 +27,15 @@
                 >
                     <div class="app-col app-col-user">{{ user?.login }}</div>
                     <div class="app-col app-col-actions">
-                        <app-button size="s" variant="tertiary" iconRight="setting.png">
+                        <app-button size="s" variant="tertiary" iconRight="setting.png" (click)="loadRightsDetails(user); $event.stopPropagation()">
                             {{ 'buttons.rights' | translate }}
                         </app-button>
-                        <app-button size="s" variant="tertiary" iconRight="lock.png">
+                        <app-button size="s" variant="tertiary" iconRight="lock.png" (click)="openChangePasswordDialog(user); $event.stopPropagation()">
                             {{ 'buttons.change-password' | translate }}
                         </app-button>
                         <div class="app-buttons">
-                            <app-button size="s" variant="tertiary" [icon]="true" iconRight="edit.png"></app-button>
-                            <app-button size="s" variant="tertiary" [icon]="true" iconRight="trash.png"></app-button>
+                            <app-button size="s" variant="tertiary" [icon]="true" iconRight="edit.png" (click)="openEditUserDialog(user); $event.stopPropagation()"></app-button>
+                            <app-button size="s" variant="tertiary" [icon]="true" iconRight="trash.png" (click)="openDeleteUserDialog(user); $event.stopPropagation()"></app-button>
                         </div>
                     </div>
                 </div>

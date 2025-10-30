@@ -263,8 +263,8 @@ export class ProcessesComponent {
             .open(ConfirmDialogComponent, {
                 data: {
                     data: process,
-                    title: this.translate.instant('messages.confirm-delete-process-title'),
-                    warning: this.translate.instant('buttons.confirm-delete'),
+                    title: 'messages.confirm-delete-process-title',
+                    warning: 'buttons.confirm-delete',
                     // message: this.translate.instant('messages.confirm-delete-message', { name: process.name }),
                 },
                 maxWidth: '800px',
@@ -290,8 +290,8 @@ export class ProcessesComponent {
             .open(ConfirmDialogComponent, {
                 data: {
                     data: process,
-                    title: this.translate.instant('messages.confirm-kill-process-title'),
-                    warning: this.translate.instant('buttons.confirm-kill'),
+                    title: 'messages.confirm-kill-process-title',
+                    warning: 'buttons.confirm-kill',
                     // message: this.translate.instant('messages.confirm-delete-message', { name: process.name }),
                 },
                 maxWidth: '800px',
@@ -317,8 +317,8 @@ export class ProcessesComponent {
             .open(ConfirmDialogComponent, {
                 data: {
                     data: process,
-                    title: this.translate.instant('messages.confirm-cancel-process-title'),
-                    warning: this.translate.instant('buttons.confirm-cancel'),
+                    title: 'messages.confirm-cancel-process-title',
+                    warning: 'buttons.confirm-cancel',
                     // message: this.translate.instant('messages.confirm-delete-message', { name: process.name }),
                 },
                 maxWidth: '800px',

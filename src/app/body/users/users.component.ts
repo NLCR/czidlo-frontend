@@ -6,6 +6,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { EditUserComponent } from '../../dialogs/edit-user/edit-user.component';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { EditPasswordDialogComponent } from '../../dialogs/edit-password-dialog/edit-password-dialog.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-users',
@@ -26,7 +28,9 @@ export class UsersComponent {
         private usersService: UsersService,
         private router: Router,
         private route: ActivatedRoute,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private _snackBar: MatSnackBar,
+        private translate: TranslateService
     ) {}
 
     ngOnInit() {
@@ -63,6 +67,10 @@ export class UsersComponent {
             },
         });
     }
+    loadRightsDetails(user: any) {
+        // TODO: implementovat načtení a zobrazení práv uživatele
+        console.log('Loading rights details for user:', user);
+    }
 
     openSidebar(user: any) {
         this.router.navigate(['/users', user.id]);
@@ -71,25 +79,116 @@ export class UsersComponent {
         this.router.navigate(['/users']);
     }
     openAddUserDialog() {
-        this.dialog.open(EditUserComponent, {
+        this.dialog
+            .open(EditUserComponent, {
+                data: {
+                    login: '',
+                    email: '',
+                    isAdmin: false,
+                    password: '',
+                    action: 'add',
+                },
+                maxWidth: '800px',
+                minWidth: '600px',
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                console.log('Add User dialog closed:', result);
+                if (result) {
+                    this.usersService.addUser(result).subscribe({
+                        next: (response) => {
+                            console.log('User added successfully:', response);
+                            this.loadUsers();
+                            this._snackBar.open(this.translate.instant('messages.user-saved-successfully'), 'Close', { duration: 2000 });
+                        },
+                        error: (error) => {
+                            console.error('Error adding user:', error);
+                        },
+                    });
+                }
+            });
+    }
+    openEditUserDialog(user: any) {
+        this.dialog
+            .open(EditUserComponent, {
+                data: {
+                    id: user.id,
+                    login: user.login,
+                    email: user.email,
+                    isAdmin: user.admin,
+                    action: 'edit',
+                },
+                maxWidth: '800px',
+                minWidth: '600px',
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                console.log('Edit User dialog closed:', result);
+                if (result) {
+                    this.usersService.updateUser(user.id, result).subscribe({
+                        next: (response) => {
+                            console.log('User updated successfully:', response);
+                            this.loadUsers();
+                            this._snackBar.open(this.translate.instant('messages.user-saved-successfully'), 'Close', { duration: 2000 });
+                        },
+                        error: (error) => {
+                            console.error('Error updating user:', error);
+                            this._snackBar.open(this.translate.instant('messages.error-updating-user'), 'Close', { duration: 2000 });
+                        },
+                    });
+                }
+            });
+    }
+    openChangePasswordDialog(user: any) {
+        console.log('Open change password dialog for user:', user);
+        const dialogRef = this.dialog.open(EditPasswordDialogComponent, {
             data: {
-                login: '',
-                email: '',
-                isAdmin: false,
-                password: ''
+                password: '',
+                login: user.login,
             },
             maxWidth: '800px',
             minWidth: '600px',
-        }).afterClosed().subscribe((result) => {
-            console.log('Add User dialog closed:', result);
-            if (result) {
-                this.usersService.addUser(result).subscribe({
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            console.log('Change Password dialog closed:', result);
+            if (result && result.password) {
+                this.usersService.updateUserPassword(user.id, result.password).subscribe({
                     next: (response) => {
-                        console.log('User added successfully:', response);
+                        console.log('Password updated successfully:', response);
                         this.loadUsers();
+                        this._snackBar.open(this.translate.instant('messages.password-updated-successfully'), 'Close', { duration: 2000 });
                     },
                     error: (error) => {
-                        console.error('Error adding user:', error);
+                        console.error('Error updating password:', error);
+                        this._snackBar.open(this.translate.instant('messages.error-updating-password'), 'Close', { duration: 2000 });
+                    },
+                });
+            }
+        });
+    }
+    openDeleteUserDialog(user: any) {
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: {
+                title: 'messages.confirm-delete-user-title',
+                data: user,
+                warning: 'buttons.confirm-delete',
+            },
+            maxWidth: '600px',
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            console.log('Delete User dialog closed:', result);
+            if (result === true) {
+                this.usersService.deleteUser(user.id).subscribe({
+                    next: (response) => {
+                        console.log('User deleted successfully:', response);
+                        this.loadUsers();
+                        this._snackBar.open(this.translate.instant('messages.user-deleted-successfully'), 'Close', { duration: 2000 });
+                    },
+                    error: (error) => {
+                        console.error('Error deleting user:', error);
+                        this._snackBar.open(this.translate.instant('messages.error-deleting-user'), 'Close', { duration: 2000 });
                     },
                 });
             }

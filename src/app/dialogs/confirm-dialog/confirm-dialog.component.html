@@ -1,7 +1,7 @@
 <div class="app-dialog app-confirm-dialog">
     <div class="app-dialog-header">
         <div class="app-dialog-title">
-            {{ data.title }} "{{ data.data?.id }} - {{ data.data?.type || data.data?.name }}"?
+            {{ data.title | translate}} "{{ data.data?.id }} - {{ data.data?.type || data.data?.name || data.data?.login }}"?
         </div>
         <div class="app-close" (click)="onCancel()">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">

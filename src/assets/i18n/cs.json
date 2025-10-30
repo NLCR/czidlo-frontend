@@ -33,17 +33,20 @@
         "Admin": "Administrátor",
         "hints": {
             "username": "Zadejte uživatelské jméno.",
-            "username-hint": "Uživatelské jméno musí být 5-15 znaků dlouhé.",
+            "username-hint": "Uživatelské jméno musí být 5-15 znaků dlouhé může obsahovat pouze písmena bez diakritiky, číslice, podtržítka a pomlčky.",
             "cancel": "Zavřít",
             "forgot": "Zapomněli jste heslo? Obraťte se na technickou podporu:",
             "error": "Chyba při přihlášení. Zkontrolujte uživatelské jméno a heslo.",
             "password-hint": "Zkopírujte heslo a předejte ho uživateli. Ten si ho může  změnit. Po zavření okna už nebude znovu dostupné.",
             "required": "Toto pole je povinné.",
-            "username-length": "Uživatelské jméno musí mít minimálně 5 a maximálně 15 znaků.",
-            "username-format": "Uživatelské jméno může obsahovat pouze písmena, číslice, podtržítka a pomlčky.",
+            "username-length": "Délka 5 až 15 znaků.",
+            "username-format": "Obsahuje nepovolený znak.",
             "generate-password": "Přegenerovat heslo",
             "copy-password": "Zkopírovat heslo do schránky",
-            "email-format": "Zadejte platnou e-mailovou adresu."
+            "email-format": "Zadejte platnou e-mailovou adresu.",
+            "password-length": "Délka 8 až 30 znaků.",
+            "password-format": "Chybí povinný znak.",
+            "password-form-hint": "Heslo musí mít minimálně 8 a maximálně 30 znaků a obsahovat alespoň jedno velké písmeno, jedno malé písmeno, jedno číslo a jeden speciální znak."
         },
         "username": "uživatelské jméno",
         "admin": "administrátor",
@@ -51,7 +54,10 @@
         "created": "vloženo",
         "modified": "naposledy změněno",
         "id": "id",
-        "add-new-user-title": "Uživatelský účet – vložení nového záznamu"
+        "add-new-user-title": "Uživatelský účet – vložení nového záznamu",
+        "edit-user-title": "Uživatelský účet – úprava záznamu",
+        "edit-password-title-1": "Uživatelský účet",
+        "edit-password-title-2": "změna hesla"
     },
     "buttons": {
         "rights": "Práva",
@@ -89,7 +95,14 @@
         "required-field": "Povinné pole",
         "process-planned-successfully": "Proces byl úspěšně naplánován",
         "process-set-successfully": "Proces byl úspěšně nastaven",
-        "error-planning-process": "Chyba při plánování procesu"
+        "error-planning-process": "Chyba při plánování procesu",
+        "confirm-delete-user-title": "Opravdu chcete smazat uživatele",
+        "password-updated-successfully": "Heslo bylo úspěšně změněno",
+        "error-updating-password": "Chyba při změně hesla",
+        "user-saved-successfully": "Uživatel byl úspěšně uložen",
+        "error-updating-user": "Chyba při aktualizaci uživatele",
+        "user-deleted-successfully": "Uživatel byl úspěšně smazán",
+        "error-deleting-user": "Chyba při mazání uživatele"
     },
     "inputs": {
         "pick-start-date": "Vyberte od",

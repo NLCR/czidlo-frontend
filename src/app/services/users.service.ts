@@ -63,4 +63,49 @@ export class UsersService {
             })
         );
     }
+    updateUser(userId: string, userData: any): Observable<any> {
+        return this.apiService.updateUser(userId, userData).pipe(
+            tap({
+                next: (data) => {
+                    console.log(`User with ID ${userId} updated successfully:`, data);
+                },
+                error: (error) => {
+                    console.error(`Error updating user with ID ${userId}:`, error);
+                },
+                complete: () => {
+                    console.log(`User update complete for ID ${userId}`);
+                },
+            })
+        );
+    }
+    updateUserPassword(userId: string, passwordData: any): Observable<any> {
+        return this.apiService.updateUserPassword(userId, passwordData).pipe(
+            tap({
+                next: (data) => {
+                    console.log(`Password for user ID ${userId} updated successfully:`, data);
+                },
+                error: (error) => {
+                    console.error(`Error updating password for user ID ${userId}:`, error);
+                },
+                complete: () => {
+                    console.log(`Password update complete for user ID ${userId}`);
+                },
+            })
+        );
+    }
+    deleteUser(userId: string): Observable<any> {
+        return this.apiService.deleteUser(userId).pipe(
+            tap({
+                next: (data) => {
+                    console.log(`User with ID ${userId} deleted successfully:`, data);
+                },
+                error: (error) => {
+                    console.error(`Error deleting user with ID ${userId}:`, error);
+                },
+                complete: () => {
+                    console.log(`User deletion complete for ID ${userId}`);
+                },
+            })
+        );
+    }
 }

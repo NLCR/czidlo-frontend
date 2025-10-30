@@ -5,13 +5,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-    selector: 'app-edit-user',
+    selector: 'app-edit-password-dialog',
     standalone: false,
-    templateUrl: './edit-user.component.html',
-    styleUrl: './edit-user.component.scss',
+    templateUrl: './edit-password-dialog.component.html',
+    styleUrl: './edit-password-dialog.component.scss',
 })
-export class EditUserComponent {
-    dialogRef = inject(MatDialogRef<EditUserComponent>);
+export class EditPasswordDialogComponent {
+    dialogRef = inject(MatDialogRef<EditPasswordDialogComponent>);
     data = inject(MAT_DIALOG_DATA);
     fb = inject(FormBuilder);
     _snackBar = inject(MatSnackBar);
@@ -20,10 +20,6 @@ export class EditUserComponent {
     passwordCopied = false;
 
     userForm: FormGroup = this.fb.group({
-        login: [
-            this.data.login || '',
-            [Validators.required, Validators.minLength(5), Validators.maxLength(15), Validators.pattern(/^[A-Za-z0-9_-]+$/)],
-        ],
         password: [
             this.data.password || '',
             [
@@ -33,29 +29,16 @@ export class EditUserComponent {
                 Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{}:;,.?\/]).{8,30}$/),
             ],
         ],
-        email: [this.data.email || '@', [Validators.required, Validators.email]],
-        isAdmin: [this.data.isAdmin || false],
     });
-    get login() {
-        return this.userForm.get('login')!;
-    }
     get password() {
         return this.userForm.get('password')!;
-    }
-    get email() {
-        return this.userForm.get('email')!;
     }
 
     ngOnInit() {
         // pokud není heslo předané zvenku, vygenerujeme ho při startu
-        if (!this.data.password && this.data.action === 'add') {
-            this.generatePassword(); // false = bez snackbaru při inicializaci
+        if (!this.data?.password) {
+            this.generatePassword();
         }
-    }
-
-    toggleIsAdmin() {
-        const current = this.userForm.get('isAdmin')?.value;
-        this.userForm.patchValue({ isAdmin: !current });
     }
 
     copyPassword() {
@@ -67,20 +50,7 @@ export class EditUserComponent {
     }
 
     onConfirm() {
-        if (this.data.action === 'edit') {
-            // při editaci uživatele heslo neodesíláme, pokud nebylo změněno
-            if (!this.userForm.get('password')?.dirty) {
-                this.userForm.removeControl('password');
-                this.dialogRef.close(this.userForm.value);
-            }
-        }
-        if (this.data.action === 'add') {
-            if (this.userForm.valid) {
-                this.dialogRef.close(this.userForm.value);
-            } else {
-                this.userForm.markAllAsTouched();
-            }
-        }
+        this.dialogRef.close(this.userForm.value);
     }
 
     onCancel() {
