@@ -171,7 +171,8 @@
         "info": "Informace",
         "rules": "Pravidla",
         "contact": "Kontakt",
-        "edit": "Upravit"
+        "edit": "Upravit",
+        "text": "CZIDLO je softwarový nástroj pro podporu národního systému trvalé identifikace ČIDLO (Český systém pro identifikaci a lokalizaci dokumentů digitálního kulturního dědictví) založeného na standardu URN:NBN."
     },
     "registrators": {
         "registrators-list": "Seznam registrátorů",

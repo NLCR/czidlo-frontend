@@ -465,7 +465,7 @@
             </div>
             <div class="app-item app-lang-dropdown">
                 <div class="app-current-lang" (click)="toggleLangDropdown(); $event.stopPropagation()">
-                    <div class="app-lang" *ngIf="currentLang === 'cs'">
+                    <div class="app-lang" *ngIf="language.currentLang() === 'cs'">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <g clip-path="url(#clip0_57_3081)">
                                 <path d="M0 0H24V12H0V0Z" fill="white" />
@@ -480,7 +480,7 @@
                         </svg>
                         {{ 'menu.cs' | translate }}
                     </div>
-                    <div class="app-lang" *ngIf="currentLang === 'en'">
+                    <div class="app-lang" *ngIf="language.currentLang() === 'en'">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <g clip-path="url(#clip0_14_7055)">
                                 <path d="M0 0H24V24H0V0Z" fill="#012169" />

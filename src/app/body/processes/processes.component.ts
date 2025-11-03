@@ -265,7 +265,6 @@ export class ProcessesComponent {
                     data: process,
                     title: 'messages.confirm-delete-process-title',
                     warning: 'buttons.confirm-delete',
-                    // message: this.translate.instant('messages.confirm-delete-message', { name: process.name }),
                 },
                 maxWidth: '800px',
             })
@@ -292,7 +291,6 @@ export class ProcessesComponent {
                     data: process,
                     title: 'messages.confirm-kill-process-title',
                     warning: 'buttons.confirm-kill',
-                    // message: this.translate.instant('messages.confirm-delete-message', { name: process.name }),
                 },
                 maxWidth: '800px',
             })

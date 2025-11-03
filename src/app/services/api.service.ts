@@ -1,8 +1,9 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, effect } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError, delay, tap } from 'rxjs/operators';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { EnvironmentService } from './environment.service';
+import { LanguageService } from './language.service';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -14,18 +15,19 @@ export class ApiService {
     private rulesUrlEn: string; //en rules
     private contactsUrlEn: string; //en contacts
 
-    constructor(private http: HttpClient, private envService: EnvironmentService) {
+    constructor(private http: HttpClient, private envService: EnvironmentService, private languageService: LanguageService) {
         this.apiUrl = this.envService.get('czidloApiServiceBaseUrl');
 
         this.infoUrlCz = this.envService.get('pageInfoCzUrl'); //cz info
         this.rulesUrlCz = this.envService.get('pageRulesCzUrl'); //cz rules
         this.contactsUrlCz = this.envService.get('pageContactsCzUrl'); //cz contacts
-
         this.infoUrlEn = this.envService.get('pageInfoEnUrl'); //en info
         this.rulesUrlEn = this.envService.get('pageRulesEnUrl'); //en rules
         this.contactsUrlEn = this.envService.get('pageContactsEnUrl'); //en contacts
 
-        console.log('API URL:', this.apiUrl);
+        effect(() => {
+            console.log('🌐 Language changed →', this.languageService.currentLang());
+        });
     }
 
     doGet(url: string, options: any = {}): Observable<Object> {
@@ -104,13 +106,21 @@ export class ApiService {
 
     // INFO PAGES
     getInfo(): Observable<any> {
-        return this.http.get(this.infoUrlCz, { responseType: 'text' });
+        const lang = this.languageService.currentLang();
+        const url = lang === 'cs' ? this.infoUrlCz : this.infoUrlEn;
+        return this.http.get(url, { responseType: 'text' });
     }
+
     getRules(): Observable<any> {
-        return this.http.get(this.rulesUrlCz, { responseType: 'text' });
+        const lang = this.languageService.currentLang();
+        const url = lang === 'cs' ? this.rulesUrlCz : this.rulesUrlEn;
+        return this.http.get(url, { responseType: 'text' });
     }
+
     getContact(): Observable<any> {
-        return this.http.get(this.contactsUrlCz, { responseType: 'text' });
+        const lang = this.languageService.currentLang();
+        const url = lang === 'cs' ? this.contactsUrlCz : this.contactsUrlEn;
+        return this.http.get(url, { responseType: 'text' });
     }
 
     // ARCHIVERS

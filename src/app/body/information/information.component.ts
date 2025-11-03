@@ -1,9 +1,10 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { marked } from 'marked'; // nainstalujeme níže
 import { EnvironmentService } from '../../services/environment.service';
 import { AuthService } from '../../services/auth.service';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
     selector: 'app-information',
@@ -18,51 +19,68 @@ export class InformationComponent {
     loggedIn = signal(false);
     isLoggedIn = computed(() => this.authService.loggedIn());
 
-    constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService, private envService: EnvironmentService, private authService: AuthService) { }
+    constructor(
+        private route: ActivatedRoute,
+        private router: Router,
+        private apiService: ApiService,
+        private envService: EnvironmentService,
+        private authService: AuthService,
+        private languageService: LanguageService
+    ) {
+        // 🔥 Sleduj změnu jazyka → znovu načti obsah
+        effect(() => {
+            const lang = this.languageService.currentLang();
+            console.log('🔄 Language changed → reloading info page', lang);
+            this.loadActiveContent(); // znovu načteme data podle isActive
+        });
+    }
 
     ngOnInit() {
-        // this.authService.isLoggedIn().subscribe((loggedIn) => {
-        //     this.loggedIn.set(loggedIn);
-        // });
         this.route.url.subscribe((url) => {
-            console.log('URL:', url);
             const tab = url[1]?.path;
             if (tab === 'info' || tab === 'rules' || tab === 'contact') {
                 this.isActive = tab;
-                if (this.isActive === 'info') {
-                    this.apiService.getInfo().subscribe((text) => {
-                        this.markdownText = text;
-                        this.htmlContent = marked.parse(text); // převede markdown → HTML
-                    });
-                }
-                if (this.isActive === 'rules') {
-                    this.apiService.getRules().subscribe((text) => {
-                        this.markdownText = text;
-                        this.htmlContent = marked.parse(text); // převede markdown → HTML
-                    });
-                }
-                if (this.isActive === 'contact') {
-                    this.apiService.getContact().subscribe((text) => {
-                        this.markdownText = text;
-                        this.htmlContent = marked.parse(this.markdownText);
-                    });
-                }
+                this.loadActiveContent();
             } else {
                 this.router.navigate(['/information', 'info']);
             }
         });
     }
 
-    editInfo(active: any) {
-        console.log('Editace:', active);
+    private loadActiveContent() {
+        if (this.isActive === 'info') {
+            this.apiService.getInfo().subscribe((text) => this.renderMarkdown(text));
+        } else if (this.isActive === 'rules') {
+            this.apiService.getRules().subscribe((text) => this.renderMarkdown(text));
+        } else if (this.isActive === 'contact') {
+            this.apiService.getContact().subscribe((text) => this.renderMarkdown(text));
+        }
+    }
+
+    private renderMarkdown(text: string) {
+        this.markdownText = text;
+        this.htmlContent = marked.parse(text);
+    }
+
+    editInfo(active: 'info' | 'rules' | 'contact') {
+        const lang = this.languageService.currentLang();
+
+        // Sestav URL podle aktuálního jazyka a typu stránky
+        let editUrl = '';
+
         if (active === 'info') {
-            window.open(this.envService.get('pageEditInfoCzUrl'));
+            editUrl = lang === 'cs' ? this.envService.get('pageEditInfoCzUrl') : this.envService.get('pageEditInfoEnUrl');
+        } else if (active === 'rules') {
+            editUrl = lang === 'cs' ? this.envService.get('pageEditRulesCzUrl') : this.envService.get('pageEditRulesEnUrl');
+        } else if (active === 'contact') {
+            editUrl = lang === 'cs' ? this.envService.get('pageEditContactsCzUrl') : this.envService.get('pageEditContactsEnUrl');
         }
-        if (active === 'rules') {
-            window.open(this.envService.get('pageEditRulesCzUrl'));
-        }
-        if (active === 'contact') {
-            window.open(this.envService.get('pageEditContactsCzUrl'));
+
+        if (editUrl) {
+            console.log(`📝 Otevírám editaci (${lang}):`, editUrl);
+            window.open(editUrl, '_blank');
+        } else {
+            console.warn('⚠️ Edit URL nenalezena pro', active, lang);
         }
     }
 }

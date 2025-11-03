@@ -24,11 +24,15 @@
             align-items: flex-start;
             align-self: stretch;
         }
+        .app-info-content {
+            width: 800px;
+        }
         &.app-info-footer {
             padding-top: 12px;
             border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
         }
         .app-info-description {
+            width: 800px;
             font-family: 'IBM Plex Sans';
             font-size: 18px;
             font-style: normal;
