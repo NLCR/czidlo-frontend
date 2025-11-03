@@ -26,7 +26,7 @@
             <div class="app-base-input-label">{{ 'users.Username' | translate }}</div>
             <mat-form-field appearance="outline" class="app-base-input-field">
                 <input matInput formControlName="login" />
-                <mat-button mat-icon-button matSuffix type="button" aria-label="info" [matTooltip]="'users.hints.username-hint' | translate">
+                <!-- <mat-button mat-icon-button matSuffix type="button" aria-label="info" [matTooltip]="'users.hints.username-hint' | translate">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 22 22" fill="none">
                         <path
                             fill-rule="evenodd"
@@ -47,8 +47,9 @@
                             fill="#8099B3"
                         />
                     </svg>
-                </mat-button>
+                </mat-button> -->
             </mat-form-field>
+            <div class="app-base-input-hint">{{ 'users.hints.username-hint' | translate }}</div>
             <div class="app-base-input-hint app-base-input-error" *ngIf="login.invalid && (login.dirty || login.touched)">
                 <div *ngIf="login.errors?.['required']">{{ 'users.hints.required' | translate }}</div>
                 <div *ngIf="login.errors?.['pattern']">{{ 'users.hints.username-format' | translate }}</div>
@@ -107,7 +108,7 @@
                         />
                     </svg>
                 </mat-button>
-                <mat-button mat-icon-button matSuffix type="button" aria-label="info" [matTooltip]="'users.hints.password-form-hint' | translate">
+                <!-- <mat-button mat-icon-button matSuffix type="button" aria-label="info" [matTooltip]="'users.hints.password-form-hint' | translate">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 22 22" fill="none">
                         <path
                             fill-rule="evenodd"
@@ -128,10 +129,13 @@
                             fill="#8099B3"
                         />
                     </svg>
-                </mat-button>
+                </mat-button> -->
             </mat-form-field>
-            <div class="app-base-input-hint app-base-input-error" *ngIf="!passwordCopied">
+            <!-- <div class="app-base-input-hint app-base-input-error" *ngIf="!passwordCopied">
                 <span>{{ 'users.hints.password-hint' | translate }}</span>
+            </div> -->
+            <div class="app-base-input-hint">
+                <span>{{ 'users.hints.password-form-hint' | translate }}</span>
             </div>
             <div class="app-base-input-hint app-base-input-error" *ngIf="password.invalid && (password.dirty || password.touched)">
                 <div *ngIf="password.errors?.['required']">{{ 'users.hints.required' | translate }}</div>
@@ -154,7 +158,7 @@
 
         <!-- Toggle -->
         <div class="app-part-content app-radio-toggle-checkboxes">
-            <div class="app-base-input-container app-radio-toggle-checkboxes">
+            <div class="app-base-input-container">
                 <div class="app-base-input app-toggle-container">
                     <app-toggle size="s" [checked]="userForm.get('isAdmin')?.value" (click)="toggleIsAdmin()"></app-toggle>
                     <div class="app-toggle-label">{{ 'users.Admin' | translate }}</div>
@@ -163,12 +167,31 @@
         </div>
     </div>
 
+    <!-- DIALOG FOOTER -->
     <div class="app-dialog-footer">
-        <app-button size="l" variant="tertiary" (click)="onCancel()">
-            {{ 'buttons.cancel' | translate }}
-        </app-button>
-        <app-button size="l" variant="primary" [disabled]="data.action === 'add' ? userForm.invalid : false" (click)="onConfirm()">
-            {{ 'buttons.save' | translate }}
-        </app-button>
+        <div class="app-dialog-footer-part app-dialog-footer-warning" *ngIf="!passwordCopied">
+            <div class="app-footer-info-icon">
+                <img src="assets/icons/snack-warning-icon.png" />
+            </div>
+            <div class="app-footer-info-text">
+                {{ 'users.hints.password-hint' | translate }}
+            </div>
+        </div>
+        <div class="app-dialog-footer-part app-dialog-footer-check" *ngIf="passwordCopied">
+            <div class="app-footer-info-icon">
+                <img src="assets/icons/snack-check-icon.png" />
+            </div>
+            <div class="app-footer-info-text">
+                {{ 'users.hints.password-copied' | translate }}
+            </div>
+        </div>
+        <div class="app-dialog-footer-part app-dialog-footer-buttons">
+            <app-button size="l" variant="tertiary" (click)="onCancel()">
+                {{ 'buttons.cancel' | translate }}
+            </app-button>
+            <app-button size="l" variant="primary" [disabled]="data.action === 'add' ? userForm.invalid : false" (click)="onConfirm()">
+                {{ 'buttons.save' | translate }}
+            </app-button>
+        </div>
     </div>
 </div>

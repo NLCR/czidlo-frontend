@@ -60,9 +60,7 @@ export class EditUserComponent {
 
     copyPassword() {
         const password = this.userForm.get('password')?.value;
-        navigator.clipboard.writeText(password).then(() => {
-            this._snackBar.open(this.translate.instant('messages.copied-to-clipboard'), 'Close', { duration: 2000 });
-        });
+        navigator.clipboard.writeText(password);
         this.passwordCopied = true;
     }
 

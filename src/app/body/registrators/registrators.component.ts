@@ -157,7 +157,7 @@ export class RegistratorsComponent {
                             console.error('Error deleting archiver:', error);
                         },
                     });
-                    this.snackBar.open(this.translate.instant('messages.boooooom'), this.translate.instant('buttons.close'), { duration: 3000 });
+                    this.snackBar.open(this.translate.instant('messages.archiver-deleted-successfully'), this.translate.instant('buttons.close'), { duration: 3000 });
                 }
             });
     }

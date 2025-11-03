@@ -41,14 +41,4 @@
             align-self: stretch;
         }
     }
-    .app-dialog-footer {
-        display: flex;
-        padding: 12px 24px;
-        justify-content: center;
-        align-items: center;
-        gap: 16px;
-        align-self: stretch;
-        border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
-        background: var(--BG-Main-Base, #fff);
-    }
 }

@@ -571,6 +571,51 @@ app-information {
     color: var(--Text-Secondary, #263340);
 }
 
+// DIALOG FOOTER
+.app-dialog-footer {
+    display: flex;
+    flex-direction: column;
+    .app-dialog-footer-part {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        align-self: stretch;
+        &.app-dialog-footer-buttons {
+            border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
+            background: var(--BG-Main-Base, #fff);
+            padding: 12px 24px;
+        }
+        &.app-dialog-footer-warning {
+            background: var(--States-high-efford-BG-default, #fde5e4);
+            padding: 8px 16px;
+            width: 600px;
+            justify-content: flex-start;
+        }
+        &.app-dialog-footer-check {
+            background: var(--States-available-BG-default, #dff1c3);
+            padding: 8px 16px;
+            width: 600px;
+            justify-content: flex-start;
+        }
+        .app-footer-info-icon {
+            display: flex;
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+        .app-footer-info-text {
+            color: var(--Text-Secondary, #263340);
+            /* Typesettings/S big/Medium */
+            font-family: Karla;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 20px; /* 142.857% */
+        }
+    }
+}
+
 // DIALOG BORDER RADIUS
 .mat-mdc-dialog-surface {
     border-radius: 4px !important;
@@ -830,7 +875,6 @@ app-information {
     background-color: var(--Color-Btn-Primary, #0080a8) !important;
     border: none !important;
 }
-
 
 // CALENDAR
 .mat-datepicker-content .mat-calendar {

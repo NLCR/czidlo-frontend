@@ -39,7 +39,9 @@
             align-items: flex-start;
             gap: var(--Spacing-x2, 8px);
             align-self: stretch;
-            &.app-part-username, &.app-part-email, &.app-part-password {
+            &.app-part-username,
+            &.app-part-email,
+            &.app-part-password {
                 width: 400px;
                 .app-base-textarea {
                     width: 100%;
@@ -61,14 +63,5 @@
             }
         }
     }
-    .app-dialog-footer {
-        display: flex;
-        padding: 12px 24px;
-        justify-content: center;
-        align-items: center;
-        gap: 16px;
-        align-self: stretch;
-        border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
-        background: var(--BG-Main-Base, #fff);
-    }
+
 }
