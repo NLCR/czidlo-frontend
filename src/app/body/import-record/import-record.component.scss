@@ -119,6 +119,7 @@
     display: none;
     height: 100%;
     align-self: flex-end;
+    gap: 20px;
     &.app-sidebar-active {
         display: flex;
     }
@@ -130,6 +131,31 @@
         z-index: 101;
         width: 800px;
         // STYLES SCSS
+        .app-sidebar-content {
+            gap: 20px;
+        }
+        .app-sidebar-content .app-part:not(:last-child) {
+            padding-bottom: 12px;
+        }
+        .app-part {
+            gap: 20px;
+            .app-part-content {
+                gap: 20px;
+            }
+        }
+        .app-items-container {
+            display: flex;
+            align-items: flex-start;
+            align-items: center;
+            gap: 20px;
+            align-self: stretch;
+        }
+        input {
+            padding: 11px 12px;
+            border-radius: var(--Spacing-x1, 4px);
+            border: 1px solid var(--Boarder-Contrast, #bfccd9);
+            background: var(--BG-Main-Base, #fff);
+        }
     }
 }
 .app-overlay {
@@ -138,8 +164,50 @@
     background: rgba(0, 0, 0, 0.4);
     z-index: 100;
 }
+.app-base-input-container {
+    gap: 20px;
+}
 .app-base-input {
-    &.app-title {
-        width: 400px;
+    &.app-title,
+    &.app-subTitle,
+    &.app-otherOriginator,
+    &.app-place,
+    &.app-publisher {
+        width: 745px;
     }
+    &.app-ccnb,
+    &.app-isbn,
+    &.app-otherId,
+    &.app-documentType,
+    &.app-year,
+    &.app-primaryArchiverId,
+    &.app-urnNbn,
+    &.app-financed,
+    &.app-contractNumber,
+    &.app-formatVersion,
+    &.app-formatValue,
+    &.app-extent,
+    &.app-resolutionHorizontal,
+    &.app-resolutionVertical,
+    &.app-compressionRatio,
+    &.app-compressionValue,
+    &.app-colorDepth,
+    &.app-colorModel,
+    &.app-iccProfile,
+    &.app-pictureSizeWidth,
+    &.app-pictureSizeHeight {
+        width: 364px;
+    }
+    &.app-bornDigital,
+    &.app-primaryOriginatorValue {
+        align-self: flex-end;
+        height: 48px;
+    }
+    &.app-primaryOriginatorType {
+        width: 135px;
+    }
+    &.app-primaryOriginatorValue {
+        width: 588px;
+    }
+
 }
