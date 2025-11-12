@@ -22,6 +22,7 @@ const routes: Routes = [
     { path: 'search', component: SearchComponent },
     { path: 'statistics', component: StatisticsComponent },
     { path: 'import', component: ImportRecordComponent },
+    { path: 'import/:entity', component: ImportRecordComponent },
     { path: 'users', component: UsersComponent },
     { path: 'users/:id', component: UsersComponent },
     { path: 'processes', component: ProcessesComponent },

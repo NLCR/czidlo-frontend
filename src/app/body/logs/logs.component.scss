@@ -28,7 +28,6 @@
     .app-logs-actions {
         display: flex;
         padding: 0 16px;
-        flex-direction: column;
         align-items: flex-start;
         gap: 8px;
         align-self: stretch;
@@ -55,4 +54,10 @@
             }
         }
     }
+}
+.app-datepicker-container {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 8px 16px;
 }

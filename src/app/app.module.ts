@@ -47,6 +47,7 @@ import { AuthService } from './services/auth.service';
 import { RegistratorsService } from './services/registrators.service';
 import { UsersService } from './services/users.service';
 import { LanguageService } from './services/language.service';
+import { ImportRecordService } from './services/import-record.service';
 
 // LOCALE & I18N
 import { registerLocaleData } from '@angular/common';
@@ -136,6 +137,7 @@ export const MY_DATE_FORMATS = {
         RegistratorsService,
         UsersService,
         LanguageService,
+        ImportRecordService,
         {
             provide: APP_INITIALIZER,
             useFactory: initializeApp,

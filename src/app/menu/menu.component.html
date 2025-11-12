@@ -5,7 +5,7 @@
             <h4 class="app-logo-text" [routerLink]="['/']">{{ 'menu.logo' | translate }}</h4>
         </div>
         <div class="app-desc">
-            <div *ngIf="currentLang === 'cs'" class="app-desc-cz">{{ 'menu.desc-cz' | translate }}</div>
+            <div *ngIf="language.currentLang() === 'cs'" class="app-desc-cz">{{ 'menu.desc-cz' | translate }}</div>
             <div class="app-desc-text">{{ 'menu.desc' | translate }}</div>
             <div class="app-version">{{ 'menu.version' | translate }} 5.0</div>
         </div>

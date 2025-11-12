@@ -429,14 +429,19 @@ h4 {
     .app-sidebar-content-item {
         font-size: 14px;
     }
+
+    // PARTS - pro formulare v sidebaru
     .app-part {
         display: flex;
         width: 100%;
         flex-direction: column;
         align-items: flex-start;
-        gap: 20px;
+        gap: 16px;
         align-self: stretch;
-        border-radius: 4px;
+        &:not(:last-child) {
+            padding-bottom: 32px;
+            // border-bottom: 1px solid var(--Boarder-Bright, #dfe5ec);
+        }
         .app-part-title {
             color: var(--Text-Link, #0080a8);
 
@@ -463,9 +468,9 @@ h4 {
             width: 100%;
             flex-direction: column;
             align-items: flex-start;
-            gap: 8px;
-            &.app-radio-toggle-checkboxes {
-                gap: 16px;
+            gap: 32px;
+            &.app-part-import-record {
+                width: 460px;
             }
             .app-datepicker-container {
                 display: flex;
@@ -480,6 +485,8 @@ h4 {
             }
         }
     }
+
+    // SECTIONS - pro textovy popis v sidebaru
     .app-sections {
         display: flex;
         flex-direction: column;
@@ -555,7 +562,8 @@ app-users,
     min-width: 0;
     overflow: hidden; /* zabrání scrollu tady */
 }
-app-information {
+app-information,
+app-import-record {
     display: flex;
     flex: 1;
 }
@@ -627,9 +635,9 @@ app-information {
     flex: 1;
     width: 100%;
     gap: 8px;
-    &.app-radio-toggle-checkboxes {
-        margin-bottom: 20px;
-    }
+    // &.app-radio-toggle-checkboxes {
+    //     margin-bottom: 20px;
+    // }
     .app-selected-items {
         display: flex;
         padding: 8px;
@@ -684,8 +692,17 @@ app-information {
     align-items: flex-start;
     gap: 8px;
     align-self: stretch;
+    &.app-radio-toggle-checkboxes {
+        gap: 16px;
+    }
     &.app-multiselect {
         width: 212px;
+        .mat-mdc-form-field {
+            width: 100%;
+        }
+    }
+    &.app-singleselect {
+        width: 460px;
         .mat-mdc-form-field {
             width: 100%;
         }
@@ -867,11 +884,21 @@ app-information {
 .mat-mdc-option:hover:not(.mdc-list-item--disabled) {
     background-color: #f6f7f9 !important;
 }
-.mat-pseudo-checkbox {
+// .mat-pseudo-checkbox {
+//     border-radius: 4px !important;
+//     border: 1px solid var(--Boarder-Contrast, #bfccd9) !important;
+// }
+// .mat-pseudo-checkbox.mat-pseudo-checkbox-checked {
+//     background-color: var(--Color-Btn-Primary, #0080a8) !important;
+//     border: none !important;
+// }
+/* Pouze pro selecty, které mají multiple */
+.mat-mdc-select-panel .mat-mdc-option-multiple .mat-pseudo-checkbox {
     border-radius: 4px !important;
     border: 1px solid var(--Boarder-Contrast, #bfccd9) !important;
 }
-.mat-pseudo-checkbox.mat-pseudo-checkbox-checked {
+
+.mat-mdc-select-panel .mat-mdc-option-multiple .mat-pseudo-checkbox.mat-pseudo-checkbox-checked {
     background-color: var(--Color-Btn-Primary, #0080a8) !important;
     border: none !important;
 }

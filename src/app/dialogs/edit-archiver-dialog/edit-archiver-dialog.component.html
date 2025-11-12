@@ -47,6 +47,16 @@
                 <!-- </mat-form-field> -->
             </div>
         </div>
+        <div class="app-part-content app-radio-toggle-checkboxes app-part-hidden">
+            <div class="app-base-input-container app-radio-toggle-checkboxes">
+                <div class="app-base-input app-toggle-container">
+                    <app-toggle size="s" [checked]="hidden" (click)="toggleHidden()">
+                        {{ 'processes.include-counts' | translate }}
+                    </app-toggle>
+                    <div class="app-toggle-label">{{ 'registrators.Hidden' | translate }}</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- DIALOG FOOTER -->

@@ -1,0 +1,141 @@
+.app-import-record-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    flex: 1 0 0;
+    .app-import-record-header {
+        display: flex;
+        padding: 20px 16px;
+        align-items: flex-start;
+        gap: 24px;
+        align-self: stretch;
+        color: var(--Text-Base, #0a0d10);
+
+        /* Typesettings/XL/Medium */
+        font-family: 'IBM Plex Sans';
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 32px; /* 160% */
+    }
+    .app-import-record-body {
+        display: flex;
+        padding: 0 16px 24px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 32px;
+        flex: 1 0 0;
+        align-self: stretch;
+    }
+}
+.app-no-registrars {
+    display: flex;
+    width: 810px;
+    padding: 20px 16px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 24px;
+    .app-no-registrars-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        align-self: stretch;
+        .app-no-registrars-header-title {
+            align-self: stretch;
+            color: var(--Text-Base, #0a0d10);
+
+            /* Typesettings/XL/Medium */
+            font-family: 'IBM Plex Sans';
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 32px; /* 160% */
+        }
+        .app-no-registrars-header-subtitle {
+            align-self: stretch;
+            color: var(--Text-Secondary, #263340);
+
+            /* Typesettings/M/Regular */
+            font-family: 'IBM Plex Sans';
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 24px; /* 150% */
+        }
+    }
+    .app-no-registrars-body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        align-self: stretch;
+        .app-no-registrars-body-part {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            align-self: stretch;
+            .app-body-title {
+                color: var(--Text-Base, #0a0d10);
+                /* Typesettings/M/Medium */
+                font-family: 'IBM Plex Sans';
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px; /* 150% */
+            }
+            .app-body-text {
+                margin: 0;
+                color: var(--Text-Secondary, #263340);
+                /* Typesettings/M/Regular */
+                font-family: 'IBM Plex Sans';
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 24px; /* 150% */
+                a {
+                    color: var(--Text-Link, #0080a8);
+
+                    /* Typesettings/M/Regular */
+                    font-family: 'IBM Plex Sans';
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: 24px;
+                    text-decoration-line: underline;
+                    text-decoration-style: solid;
+                    text-decoration-skip-ink: none;
+                    text-decoration-thickness: auto;
+                    text-underline-offset: auto;
+                    text-underline-position: from-font;
+                }
+            }
+        }
+    }
+}
+.app-sidebar {
+    display: none;
+    height: 100%;
+    align-self: flex-end;
+    &.app-sidebar-active {
+        display: flex;
+        position: absolute;
+    }
+    .app-sidebar-entity {
+        display: flex;
+        background-color: #fff;
+        flex-direction: column;
+        align-items: flex-start;
+        z-index: 101;
+        width: 800px;
+        // STYLES SCSS
+    }
+}
+.app-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100;
+}

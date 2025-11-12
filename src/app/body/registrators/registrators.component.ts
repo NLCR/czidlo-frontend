@@ -178,13 +178,14 @@ export class RegistratorsComponent {
                 title: archiver ? this.translate.instant('registrators.edit-archiver-title') : this.translate.instant('registrators.add-archiver-title'),
                 name: archiver?.name || '',
                 description: archiver?.description || '',
+                hidden: archiver?.hidden || false,
             },
         }).afterClosed().subscribe(result => {
             if (result) {
                 console.log('Archiver edited/added:', result);
                 if (archiver) {
                     // Edit existing archiver
-                    result.hidden = archiver.hidden; // preserve history
+                    // result.hidden = archiver.hidden; // preserve history
                     this.registratorsService.editArchiver(archiver.id, result).subscribe({
                         next: () => {
                             console.log('Archiver edited successfully');

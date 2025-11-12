@@ -14,19 +14,24 @@ export class EditArchiverDialogComponent {
 
     name: string = '';
     description: string = '';
+    hidden: boolean = false;
 
     ngOnInit(): void {
         this.name = this.data.name || '';
         this.description = this.data.description || '';
+        this.hidden = this.data.hidden;
+        console.log(this.hidden);
     }
-
+    toggleHidden(): void {
+        this.hidden = !this.hidden;
+    }
     onConfirm(): void {
         this.dialogRef.close({
             name: this.name,
             description: this.description,
+            hidden: this.hidden,
         });
     }
-
     onCancel(): void {
         this.dialogRef.close(false);
     }

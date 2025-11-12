@@ -184,6 +184,10 @@
                             <span class="app-item-label">{{ 'registrators.modified' | translate }}:</span>
                             <span class="app-item-value">{{ activeArchiver?.modified }}</span>
                         </div>
+                        <div class="app-item" *ngIf="activeArchiver?.hidden !== undefined && loggedIn()">
+                            <span class="app-item-label">{{ 'registrators.hidden' | translate }}:</span>
+                            <span class="app-item-value">{{ activeArchiver?.hidden ? 'Ano' : 'Ne' }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

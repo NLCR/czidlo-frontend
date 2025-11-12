@@ -1,1 +1,158 @@
-<p>import-record works!</p>
+<div class="app-import-record-container" *ngIf="assignedRegistars.length > 0">
+    <div class="app-import-record-header">
+        {{ 'import.import-record-title' | translate }}
+    </div>
+    <div class="app-import-record-body app-sidebar-content">
+        <div class="app-part">
+            <div class="app-part-content">
+                <!-- INTELLECTUAL ENTITY -->
+                <div class="app-base-input-container">
+                    <div class="app-base-input app-singleselect">
+                        <div class="app-base-input-label">
+                            {{ 'import.intelectual-entity-type' | translate }}
+                        </div>
+                        <mat-form-field appearance="outline">
+                            <mat-select class="app-singleselect" [(value)]="selectedEntity">
+                                @for (entity of intellectualEntitiesList(); track entity) {
+                                <mat-option [value]="entity">{{ entity }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <!-- REGISTRAR -->
+                <div class="app-base-input-container">
+                    <div class="app-base-input app-singleselect">
+                        <div class="app-base-input-label">
+                            {{ 'import.registrar' | translate }}
+                        </div>
+                        <mat-form-field appearance="outline">
+                            <mat-select class="app-singleselect" [(value)]="selectedRegistrar">
+                                @for (registrar of assignedRegistars; track registrar) {
+                                <mat-option [value]="registrar">{{ registrar }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <!-- REGISTRATION MODE -->
+                <div class="app-base-input-container">
+                    <div class="app-base-input app-singleselect">
+                        <div class="app-base-input-label">
+                            {{ 'import.registration-mode' | translate }}
+                        </div>
+                        <mat-form-field appearance="outline">
+                            <mat-select class="app-singleselect" [(value)]="selectedMode" [compareWith]="compareMode">
+                                @for (mode of registrationMode; track mode) {
+                                <mat-option [value]="mode.value">{{ mode.label | translate }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <!-- BUTTON -->
+                <div class="">
+                    <app-button
+                        *ngIf="this.selectedEntity && this.selectedMode && this.selectedRegistrar"
+                        variant="primary"
+                        size="l"
+                        iconRight="arrow-right.png"
+                        (click)="openSidebar()"
+                    >
+                        {{ 'import.continue' | translate }}
+                    </app-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- No Registrars -->
+<div class="app-no-registrars" *ngIf="assignedRegistars.length === 0">
+    <div class="app-no-registrars-header">
+        <div class="app-no-registrars-header-title">{{ 'import.no-registrar-title' | translate }}</div>
+        <div class="app-no-registrars-header-subtitle">{{ 'import.no-registrar-subtitle' | translate }}</div>
+    </div>
+    <div class="app-no-registrars-header">
+        <div class="app-no-registrars-header-title">{{ 'import.what-now' | translate }}</div>
+    </div>
+    <div class="app-no-registrars-body">
+        <div class="app-no-registrars-body-part">
+            <div class="app-body-title">
+                {{ 'import.you-are-admin' | translate }}
+            </div>
+            <ul class="app-body-text">
+                <li>
+                    {{ 'import.open-users-page' | translate }}
+                    <a routerLink="/users">{{ 'import.user-link-text' | translate }}</a>
+                </li>
+                <li>{{ 'import.assign-registrar' | translate }}</li>
+                <li>{{ 'import.after-assign' | translate }}</li>
+            </ul>
+        </div>
+        <div class="app-no-registrars-body-part">
+            <div class="app-body-title">
+                {{ 'import.not-admin' | translate }}
+            </div>
+            <ul class="app-body-text">
+                <li>
+                    {{ 'import.contact-admin' | translate }}
+                    <a href="mailto:resolver-podpora@nkp.cz">resolver-podpora&#64;nkp.cz</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
+    <div class="app-sidebar-entity">
+        <!-- HEADER -->
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">
+                {{ 'import.' + selectedEntity | translate }}
+            </div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+        <div class="app-sidebar-content">
+            <div class="app-field-hint">{{ 'import.mandatory' | translate }}</div>
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <div *ngFor="let section of sections" class="app-part">
+                    <div class="app-part-title">{{ 'import.' + section[0] | translate }}</div>
+                    <div *ngFor="let field of section[1]" class="app-part-content">
+                        <div class="app-base-input-container"  *ngIf="field.controlType === 'input'">
+                            <div class="app-base-input">
+                                <div class="app-base-input-label">{{ 'import.' + field.name | translate }}</div>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>{{ field.label }}</mat-label>
+                                    <input matInput [type]="field.type || 'text'" [formControlName]="field.name" />
+                                    <mat-hint *ngIf="field.hint">{{ field.hint }}</mat-hint>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <!-- <mat-form-field appearance="outline" *ngIf="field.controlType === 'select'">
+                            <mat-label>{{ field.label }}</mat-label>
+                            <mat-select [formControlName]="field.name">
+                                <mat-option *ngFor="let opt of field.options" [value]="opt.value">{{ opt.label }}</mat-option>
+                            </mat-select>
+                        </mat-form-field> -->
+
+                        <!-- <mat-form-field appearance="outline" *ngIf="field.controlType === 'textarea'">
+                            <mat-label>{{ field.label }}</mat-label>
+                            <textarea matInput [formControlName]="field.name" rows="3"></textarea>
+                        </mat-form-field> -->
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
