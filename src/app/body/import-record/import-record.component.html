@@ -125,11 +125,11 @@
         <div class="app-sidebar-content">
             <div class="app-field-hint">{{ 'import.mandatory' | translate }}</div>
             <form [formGroup]="form" (ngSubmit)="onSubmit()">
-                <div *ngFor="let section of sections" class="app-part">
+                <div *ngFor="let section of sections" class="app-part app-{{ section[0] }}">
                     <div class="app-part-title">{{ 'import.' + section[0] | translate }}</div>
                     <div *ngFor="let field of section[1]" class="app-part-content">
                         <div class="app-base-input-container"  *ngIf="field.controlType === 'input'">
-                            <div class="app-base-input">
+                            <div class="app-base-input app-{{ field.name || 'text' }}">
                                 <div class="app-base-input-label">{{ 'import.' + field.name | translate }}</div>
                                 <mat-form-field appearance="outline">
                                     <mat-label>{{ field.label }}</mat-label>

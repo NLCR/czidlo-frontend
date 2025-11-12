@@ -42,27 +42,32 @@ export class LogsComponent implements OnInit {
 
     onDownloadLogs(period?: string) {
         console.log('Downloading logs...', period);
-        let dateFrom = null;
-        let dateTo = null;
+        let minDate = null;
+        let dayAfterMaxDate = null;
         const now = new Date();
         if (period === 'last_month') {
             const dFrom = new Date(Date.UTC(now.getFullYear(), now.getMonth() - 1, 1));
-            const dTo = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 0));
-            dateFrom = dFrom.toISOString().slice(0, 10);
-            dateTo = dTo.toISOString().slice(0, 10);
+            const dTo = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
+            minDate = dFrom.toISOString().slice(0, 10);
+            dayAfterMaxDate = dTo.toISOString().slice(0, 10);
         } else if (period === 'this_month') {
             const dFrom = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
-            const dTo = new Date(Date.UTC(now.getFullYear(), now.getMonth() + 1, 0));
-            dateFrom = dFrom.toISOString().slice(0, 10);
-            dateTo = dTo.toISOString().slice(0, 10);
+            // const dTo = new Date(Date.UTC(now.getFullYear(), now.getMonth() + 1, 0));
+            minDate = dFrom.toISOString().slice(0, 10);
+            // dayAfterMaxDate = dTo.toISOString().slice(0, 10);
         }
-        this.apiService.getLogs(null, dateFrom, dateTo);
+        this.apiService.getLogs(null, minDate, dayAfterMaxDate);
     }
     private formatLocalDate(date: Date): string {
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, '0');
         const d = String(date.getDate()).padStart(2, '0');
         return `${y}-${m}-${d}`;
+    }
+    private addOneDay(date: Date): Date {
+        const newDate = new Date(date);
+        newDate.setDate(newDate.getDate() + 1);
+        return newDate;
     }
 
     onDownloadLogsWithDateRange() {
@@ -74,7 +79,7 @@ export class LogsComponent implements OnInit {
         }
 
         if (this.endDateControl.value) {
-            dateTo = this.formatLocalDate(new Date(this.endDateControl.value));
+            dateTo = this.formatLocalDate(this.addOneDay(new Date(this.endDateControl.value)));
         }
         this.apiService.getLogs(null, dateFrom, dateTo);
     }

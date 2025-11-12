@@ -146,22 +146,22 @@ export class ApiService {
     }
 
     // LOGS
-    getLogs(lines?: number | null, dateFrom?: any, dateTo?: any): Observable<any> {
-        console.log('Fetching logs, lines:', lines, dateFrom, dateTo);
+    getLogs(lines?: number | null, minDate?: any, dayAfterMaxDate?: any): Observable<any> {
+        console.log('Fetching logs, lines:', lines, minDate, dayAfterMaxDate);
         let url = `${this.apiUrl}/system_logs`;
 
         if (lines) {
             url += `?maxLines=${lines}`;
             this.doGet(url);
         }
-        if (dateFrom || dateTo) {
-            if (dateFrom) {
+        if (minDate || dayAfterMaxDate) {
+            if (minDate) {
                 const separator = url.includes('?') ? '&' : '?';
-                url += `${separator}minDate=${dateFrom}`;
+                url += `${separator}minDate=${minDate}`;
             }
-            if (dateTo) {
+            if (dayAfterMaxDate) {
                 const separator = url.includes('?') ? '&' : '?';
-                url += `${separator}maxDate=${dateTo}`;
+                url += `${separator}dayAfterMaxDate=${dayAfterMaxDate}`;
             }
             this.downloadLogFile(url);
             return of(null);

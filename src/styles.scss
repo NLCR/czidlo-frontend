@@ -554,6 +554,7 @@ app-processes,
 app-registrators,
 app-logs,
 app-users,
+app-import-record,
 .app-instances {
     display: flex;
     flex: 1;
@@ -562,8 +563,7 @@ app-users,
     min-width: 0;
     overflow: hidden; /* zabrání scrollu tady */
 }
-app-information,
-app-import-record {
+app-information {
     display: flex;
     flex: 1;
 }
