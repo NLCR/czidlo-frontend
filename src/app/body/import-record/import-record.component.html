@@ -131,20 +131,70 @@
                     {{ 'import.title_part' | translate }}
                 </div>
                 <div class="app-part-content">
-                    <div class="app-base-input-container">
-                        <div class="app-base-input app-title">
+                    <div
+                        class="app-base-input-container"
+                        *ngIf="
+                            selectedEntity !== 'MONOGRAPH_VOLUME' && selectedEntity !== 'PERIODICAL_VOLUME' && selectedEntity !== 'PERIODICAL_ISSUE'
+                        "
+                    >
+                        <div class="app-base-input app-full-width app-title">
                             <div class="app-base-input-label">
                                 {{ 'import.title' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="title" />
+                            <mat-error class="app-error-message" *ngIf="title.invalid && (title.dirty || title.touched)">
+                                {{ 'messages.title-required' | translate }}
+                            </mat-error>
                         </div>
                     </div>
-                    <div class="app-base-input-container">
-                        <div class="app-base-input app-subTitle">
+                    <div
+                        class="app-base-input-container"
+                        *ngIf="
+                            selectedEntity !== 'MONOGRAPH_VOLUME' && selectedEntity !== 'PERIODICAL_VOLUME' && selectedEntity !== 'PERIODICAL_ISSUE'
+                        "
+                    >
+                        <div class="app-base-input app-full-width app-subTitle">
                             <div class="app-base-input-label">
                                 {{ 'import.subTitle' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="subTitle" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container" *ngIf="selectedEntity === 'MONOGRAPH_VOLUME'">
+                        <div class="app-base-input app-full-width app-monographTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.monographTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="monographTitle" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container" *ngIf="selectedEntity === 'PERIODICAL_VOLUME' || selectedEntity === 'PERIODICAL_ISSUE'">
+                        <div class="app-base-input app-full-width app-periodicalTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.periodicalTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="periodicalTitle" />
+                        </div>
+                    </div>
+                    <div
+                        class="app-base-input-container"
+                        *ngIf="
+                            selectedEntity === 'MONOGRAPH_VOLUME' || selectedEntity === 'PERIODICAL_VOLUME' || selectedEntity === 'PERIODICAL_ISSUE'
+                        "
+                    >
+                        <div class="app-base-input app-full-width app-volumeTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.volumeTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="volumeTitle" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container" *ngIf="selectedEntity === 'PERIODICAL_ISSUE'">
+                        <div class="app-base-input app-full-width app-issueTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.issueTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="issueTitle" />
                         </div>
                     </div>
                 </div>
@@ -156,24 +206,47 @@
                     {{ 'import.identifiers' | translate }}
                 </div>
                 <div class="app-part-content">
-                    <div class="app-base-input-container">
-                        <div class="app-base-input app-ccnb">
+                    <div class="app-base-input-container" *ngIf="selectedEntity !== 'ANALYTICAL'">
+                        <div class="app-base-input app-half-width app-ccnb">
                             <div class="app-base-input-label">
                                 {{ 'import.ccnb' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="ccnb" />
+                            <mat-error *ngIf="ccnb.hasError('invalidCcnb')">
+                                {{ 'messages.invalid-ccnb' | translate }}
+                            </mat-error>
                         </div>
                     </div>
-                    <div class="app-base-input-container">
-                        <div class="app-base-input app-isbn">
+                    <div
+                        class="app-base-input-container"
+                        *ngIf="selectedEntity === 'MONOGRAPH' || selectedEntity === 'MONOGRAPH_VOLUME' || selectedEntity === 'OTHER'"
+                    >
+                        <div class="app-base-input app-half-width app-isbn">
                             <div class="app-base-input-label">
                                 {{ 'import.isbn' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="isbn" />
+                            <mat-error *ngIf="isbn.hasError('invalidIsbn')">
+                                {{ 'messages.invalid-isbn' | translate }}
+                            </mat-error>
+                        </div>
+                    </div>
+                    <div
+                        class="app-base-input-container"
+                        *ngIf="selectedEntity === 'PERIODICAL' || selectedEntity === 'PERIODICAL_ISSUE' || selectedEntity === 'PERIODICAL_VOLUME'"
+                    >
+                        <div class="app-base-input app-half-width app-issn">
+                            <div class="app-base-input-label">
+                                {{ 'import.issn' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="issn" />
+                            <mat-error *ngIf="issn.hasError('invalidIssn')">
+                                {{ 'messages.invalid-issn' | translate }}
+                            </mat-error>
                         </div>
                     </div>
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-otherId">
+                        <div class="app-base-input app-half-width app-otherId">
                             <div class="app-base-input-label">
                                 {{ 'import.otherId' | translate }}
                             </div>
@@ -191,13 +264,13 @@
                 <div class="app-part-content">
                     <!-- DOCUMENT TYPE & BORN DIGITAL -->
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-documentType">
+                        <div class="app-base-input app-half-width app-documentType">
                             <div class="app-base-input-label">
                                 {{ 'import.documentType' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="documentType" />
                         </div>
-                        <div class="app-base-input app-toggle-container app-bornDigital">
+                        <div class="app-base-input app-toggle-container app-bornDigital" *ngIf="selectedEntity !== 'ANALYTICAL'">
                             <app-toggle size="s" [checked]="bornDigital" (click)="bornDigital = !bornDigital"></app-toggle>
                             <div class="app-toggle-label">{{ 'import.bornDigital' | translate }}</div>
                         </div>
@@ -224,7 +297,7 @@
 
                     <!-- OTHER ORIGINATOR -->
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-otherOriginator">
+                        <div class="app-base-input app-full-width app-otherOriginator">
                             <div class="app-base-input-label">
                                 {{ 'import.otherOriginator' | translate }}
                             </div>
@@ -233,28 +306,111 @@
                     </div>
 
                     <!-- PUBLICATION -->
-                    <div class="app-base-input-container">
-                        <div class="app-base-input app-place">
+                    <div class="app-base-input-container" *ngIf="selectedEntity !== 'ANALYTICAL'">
+                        <div class="app-base-input app-full-width app-place">
                             <div class="app-base-input-label">
                                 {{ 'import.place' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="place" />
                         </div>
                     </div>
-                    <div class="app-base-input-container">
-                        <div class="app-base-input app-publisher">
+                    <div class="app-base-input-container" *ngIf="selectedEntity !== 'ANALYTICAL'">
+                        <div class="app-base-input app-full-width app-publisher">
                             <div class="app-base-input-label">
                                 {{ 'import.publisher' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="publisher" />
                         </div>
                     </div>
-                    <div class="app-base-input-container">
-                        <div class="app-base-input app-year">
+                    <div class="app-base-input-container" *ngIf="selectedEntity !== 'ANALYTICAL'">
+                        <div class="app-base-input app-half-width app-year">
                             <div class="app-base-input-label">
                                 {{ 'import.year' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="year" />
+                        </div>
+                    </div>
+                    <!-- THESIS -->
+                    <div class="app-base-input-container" *ngIf="selectedEntity === 'THESIS'">
+                        <div class="app-base-input app-full-width app-degreeAwardingInstitution">
+                            <div class="app-base-input-label">
+                                {{ 'import.degreeAwardingInstitution' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="degreeAwardingInstitution" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- SOURCE DOCUMENT (ANALYTICAL) -->
+            <div class="app-part" *ngIf="selectedEntity === 'ANALYTICAL'">
+                <div class="app-part-title">
+                    {{ 'import.sourceDocument' | translate }}
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-sourceDocumentTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.sourceDocumentTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="sourceDocumentTitle" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-sourceDocumentVolumeTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.sourceDocumentVolumeTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="sourceDocumentVolumeTitle" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-sourceDocumentIssueTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.sourceDocumentIssueTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="sourceDocumentIssueTitle" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-ccnb">
+                            <div class="app-base-input-label">{{ 'import.ccnb' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentCcnb" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-isbn">
+                            <div class="app-base-input-label">{{ 'import.isbn' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentIsbn" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-issn">
+                            <div class="app-base-input-label">{{ 'import.issn' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentIssn" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-otherId">
+                            <div class="app-base-input-label">{{ 'import.otherId' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentOtherId" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-place">
+                            <div class="app-base-input-label">{{ 'import.place' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentPlace" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-publisher">
+                            <div class="app-base-input-label">{{ 'import.publisher' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentPublisher" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-year">
+                            <div class="app-base-input-label">{{ 'import.year' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentYear" />
                         </div>
                     </div>
                 </div>
@@ -268,7 +424,7 @@
                 <div class="app-part-content">
                     <!-- ARCHIVER ID -->
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-primaryArchiverId">
+                        <div class="app-base-input app-half-width app-primaryArchiverId">
                             <div class="app-base-input-label">
                                 {{ 'import.archiverId' | translate }}
                             </div>
@@ -282,7 +438,7 @@
                         </div>
                     </div>
                     <div class="app-base-input-container" *ngIf="selectedMode === 'reservation'">
-                        <div class="app-base-input app-urnNbn">
+                        <div class="app-base-input app-half-width app-urnNbn">
                             <div class="app-base-input-label">
                                 {{ 'import.urnNbn' | translate }}
                             </div>
@@ -290,13 +446,13 @@
                         </div>
                     </div>
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-financed">
+                        <div class="app-base-input app-half-width app-financed">
                             <div class="app-base-input-label">
                                 {{ 'import.financed' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="financed" />
                         </div>
-                        <div class="app-base-input app-contractNumber">
+                        <div class="app-base-input app-half-width app-contractNumber">
                             <div class="app-base-input-label">
                                 {{ 'import.contractNumber' | translate }}
                             </div>
@@ -311,13 +467,13 @@
                 </div>
                 <div class="app-part-content">
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-formatValue">
+                        <div class="app-base-input app-half-width app-formatValue">
                             <div class="app-base-input-label">
                                 {{ 'import.formatValue' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="formatValue" />
                         </div>
-                        <div class="app-base-input app-formatVersion">
+                        <div class="app-base-input app-half-width app-formatVersion">
                             <div class="app-base-input-label">
                                 {{ 'import.formatVersion' | translate }}
                             </div>
@@ -325,7 +481,7 @@
                         </div>
                     </div>
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-extent">
+                        <div class="app-base-input app-half-width app-extent">
                             <div class="app-base-input-label">
                                 {{ 'import.extent' | translate }}
                             </div>
@@ -333,13 +489,13 @@
                         </div>
                     </div>
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-resolutionHorizontal">
+                        <div class="app-base-input app-half-width app-resolutionHorizontal">
                             <div class="app-base-input-label">
                                 {{ 'import.resolutionHorizontal' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="resolutionHorizontal" />
                         </div>
-                        <div class="app-base-input app-resolutionVertical">
+                        <div class="app-base-input app-half-width app-resolutionVertical">
                             <div class="app-base-input-label">
                                 {{ 'import.resolutionVertical' | translate }}
                             </div>
@@ -347,13 +503,13 @@
                         </div>
                     </div>
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-compressionRatio">
+                        <div class="app-base-input app-half-width app-compressionRatio">
                             <div class="app-base-input-label">
                                 {{ 'import.compressionRatio' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="compressionRatio" />
                         </div>
-                        <div class="app-base-input app-compressionValue">
+                        <div class="app-base-input app-half-width app-compressionValue">
                             <div class="app-base-input-label">
                                 {{ 'import.compressionValue' | translate }}
                             </div>
@@ -361,35 +517,35 @@
                         </div>
                     </div>
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-colorModel">
+                        <div class="app-base-input app-half-width app-colorModel">
                             <div class="app-base-input-label">
                                 {{ 'import.colorModel' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="colorModel" />
                         </div>
-                        <div class="app-base-input app-colorDepth">
+                        <div class="app-base-input app-half-width app-colorDepth">
                             <div class="app-base-input-label">
                                 {{ 'import.colorDepth' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="colorDepth" />
                         </div>
                     </div>
-                     <div class="app-base-input-container">
-                        <div class="app-base-input app-iccProfile">
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-iccProfile">
                             <div class="app-base-input-label">
                                 {{ 'import.iccProfile' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="iccProfile" />
                         </div>
                     </div>
-                     <div class="app-base-input-container">
-                        <div class="app-base-input app-pictureSizeWidth">
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-pictureSizeWidth">
                             <div class="app-base-input-label">
                                 {{ 'import.pictureSizeWidth' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="pictureSizeWidth" />
                         </div>
-                        <div class="app-base-input app-pictureSizeHeight">
+                        <div class="app-base-input app-half-width app-pictureSizeHeight">
                             <div class="app-base-input-label">
                                 {{ 'import.pictureSizeHeight' | translate }}
                             </div>
@@ -409,12 +565,7 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
-                <app-button
-                    variant="primary"
-                    size="l"
-                    (click)="importRecord()"
-                    [disabled]="isButtonDisabled()"
-                >
+                <app-button variant="primary" size="l" (click)="importRecord()" [disabled]="isButtonDisabled()">
                     <span>{{ 'buttons.import-record' | translate }}</span>
                 </app-button>
             </div>

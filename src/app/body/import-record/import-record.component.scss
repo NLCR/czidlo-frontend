@@ -168,36 +168,21 @@
     gap: 20px;
 }
 .app-base-input {
-    &.app-title,
-    &.app-subTitle,
-    &.app-otherOriginator,
+    mat-error {
+        font-size: 14px;
+    }
+    &.app-full-width {
+        width: 745px;
+    }
+    &.app-half-width {
+        width: 364px;
+    }
+
     &.app-place,
     &.app-publisher {
         width: 745px;
     }
-    &.app-ccnb,
-    &.app-isbn,
-    &.app-otherId,
-    &.app-documentType,
-    &.app-year,
-    &.app-primaryArchiverId,
-    &.app-urnNbn,
-    &.app-financed,
-    &.app-contractNumber,
-    &.app-formatVersion,
-    &.app-formatValue,
-    &.app-extent,
-    &.app-resolutionHorizontal,
-    &.app-resolutionVertical,
-    &.app-compressionRatio,
-    &.app-compressionValue,
-    &.app-colorDepth,
-    &.app-colorModel,
-    &.app-iccProfile,
-    &.app-pictureSizeWidth,
-    &.app-pictureSizeHeight {
-        width: 364px;
-    }
+
     &.app-bornDigital,
     &.app-primaryOriginatorValue {
         align-self: flex-end;

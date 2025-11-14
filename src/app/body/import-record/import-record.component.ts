@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { ImportRecordService } from '../../services/import-record.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -29,9 +29,17 @@ export class ImportRecordComponent {
     // BASIC DETAILS
     title = new FormControl<string>('', [Validators.required]);
     subTitle = new FormControl<string>('');
-    ccnb = new FormControl<string>('');
-    isbn = new FormControl<string>('');
+    monographTitle = new FormControl<string>('', [Validators.required]);
+    periodicalTitle = new FormControl<string>('', [Validators.required]);
+    volumeTitle = new FormControl<string>('', [Validators.required]);
+    issueTitle = new FormControl<string>('', [Validators.required]);
+
+    // IDENTIFIERS
+    ccnb = new FormControl<string>('', [this.ccnbValidator()]);
+    isbn = new FormControl<string>('', [this.isbnValidator()]);
+    issn = new FormControl<string>('', [this.issnValidator()]);
     otherId = new FormControl<string>('');
+
     documentType = new FormControl<string>('', [Validators.required]);
     bornDigital: boolean = false;
 
@@ -69,8 +77,23 @@ export class ImportRecordComponent {
     pictureSizeWidth = new FormControl<string>('');
     pictureSizeHeight = new FormControl<string>('');
 
+    // THESIS
+    degreeAwardingInstitution = new FormControl<string>('');
+
+    // ANALYTICAL
+    sourceDocumentTitle = new FormControl<string>('');
+    sourceDocumentVolumeTitle = new FormControl<string>('');
+    sourceDocumentIssueTitle = new FormControl<string>('');
+    sourceDocumentCcnb = new FormControl<string>('');
+    sourceDocumentIsbn = new FormControl<string>('');
+    sourceDocumentIssn = new FormControl<string>('');
+    sourceDocumentOtherId = new FormControl<string>('');
+    sourceDocumentPlace = new FormControl<string>('');
+    sourceDocumentPublisher = new FormControl<string>('');
+    sourceDocumentYear = new FormControl<string>('');
+
     importRecordSnackBarVisible = signal(false);
-    isButtonDisabled = signal(false);
+    isButtonDisabled = signal(true);
 
     constructor(
         private importRecordService: ImportRecordService,
@@ -107,6 +130,19 @@ export class ImportRecordComponent {
             },
         });
 
+        const controlsToWatch = [this.title, this.ccnb, this.isbn, this.issn];
+        controlsToWatch.forEach((ctrl) => {
+            ctrl.statusChanges.subscribe(() => {
+                this.updateButtonState();
+            });
+            ctrl.valueChanges.subscribe(() => {
+                this.updateButtonState();
+            });
+        });
+
+        // inicializace při startu
+        this.updateButtonState();
+
         this.intellectualEntitiesList.set(this.importRecordService.intellectualEntities() || []);
         this.selectedRegistrar = this.assignedRegistars[0];
         this.selectedEntity = this.intellectualEntitiesList()[0];
@@ -123,10 +159,71 @@ export class ImportRecordComponent {
     closeSidebar() {
         this.isSidebarOpen.set(false);
     }
+    buildRecordToImport() {
+        let record: any = {};
+        if (this.selectedEntity === 'MONOGRAPH') {
+            if (this.title.valid) {
+                record.title = this.title.value;
+            } else {
+                console.error('Title is required for MONOGRAPH');
+                return null;
+            }
+        }
+        console.log('record to import', record);
+        return record;
+    }
     importRecord() {
+        const record = this.buildRecordToImport();
+        if (!record) {
+            console.error('Record is invalid, cannot import.');
+            return;
+        }
         this.importRecordSnackBarVisible.set(true);
         setTimeout(() => {
             this.importRecordSnackBarVisible.set(false);
         }, 3000);
+    }
+
+    // VALIDACNI FUNKCE
+    updateButtonState() {
+        // tlačítko se aktivuje jen když:
+        // - title je validní (required)
+        // - ccnb, isbn a issn jsou validní (nebo prázdné)
+        const titleValid = this.title.valid;
+        const ccnbValid = this.ccnb.valid;
+        const isbnValid = this.isbn.valid;
+        const issnValid = this.issn.valid;
+
+        const isDisabled = !titleValid || !ccnbValid || !isbnValid || !issnValid;
+        this.isButtonDisabled.set(isDisabled);
+    }
+    /** Validátor CCNB: musí začínat "cnb" a mít přesně 9 číslic */
+    ccnbValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value?.trim();
+            if (!value) return null; // prázdné pole je OK, pokud není required
+            const regex = /^cnb\d{9}$/i;
+            return regex.test(value) ? null : { invalidCcnb: true };
+        };
+    }
+
+    /** Validátor ISSN: formát 1234-567X (X může být číslice nebo X) */
+    issnValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value?.trim();
+            if (!value) return null;
+            const regex = /^\d{4}-\d{3}[\dXx]$/;
+            return regex.test(value) ? null : { invalidIssn: true };
+        };
+    }
+
+    /** Validátor ISBN: povolíme 10 nebo 13 číslic, případně s pomlčkami */
+    isbnValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value?.trim();
+            if (!value) return null;
+            const regex = /^(97(8|9))?\d{9}(\d|X)$/; // ISBN-10 nebo ISBN-13
+            return regex.test(value.replace(/[-\s]/g, '')) ? null : { invalidIsbn: true };
+        };
     }
 }

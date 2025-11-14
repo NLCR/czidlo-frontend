@@ -9,8 +9,9 @@ export class ImportRecordService {
         'PERIODICAL',
         'PERIODICAL_VOLUME',
         'PERIODICAL_ISSUE',
-        'THESIS',
         'ANALYTICAL',
+        'THESIS',
         'OTHER',
+        'SOUND_COLLECTION'
     ]);
 }

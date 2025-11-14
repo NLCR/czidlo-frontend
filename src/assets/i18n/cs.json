@@ -109,7 +109,11 @@
         "user-saved-successfully": "Uživatel byl úspěšně uložen",
         "error-updating-user": "Chyba při aktualizaci uživatele",
         "user-deleted-successfully": "Uživatel byl úspěšně smazán",
-        "error-deleting-user": "Chyba při mazání uživatele"
+        "error-deleting-user": "Chyba při mazání uživatele",
+        "title-required": "Název je povinný",
+        "invalid-ccnb": "Neplatné ČCNB (požadovaný formát cnb123456789)",
+        "invalid-isbn": "Neplatné ISBN (požadovaný formát 10 nebo 13 číslic)",
+        "invalid-issn": "Neplatné ISSN (požadovaný formát 8 číslic)"
     },
     "inputs": {
         "pick-start-date": "Vyberte od",
@@ -232,6 +236,7 @@
         "identifiers": "Identifikátory",
         "ccnb": "ČCNB",
         "isbn": "ISBN",
+        "issn": "ISSN",
         "otherId": "Jiný identifikátor",
         "other": "Další",
         "documentType": "Typ dokumentu",
@@ -262,6 +267,22 @@
         "iccProfile": "ICC profil",
         "pictureSizeWidth": "Šířka obrázku",
         "pictureSizeHeight": "Výška obrázku",
-        "MONOGRAPH": "Monografie"
+        "monographTitle": "Název monografie *",
+        "volumeTitle": "Název svazku *",
+        "degreeAwardingInstitution": "Vysokoškolská instituce udělující titul",
+        "sourceDocument": "Zdrojový dokument",
+        "sourceDocumentTitle": "Název zdrojového dokumentu",
+        "sourceDocumentVolumeTitle": "Název svazku zdrojového dokumentu",
+        "sourceDocumentIssueTitle": "Název čísla zdrojového dokumentu",
+        "of-source-document": "zdrojového dokumentu",
+        "MONOGRAPH": "Monografie",
+        "MONOGRAPH_VOLUME": "Svazek monografie",
+        "PERIODICAL": "Periodikum",
+        "PERIODICAL_VOLUME": "Svazek periodika",
+        "PERIODICAL_ISSUE": "Číslo periodika",
+        "ANALYTICAL": "Analytikum",
+        "THESIS": "Vysokoškolská kvalifikační práce",
+        "OTHER": "Jiný dokument",
+        "SOUND_COLLECTION": "Zvukový dokument"
     }
 }
