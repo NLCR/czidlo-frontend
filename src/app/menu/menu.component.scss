@@ -297,3 +297,24 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
+.app-sidebar {
+    display: none;
+    height: 100%;
+    align-self: flex-end;
+    &.app-sidebar-active {
+        display: flex;
+        position: absolute;
+        right: 0;
+        background-color: #fff;
+        flex-direction: column;
+        align-items: flex-start;
+        z-index: 101;
+        width: 800px;
+    }
+}
+.app-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100;
+}

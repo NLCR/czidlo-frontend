@@ -1,9 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { FormControl, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { ImportRecordService } from '../../services/import-record.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RegistratorsService } from '../../services/registrators.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-import-record',
@@ -12,6 +13,7 @@ import { RegistratorsService } from '../../services/registrators.service';
     styleUrl: './import-record.component.scss',
 })
 export class ImportRecordComponent {
+    loggedIn = computed(() => this.authService.loggedIn());
     // assignedRegistars = [];
     assignedRegistars = ['aba001', 'boa001'];
     selectedRegistrar: string = '';
@@ -100,7 +102,8 @@ export class ImportRecordComponent {
         private translate: TranslateService,
         private router: Router,
         private route: ActivatedRoute,
-        private registratorsService: RegistratorsService
+        private registratorsService: RegistratorsService,
+        private authService: AuthService
     ) {}
 
     ngOnInit(): void {

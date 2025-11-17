@@ -604,3 +604,51 @@
         </div>
     </div>
 </div>
+
+<!-- Overlay -->
+<div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
+    <div class="app-sidebar-header">
+        <div class="app-sidebar-title">{{ 'menu.user-account' | translate }}</div>
+        <div class="app-sidebar-close" (click)="closeSidebar()">
+            <img src="assets/icons/close.svg" />
+        </div>
+    </div>
+    <div class="app-sidebar-content">
+        <div class="app-sections">
+            <div class="app-section">
+                <div class="app-items">
+                    <div class="app-item" *ngIf="user">
+                        <span class="app-item-label">{{ 'users.username' | translate }}:</span>
+                        <span class="app-item-value">{{ user }}</span>
+                    </div>
+                    <div class="app-item" *ngIf="email">
+                        <span class="app-item-label">{{ 'users.email' | translate }}:</span>
+                        <span class="app-item-value">{{ email }}</span>
+                    </div>
+                    <div class="app-item" *ngIf="isAdmin().valueOf()">
+                        <span class="app-item-label">{{ 'users.admin' | translate }}:</span>
+                        <span class="app-item-value">{{ isAdmin().valueOf().toString() | translate}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="app-section">
+                <app-button variant="primary" size="l" iconRight="lock.svg" (click)="onChangePasswordClick()">
+                    <span>{{ 'buttons.change-password' | translate }}</span>
+                </app-button>
+            </div>
+        </div>
+    </div>
+    <div class="app-sidebar-footer">
+        <div class="app-button-container">
+            <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                <span>{{ 'buttons.cancel' | translate }}</span>
+            </app-button>
+            <app-button variant="primary" size="l" iconRight="logout.svg" (click)="onLogoutClick()">
+                <span>{{ 'buttons.logout' | translate }}</span>
+            </app-button>
+        </div>
+    </div>
+</div>

@@ -7,6 +7,7 @@ import { EnvironmentService } from './environment.service';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
     public loggedIn = signal(false);
+    public isAdmin = signal(false);
 
     private readonly TOKEN_KEY = 'auth_token';
     private readonly USER_KEY = 'auth_user';
@@ -32,8 +33,16 @@ export class AuthService {
             const token = 'fake-jwt-token';
             this.setSession(token, username);
             this.loggedIn.set(true);
+            this.isAdmin.set(true);
             return of(true).pipe(delay(300));
-        } else {
+        } else if (username === 'user' && password === 'password') {
+            const token = 'fake-jwt-token';
+            this.setSession(token, username);
+            this.loggedIn.set(true);
+            this.isAdmin.set(false);
+            return of(true).pipe(delay(300));
+        }
+        else {
             return throwError(() => 'Invalid credentials').pipe(delay(300));
         }
     }
@@ -67,6 +76,7 @@ export class AuthService {
 
         if (token && expiresAt && new Date().getTime() < Number(expiresAt)) {
             this.loggedIn.set(true);
+            this.isAdmin.set(localStorage.getItem(this.USER_KEY) === 'admin');
             console.log('Session restored for user:', localStorage.getItem(this.USER_KEY));
         } else {
             this.logout();

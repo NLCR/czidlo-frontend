@@ -23,7 +23,7 @@
     <div class="app-info-part app-scrollable">
         <div class="app-info-content" [innerHTML]="htmlContent"></div>
     </div>
-    <div class="app-info-part app-info-footer" *ngIf="isLoggedIn()">
+    <div class="app-info-part app-info-footer" *ngIf="isLoggedIn() && isAdmin()">
         <app-button variant="primary" size="l" iconLeft="" iconRight="edit-white.svg" (click)="editInfo(isActive)">
             <span>{{ 'info.edit' | translate }}</span>
         </app-button>

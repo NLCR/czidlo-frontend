@@ -18,6 +18,8 @@ import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
     styleUrl: './processes.component.scss',
 })
 export class ProcessesComponent {
+    loggedIn = computed(() => this.authService.loggedIn());
+
     processes = signal<Array<any>>([]);
     definitions = signal<Array<any>>([
         { type: 'OAI_ADAPTER' },
@@ -62,7 +64,6 @@ export class ProcessesComponent {
     selectedState = 'ALL';
     states = ['ALL', 'ACTIVE', 'DEACTIVATED'];
     selectedIncludeCount = false;
-    loggedIn = computed(() => this.authService.loggedIn());
 
     isPlanButtonDisabled = computed(() => {
         const def = this.activeDefinition();

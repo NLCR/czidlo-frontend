@@ -4,6 +4,8 @@
     "actions": "Akce",
     "ID": "ID",
     "not-logged-in-message": "Pro přístup k této části aplikace se prosím přihlaste.",
+    "true": "Ano",
+    "false": "Ne",
     "menu": {
         "logo": "ČIDLO",
         "desc-cz": "Český systém pro IDentifikaci a LOkalizaci digitálních dokumentů českého kulturního dědictví",
@@ -21,7 +23,8 @@
         "login": "Přihlásit se",
         "powered-by": "Vzniklo za podpory",
         "cs": "Čeština",
-        "en": "English"
+        "en": "English",
+        "user-account": "Uživatelský účet"
     },
     "users": {
         "list-of-users": "Seznam uživatelských účtů",
@@ -86,7 +89,8 @@
         "add-date-range": "Přidat jiné rozmezí",
         "remove-date-range": "Odebrat rozmezí",
         "login": "Přihlásit se",
-        "import-record": "Vložit"
+        "import-record": "Vložit",
+        "logout": "Odhlásit se"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",

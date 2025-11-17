@@ -1,4 +1,11 @@
-<div class="app-import-record-container" *ngIf="assignedRegistars.length > 0">
+<div class="app-not-logged-in" *ngIf="!loggedIn()">
+    <div class="app-not-logged-in-content">
+        <div class="app-not-logged-in-message">
+            {{ 'not-logged-in-message' | translate }}
+        </div>
+    </div>
+</div>
+<div class="app-import-record-container" *ngIf="assignedRegistars.length > 0 && loggedIn()">
     <div class="app-import-record-header">
         {{ 'import.import-record-title' | translate }}
     </div>

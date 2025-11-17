@@ -16,8 +16,8 @@ export class InformationComponent {
     isActive: 'info' | 'rules' | 'contact' = 'info';
     markdownText: string = '';
     htmlContent: any = '';
-    loggedIn = signal(false);
     isLoggedIn = computed(() => this.authService.loggedIn());
+    isAdmin = computed(() => this.authService.isAdmin());
 
     constructor(
         private route: ActivatedRoute,
