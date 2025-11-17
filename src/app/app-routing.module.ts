@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BodyComponent } from './body/body.component';
 import { InformationComponent } from './body/information/information.component';
-import { RegistratorsComponent } from './body/registrators/registrators.component';
+import { RegistrarsComponent } from './body/registrars/registrars.component';
 import { RulesComponent } from './body/rules/rules.component';
 import { SearchComponent } from './body/search/search.component';
 import { StatisticsComponent } from './body/statistics/statistics.component';
@@ -15,9 +15,9 @@ const routes: Routes = [
     { path: '', component: BodyComponent },
     { path: 'information', component: InformationComponent },
     { path: 'information/:tab', component: InformationComponent },
-    { path: 'registrators', component: RegistratorsComponent },
-    { path: 'registrators/:tab', component: RegistratorsComponent },
-    { path: 'registrators/:tab/:id', component: RegistratorsComponent },
+    { path: 'registrars', component: RegistrarsComponent },
+    { path: 'registrars/:tab', component: RegistrarsComponent },
+    { path: 'registrars/:tab/:id', component: RegistrarsComponent },
     { path: 'rules', component: RulesComponent },
     { path: 'search', component: SearchComponent },
     { path: 'statistics', component: StatisticsComponent },

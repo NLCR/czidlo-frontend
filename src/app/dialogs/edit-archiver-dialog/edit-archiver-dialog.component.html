@@ -1,7 +1,7 @@
 <div class="app-dialog app-add-archiver-dialog">
     <div class="app-dialog-header">
         <div class="app-dialog-title">
-            <span>{{ 'registrators.archiver' | translate }}</span>
+            <span>{{ 'registrars.archiver' | translate }}</span>
             <span *ngIf="data.name">: {{ data.name }}</span>
             <span>– {{ data.title }}</span>
         </div>
@@ -24,7 +24,7 @@
     </div>
     <div class="app-dialog-body">
         <div class="app-part-content app-part-name">
-            <div class="app-base-input-label">{{ 'registrators.Name' | translate }}</div>
+            <div class="app-base-input-label">{{ 'registrars.Name' | translate }}</div>
             <div class="app-base-input app-login-input">
                 <mat-form-field appearance="outline" class="app-base-input-field">
                     <input matInput [(ngModel)]="name" />
@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="app-part-content app-part-description">
-            <div class="app-base-input-label">{{ 'registrators.Description' | translate }}</div>
+            <div class="app-base-input-label">{{ 'registrars.Description' | translate }}</div>
             <div class="app-base-input app-base-textarea">
                 <!-- <mat-form-field appearance="outline"> -->
                 <textarea
@@ -53,7 +53,7 @@
                     <app-toggle size="s" [checked]="hidden" (click)="toggleHidden()">
                         {{ 'processes.include-counts' | translate }}
                     </app-toggle>
-                    <div class="app-toggle-label">{{ 'registrators.Hidden' | translate }}</div>
+                    <div class="app-toggle-label">{{ 'registrars.Hidden' | translate }}</div>
                 </div>
             </div>
         </div>

@@ -4,8 +4,8 @@ import { tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
 @Injectable({ providedIn: 'root' })
-export class RegistratorsService {
-    public registrators = signal<Array<any>>([]);
+export class RegistrarsService {
+    public registrars = signal<Array<any>>([]);
     public archivers = signal<Array<any>>([]);
 
     constructor(private apiService: ApiService) {}
@@ -65,9 +65,9 @@ export class RegistratorsService {
         return this.apiService.editArchiver(id, body);
     }
 
-    // REGISTRATORS
+    // REGISTRARS
 
-    getRegistrators(): Observable<any> {
+    getRegistrars(): Observable<any> {
         // Implement similarly to getArchivers if needed
         return of([]);
     }

@@ -52,8 +52,8 @@ export class ProcessesComponent {
 
     showMyProcesses = false;
 
-    registators = new FormControl();
-    registatorList = signal(<Array<string>>[]);
+    registrars = new FormControl();
+    registrarList = signal(<Array<string>>[]);
     intellectualEntities = new FormControl();
     intellectualEntitiesList = signal(<Array<string>>[]);
     missingCNB = false;
@@ -110,7 +110,7 @@ export class ProcessesComponent {
         this.deactivationStartControl.disable();
         this.deactivationEndControl.disable();
 
-        this.registatorList.set(this.processesService.registrators() || []);
+        this.registrarList.set(this.processesService.registrars() || []);
         this.intellectualEntitiesList.set(this.processesService.intellectualEntities() || []);
 
         this.route.url.subscribe((url) => {
@@ -378,7 +378,7 @@ export class ProcessesComponent {
             console.log('Planning REGISTRARS_URN_NBN_CSV_EXPORT process...');
             const registrationStart = this.startDateControl.value;
             const registrationEnd = this.endDateControl.value;
-            const registrars = this.registators.value?.join(',');
+            const registrars = this.registrars.value?.join(',');
             const entityTypes = this.intellectualEntities.value?.join(',');
             const withMissingCnbOnly = this.missingCNB;
             const withMissingIssnOnly = this.missingISSN;
@@ -424,7 +424,7 @@ export class ProcessesComponent {
         // PLAN URL AVAILABILITY CHECK
         if (activeProcess === 'DI_URL_AVAILABILITY_CHECK') {
             console.log('Planning DI_URL_AVAILABILITY_CHECK process...');
-            const registrarCodes = this.registators.value?.join(',') || '';
+            const registrarCodes = this.registrars.value?.join(',') || '';
             const intEntTypes = this.intellectualEntities.value?.join(',') || '';
             const urnNbnStatesIncludeActive: boolean = this.selectedUrnNbnState === 'ALL' || this.selectedUrnNbnState === 'ACTIVE';
             const urnNbnStatesIncludeDeactivated: boolean = this.selectedUrnNbnState === 'ALL' || this.selectedUrnNbnState === 'DEACTIVATED';
@@ -536,12 +536,12 @@ export class ProcessesComponent {
             return { invalidDate: true };
         };
     }
-    removeSelectedRegistrator(item: string) {
-        const currentItems = this.registators.value || [];
+    removeSelectedRegistrar(item: string) {
+        const currentItems = this.registrars.value || [];
         const index = currentItems.indexOf(item);
         if (index >= 0) {
             currentItems.splice(index, 1);
-            this.registators.setValue(currentItems);
+            this.registrars.setValue(currentItems);
         }
     }
     removeSelectedEntity(item: string) {

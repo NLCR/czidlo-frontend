@@ -51,7 +51,7 @@
 <div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
     <div class="app-sidebar-user" *ngIf="activeUser">
         <div class="app-sidebar-header">
-            <div class="app-sidebar-title">{{ 'registrators.detail' | translate }} - {{ activeUser?.login }}</div>
+            <div class="app-sidebar-title">{{ 'registrars.detail' | translate }} - {{ activeUser?.login }}</div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>

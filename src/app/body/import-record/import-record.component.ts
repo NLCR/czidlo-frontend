@@ -3,7 +3,7 @@ import { FormControl, Validators, AbstractControl, ValidationErrors, ValidatorFn
 import { ImportRecordService } from '../../services/import-record.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { RegistratorsService } from '../../services/registrators.service';
+import { RegistrarsService } from '../../services/registrars.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -102,7 +102,7 @@ export class ImportRecordComponent {
         private translate: TranslateService,
         private router: Router,
         private route: ActivatedRoute,
-        private registratorsService: RegistratorsService,
+        private registrarsService: RegistrarsService,
         private authService: AuthService
     ) {}
 
@@ -123,9 +123,9 @@ export class ImportRecordComponent {
                 this.selectedMode = this.registrationMode[0].value;
             });
 
-        this.registratorsService.getArchivers().subscribe({
+        this.registrarsService.getArchivers().subscribe({
             next: (data) => {
-                this.archiverIdsList.set(this.registratorsService.archivers() || []);
+                this.archiverIdsList.set(this.registrarsService.archivers() || []);
                 console.log('Archiver IDs for selection:', this.archiverIdsList());
             },
             error: (error) => {

@@ -1,62 +1,62 @@
-<div class="app-registrators-container">
-    <div class="app-registrators-page">
+<div class="app-registrars-container">
+    <div class="app-registrars-page">
         <!-- TABS -->
-        <div class="app-tabs-header app-registrators-header">
+        <div class="app-tabs-header app-registrars-header">
             <div class="app-tabs">
                 <div
                     class="app-tab app-tab-first"
-                    [ngClass]="{ 'app-tab-active': isActive === 'registrators' }"
-                    routerLink="/registrators/registrators"
+                    [ngClass]="{ 'app-tab-active': isActive === 'registrars' }"
+                    routerLink="/registrars/registrars"
                 >
-                    {{ 'registrators.registrators-list' | translate }}
+                    {{ 'registrars.registrars-list' | translate }}
                 </div>
-                <div class="app-tab app-tab-last" [ngClass]="{ 'app-tab-active': isActive === 'archivers' }" routerLink="/registrators/archivers">
-                    {{ 'registrators.archivers-list' | translate }}
+                <div class="app-tab app-tab-last" [ngClass]="{ 'app-tab-active': isActive === 'archivers' }" routerLink="/registrars/archivers">
+                    {{ 'registrars.archivers-list' | translate }}
                 </div>
             </div>
         </div>
 
-        <!-- REGISTRATORS -->
-        <div class="app-registrators" *ngIf="isActive === 'registrators'">
-            <div class="app-add app-add-registrator" *ngIf="loggedIn()">
-                <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openAddRegistratorDialog()">
-                    {{ 'buttons.add-registrator' | translate }}
+        <!-- REGISTRARS -->
+        <div class="app-registrars" *ngIf="isActive === 'registrars'">
+            <div class="app-add app-add-registrar" *ngIf="loggedIn()">
+                <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openAddRegistrarDialog()">
+                    {{ 'buttons.add-registrar' | translate }}
                 </app-button>
             </div>
-            <div class="app-table app-table-registrators">
+            <div class="app-table app-table-registrars">
                 <!-- table header -->
                 <div class="app-row app-row-header">
                     <div class="app-col app-col-name app-table-header-item">
-                        {{ 'registrators.name' | translate }}
+                        {{ 'registrars.name' | translate }}
                     </div>
                     <div class="app-col app-col-code app-table-header-item">
-                        {{ 'registrators.code' | translate }}
+                        {{ 'registrars.code' | translate }}
                     </div>
                     <div class="app-col app-col-actions app-table-header-item">
-                        {{ 'registrators.actions' | translate }}
+                        {{ 'registrars.actions' | translate }}
                     </div>
                 </div>
-                <!-- no registrators -->
-                <div class="no-processes" *ngIf="!loadingRegistrators() && registrators().length === 0">
-                    {{ 'registrators.no-registrators' | translate }}
+                <!-- no registrars -->
+                <div class="no-processes" *ngIf="!loadingRegistrars() && registrars().length === 0">
+                    {{ 'registrars.no-registrars' | translate }}
                 </div>
                 <!-- table body -->
                 <div class="app-table-body">
                     <div
-                        *ngFor="let registrator of registrators()"
+                        *ngFor="let registrar of registrars()"
                         class="app-row app-table-row app-row-clicable"
-                        [ngClass]="{ 'app-row-active': activeRegistrator === registrator }"
-                        (click)="openSidebar(registrator)"
+                        [ngClass]="{ 'app-row-active': activeRegistrar === registrar }"
+                        (click)="openSidebar(registrar)"
                     >
-                        <div class="app-col app-col-name">{{ registrator.name }}</div>
-                        <div class="app-col app-col-code">{{ registrator.code }}</div>
+                        <div class="app-col app-col-name">{{ registrar.name }}</div>
+                        <div class="app-col app-col-code">{{ registrar.code }}</div>
                         <div class="app-col app-col-actions">
                             <app-button
                                 variant="tertiary"
                                 size="s"
                                 [icon]="true"
                                 iconLeft="trash-blue.svg"
-                                (click)="deleteRegistrator(registrator); $event.stopPropagation()"
+                                (click)="deleteRegistrar(registrar); $event.stopPropagation()"
                             ></app-button>
                         </div>
                     </div>
@@ -75,15 +75,15 @@
                 <!-- table header -->
                 <div class="app-row app-row-header">
                     <div class="app-col app-col-name app-table-header-item">
-                        {{ 'registrators.Name' | translate }}
+                        {{ 'registrars.Name' | translate }}
                     </div>
                     <div class="app-col app-col-actions app-table-header-item" *ngIf="loggedIn()">
-                        {{ 'registrators.actions' | translate }}
+                        {{ 'registrars.actions' | translate }}
                     </div>
                 </div>
                 <!-- no archivers -->
                 <div class="no-records" *ngIf="!loadingArchivers() && archivers().length === 0">
-                    {{ 'registrators.no-archivers' | translate }}
+                    {{ 'registrars.no-archivers' | translate }}
                 </div>
                 <!-- table body -->
                 <div class="app-table-body">
@@ -127,15 +127,15 @@
 
 <!-- Sidebar -->
 <div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
-    <!-- Sidebar Registrator -->
-    <div class="app-sidebar-registrator" *ngIf="activeRegistrator && isActive === 'registrators'">
+    <!-- Sidebar Registrar -->
+    <div class="app-sidebar-registrar" *ngIf="activeRegistrar && isActive === 'registrars'">
         <div class="app-sidebar-header">
-            <div class="app-sidebar-title">{{ activeRegistrator?.name }}</div>
+            <div class="app-sidebar-title">{{ activeRegistrar?.name }}</div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>
         </div>
-        <div class="app-sidebar-content">{{ activeRegistrator?.log | json }}</div>
+        <div class="app-sidebar-content">{{ activeRegistrar?.log | json }}</div>
         <div class="app-sidebar-footer">
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
@@ -154,7 +154,7 @@
     <!-- Sidebar Archiver -->
     <div class="app-sidebar-archiver" *ngIf="activeArchiver && isActive === 'archivers'">
         <div class="app-sidebar-header">
-            <div class="app-sidebar-title">{{ 'registrators.detail' | translate }} - {{ activeArchiver?.name }}</div>
+            <div class="app-sidebar-title">{{ 'registrars.detail' | translate }} - {{ activeArchiver?.name }}</div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>
@@ -162,30 +162,30 @@
         <div class="app-sidebar-content">
             <div class="app-sections">
                 <div class="app-section">
-                    <!-- <div class="app-section-title">{{ 'registrators.detail' | translate }}</div> -->
+                    <!-- <div class="app-section-title">{{ 'registrars.detail' | translate }}</div> -->
                     <div class="app-items">
                         <div class="app-item" *ngIf="activeArchiver?.name">
-                            <span class="app-item-label">{{ 'registrators.name' | translate }}:</span>
+                            <span class="app-item-label">{{ 'registrars.name' | translate }}:</span>
                             <span class="app-item-value">{{ activeArchiver?.name }}</span>
                         </div>
                         <div class="app-item">
-                            <span class="app-item-label">{{ 'registrators.id' | translate }}:</span>
+                            <span class="app-item-label">{{ 'registrars.id' | translate }}:</span>
                             <span class="app-item-value">{{ activeArchiver?.id }}</span>
                         </div>
                         <div class="app-item" *ngIf="activeArchiver?.description">
-                            <span class="app-item-label">{{ 'registrators.description' | translate }}:</span>
+                            <span class="app-item-label">{{ 'registrars.description' | translate }}:</span>
                             <span class="app-item-value">{{ activeArchiver?.description }}</span>
                         </div>
                         <div class="app-item" *ngIf="activeArchiver?.created">
-                            <span class="app-item-label">{{ 'registrators.created' | translate }}:</span>
+                            <span class="app-item-label">{{ 'registrars.created' | translate }}:</span>
                             <span class="app-item-value">{{ activeArchiver?.created }}</span>
                         </div>
                         <div class="app-item" *ngIf="activeArchiver?.modified">
-                            <span class="app-item-label">{{ 'registrators.modified' | translate }}:</span>
+                            <span class="app-item-label">{{ 'registrars.modified' | translate }}:</span>
                             <span class="app-item-value">{{ activeArchiver?.modified }}</span>
                         </div>
                         <div class="app-item" *ngIf="activeArchiver?.hidden !== undefined && loggedIn()">
-                            <span class="app-item-label">{{ 'registrators.hidden' | translate }}:</span>
+                            <span class="app-item-label">{{ 'registrars.hidden' | translate }}:</span>
                             <span class="app-item-value">{{ activeArchiver?.hidden ? 'Ano' : 'Ne' }}</span>
                         </div>
                     </div>

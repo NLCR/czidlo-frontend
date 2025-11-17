@@ -1,6 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { RegistratorsService } from '../../services/registrators.service';
+import { RegistrarsService } from '../../services/registrars.service';
 import { AuthService } from '../../services/auth.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
@@ -9,29 +9,29 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { EditArchiverDialogComponent } from '../../dialogs/edit-archiver-dialog/edit-archiver-dialog.component';
 
 @Component({
-    selector: 'app-registrators',
+    selector: 'app-registrars',
     standalone: false,
-    templateUrl: './registrators.component.html',
-    styleUrl: './registrators.component.scss',
+    templateUrl: './registrars.component.html',
+    styleUrl: './registrars.component.scss',
 })
-export class RegistratorsComponent {
-    isActive = 'registrators';
-    loadingRegistrators = signal(false);
+export class RegistrarsComponent {
+    isActive = 'registrars';
+    loadingRegistrars = signal(false);
     loadingArchivers = signal(false);
 
     loggedIn = computed(() => this.authService.loggedIn());
 
-    registrators = signal<Array<any>>([]);
+    registrars = signal<Array<any>>([]);
     archivers = signal<Array<any>>([]);
 
     isSidebarOpen = signal(false);
-    activeRegistrator: any = null;
+    activeRegistrar: any = null;
     activeArchiver: any = null;
 
     constructor(
         private router: Router,
         private route: ActivatedRoute,
-        private registratorsService: RegistratorsService,
+        private registrarsService: RegistrarsService,
         private authService: AuthService,
         private dialog: MatDialog,
         private translate: TranslateService,
@@ -40,30 +40,30 @@ export class RegistratorsComponent {
 
     ngOnInit(): void {
         this.route.url.subscribe((url) => {
-            this.isActive = url[1]?.path || 'registrators';
-            // REDIRECT TO REGISTRATORS IF NO SUBPATH
+            this.isActive = url[1]?.path || 'registrars';
+            // REDIRECT TO REGISTRARS IF NO SUBPATH
             if (url.length < 2) {
-                this.router.navigate(['/registrators', 'registrators']);
+                this.router.navigate(['/registrars', 'registrars']);
             }
-            // REGISTRATORS
-            if (this.isActive === 'registrators') {
-                this.loadingRegistrators.set(true);
-                if (this.registratorsService.registrators().length === 0) {
-                    console.log('Loading registrators...');
-                    this.loadRegistrators();
+            // REGISTRARS
+            if (this.isActive === 'registrars') {
+                this.loadingRegistrars.set(true);
+                if (this.registrarsService.registrars().length === 0) {
+                    console.log('Loading registrars...');
+                    this.loadRegistrars();
                 } else {
-                    this.registrators.set(this.registratorsService.registrators());
-                    this.loadingRegistrators.set(false);
+                    this.registrars.set(this.registrarsService.registrars());
+                    this.loadingRegistrars.set(false);
                 }
             }
             // ARCHIVERS
             else if (this.isActive === 'archivers') {
                 this.loadingArchivers.set(true);
-                if (this.registratorsService.archivers().length === 0) {
+                if (this.registrarsService.archivers().length === 0) {
                     console.log('Loading archivers...');
                     this.loadArchivers();
                 } else {
-                    this.archivers.set(this.registratorsService.archivers());
+                    this.archivers.set(this.registrarsService.archivers());
                     this.loadingArchivers.set(false);
                 }
                 if (url.length === 3) {
@@ -76,9 +76,9 @@ export class RegistratorsComponent {
     }
 
     loadArchivers(): void {
-        this.registratorsService.getArchivers().subscribe({
+        this.registrarsService.getArchivers().subscribe({
             next: (data) => {
-                this.archivers.set(this.registratorsService.archivers());
+                this.archivers.set(this.registrarsService.archivers());
             },
             error: (error) => {
                 console.error('Error loading archivers in component:', error);
@@ -91,7 +91,7 @@ export class RegistratorsComponent {
         });
     }
     loadArchiverDetails(archiverId: any): void {
-        this.registratorsService.getArchiver(archiverId).subscribe({
+        this.registrarsService.getArchiver(archiverId).subscribe({
             next: (data) => {
                 data.created = data.created ? new Date(data.created.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
                 data.modified = data.modified ? new Date(data.modified.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
@@ -104,34 +104,34 @@ export class RegistratorsComponent {
         });
     }
 
-    loadRegistrators(): void {
-        this.registratorsService.getRegistrators().subscribe({
+    loadRegistrars(): void {
+        this.registrarsService.getRegistrars().subscribe({
             next: (data) => {
-                this.registrators.set(this.registratorsService.registrators());
+                this.registrars.set(this.registrarsService.registrars());
             },
             error: (error) => {
-                console.error('Error loading registrators in component:', error);
-                this.loadingRegistrators.set(false);
+                console.error('Error loading registrars in component:', error);
+                this.loadingRegistrars.set(false);
             },
             complete: () => {
-                console.log('Registrators loading complete in component');
-                this.loadingRegistrators.set(false);
+                console.log('Registrars loading complete in component');
+                this.loadingRegistrars.set(false);
             },
         });
     }
 
     openSidebar(institution: any): void {
         if (this.isActive === 'archivers') {
-            this.router.navigate(['/registrators', 'archivers', institution.id]);
-        } else if (this.isActive === 'registrators') {
-            this.router.navigate(['/registrators', 'registrators', institution.id]);
+            this.router.navigate(['/registrars', 'archivers', institution.id]);
+        } else if (this.isActive === 'registrars') {
+            this.router.navigate(['/registrars', 'registrars', institution.id]);
         }
     }
     closeSidebar(): void {
-        this.router.navigate(['/registrators', this.isActive]);
+        this.router.navigate(['/registrars', this.isActive]);
         this.isSidebarOpen.set(false);
         this.activeArchiver = null;
-        this.activeRegistrator = null;
+        this.activeRegistrar = null;
     }
     deleteArchiver(archiver: any): void {
         console.log('Delete archiver:', archiver);
@@ -148,7 +148,7 @@ export class RegistratorsComponent {
             .afterClosed()
             .subscribe((result) => {
                 if (result === true) {
-                    this.registratorsService.deleteArchiver(archiver.id).subscribe({
+                    this.registrarsService.deleteArchiver(archiver.id).subscribe({
                         next: () => {
                             console.log('Archiver deleted successfully');
                             this.loadArchivers();
@@ -162,12 +162,12 @@ export class RegistratorsComponent {
             });
     }
 
-    deleteRegistrator(registrator: any): void {
-        console.log('Delete registrator:', registrator);
+    deleteRegistrar(registrar: any): void {
+        console.log('Delete registrar:', registrar);
     }
 
-    openAddRegistratorDialog(): void {
-        console.log('Open add registrator dialog');
+    openAddRegistrarDialog(): void {
+        console.log('Open add registrar dialog');
     }
 
     openEditArchiverDialog(archiver?: any): void {
@@ -175,7 +175,7 @@ export class RegistratorsComponent {
         this.dialog.open(EditArchiverDialogComponent, {
             minWidth: '800px',
             data: {
-                title: archiver ? this.translate.instant('registrators.edit-archiver-title') : this.translate.instant('registrators.add-archiver-title'),
+                title: archiver ? this.translate.instant('registrars.edit-archiver-title') : this.translate.instant('registrars.add-archiver-title'),
                 name: archiver?.name || '',
                 description: archiver?.description || '',
                 hidden: archiver?.hidden || false,
@@ -186,7 +186,7 @@ export class RegistratorsComponent {
                 if (archiver) {
                     // Edit existing archiver
                     // result.hidden = archiver.hidden; // preserve history
-                    this.registratorsService.editArchiver(archiver.id, result).subscribe({
+                    this.registrarsService.editArchiver(archiver.id, result).subscribe({
                         next: () => {
                             console.log('Archiver edited successfully');
                             this.loadArchivers();
@@ -197,7 +197,7 @@ export class RegistratorsComponent {
                     });
                 } else {
                     // Create new archiver
-                    this.registratorsService.createArchiver(result).subscribe({
+                    this.registrarsService.createArchiver(result).subscribe({
                         next: () => {
                             console.log('Archiver created successfully');
                             this.loadArchivers();

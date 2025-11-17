@@ -340,28 +340,28 @@
                             </div>
                         </div>
                     </div>
-                    <!-- REGISTRATORS FILTER -->
+                    <!-- REGISTRARS FILTER -->
                     <div class="app-base-input-container">
                         <div class="app-base-input app-multiselect">
-                            <div class="app-base-input-label">{{ 'processes.filter-by-registrator' | translate }} URN:NBN</div>
+                            <div class="app-base-input-label">{{ 'processes.filter-by-registrar' | translate }} URN:NBN</div>
                             <mat-form-field appearance="outline">
-                                <mat-select [formControl]="registators" multiple [placeholder]="'inputs.select-registrator' | translate">
+                                <mat-select [formControl]="registrars" multiple [placeholder]="'inputs.select-registrar' | translate">
                                     <mat-select-trigger>
-                                        @if ((registators.value?.length || 0) > 0) {
+                                        @if ((registrars.value?.length || 0) > 0) {
                                         {{ 'inputs.selected-items' | translate }}:
-                                        <span>{{ registators.value?.length }}</span>
+                                        <span>{{ registrars.value?.length }}</span>
                                         }
                                     </mat-select-trigger>
-                                    @for (reg of registatorList(); track reg) {
+                                    @for (reg of registrarList(); track reg) {
                                     <mat-option [value]="reg">{{ reg }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
                         </div>
-                        <div class="app-selected-items" *ngIf="registators.value?.length > 0">
-                            <div class="app-selected-item" *ngFor="let item of registators.value">
+                        <div class="app-selected-items" *ngIf="registrars.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let item of registrars.value">
                                 {{ item }}
-                                <div class="app-selected-item-remove" (click)="removeSelectedRegistrator(item)">
+                                <div class="app-selected-item-remove" (click)="removeSelectedRegistrar(item)">
                                     <img src="assets/icons/close.svg" />
                                 </div>
                             </div>
@@ -498,28 +498,28 @@
             <div class="app-part">
                 <div class="app-part-title">{{ 'processes.digital-document' | translate }}</div>
                 <div class="app-part-content">
-                    <!-- REGISTRATORS -->
+                    <!-- REGISTRARS -->
                     <div class="app-base-input-container">
                         <div class="app-base-input app-multiselect">
-                            <div class="app-base-input-label">{{ 'processes.registrator' | translate }}</div>
+                            <div class="app-base-input-label">{{ 'processes.registrar' | translate }}</div>
                             <mat-form-field appearance="outline">
-                                <mat-select [formControl]="registators" multiple [placeholder]="'inputs.select-registrator' | translate">
+                                <mat-select [formControl]="registrars" multiple [placeholder]="'inputs.select-registrar' | translate">
                                     <mat-select-trigger>
-                                        @if ((registators.value?.length || 0) > 0) {
+                                        @if ((registrars.value?.length || 0) > 0) {
                                         {{ 'inputs.selected-items' | translate }}:
-                                        <span>{{ registators.value?.length }}</span>
+                                        <span>{{ registrars.value?.length }}</span>
                                         }
                                     </mat-select-trigger>
-                                    @for (reg of registatorList(); track reg) {
+                                    @for (reg of registrarList(); track reg) {
                                     <mat-option [value]="reg">{{ reg }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
                         </div>
-                        <div class="app-selected-items" *ngIf="registators.value?.length > 0">
-                            <div class="app-selected-item" *ngFor="let item of registators.value">
+                        <div class="app-selected-items" *ngIf="registrars.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let item of registrars.value">
                                 {{ item }}
-                                <div class="app-selected-item-remove" (click)="removeSelectedRegistrator(item)">
+                                <div class="app-selected-item-remove" (click)="removeSelectedRegistrar(item)">
                                     <img src="assets/icons/close.svg" />
                                 </div>
                             </div>

@@ -10,7 +10,7 @@ import { BodyComponent } from './body/body.component';
 import { InformationComponent } from './body/information/information.component';
 import { RulesComponent } from './body/rules/rules.component';
 import { SearchComponent } from './body/search/search.component';
-import { RegistratorsComponent } from './body/registrators/registrators.component';
+import { RegistrarsComponent } from './body/registrars/registrars.component';
 import { StatisticsComponent } from './body/statistics/statistics.component';
 import { ImportRecordComponent } from './body/import-record/import-record.component';
 import { AdminComponent } from './body/admin/admin.component';
@@ -44,7 +44,7 @@ import { EnvironmentService } from './services/environment.service';
 import { ApiService } from './services/api.service';
 import { ProcessesService } from './services/processes.service';
 import { AuthService } from './services/auth.service';
-import { RegistratorsService } from './services/registrators.service';
+import { RegistrarsService } from './services/registrars.service';
 import { UsersService } from './services/users.service';
 import { LanguageService } from './services/language.service';
 import { ImportRecordService } from './services/import-record.service';
@@ -90,7 +90,7 @@ export const MY_DATE_FORMATS = {
         InformationComponent,
         RulesComponent,
         SearchComponent,
-        RegistratorsComponent,
+        RegistrarsComponent,
         StatisticsComponent,
         ImportRecordComponent,
         AdminComponent,
@@ -134,7 +134,7 @@ export const MY_DATE_FORMATS = {
         ApiService,
         ProcessesService,
         AuthService,
-        RegistratorsService,
+        RegistrarsService,
         UsersService,
         LanguageService,
         ImportRecordService,
