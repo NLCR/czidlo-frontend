@@ -311,6 +311,13 @@ h4 {
             flex: 1 1 auto;
             min-width: 250px;
         }
+        &.app-col-reg-actions {
+            width: 32px;
+            justify-content: flex-end;
+        }
+        &.app-col-code {
+            width: 100px;
+        }
         &.app-col-40px {
             width: 40px;
         }
@@ -497,6 +504,66 @@ h4 {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            &.app-section-framed {
+                display: flex;
+                padding: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                align-self: stretch;
+                border-radius: 4px;
+                border: 1px solid var(--Boarder-Bright, #dfe5ec);
+            }
+            .app-section-part {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                .app-section-part-title {
+                    color: var(--Text-Base, #0a0d10);
+                    /* Typesettings/M/Medium */
+                    font-family: 'IBM Plex Sans';
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 24px; /* 150% */
+                }
+                .app-item {
+                    display: flex;
+                    gap: 8px;
+                    .app-label {
+                        display: flex;
+                        gap: 4px;
+                        padding: var(--Spacing-x1, 4px) var(--Spacing-x2, 8px);
+                        justify-content: center;
+                        align-items: center;
+                        border-radius: var(--Spacing-x1, 4px);
+                        border: 1px solid var(--Boarder-Contrast, #DFE5EC);
+                        background: var(--BG-Main-Base, #fff);
+                        cursor: pointer;
+                        &:hover, &:active {
+                            border: 1px solid var(--Boarder-Primary-Default, #BFCCD9);
+                        }
+                        .app-label-name {
+                            color: var(--Text-Base, #0a0d10);
+
+                            /* Typesettings/S/XS/Regular */
+                            font-family: Karla;
+                            font-size: 12px;
+                            font-style: normal;
+                            font-weight: 400;
+                            line-height: 16px; /* 133.333% */
+                        }
+                        .app-label-icon {
+                            color: var(--Text-Base, #0a0d10);
+                            font-family: 'Sometype Mono', monospace;
+                            font-size: 12px;
+                            font-style: normal;
+                            font-weight: 400;
+                            line-height: 16px;
+                        }
+                    }
+                }
+            }
             .app-section-title {
                 color: var(--Text-Base, #0a0d10);
                 /* Typesettings/L/Medium */
@@ -507,6 +574,11 @@ h4 {
                 line-height: 28px; /* 155.556% */
             }
             .app-items {
+                &.app-gap-items {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
                 .app-item {
                     display: flex;
                     gap: 2px;

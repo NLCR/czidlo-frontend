@@ -90,7 +90,9 @@
         "remove-date-range": "Odebrat rozmezí",
         "login": "Přihlásit se",
         "import-record": "Vložit",
-        "logout": "Odhlásit se"
+        "logout": "Odhlásit se",
+        "open": "Otevřít",
+        "details": "Podrobnosti"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
@@ -196,7 +198,9 @@
         "name": "název",
         "Name": "Název",
         "code": "kód",
-        "actions": "Akce",
+        "Code": "Kód",
+        "actions": "akce",
+        "Actions": "Akce",
         "no-registrars": "Žádní registrátoři",
         "no-archivers": "Žádní archivátoři",
         "detail": "Podrobnosti",
@@ -206,10 +210,20 @@
         "modified": "naposledy změněno",
         "id": "id",
         "archiver": "Archivátor",
+        "registrar": "Registrátor",
         "add-archiver-title": "vložení nového záznamu",
+        "add-registrar-title": "vložení nového záznamu",
         "edit-archiver-title": "úprava záznamu",
+        "visibility": "Viditelnost",
         "hidden": "skrytý",
-        "Hidden": "Skrytý"
+        "Hidden": "Skrytý",
+        "Modes": "Povolené módy registrace urn:nbn",
+        "resolverMode": "Resolverem",
+        "reservationMode": "Rezervací",
+        "registrarMode": "Registrátorem",
+        "digital-libraries": "Seznam digitálních knihoven",
+        "catalogues": "Seznam katalogů",
+        "statistics": "Statistiky"
     },
     "logs": {
         "title": "Seznam posledních 30 logů"

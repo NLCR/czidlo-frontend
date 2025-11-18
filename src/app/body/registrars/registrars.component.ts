@@ -7,6 +7,7 @@ import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dia
 import { TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EditArchiverDialogComponent } from '../../dialogs/edit-archiver-dialog/edit-archiver-dialog.component';
+import { EditRegistrarDialogComponent } from '../../dialogs/edit-registrar-dialog/edit-registrar-dialog.component';
 
 @Component({
     selector: 'app-registrars',
@@ -54,6 +55,11 @@ export class RegistrarsComponent {
                 } else {
                     this.registrars.set(this.registrarsService.registrars());
                     this.loadingRegistrars.set(false);
+                }
+                if (url.length === 3) {
+                    const registrarId = url[2]?.path;
+                    this.activeRegistrar = registrarId;
+                    this.loadRegistrarDetails(registrarId);
                 }
             }
             // ARCHIVERS
@@ -119,12 +125,26 @@ export class RegistrarsComponent {
             },
         });
     }
+    loadRegistrarDetails(registrarId: any): void {
+        this.registrarsService.getRegistrar(registrarId).subscribe({
+            next: (data) => {
+                console.log(data);
+                data.created = data.created ? new Date(data.created.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
+                data.modified = data.modified ? new Date(data.modified.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
+                this.activeRegistrar = data;
+                this.isSidebarOpen.set(true);
+            },
+            error: (error) => {
+                console.error('Error loading registrar details:', error);
+            },
+        });
+    }
 
     openSidebar(institution: any): void {
         if (this.isActive === 'archivers') {
             this.router.navigate(['/registrars', 'archivers', institution.id]);
         } else if (this.isActive === 'registrars') {
-            this.router.navigate(['/registrars', 'registrars', institution.id]);
+            this.router.navigate(['/registrars', 'registrars', institution.code]);
         }
     }
     closeSidebar(): void {
@@ -157,7 +177,9 @@ export class RegistrarsComponent {
                             console.error('Error deleting archiver:', error);
                         },
                     });
-                    this.snackBar.open(this.translate.instant('messages.archiver-deleted-successfully'), this.translate.instant('buttons.close'), { duration: 3000 });
+                    this.snackBar.open(this.translate.instant('messages.archiver-deleted-successfully'), this.translate.instant('buttons.close'), {
+                        duration: 3000,
+                    });
                 }
             });
     }
@@ -166,48 +188,116 @@ export class RegistrarsComponent {
         console.log('Delete registrar:', registrar);
     }
 
-    openAddRegistrarDialog(): void {
-        console.log('Open add registrar dialog');
-    }
-
-    openEditArchiverDialog(archiver?: any): void {
-        console.log('Open edit archiver dialog');
-        this.dialog.open(EditArchiverDialogComponent, {
+    openEditRegistrarDialog(registrar?: any): void {
+        console.log('Open edit registrar dialog');
+        const dialogRef = this.dialog.open(EditRegistrarDialogComponent, {
             minWidth: '800px',
             data: {
-                title: archiver ? this.translate.instant('registrars.edit-archiver-title') : this.translate.instant('registrars.add-archiver-title'),
-                name: archiver?.name || '',
-                description: archiver?.description || '',
-                hidden: archiver?.hidden || false,
+                title: registrar
+                    ? this.translate.instant('registrars.edit-registrar-title')
+                    : this.translate.instant('registrars.add-registrar-title'),
+                name: registrar?.name || '',
+                code: registrar?.code || '',
+                description: registrar?.description || '',
+                resolverMode: registrar?.allowedRegistrationModeByResolver || false,
+                reserveMode: registrar?.allowedRegistrationModeByReservation || false,
+                registrarMode: registrar?.allowedRegistrationModeByRegistrar || false,
             },
-        }).afterClosed().subscribe(result => {
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('Archiver edited/added:', result);
-                if (archiver) {
-                    // Edit existing archiver
-                    // result.hidden = archiver.hidden; // preserve history
-                    this.registrarsService.editArchiver(archiver.id, result).subscribe({
+                console.log('Registrar edited/added:', result);
+                if (registrar) {
+                    // Edit existing registrar
+                    this.registrarsService.editRegistrar(registrar.code, result).subscribe({
                         next: () => {
-                            console.log('Archiver edited successfully');
-                            this.loadArchivers();
+                            console.log('Registrar edited successfully');
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-edited-successfully'),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 3000,
+                                }
+                            );
+                            this.loadRegistrarDetails(registrar.code);
+                            this.loadRegistrars();
                         },
                         error: (error) => {
-                            console.error('Error editing archiver:', error);
+                            console.error('Error editing registrar:', error);
                         },
                     });
                 } else {
-                    // Create new archiver
-                    this.registrarsService.createArchiver(result).subscribe({
+                    // Create new registrar
+                    this.registrarsService.createRegistrar(result).subscribe({
                         next: () => {
-                            console.log('Archiver created successfully');
-                            this.loadArchivers();
+                            console.log('Registrar created successfully');
+                            this.loadRegistrars();
                         },
                         error: (error) => {
-                            console.error('Error creating archiver:', error);
+                            console.error('Error creating registrar:', error);
                         },
                     });
                 }
             }
         });
+    }
+
+    openEditArchiverDialog(archiver?: any): void {
+        console.log('Open edit archiver dialog');
+        this.dialog
+            .open(EditArchiverDialogComponent, {
+                minWidth: '800px',
+                data: {
+                    title: archiver
+                        ? this.translate.instant('registrars.edit-archiver-title')
+                        : this.translate.instant('registrars.add-archiver-title'),
+                    name: archiver?.name || '',
+                    description: archiver?.description || '',
+                    hidden: archiver?.hidden || false,
+                },
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                if (result) {
+                    console.log('Archiver edited/added:', result);
+                    if (archiver) {
+                        // Edit existing archiver
+                        // result.hidden = archiver.hidden; // preserve history
+                        this.registrarsService.editArchiver(archiver.id, result).subscribe({
+                            next: () => {
+                                console.log('Archiver edited successfully');
+                                this.loadArchivers();
+                            },
+                            error: (error) => {
+                                console.error('Error editing archiver:', error);
+                            },
+                        });
+                    } else {
+                        // Create new archiver
+                        this.registrarsService.createArchiver(result).subscribe({
+                            next: () => {
+                                console.log('Archiver created successfully');
+                                this.loadArchivers();
+                            },
+                            error: (error) => {
+                                console.error('Error creating archiver:', error);
+                            },
+                        });
+                    }
+                }
+            });
+    }
+    addNewDigitalLibrary(registrarCode: string): void {
+        console.log('Add new digital library for registrar:', registrarCode);
+    }
+    showDetails(registrarCode: string, libraryId: string): void {
+        console.log('Show details for registrar:', registrarCode, 'and library:', libraryId);
+    }
+    addNewCatalogue(registrarCode: string): void {
+        console.log('Add new catalogue for registrar:', registrarCode);
+    }
+    openStatistics(registrarCode: string): void {
+        console.log('Open statistics for registrar:', registrarCode);
     }
 }

@@ -29,34 +29,10 @@ export class RegistrarsService {
         );
     }
     getArchiver(archiverId: string): Observable<any> {
-        return this.apiService.getArchiver(archiverId).pipe(
-            tap({
-                next: (data) => {
-                    console.log(`Archiver details for ID ${archiverId} received:`, data);
-                },
-                error: (error) => {
-                    console.error(`Error loading archiver details for ID ${archiverId}:`, error);
-                },
-                complete: () => {
-                    console.log(`Archiver details loading complete for ID ${archiverId}`);
-                },
-            })
-        );
+        return this.apiService.getArchiver(archiverId);
     }
     deleteArchiver(archiverId: string): Observable<any> {
-        return this.apiService.deleteArchiver(archiverId).pipe(
-            tap({
-                next: () => {
-                    console.log(`Archiver with ID ${archiverId} deleted successfully`);
-                },
-                error: (error) => {
-                    console.error(`Error deleting archiver with ID ${archiverId}:`, error);
-                },
-                complete: () => {
-                    console.log(`Archiver deletion complete for ID ${archiverId}`);
-                },
-            })
-        );
+        return this.apiService.deleteArchiver(archiverId);
     }
     createArchiver(body: any): Observable<any> {
         return this.apiService.createArchiver(body);
@@ -68,8 +44,32 @@ export class RegistrarsService {
     // REGISTRARS
 
     getRegistrars(): Observable<any> {
-        // Implement similarly to getArchivers if needed
-        return of([]);
+        return this.apiService.getRegistrars().pipe(
+            tap({
+                next: (data) => {
+                    console.log('Registrars data received:', data);
+                    this.registrars.set(data.items);
+                    console.log('Registrars loaded:', this.registrars());
+                },
+                error: (error) => {
+                    console.error('Error loading registrars:', error);
+                },
+                complete: () => {
+                    console.log('Registrars loading complete');
+                },
+            })
+        );
     }
-
+    getRegistrar(code: string): Observable<any> {
+        return this.apiService.getRegistrar(code);
+    }
+    deleteRegistrar(registrarId: string): Observable<any> {
+        return this.apiService.deleteRegistrar(registrarId);
+    }
+    createRegistrar(body: any): Observable<any> {
+        return this.apiService.createRegistrar(body);
+    }
+    editRegistrar(id: string, body: any): Observable<any> {
+        return this.apiService.editRegistrar(id, body);
+    }
 }

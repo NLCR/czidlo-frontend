@@ -7,10 +7,10 @@
     background: var(--BG-Main-Contrast, #dfe5ec);
     &:hover {
         cursor: pointer;
-        background: var(--BG-Main-Additionally-1, #BFCCD9);
+        background: var(--BG-Main-Additionally-1, #bfccd9);
     }
     &:active {
-        background: var(--BG-Main-Additionally-1, #BFCCD9);
+        background: var(--BG-Main-Additionally-1, #bfccd9);
     }
     &.tgl-checked {
         background: var(--Icon-Primary-Default, #0080a8);
@@ -18,10 +18,20 @@
             margin-left: 16px;
         }
         &:hover {
-            background: var(--Icon-Primary-Hover, #1E657B);
+            background: var(--Icon-Primary-Hover, #1e657b);
         }
         &:active {
             background: var(--Icon-Primary-Pressed, #144452);
+        }
+        &.tgl-disabled {
+            background: var(--BG-Main-Disabled, #d6eef5);
+        }
+    }
+    &.tgl-disabled {
+        background: var(--BG-Main-Contrast, #dfe5ec);
+        cursor: default;
+        .tgl-slider {
+            background: var(--Icon-On-Disabled, #fff);
         }
     }
 }

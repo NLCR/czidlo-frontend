@@ -123,6 +123,54 @@ export class ApiService {
         return this.http.get(url, { responseType: 'text' });
     }
 
+    // REGISTRARS
+    getRegistrars(): Observable<any> {
+        const url = `${this.apiUrl}/registrars`;
+        return this.doGet(url);
+    }
+    getRegistrar(code: string): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}`;
+        return this.doGet(url);
+    }
+    deleteRegistrar(code: string): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}`;
+        return this.http.delete(url).pipe(catchError(this.handleError));
+    }
+    createRegistrar(body: any): Observable<any> {
+        const url = `${this.apiUrl}/registrars`;
+        return this.http.post(url, body).pipe(catchError(this.handleError));
+    }
+    editRegistrar(code: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}`;
+        return this.http.put(url, body).pipe(catchError(this.handleError));
+    }
+    // CATALOGUES
+    createRegistrarCatalog(code: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}/catalogues`;
+        return this.http.post(url, body).pipe(catchError(this.handleError));
+    }
+    editRegistrarCatalog(code: string, catalogId: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}/catalogues/${catalogId}`;
+        return this.http.put(url, body).pipe(catchError(this.handleError));
+    }
+    deleteRegistrarCatalog(code: string, catalogId: string): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}/catalogues/${catalogId}`;
+        return this.http.delete(url).pipe(catchError(this.handleError));
+    }
+    // DIGITAL LIBRARIES
+    createRegistrarDigitalLibrary(code: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}/digital_libraries`;
+        return this.http.post(url, body).pipe(catchError(this.handleError));
+    }
+    editRegistrarDigitalLibrary(code: string, dlId: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}/digital_libraries/${dlId}`;
+        return this.http.put(url, body).pipe(catchError(this.handleError));
+    }
+    deleteRegistrarDigitalLibrary(code: string, dlId: string): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}/digital_libraries/${dlId}`;
+        return this.http.delete(url).pipe(catchError(this.handleError));
+    }
+
     // ARCHIVERS
     getArchivers(): Observable<any> {
         const url = `${this.apiUrl}/archivers`;

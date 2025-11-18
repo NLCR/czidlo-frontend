@@ -35,5 +35,4 @@ export class EditArchiverDialogComponent {
     onCancel(): void {
         this.dialogRef.close(false);
     }
-
 }

@@ -3,11 +3,7 @@
         <!-- TABS -->
         <div class="app-tabs-header app-registrars-header">
             <div class="app-tabs">
-                <div
-                    class="app-tab app-tab-first"
-                    [ngClass]="{ 'app-tab-active': isActive === 'registrars' }"
-                    routerLink="/registrars/registrars"
-                >
+                <div class="app-tab app-tab-first" [ngClass]="{ 'app-tab-active': isActive === 'registrars' }" routerLink="/registrars/registrars">
                     {{ 'registrars.registrars-list' | translate }}
                 </div>
                 <div class="app-tab app-tab-last" [ngClass]="{ 'app-tab-active': isActive === 'archivers' }" routerLink="/registrars/archivers">
@@ -19,7 +15,7 @@
         <!-- REGISTRARS -->
         <div class="app-registrars" *ngIf="isActive === 'registrars'">
             <div class="app-add app-add-registrar" *ngIf="loggedIn()">
-                <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openAddRegistrarDialog()">
+                <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openEditRegistrarDialog()">
                     {{ 'buttons.add-registrar' | translate }}
                 </app-button>
             </div>
@@ -27,13 +23,13 @@
                 <!-- table header -->
                 <div class="app-row app-row-header">
                     <div class="app-col app-col-name app-table-header-item">
-                        {{ 'registrars.name' | translate }}
+                        {{ 'registrars.Name' | translate }}
                     </div>
                     <div class="app-col app-col-code app-table-header-item">
-                        {{ 'registrars.code' | translate }}
+                        {{ 'registrars.Code' | translate }}
                     </div>
-                    <div class="app-col app-col-actions app-table-header-item">
-                        {{ 'registrars.actions' | translate }}
+                    <div class="app-col app-col-actions app-col-reg-actions app-table-header-item">
+                        {{ 'registrars.Actions' | translate }}
                     </div>
                 </div>
                 <!-- no registrars -->
@@ -50,7 +46,7 @@
                     >
                         <div class="app-col app-col-name">{{ registrar.name }}</div>
                         <div class="app-col app-col-code">{{ registrar.code }}</div>
-                        <div class="app-col app-col-actions">
+                        <div class="app-col app-col-actions app-col-reg-actions">
                             <app-button
                                 variant="tertiary"
                                 size="s"
@@ -130,12 +126,119 @@
     <!-- Sidebar Registrar -->
     <div class="app-sidebar-registrar" *ngIf="activeRegistrar && isActive === 'registrars'">
         <div class="app-sidebar-header">
-            <div class="app-sidebar-title">{{ activeRegistrar?.name }}</div>
+            <div class="app-sidebar-title">{{ 'registrars.detail' | translate }} - {{ activeRegistrar?.name }}</div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>
         </div>
-        <div class="app-sidebar-content">{{ activeRegistrar?.log | json }}</div>
+        <div class="app-sidebar-content">
+            <div class="app-sections">
+                <div class="app-section app-section-framed">
+                    <div class="app-section-part">
+                        <!-- <div class="app-section-part-title">{{ 'registrars.detail' | translate }}</div> -->
+                        <div class="app-items">
+                            <div class="app-item" *ngIf="activeRegistrar?.name">
+                                <span class="app-item-label">{{ 'registrars.name' | translate }}:</span>
+                                <span class="app-item-value">{{ activeRegistrar?.name }}</span>
+                            </div>
+                            <div class="app-item">
+                                <span class="app-item-label">{{ 'registrars.code' | translate }}:</span>
+                                <span class="app-item-value">{{ activeRegistrar?.code }}</span>
+                            </div>
+                        </div>
+                        <div class="app-section-part">
+                            <div class="app-section-part-title">{{ 'registrars.Modes' | translate }}</div>
+                            <div class="app-items app-gap-items">
+                                <div class="app-base-input-container app-radio-toggle-checkboxes">
+                                    <div class="app-base-input app-toggle-container">
+                                        <app-toggle
+                                            size="s"
+                                            [checked]="activeRegistrar.allowedRegistrationModeByResolver"
+                                            [disabled]="true"
+                                        ></app-toggle>
+                                        <div class="app-toggle-label">{{ 'registrars.resolverMode' | translate }}</div>
+                                    </div>
+                                </div>
+                                <div class="app-base-input-container app-radio-toggle-checkboxes">
+                                    <div class="app-base-input app-toggle-container">
+                                        <app-toggle
+                                            size="s"
+                                            [checked]="activeRegistrar.allowedRegistrationModeByReservation"
+                                            [disabled]="true"
+                                        ></app-toggle>
+                                        <div class="app-toggle-label">{{ 'registrars.reservationMode' | translate }}</div>
+                                    </div>
+                                </div>
+                                <div class="app-base-input-container app-radio-toggle-checkboxes">
+                                    <div class="app-base-input app-toggle-container">
+                                        <app-toggle
+                                            size="s"
+                                            [checked]="activeRegistrar.allowedRegistrationModeByRegistrar"
+                                            [disabled]="true"
+                                        ></app-toggle>
+                                        <div class="app-toggle-label">{{ 'registrars.registrarMode' | translate }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="app-section-part">
+                            <div class="app-section-part-title">{{ 'registrars.visibility' | translate }}</div>
+                            <div class="app-items app-gap-items">
+                                <div class="app-base-input-container app-radio-toggle-checkboxes">
+                                    <div class="app-base-input app-toggle-container">
+                                        <app-toggle size="s" [checked]="activeRegistrar.hidden" [disabled]="true"></app-toggle>
+                                        <div class="app-toggle-label">{{ 'registrars.Hidden' | translate }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="app-section-part">
+                            <app-button variant="primary" size="s" (click)="openEditRegistrarDialog(activeRegistrar)">
+                                {{ 'buttons.edit' | translate }}
+                            </app-button>
+                        </div>
+                    </div>
+                </div>
+                <!-- digital libraries -->
+                <div class="app-section app-section-framed">
+                    <div class="app-section-title">{{ 'registrars.digital-libraries' | translate }}</div>
+                    <div class="app-section-part" *ngIf="activeRegistrar?.digitalLibraries">
+                        <div *ngFor="let library of activeRegistrar.digitalLibraries">
+                            <div class="app-item">
+                                <div>{{library.name}}</div>
+                                <div class="app-label" (click)="showDetails(activeRegistrar.code, library.id)">
+                                    <div class="app-label-name">{{ 'buttons.details' | translate }}</div>
+                                    <div class="app-label-icon">→</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="app-section-part">
+                        <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="addNewDigitalLibrary(activeRegistrar.code)">
+                            {{ 'buttons.add' | translate }}
+                        </app-button>
+                    </div>
+                </div>
+                <!-- catalogues -->
+                <div class="app-section app-section-framed">
+                    <div class="app-section-title">{{ 'registrars.catalogues' | translate }}</div>
+                    <div class="app-section-part">
+                        <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="addNewCatalogue(activeRegistrar.code)">
+                            {{ 'buttons.add' | translate }}
+                        </app-button>
+                    </div>
+                </div>
+                <div class="app-section app-section-framed">
+                    <div class="app-section-title">{{ 'registrars.statistics' | translate }}</div>
+                    <div class="app-section-part">
+                        <app-button variant="primary" size="s" (click)="openStatistics(activeRegistrar.code)">
+                            {{ 'buttons.open' | translate }}
+                        </app-button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="app-sidebar-footer">
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
