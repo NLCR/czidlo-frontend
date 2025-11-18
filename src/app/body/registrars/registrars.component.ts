@@ -188,6 +188,33 @@ export class RegistrarsComponent {
 
     deleteRegistrar(registrar: any): void {
         console.log('Delete registrar:', registrar);
+        this.dialog
+            .open(ConfirmDialogComponent, {
+                data: {
+                    data: registrar,
+                    title: this.translate.instant('messages.confirm-delete-registrar-title', { name: registrar.name }),
+                    warning: this.translate.instant('buttons.confirm-delete'),
+                    // message: this.translate.instant('messages.confirm-delete-message', { name: registrar.name }),
+                },
+                maxWidth: '800px',
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                if (result === true) {
+                    this.registrarsService.deleteRegistrar(registrar.code).subscribe({
+                        next: () => {
+                            console.log('Registrar deleted successfully');
+                            this.loadRegistrars();
+                        },
+                        error: (error) => {
+                            console.error('Error deleting registrar:', error);
+                        },
+                    });
+                    this.snackBar.open(this.translate.instant('messages.registrar-deleted-successfully'), this.translate.instant('buttons.close'), {
+                        duration: 3000,
+                    });
+                }
+            });
     }
 
     openEditRegistrarDialog(registrar?: any): void {

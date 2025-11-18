@@ -120,7 +120,10 @@
         "invalid-ccnb": "Neplatné ČCNB (požadovaný formát cnb123456789)",
         "invalid-isbn": "Neplatné ISBN (požadovaný formát 10 nebo 13 číslic)",
         "invalid-issn": "Neplatné ISSN (požadovaný formát 8 číslic)",
-        "invalid-url": "Neplatná URL adresa. Musí začínat http:// nebo https://"
+        "invalid-url": "Neplatná URL adresa.",
+        "required-length-3-30": "Délka musí být mezi 3 a 30 znaky",
+        "required-length-0-200": "Délka může být maximálně 200 znaků",
+        "confirm-delete-registrar-title": "Opravdu chcete smazat registrátora"
     },
     "inputs": {
         "pick-start-date": "Vyberte od",

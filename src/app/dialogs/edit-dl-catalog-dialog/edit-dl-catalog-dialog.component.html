@@ -10,8 +10,13 @@
             <div class="app-base-input app-half-width">
                 <div class="app-base-input-label">{{ 'registrars.Name' | translate }}</div>
                 <input matInput [formControl]="nameControl" />
-                <mat-error  *ngIf="nameControl.hasError('required') && (nameControl.touched || nameControl.dirty)">
+                <mat-error *ngIf="nameControl.hasError('required') && (nameControl.touched || nameControl.dirty)">
                     {{ 'messages.required-field' | translate }}
+                </mat-error>
+                <mat-error
+                    *ngIf="(nameControl.hasError('maxlength') || nameControl.hasError('minlength')) && (nameControl.touched || nameControl.dirty)"
+                >
+                    {{ 'messages.required-length-3-30' | translate }}
                 </mat-error>
             </div>
         </div>
@@ -26,14 +31,16 @@
                     #autosize="cdkTextareaAutosize"
                     cdkAutosizeMinRows="2"
                     cdkAutosizeMaxRows="5"
-                    [(ngModel)]="description"
+                    [formControl]="descriptionControl"
                 ></textarea>
-                <!-- </mat-form-field> -->
+                <mat-error *ngIf="descriptionControl.hasError('maxlength') && (descriptionControl.touched || descriptionControl.dirty)">
+                    {{ 'messages.required-length-0-200' | translate }}
+                </mat-error>
             </div>
         </div>
         <div class="app-part-content app-part-url">
             <div class="app-base-input app-full-width">
-                <div class="app-base-input-label">{{ data.context === 'dl' ? 'registrars.URL' : 'registrars.URL-prefix' | translate }}</div>
+                <div class="app-base-input-label">{{ data.context === 'dl' ? 'registrars.URL' : ('registrars.URL-prefix' | translate) }}</div>
                 <input matInput [formControl]="urlControl" placeholder="https://digitalni-knihovna.cz" />
                 <!-- CHYBA – povinné pole -->
                 <mat-error *ngIf="urlControl.hasError('required') && (urlControl.touched || urlControl.dirty)">
@@ -51,7 +58,7 @@
             <app-button size="l" variant="tertiary" (click)="closeDialog()">
                 {{ 'buttons.cancel' | translate }}
             </app-button>
-            <app-button size="l" variant="primary" [disabled]="nameControl.invalid || urlControl.invalid" (click)="onConfirm()">
+            <app-button size="l" variant="primary" [disabled]="nameControl.invalid || urlControl.invalid || descriptionControl.invalid" (click)="onConfirm()">
                 {{ 'buttons.save' | translate }}
             </app-button>
         </div>

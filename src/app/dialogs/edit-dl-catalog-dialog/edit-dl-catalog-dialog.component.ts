@@ -19,7 +19,8 @@ export class EditDlCatalogDialogComponent {
     description: string = this.data.description;
 
     urlControl = new FormControl(this.context === 'dl' ? this.url : this.urlPrefix, [Validators.required, Validators.pattern(/^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/\S*)?$/)]);
-    nameControl = new FormControl(this.name, [Validators.required]);
+    nameControl = new FormControl(this.name, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]);
+    descriptionControl = new FormControl(this.description, [Validators.maxLength(200)]);
 
     closeDialog(): void {
         // Logic to close the dialog
@@ -31,12 +32,12 @@ export class EditDlCatalogDialogComponent {
         let result = {name: '', description: '', url: '', urlPrefix: ''};
         if (this.context === 'dl') {
             result.name = this.nameControl.value as string;
-            result.description = this.description;
+            result.description = this.descriptionControl.value as string;
             result.url = this.urlControl.value as string;
         }
         if (this.context === 'catalogue') {
             result.name = this.nameControl.value as string;
-            result.description = this.description;
+            result.description = this.descriptionControl.value as string;
             result.urlPrefix = this.urlControl.value as string;
         }
         this.dialogRef.close(result);

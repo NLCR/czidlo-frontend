@@ -119,7 +119,7 @@
 </div>
 
 <!-- Overlay -->
-<!-- <div class="app-overlay" *ngIf="isSidebarOpen() && loggedIn()" (click)="closeSidebar()"></div> -->
+<div class="app-overlay" *ngIf="isSidebarOpen() && loggedIn()" (click)="closeSidebar()"></div>
 
 <!-- Sidebar -->
 <div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
@@ -290,7 +290,7 @@
         <div class="app-sidebar-footer">
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
-                    <span>{{ 'buttons.cancel' | translate }}</span>
+                    <span>{{ 'buttons.close' | translate }}</span>
                 </app-button>
                 <!-- <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadProcess(activeProcess)">
                     <span>{{ 'buttons.download' | translate }}</span>
@@ -346,7 +346,7 @@
         <div class="app-sidebar-footer">
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
-                    <span>{{ 'buttons.cancel' | translate }}</span>
+                    <span>{{ 'buttons.close' | translate }}</span>
                 </app-button>
             </div>
         </div>
