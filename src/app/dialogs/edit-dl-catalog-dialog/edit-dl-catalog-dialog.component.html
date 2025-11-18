@@ -1,0 +1,59 @@
+<div class="app-dialog app-detail-dialog">
+    <div class="app-dialog-header">
+        <div class="app-dialog-title">{{ data.title | translate }}</div>
+        <div class="app-close" (click)="closeDialog()">
+            <img src="assets/icons/close.svg" />
+        </div>
+    </div>
+    <div class="app-dialog-body">
+        <div class="app-part-content app-part-name">
+            <div class="app-base-input app-half-width">
+                <div class="app-base-input-label">{{ 'registrars.Name' | translate }}</div>
+                <input matInput [formControl]="nameControl" />
+                <mat-error  *ngIf="nameControl.hasError('required') && (nameControl.touched || nameControl.dirty)">
+                    {{ 'messages.required-field' | translate }}
+                </mat-error>
+            </div>
+        </div>
+        <div class="app-part-content app-part-description">
+            <div class="app-base-input-label">{{ 'registrars.Description' | translate }}</div>
+            <div class="app-base-input app-base-textarea">
+                <!-- <mat-form-field appearance="outline"> -->
+                <textarea
+                    class="app-base-textarea-input"
+                    matInput
+                    cdkTextareaAutosize
+                    #autosize="cdkTextareaAutosize"
+                    cdkAutosizeMinRows="2"
+                    cdkAutosizeMaxRows="5"
+                    [(ngModel)]="description"
+                ></textarea>
+                <!-- </mat-form-field> -->
+            </div>
+        </div>
+        <div class="app-part-content app-part-url">
+            <div class="app-base-input app-full-width">
+                <div class="app-base-input-label">{{ data.context === 'dl' ? 'registrars.URL' : 'registrars.URL-prefix' | translate }}</div>
+                <input matInput [formControl]="urlControl" placeholder="https://digitalni-knihovna.cz" />
+                <!-- CHYBA – povinné pole -->
+                <mat-error *ngIf="urlControl.hasError('required') && (urlControl.touched || urlControl.dirty)">
+                    {{ 'messages.required-field' | translate }}
+                </mat-error>
+                <!-- CHYBA – nevalidní URL -->
+                <mat-error class="app-error-message" *ngIf="urlControl.hasError('pattern') && (urlControl.touched || urlControl.dirty)">
+                    {{ 'messages.invalid-url' | translate }}
+                </mat-error>
+            </div>
+        </div>
+    </div>
+    <div class="app-dialog-footer">
+        <div class="app-dialog-footer-part app-dialog-footer-buttons">
+            <app-button size="l" variant="tertiary" (click)="closeDialog()">
+                {{ 'buttons.cancel' | translate }}
+            </app-button>
+            <app-button size="l" variant="primary" [disabled]="nameControl.invalid || urlControl.invalid" (click)="onConfirm()">
+                {{ 'buttons.save' | translate }}
+            </app-button>
+        </div>
+    </div>
+</div>

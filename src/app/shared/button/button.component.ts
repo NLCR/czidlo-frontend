@@ -8,7 +8,7 @@ import { Component, Input } from '@angular/core';
 })
 export class ButtonComponent {
     @Input() variant: 'primary' | 'secondary' | 'tertiary' = 'primary';
-    @Input() size: 's' | 'm' | 'l' = 'm';
+    @Input() size: 'xs' | 's' | 'm' | 'l' = 'm';
     @Input() icon: boolean = false; // Jen ikonka bez textu
     @Input() iconLeft?: string; // Název ikonky pro levý ikon
     @Input() iconRight?: string; // Název ikonky pro pravý ikon

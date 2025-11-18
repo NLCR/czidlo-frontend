@@ -72,4 +72,24 @@ export class RegistrarsService {
     editRegistrar(id: string, body: any): Observable<any> {
         return this.apiService.editRegistrar(id, body);
     }
+
+    // DIGITAL LIBRARIES AND CATALOGUES
+    createDigitalLibrary(registrarCode: string, body: any): Observable<any> {
+        return this.apiService.createRegistrarDigitalLibrary(registrarCode, body);
+    }
+    editDigitalLibrary(registrarCode: string, dlId: string, body: any): Observable<any> {
+        return this.apiService.editRegistrarDigitalLibrary(registrarCode, dlId, body);
+    }
+    deleteDigitalLibrary(registrarCode: string, dlId: string): Observable<any> {
+        return this.apiService.deleteRegistrarDigitalLibrary(registrarCode, dlId);
+    }
+    createCatalogue(registrarCode: string, body: any): Observable<any> {
+        return this.apiService.createRegistrarCatalogue(registrarCode, body);
+    }
+    editCatalogue(registrarCode: string, catalogId: string, body: any): Observable<any> {
+        return this.apiService.editRegistrarCatalogue(registrarCode, catalogId, body);
+    }
+    deleteCatalogue(registrarCode: string, catalogId: string): Observable<any> {
+        return this.apiService.deleteRegistrarCatalogue(registrarCode, catalogId);
+    }
 }

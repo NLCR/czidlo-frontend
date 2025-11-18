@@ -35,12 +35,12 @@ export class ApiService {
     }
 
     private handleError(error: Response) {
-        if (error.status === 404) {
-            return throwError(() => 'Not found');
-        } else if (error.status === 401 || error.status === 403) {
-            return throwError(() => 'Unauthorized');
-        }
-        return throwError(() => 'Server error');
+        // if (error.status === 404) {
+        //     return throwError(() => 'Not found');
+        // } else if (error.status === 401 || error.status === 403) {
+        //     return throwError(() => 'Unauthorized');
+        // }
+        return throwError(() => error || 'Server error');
     }
 
     // ✅ univerzální metoda pro stahování souborů
@@ -145,16 +145,16 @@ export class ApiService {
         return this.http.put(url, body).pipe(catchError(this.handleError));
     }
     // CATALOGUES
-    createRegistrarCatalog(code: string, body: any): Observable<any> {
+    createRegistrarCatalogue(code: string, body: any): Observable<any> {
         const url = `${this.apiUrl}/registrars/${code}/catalogues`;
         return this.http.post(url, body).pipe(catchError(this.handleError));
     }
-    editRegistrarCatalog(code: string, catalogId: string, body: any): Observable<any> {
-        const url = `${this.apiUrl}/registrars/${code}/catalogues/${catalogId}`;
+    editRegistrarCatalogue(code: string, catalogId: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}/catalogue/${catalogId}`;
         return this.http.put(url, body).pipe(catchError(this.handleError));
     }
-    deleteRegistrarCatalog(code: string, catalogId: string): Observable<any> {
-        const url = `${this.apiUrl}/registrars/${code}/catalogues/${catalogId}`;
+    deleteRegistrarCatalogue(code: string, catalogId: string): Observable<any> {
+        const url = `${this.apiUrl}/registrars/${code}/catalogue/${catalogId}`;
         return this.http.delete(url).pipe(catchError(this.handleError));
     }
     // DIGITAL LIBRARIES

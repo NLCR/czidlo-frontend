@@ -8,6 +8,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EditArchiverDialogComponent } from '../../dialogs/edit-archiver-dialog/edit-archiver-dialog.component';
 import { EditRegistrarDialogComponent } from '../../dialogs/edit-registrar-dialog/edit-registrar-dialog.component';
+import { DetailDialogComponent } from '../../dialogs/detail-dialog/detail-dialog.component';
+import { EditDlCatalogDialogComponent } from '../../dialogs/edit-dl-catalog-dialog/edit-dl-catalog-dialog.component';
 
 @Component({
     selector: 'app-registrars',
@@ -290,12 +292,225 @@ export class RegistrarsComponent {
     }
     addNewDigitalLibrary(registrarCode: string): void {
         console.log('Add new digital library for registrar:', registrarCode);
+        const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
+            minWidth: '800px',
+            data: {
+                context: 'dl',
+                title: this.translate.instant('registrars.add-digital-library-title'),
+                name: '',
+                url: '',
+                description: '',
+            },
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                console.log('New digital library data:', result);
+                this.registrarsService.createDigitalLibrary(registrarCode, result).subscribe({
+                    next: () => {
+                        console.log('Digital library created successfully');
+                        this.loadRegistrarDetails(registrarCode);
+                    },
+                    error: (error) => {
+                        console.error('Error creating digital library:', error);
+                        this.snackBar.open(
+                            this.translate.instant('messages.' + error?.error?.message || 'digital-library-creation-failed'),
+                            this.translate.instant('buttons.close'),
+                            {
+                                duration: 3000,
+                            }
+                        );
+                    },
+                });
+           }
+        });
     }
-    showDetails(registrarCode: string, libraryId: string): void {
-        console.log('Show details for registrar:', registrarCode, 'and library:', libraryId);
+    editDigitalLibrary(registrarCode: string, library: any): void {
+        console.log('Edit digital library:', library, 'for registrar:', registrarCode);
+        const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
+            minWidth: '800px',
+            data: {
+                context: 'dl',
+                title: this.translate.instant('registrars.edit-digital-library-title'),
+                name: library.name,
+                url: library.url,
+                description: library.description,
+            },
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                console.log('Edited digital library data:', result);
+                this.registrarsService.editDigitalLibrary(registrarCode, library.id, result).subscribe({
+                    next: () => {
+                        console.log('Digital library edited successfully');
+                        this.loadRegistrarDetails(registrarCode);
+                    },
+                    error: (error) => {
+                        console.error('Error editing digital library:', error);
+                        this.snackBar.open(
+                            this.translate.instant('messages.' + error?.error?.message || 'digital-library-edit-failed'),
+                            this.translate.instant('buttons.close'),
+                            {
+                                duration: 3000,
+                            }
+                        );
+                    },
+                });
+            }
+        });
+    }
+    deleteDigitalLibrary(registrarCode: string, library: any): void {
+        console.log('Delete digital library:', library, 'for registrar:', registrarCode);
+        this.dialog
+            .open(ConfirmDialogComponent, {
+                data: {
+                    data: library,
+                    title: this.translate.instant('messages.confirm-delete-digital-library-title', { name: library.name }),
+                    warning: this.translate.instant('buttons.confirm-delete'),
+                },
+                maxWidth: '800px',
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                if (result === true) {
+                    this.registrarsService.deleteDigitalLibrary(registrarCode, library.id).subscribe({
+                        next: () => {
+                            console.log('Digital library deleted successfully');
+                            this.loadRegistrarDetails(registrarCode);
+                        },
+                        error: (error) => {
+                            console.error('Error deleting digital library:', error);
+                        },
+                    });
+                    this.snackBar.open(
+                        this.translate.instant('messages.digital-library-deleted-successfully'),
+                        this.translate.instant('buttons.close'),
+                        {
+                            duration: 3000,
+                        }
+                    );
+                }
+            });
     }
     addNewCatalogue(registrarCode: string): void {
         console.log('Add new catalogue for registrar:', registrarCode);
+        const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
+            minWidth: '800px',
+            data: {
+                context: 'catalogue',
+                title: this.translate.instant('registrars.add-catalogue-title'),
+                name: '',
+                urlPrefix: '',
+                description: '',
+            },
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                console.log('New catalogue data:', result);
+                this.registrarsService.createCatalogue(registrarCode, result).subscribe({
+                    next: () => {
+                        console.log('Catalogue created successfully');
+                        this.loadRegistrarDetails(registrarCode);
+                    },
+                    error: (error) => {
+                        console.error('Error creating catalogue:', error);
+                        this.snackBar.open(
+                            this.translate.instant('messages.' + error?.error?.message || 'catalogue-creation-failed'),
+                            this.translate.instant('buttons.close'),
+                            {
+                                duration: 3000,
+                            }
+                        );
+                    },
+                });
+            }
+        });
+    }
+    editCatalogue(registrarCode: string, catalog: any): void {
+        console.log('Edit catalogue:', catalog, 'for registrar:', registrarCode);
+        const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
+            minWidth: '800px',
+            data: {
+                context: 'catalogue',
+                title: this.translate.instant('registrars.edit-catalogue-title'),
+                name: catalog.name,
+                urlPrefix: catalog.urlPrefix,
+                description: catalog.description,
+            },
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                console.log('Edited catalogue data:', result);
+                let body = {name: result.name, description: result.description, urlPrefix: result.urlPrefix};
+                this.registrarsService.editCatalogue(registrarCode, catalog.id, body).subscribe({
+                    next: () => {
+                        console.log('Catalogue edited successfully');
+                        this.loadRegistrarDetails(registrarCode);
+                    },
+                    error: (error) => {
+                        console.error('Error editing catalogue:', error);
+                        this.snackBar.open(
+                            this.translate.instant('messages.' + error?.error?.message || 'catalogue-edit-failed'),
+                            this.translate.instant('buttons.close'),
+                            {
+                                duration: 3000,
+                            }
+                        );
+                    },
+                });
+            }
+        });
+    }
+    deleteCatalogue(registrarCode: string, catalog: any): void {
+        console.log('Delete catalogue:', catalog, 'for registrar:', registrarCode);
+        this.dialog
+            .open(ConfirmDialogComponent, {
+                data: {
+                    data: catalog,
+                    title: this.translate.instant('messages.confirm-delete-catalogue-title', { name: catalog.name }),
+                    warning: this.translate.instant('buttons.confirm-delete'),
+                },
+                maxWidth: '800px',
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                if (result === true) {
+                    this.registrarsService.deleteCatalogue(registrarCode, catalog.id).subscribe({
+                        next: () => {
+                            console.log('Catalogue deleted successfully');
+                            this.loadRegistrarDetails(registrarCode);
+                        },
+                        error: (error) => {
+                            console.error('Error deleting catalogue:', error);
+                        },
+                    });
+                    this.snackBar.open(
+                        this.translate.instant('messages.catalogue-deleted-successfully'),
+                        this.translate.instant('buttons.close'),
+                        {
+                            duration: 3000,
+                        }
+                    );
+                }
+            });
+    }
+    showDetails(registrarCode: string, item: any, context: string): void {
+        console.log('Show details for registrar:', registrarCode, 'and library or catalogue:', item);
+        const dialogRef = this.dialog.open(DetailDialogComponent, {
+            minWidth: '600px',
+            data: {
+                context: context,
+                registrarCode: registrarCode,
+                item: {
+                    id: item.id,
+                    name: item.name,
+                    url: item.url,
+                    urlPrefix: item.urlPrefix,
+                    description: item.description,
+                    created: item.created ? new Date(item.created.replace(/\[UTC\]$/, '')).toLocaleString() : '',
+                    modified: item.modified ? new Date(item.modified.replace(/\[UTC\]$/, '')).toLocaleString() : '',
+                },
+            },
+        });
     }
     openStatistics(registrarCode: string): void {
         console.log('Open statistics for registrar:', registrarCode);

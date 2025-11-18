@@ -202,16 +202,34 @@
                 <!-- digital libraries -->
                 <div class="app-section app-section-framed">
                     <div class="app-section-title">{{ 'registrars.digital-libraries' | translate }}</div>
-                    <div class="app-section-part" *ngIf="activeRegistrar?.digitalLibraries">
+                    <div class="app-section-part" *ngIf="activeRegistrar?.digitalLibraries?.length > 0">
                         <div *ngFor="let library of activeRegistrar.digitalLibraries">
                             <div class="app-item">
-                                <div>{{library.name}}</div>
-                                <div class="app-label" (click)="showDetails(activeRegistrar.code, library.id)">
+                                <div>{{ library.name }}</div>
+                                <!-- <div class="app-label" (click)="showDetails(activeRegistrar.code, library)">
                                     <div class="app-label-name">{{ 'buttons.details' | translate }}</div>
                                     <div class="app-label-icon">→</div>
-                                </div>
+                                </div> -->
+                                <app-button variant="tertiary" size="xs" iconRight="" (click)="showDetails(activeRegistrar.code, library, 'dl')">
+                                    {{ 'buttons.details' | translate }}
+                                </app-button>
+                                <app-button
+                                    variant="tertiary"
+                                    size="xs"
+                                    [icon]="true"
+                                    iconLeft="edit-blue.svg"
+                                    [matTooltip]="'buttons.edit' | translate"
+                                    (click)="editDigitalLibrary(activeRegistrar.code, library); $event.stopPropagation()"
+                                ></app-button>
+                                <app-button
+                                    variant="tertiary"
+                                    size="xs"
+                                    [icon]="true"
+                                    iconLeft="trash-blue.svg"
+                                    [matTooltip]="'buttons.delete' | translate"
+                                    (click)="deleteDigitalLibrary(activeRegistrar.code, library); $event.stopPropagation()"
+                                ></app-button>
                             </div>
-
                         </div>
                     </div>
                     <div class="app-section-part">
@@ -223,6 +241,36 @@
                 <!-- catalogues -->
                 <div class="app-section app-section-framed">
                     <div class="app-section-title">{{ 'registrars.catalogues' | translate }}</div>
+                    <div class="app-section-part" *ngIf="activeRegistrar?.catalogues?.length > 0">
+                        <div *ngFor="let catalog of activeRegistrar.catalogues">
+                            <div class="app-item">
+                                <div>{{ catalog.name }}</div>
+                                <!-- <div class="app-label" (click)="showDetails(activeRegistrar.code, catalog)">
+                                    <div class="app-label-name">{{ 'buttons.details' | translate }}</div>
+                                    <div class="app-label-icon">→</div>
+                                </div> -->
+                                <app-button variant="tertiary" size="xs" (click)="showDetails(activeRegistrar.code, catalog, 'catalogue')">
+                                    {{ 'buttons.details' | translate }}
+                                </app-button>
+                                <app-button
+                                    variant="tertiary"
+                                    size="xs"
+                                    [icon]="true"
+                                    iconLeft="edit-blue.svg"
+                                    [matTooltip]="'buttons.edit' | translate"
+                                    (click)="editCatalogue(activeRegistrar.code, catalog); $event.stopPropagation()"
+                                ></app-button>
+                                <app-button
+                                    variant="tertiary"
+                                    size="xs"
+                                    [icon]="true"
+                                    iconLeft="trash-blue.svg"
+                                    [matTooltip]="'buttons.delete' | translate"
+                                    (click)="deleteCatalogue(activeRegistrar.code, catalog); $event.stopPropagation()"
+                                ></app-button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="app-section-part">
                         <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="addNewCatalogue(activeRegistrar.code)">
                             {{ 'buttons.add' | translate }}

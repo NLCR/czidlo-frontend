@@ -492,107 +492,85 @@ h4 {
             }
         }
     }
-
-    // SECTIONS - pro textovy popis v sidebaru
-    .app-sections {
+}
+// SECTIONS - pro textovy popis v sidebaru nebo dialogu
+.app-sections {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    align-self: stretch;
+    .app-section {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-        align-self: stretch;
-        .app-section {
+        gap: 8px;
+        &.app-section-framed {
+            display: flex;
+            padding: 16px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+            align-self: stretch;
+            border-radius: 4px;
+            border: 1px solid var(--Boarder-Bright, #dfe5ec);
+        }
+        .app-section-part {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            &.app-section-framed {
-                display: flex;
-                padding: 16px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 16px;
-                align-self: stretch;
-                border-radius: 4px;
-                border: 1px solid var(--Boarder-Bright, #dfe5ec);
-            }
-            .app-section-part {
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-                .app-section-part-title {
-                    color: var(--Text-Base, #0a0d10);
-                    /* Typesettings/M/Medium */
-                    font-family: 'IBM Plex Sans';
-                    font-size: 16px;
-                    font-style: normal;
-                    font-weight: 500;
-                    line-height: 24px; /* 150% */
-                }
-                .app-item {
-                    display: flex;
-                    gap: 8px;
-                    .app-label {
-                        display: flex;
-                        gap: 4px;
-                        padding: var(--Spacing-x1, 4px) var(--Spacing-x2, 8px);
-                        justify-content: center;
-                        align-items: center;
-                        border-radius: var(--Spacing-x1, 4px);
-                        border: 1px solid var(--Boarder-Contrast, #DFE5EC);
-                        background: var(--BG-Main-Base, #fff);
-                        cursor: pointer;
-                        &:hover, &:active {
-                            border: 1px solid var(--Boarder-Primary-Default, #BFCCD9);
-                        }
-                        .app-label-name {
-                            color: var(--Text-Base, #0a0d10);
-
-                            /* Typesettings/S/XS/Regular */
-                            font-family: Karla;
-                            font-size: 12px;
-                            font-style: normal;
-                            font-weight: 400;
-                            line-height: 16px; /* 133.333% */
-                        }
-                        .app-label-icon {
-                            color: var(--Text-Base, #0a0d10);
-                            font-family: 'Sometype Mono', monospace;
-                            font-size: 12px;
-                            font-style: normal;
-                            font-weight: 400;
-                            line-height: 16px;
-                        }
-                    }
-                }
-            }
-            .app-section-title {
+            gap: 16px;
+            .app-section-part-title {
                 color: var(--Text-Base, #0a0d10);
-                /* Typesettings/L/Medium */
+                /* Typesettings/M/Medium */
                 font-family: 'IBM Plex Sans';
-                font-size: 18px;
+                font-size: 16px;
                 font-style: normal;
                 font-weight: 500;
-                line-height: 28px; /* 155.556% */
+                line-height: 24px; /* 150% */
             }
-            .app-items {
-                &.app-gap-items {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 8px;
+            .app-item {
+                display: flex;
+                gap: 8px;
+            }
+        }
+        .app-section-title {
+            color: var(--Text-Base, #0a0d10);
+            /* Typesettings/L/Medium */
+            font-family: 'IBM Plex Sans';
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 28px; /* 155.556% */
+        }
+        .app-items {
+            &.app-gap-items {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .app-item {
+                display: flex;
+                gap: 4px;
+                /* Typesettings/M/Regular */
+                font-family: 'IBM Plex Sans';
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 24px; /* 150% */
+                .app-item-label {
+                    color: var(--Text-Light, #4c6580);
                 }
-                .app-item {
-                    display: flex;
-                    gap: 2px;
-                    /* Typesettings/M/Regular */
-                    font-family: 'IBM Plex Sans';
-                    font-size: 16px;
-                    font-style: normal;
-                    font-weight: 400;
-                    line-height: 24px; /* 150% */
-                    .app-item-label {
-                        color: var(--Text-Light, #4c6580);
-                    }
-                    .app-item-value {
-                        color: var(--Text-Secondary, #263340);
+                .app-item-value {
+                    color: var(--Text-Secondary, #263340);
+                    a {
+                        color: var(--Text-Link, #0080a8);
+
+                        /* Typesettings/M/Regular */
+                        font-family: 'IBM Plex Sans';
+                        font-size: 16px;
+                        font-style: normal;
+                        font-weight: 400;
+                        line-height: 24px;
+                        text-decoration: underline;
                     }
                 }
             }
@@ -649,6 +627,96 @@ app-information {
     gap: 16px;
     flex-direction: column;
     color: var(--Text-Secondary, #263340);
+}
+
+// DIALOG && DIALOG HEADER
+.app-dialog {
+    border-radius: 4px;
+    background: var(--BG-Main-Base, #fff);
+    .app-dialog-header {
+        display: flex;
+        padding: 20px 24px;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 24px;
+        align-self: stretch;
+        .app-dialog-title {
+            flex: 1 0 0;
+            color: var(--Text-Base, #0a0d10);
+
+            /* Typesettings/XL/Medium */
+            font-family: 'IBM Plex Sans';
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 32px;
+        }
+        .app-close {
+            display: flex;
+            padding: 4px 0;
+            align-items: center;
+            gap: 8px;
+        }
+    }
+}
+
+// DIALOG BODY
+.app-dialog-body {
+    display: flex;
+    padding: 0 24px 24px 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    align-self: stretch;
+    .app-part-content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--Spacing-x2, 8px);
+        align-self: stretch;
+        &.app-part-username,
+        &.app-part-email,
+        &.app-part-password {
+            width: 400px;
+            .app-base-textarea {
+                width: 100%;
+            }
+            textarea {
+                width: 100%;
+                height: auto;
+                padding: 12px 16px;
+                border-radius: 4px;
+                color: var(--Text-Base, #0a0d10);
+
+                /* Typesettings/M/Regular */
+                font-family: 'IBM Plex Sans';
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 24px; /* 150% */
+            }
+        }
+        &.app-part-description {
+            width: 700px;
+            .app-base-textarea {
+                width: 100%;
+            }
+            textarea {
+                width: 100%;
+                height: auto;
+                padding: 12px 16px;
+                border-radius: 4px;
+                color: var(--Text-Base, #0a0d10);
+
+                /* Typesettings/M/Regular */
+                font-family: 'IBM Plex Sans';
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 24px; /* 150% */
+            }
+        }
+    }
 }
 
 // DIALOG FOOTER
@@ -764,6 +832,17 @@ app-information {
     align-items: flex-start;
     gap: 8px;
     align-self: stretch;
+    mat-error {
+        display: flex;
+        font-size: 14px;
+        color: #ff3a30;
+    }
+    &.app-full-width {
+        width: 745px;
+    }
+    &.app-half-width {
+        width: 364px;
+    }
     &.app-radio-toggle-checkboxes {
         gap: 16px;
     }

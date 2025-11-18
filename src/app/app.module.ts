@@ -56,6 +56,8 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translate/http-loader';
 import { EditPasswordDialogComponent } from './dialogs/edit-password-dialog/edit-password-dialog.component';
 import { EditRegistrarDialogComponent } from './dialogs/edit-registrar-dialog/edit-registrar-dialog.component';
+import { DetailDialogComponent } from './dialogs/detail-dialog/detail-dialog.component';
+import { EditDlCatalogDialogComponent } from './dialogs/edit-dl-catalog-dialog/edit-dl-catalog-dialog.component';
 
 // Překladač
 export function HttpLoaderFactory() {
@@ -109,6 +111,8 @@ export const MY_DATE_FORMATS = {
         EditUserComponent,
         EditPasswordDialogComponent,
         EditRegistrarDialogComponent,
+        DetailDialogComponent,
+        EditDlCatalogDialogComponent,
     ],
     imports: [
         BrowserModule,

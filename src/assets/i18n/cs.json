@@ -68,7 +68,7 @@
         "edit": "Upravit",
         "delete": "Smazat",
         "change-password": "Změnit heslo",
-        "cancel": "Zavřít",
+        "cancel": "Zrušit",
         "save": "Uložit",
         "copy": "Zkopírovat",
         "download": "Stáhnout",
@@ -119,7 +119,8 @@
         "title-required": "Název je povinný",
         "invalid-ccnb": "Neplatné ČCNB (požadovaný formát cnb123456789)",
         "invalid-isbn": "Neplatné ISBN (požadovaný formát 10 nebo 13 číslic)",
-        "invalid-issn": "Neplatné ISSN (požadovaný formát 8 číslic)"
+        "invalid-issn": "Neplatné ISSN (požadovaný formát 8 číslic)",
+        "invalid-url": "Neplatná URL adresa. Musí začínat http:// nebo https://"
     },
     "inputs": {
         "pick-start-date": "Vyberte od",
@@ -222,8 +223,17 @@
         "reservationMode": "Rezervací",
         "registrarMode": "Registrátorem",
         "digital-libraries": "Seznam digitálních knihoven",
+        "digital-library": "Digitální knihovna",
+        "dl": "Digitální knihovna",
+        "add-digital-library-title": "Digitální knihovna – vložení nového záznamu",
         "catalogues": "Seznam katalogů",
-        "statistics": "Statistiky"
+        "catalogue": "Katalog",
+        "add-catalogue-title": "Katalog – vložení nového záznamu",
+        "statistics": "Statistiky",
+        "url": "url",
+        "URL": "URL",
+        "URL-prefix": "URL prefix",
+        "url-prefix": "url prefix"
     },
     "logs": {
         "title": "Seznam posledních 30 logů"

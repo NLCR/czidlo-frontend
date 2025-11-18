@@ -127,6 +127,18 @@
     }
 
     /* Velikosti tlačítek */
+    &.btn-xs {
+        padding: 4px 8px;
+        font-size: 12px;
+        gap: 4px;
+        &.btn-icon-only {
+            padding: 4px;
+        }
+        font-family: Karla;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 16px; /* 140% */
+    }
     &.btn-s {
         padding: 8px 12px;
         font-size: 12px;

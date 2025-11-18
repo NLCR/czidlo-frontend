@@ -1,0 +1,52 @@
+<div class="app-dialog app-detail-dialog">
+    <div class="app-dialog-header">
+        <div class="app-dialog-title">{{ 'registrars.detail' | translate }} - {{ 'registrars.' + data.context | translate }} "{{data.item.name}}"</div>
+        <div class="app-close" (click)="closeDialog()">
+            <img src="assets/icons/close.svg" />
+        </div>
+    </div>
+    <div class="app-dialog-body">
+        <!-- <pre>{{ data | json }}</pre> -->
+        <div class="app-sections">
+            <div class="app-section">
+                <div class="app-items">
+                    <div class="app-item">
+                        <div class="app-item-label">{{ 'registrars.name' | translate }}:</div>
+                        <div class="app-item-value">{{ data.item.name }}</div>
+                    </div>
+                    <div class="app-item">
+                        <div class="app-item-label">{{ 'registrars.id' | translate }}:</div>
+                        <div class="app-item-value">{{ data.item.id }}</div>
+                    </div>
+                    <div class="app-item" *ngIf="data?.item?.description">
+                        <div class="app-item-label">{{ 'registrars.description' | translate }}:</div>
+                        <div class="app-item-value">{{ data.item.description }}</div>
+                    </div>
+                    <div class="app-item" *ngIf="data?.item?.url">
+                        <div class="app-item-label">{{ 'registrars.url' | translate }}:</div>
+                        <div class="app-item-value"><a href="{{ data.item.url }}" target="_blank" rel="noopener noreferrer">{{ data.item.url }}</a></div>
+                    </div>
+                    <div class="app-item" *ngIf="data?.item?.urlPrefix">
+                        <div class="app-item-label">{{ 'registrars.url-prefix' | translate }}:</div>
+                        <div class="app-item-value"><a href="{{ data.item.urlPrefix }}" target="_blank" rel="noopener noreferrer">{{ data.item.urlPrefix }}</a></div>
+                    </div>
+                    <div class="app-item" *ngIf="data?.item?.created">
+                        <div class="app-item-label">{{ 'registrars.created' | translate }}:</div>
+                        <div class="app-item-value">{{ data.item.created }}</div>
+                    </div>
+                    <div class="app-item" *ngIf="data?.item?.modified">
+                        <div class="app-item-label">{{ 'registrars.modified' | translate }}:</div>
+                        <div class="app-item-value">{{ data.item.modified }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="app-dialog-footer">
+        <div class="app-dialog-footer-part app-dialog-footer-buttons">
+            <app-button variant="primary" size="l" (click)="closeDialog()">
+                {{ 'buttons.close' | translate }}
+            </app-button>
+        </div>
+    </div>
+</div>
