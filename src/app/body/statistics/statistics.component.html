@@ -1,1 +1,61 @@
-<p>statistics works!</p>
+<div class="app-statistics-container">
+    <div class="app-statistics">
+        <!-- TABS -->
+        <div class="app-tabs-header app-statistics-header">
+            <div class="app-tabs">
+                <div class="app-tab app-tab-first" [ngClass]="{ 'app-tab-active': isActive === 'assignments' }" routerLink="/statistics/assignments">
+                    {{ 'statistics.assignments' | translate }}
+                </div>
+                <div class="app-tab app-tab-last" [ngClass]="{ 'app-tab-active': isActive === 'resolvations' }" routerLink="/statistics/resolvations">
+                    {{ 'statistics.resolvations' | translate }}
+                </div>
+            </div>
+        </div>
+        <div class="app-assignments app-tab-content" *ngIf="isActive === 'assignments'">
+            <div class="app-title">
+                {{ 'statistics.assignments-title' | translate }}
+            </div>
+            <div class="app-actions">
+                <div class="app-left-part">
+                    select
+                </div>
+                <div class="app-right-part">
+                    <div class="app-tags">
+                        <div class="app-tag">
+                            tag1
+                        </div>
+                        <div class="app-tag">
+                            tag2
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-content">
+                assignments content
+            </div>
+        </div>
+        <div class="app-assignments app-tab-content" *ngIf="isActive === 'assignments'">
+            <div class="app-title">
+                {{ 'statistics.assignments-title' | translate }}
+            </div>
+            <div class="app-actions">
+                <div class="app-left-part">
+                    select
+                </div>
+                <div class="app-right-part">
+                    <div class="app-tags">
+                        <div class="app-tag">
+                            tag1
+                        </div>
+                        <div class="app-tag">
+                            tag2
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-content">
+                assignments content
+            </div>
+        </div>
+    </div>
+</div>

@@ -315,5 +315,11 @@
         "THESIS": "Vysokoškolská kvalifikační práce",
         "OTHER": "Jiný dokument",
         "SOUND_COLLECTION": "Zvukový dokument"
+    },
+    "statistics": {
+        "assignments": "Přiřazení",
+        "resolvations": "Resolvování",
+        "assignments-title": "Souhrnné statistiky přiřazení URN:NBN",
+        "resolvations-title": "Souhrnné statistiky resolvování URN:NBN"
     }
 }

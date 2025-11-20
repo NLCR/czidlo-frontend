@@ -1,7 +1,7 @@
 import { Injectable, signal, effect } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError, delay, tap } from 'rxjs/operators';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { EnvironmentService } from './environment.service';
 import { LanguageService } from './language.service';
 
@@ -144,6 +144,7 @@ export class ApiService {
         const url = `${this.apiUrl}/registrars/${code}`;
         return this.http.put(url, body).pipe(catchError(this.handleError));
     }
+
     // CATALOGUES
     createRegistrarCatalogue(code: string, body: any): Observable<any> {
         const url = `${this.apiUrl}/registrars/${code}/catalogues`;
@@ -250,8 +251,30 @@ export class ApiService {
         const url = `${this.apiUrl}/users/${id}/registrar_rights/${registrarId}`;
         return this.http.delete(url).pipe(catchError(this.handleError));
     }
-    listUserRights(id: string): Observable<any> {
+    getUserRights(id: string): Observable<any> {
         const url = `${this.apiUrl}/users/${id}/registrar_rights`;
         return this.doGet(url);
+    }
+
+    // ELASTICSEARCH
+    getRecords(): Observable<any> {
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_1/_search';
+
+        const login = 'czidlo_reader';
+        const password = 'dq7o8rDrXZzhiS20qm';
+
+        const headers = new HttpHeaders({
+            Authorization: 'Basic ' + btoa(`${login}:${password}`),
+            'Content-Type': 'application/json',
+        });
+
+        const body = {
+            query: {
+                match_all: {},
+            },
+            size: 10000, // kolik chceš – max 10k
+        };
+
+        return this.http.post(url, body, { headers }).pipe(catchError(this.handleError));
     }
 }

@@ -20,6 +20,7 @@ export class UsersComponent {
 
     users = signal<Array<any>>([]);
     activeUser: any = null;
+    rightsDetails: any = null;
 
     isSidebarOpen = signal<boolean>(false);
 
@@ -40,6 +41,10 @@ export class UsersComponent {
             if (url.length === 2) {
                 const userId = url[1].path;
                 this.loadUserDetails(userId);
+            }
+            if (url.length === 3 && url[2].path === 'rights') {
+                const userId = url[1].path;
+                this.loadRightsDetails(userId);
             }
         });
     }
@@ -67,11 +72,21 @@ export class UsersComponent {
             },
         });
     }
-    loadRightsDetails(user: any) {
-        // TODO: implementovat načtení a zobrazení práv uživatele
-        console.log('Loading rights details for user:', user);
+    loadRightsDetails(userId: any) {
+        console.log('loading rights details for user:', userId);
+        this.usersService.getUserRights(userId).subscribe({
+            next: (response) => {
+                this.rightsDetails = response;
+                this.isSidebarOpen.set(true);
+            },
+            error: (error) => {
+                console.error('Error loading user rights details:', error);
+            },
+        });
     }
-
+    openRightsSidebar(user: any) {
+        this.router.navigate(['/users', user.id, 'rights']);
+    }
     openSidebar(user: any) {
         this.router.navigate(['/users', user.id]);
     }

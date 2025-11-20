@@ -73,6 +73,9 @@ export class RegistrarsService {
         return this.apiService.editRegistrar(id, body);
     }
 
+    // RIGHTS
+
+
     // DIGITAL LIBRARIES AND CATALOGUES
     createDigitalLibrary(registrarCode: string, body: any): Observable<any> {
         return this.apiService.createRegistrarDigitalLibrary(registrarCode, body);

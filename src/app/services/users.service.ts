@@ -33,79 +33,27 @@ export class UsersService {
         );
     }
     getUser(userId: string): Observable<any> {
-        return this.apiService.getUser(userId).pipe(
-            tap({
-                next: (data) => {
-                    data.created = data.created ? new Date(data.created.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
-                    data.modified = data.modified ? new Date(data.modified.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
-                },
-                error: (error) => {
-                    console.error(`Error loading user details for ID ${userId}:`, error);
-                },
-                complete: () => {
-                    console.log(`User details loading complete for ID ${userId}`);
-                },
-            })
-        );
+        return this.apiService.getUser(userId);
     }
     addUser(userData: any): Observable<any> {
-        return this.apiService.createUser(userData).pipe(
-            tap({
-                next: (data) => {
-                    console.log('User added successfully:', data);
-                },
-                error: (error) => {
-                    console.error('Error adding user:', error);
-                },
-                complete: () => {
-                    console.log('User addition complete');
-                },
-            })
-        );
+        return this.apiService.createUser(userData);
     }
     updateUser(userId: string, userData: any): Observable<any> {
-        return this.apiService.updateUser(userId, userData).pipe(
-            tap({
-                next: (data) => {
-                    console.log(`User with ID ${userId} updated successfully:`, data);
-                },
-                error: (error) => {
-                    console.error(`Error updating user with ID ${userId}:`, error);
-                },
-                complete: () => {
-                    console.log(`User update complete for ID ${userId}`);
-                },
-            })
-        );
+        return this.apiService.updateUser(userId, userData);
     }
     updateUserPassword(userId: string, passwordData: any): Observable<any> {
-        return this.apiService.updateUserPassword(userId, passwordData).pipe(
-            tap({
-                next: (data) => {
-                    console.log(`Password for user ID ${userId} updated successfully:`, data);
-                },
-                error: (error) => {
-                    console.error(`Error updating password for user ID ${userId}:`, error);
-                },
-                complete: () => {
-                    console.log(`Password update complete for user ID ${userId}`);
-                },
-            })
-        );
+        return this.apiService.updateUserPassword(userId, passwordData);
     }
     deleteUser(userId: string): Observable<any> {
-        return this.apiService.deleteUser(userId).pipe(
-            tap({
-                next: (data) => {
-                    console.log(`User with ID ${userId} deleted successfully:`, data);
-                },
-                error: (error) => {
-                    console.error(`Error deleting user with ID ${userId}:`, error);
-                },
-                complete: () => {
-                    console.log(`User deletion complete for ID ${userId}`);
-                },
-            })
-        );
+        return this.apiService.deleteUser(userId);
+    }
+    getUserRights(userId: string): Observable<any> {
+        return this.apiService.getUserRights(userId);
+    }
+    assignUserRights(userId: string, rightsData: any): Observable<any> {
+        return this.apiService.assignUserRights(userId, rightsData);
+    }
+    removeUserRights(userId: string, rightsData: any): Observable<any> {
+        return this.apiService.removeUserRights(userId, rightsData);
     }
 }

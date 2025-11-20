@@ -27,7 +27,7 @@
                 >
                     <div class="app-col app-col-user">{{ user?.login }}</div>
                     <div class="app-col app-col-actions">
-                        <app-button size="s" variant="tertiary" iconRight="setting.png" (click)="loadRightsDetails(user); $event.stopPropagation()">
+                        <app-button size="s" variant="tertiary" iconRight="setting.png" (click)="openRightsSidebar(user); $event.stopPropagation()">
                             {{ 'buttons.rights' | translate }}
                         </app-button>
                         <app-button size="s" variant="tertiary" iconRight="lock.png" (click)="openChangePasswordDialog(user); $event.stopPropagation()">
@@ -97,6 +97,35 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
+            </div>
+        </div>
+    </div>
+    <div class="app-sidebar-rights" *ngIf="rightsDetails">
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">{{ 'users.rights-details' | translate }} - {{ rightsDetails?.userLogin }}</div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+        <div class="app-sidebar-content">
+            <div class="app-sections">
+                <div class="app-section" *ngFor="let registrarRight of rightsDetails?.registrarRights">
+                    <div class="app-section-title">{{ 'registrars.' + registrarRight.registrarName | translate }}</div>
+                    <div class="app-items">
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'users.rights.resolverMode' | translate }}:</span>
+                            <span class="app-item-value">{{ registrarRight.resolverMode ? 'ano' : 'ne' }}</span>
+                        </div>
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'users.rights.reservationMode' | translate }}:</span>
+                            <span class="app-item-value">{{ registrarRight.reservationMode ? 'ano' : 'ne' }}</span>
+                        </div>
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'users.rights.registrarMode' | translate }}:</span>
+                            <span class="app-item-value">{{ registrarRight.registrarMode ? 'ano' : 'ne' }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
