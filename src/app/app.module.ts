@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule, LOCALE_ID } from '@angular/core';
+import { APP_INITIALIZER, NgModule, LOCALE_ID, EnvironmentInjector, inject } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClient, provideHttpClient } from '@angular/common/http';
@@ -38,6 +38,10 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
+//  CHARTS
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // SERVICES
 import { EnvironmentService } from './services/environment.service';
@@ -133,7 +137,9 @@ export const MY_DATE_FORMATS = {
         MatSnackBarModule,
         FormsModule,
         MatRadioModule,
-        MatTooltipModule
+        MatTooltipModule,
+        NgxChartsModule,
+        BrowserAnimationsModule
     ],
     providers: [
         provideHttpClient(),

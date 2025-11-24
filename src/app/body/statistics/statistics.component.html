@@ -15,47 +15,84 @@
             <div class="app-title">
                 {{ 'statistics.assignments-title' | translate }}
             </div>
-            <div class="app-actions">
-                <div class="app-left-part">
-                    select
-                </div>
+            <!-- <div class="app-actions">
+                <div class="app-left-part">select</div>
                 <div class="app-right-part">
                     <div class="app-tags">
-                        <div class="app-tag">
-                            tag1
-                        </div>
-                        <div class="app-tag">
-                            tag2
-                        </div>
+                        <div class="app-tag">všechno: {{ recordsCount() }}</div>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="app-content">
-                assignments content
+                <div class="app-chart app-chart-years" *ngIf="!selectedYear()">
+                    <div class="app-chart-header">
+                        {{ 'statistics.all-years' | translate }}
+                    </div>
+                    <ngx-charts-bar-vertical
+                        [scheme]="colorScheme"
+                        [view]="[800, 350]"
+                        [results]="chartDataByYears()"
+                        [gradient]="false"
+                        [xAxis]="true"
+                        [yAxis]="true"
+                        [legend]="false"
+                        [showDataLabel]="false"
+                        (select)="onYearClick($event)"
+                    ></ngx-charts-bar-vertical>
+                </div>
+                <div class="app-chart app-chart-months" *ngIf="selectedYear()">
+                    <div class="app-chart-header">
+                        <app-button variant="tertiary" size="s" [icon]="true" iconLeft="arrow-left.svg" (click)="onBackClick()"></app-button>
+                        {{ selectedYear() }}
+                    </div>
+                    <ngx-charts-bar-vertical
+                        [scheme]="colorScheme"
+                        [view]="[800, 350]"
+                        [results]="chartDataByMonths()"
+                        [xAxis]="true"
+                        [yAxis]="true"
+                        [legend]="false"
+                    ></ngx-charts-bar-vertical>
+                </div>
+                <div class="app-chart app-chart-pie">
+                    <ngx-charts-pie-chart
+                        [results]="chartDataByRegistrar()"
+                        [view]="[800, 350]"
+                        [legend]="true"
+                        [labels]="true"
+                        [doughnut]="false"
+                        [explodeSlices]="false"
+                        [gradient]="false"
+                        [scheme]="colorScheme"
+                    ></ngx-charts-pie-chart>
+                </div>
             </div>
+            <!-- <div class="app-chart app-chart-entities">
+                <ngx-charts-bar-vertical
+                    [scheme]="colorScheme"
+                    [results]="chartData()"
+                    [gradient]="false"
+                    [xAxis]="true"
+                    [yAxis]="true"
+                    [legend]="false"
+                    [showDataLabel]="false"
+                ></ngx-charts-bar-vertical>
+            </div> -->
         </div>
-        <div class="app-assignments app-tab-content" *ngIf="isActive === 'assignments'">
+        <div class="app-resolvations app-tab-content" *ngIf="isActive === 'resolvations'">
             <div class="app-title">
-                {{ 'statistics.assignments-title' | translate }}
+                {{ 'statistics.resolvations-title' | translate }}
             </div>
             <div class="app-actions">
-                <div class="app-left-part">
-                    select
-                </div>
+                <div class="app-left-part">select</div>
                 <div class="app-right-part">
                     <div class="app-tags">
-                        <div class="app-tag">
-                            tag1
-                        </div>
-                        <div class="app-tag">
-                            tag2
-                        </div>
+                        <div class="app-tag">tag1</div>
+                        <div class="app-tag">tag2</div>
                     </div>
                 </div>
             </div>
-            <div class="app-content">
-                assignments content
-            </div>
+            <div class="app-content">assignments content</div>
         </div>
     </div>
 </div>

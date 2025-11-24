@@ -257,9 +257,8 @@ export class ApiService {
     }
 
     // ELASTICSEARCH
-    getRecords(): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_1/_search';
-
+    getRecords(body: any): Observable<any> {
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_2/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -268,13 +267,67 @@ export class ApiService {
             'Content-Type': 'application/json',
         });
 
-        const body = {
-            query: {
-                match_all: {},
+        return this.http.post(url, body, { headers }).pipe(tap({
+            next: (data) => {
+                console.log('Records data received:', data);
             },
-            size: 10000, // kolik chceš – max 10k
-        };
+            error: (error) => {
+                console.error('Error fetching records:', error);
+            },
+            complete: () => {
+                console.log('Records fetch complete');
+            },
+        }));
+    }
+    getRecordCount(body?: any): Observable<number> {
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_2/_count';
+        const login = 'czidlo_reader';
+        const password = 'dq7o8rDrXZzhiS20qm';
 
-        return this.http.post(url, body, { headers }).pipe(catchError(this.handleError));
+        const headers = new HttpHeaders({
+            Authorization: 'Basic ' + btoa(`${login}:${password}`),
+            'Content-Type': 'application/json',
+        });
+
+        if (!body) {
+            return this.http.get<any>(url, { headers });
+        } else {
+            return this.http.post<any>(url, body, { headers });
+        }
+    }
+
+    getElasticStructure(): Observable<any> {
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_2/_mapping';
+        const login = 'czidlo_reader';
+        const password = 'dq7o8rDrXZzhiS20qm';
+
+        const headers = new HttpHeaders({
+            Authorization: 'Basic ' + btoa(`${login}:${password}`),
+            'Content-Type': 'application/json',
+        });
+
+        return this.http.get(url, { headers }).pipe(catchError(this.handleError));
+    }
+    getRecords3(body: any): Observable<any> {
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_3/_search';
+        const login = 'czidlo_reader';
+        const password = 'dq7o8rDrXZzhiS20qm';
+
+        const headers = new HttpHeaders({
+            Authorization: 'Basic ' + btoa(`${login}:${password}`),
+            'Content-Type': 'application/json',
+        });
+
+        return this.http.post(url, body, { headers }).pipe(tap({
+            next: (data) => {
+                console.log('Records data received:', data);
+            },
+            error: (error) => {
+                console.error('Error fetching records:', error);
+            },
+            complete: () => {
+                console.log('Records fetch complete');
+            },
+        }));
     }
 }

@@ -14,9 +14,17 @@ export class SearchComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.searchInput.nativeElement.focus();
-    this.apiService.getRecords().subscribe({
+
+    const body = {
+      query: {
+        match_all: {},
+      },
+      size: 100, // kolik chceš – max 10k
+    };
+
+    this.apiService.getRecords(body).subscribe({
       next: (response) => {
-        console.log('Records count:', response);
+        console.log('Records from search component:', response);
       },
       error: (error) => {
         console.error('Error fetching records count:', error);

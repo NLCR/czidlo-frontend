@@ -320,6 +320,7 @@
         "assignments": "Přiřazení",
         "resolvations": "Resolvování",
         "assignments-title": "Souhrnné statistiky přiřazení URN:NBN",
-        "resolvations-title": "Souhrnné statistiky resolvování URN:NBN"
+        "resolvations-title": "Souhrnné statistiky resolvování URN:NBN",
+        "all-years": "Všechny roky"
     }
 }
