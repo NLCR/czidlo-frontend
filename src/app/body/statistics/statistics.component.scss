@@ -76,9 +76,13 @@
                     // height: 300px;
                     .app-chart-header {
                         display: flex;
-                        align-items: center;
-                        gap: 16px;
-                        margin-bottom: 8px;
+
+                        .app-chart-header-item {
+                            display: flex;
+                            align-items: center;
+                            gap: 16px;
+                            margin-bottom: 8px;
+                        }
                     }
                 }
             }

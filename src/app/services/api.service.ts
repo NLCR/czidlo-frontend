@@ -257,8 +257,8 @@ export class ApiService {
     }
 
     // ELASTICSEARCH
-    getRecords(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_2/_search';
+    getStatisticsDataReg(body: any): Observable<any> {
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_4/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -267,20 +267,41 @@ export class ApiService {
             'Content-Type': 'application/json',
         });
 
-        return this.http.post(url, body, { headers }).pipe(tap({
-            next: (data) => {
-                console.log('Records data received:', data);
-            },
-            error: (error) => {
-                console.error('Error fetching records:', error);
-            },
-            complete: () => {
-                console.log('Records fetch complete');
-            },
-        }));
+        return this.http.post(url, body, { headers }).pipe(
+            tap({
+                next: (data) => {
+                    console.log('Statistics data received:', data);
+                }
+            })
+        );
+    }
+
+    getRecords(body: any): Observable<any> {
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_3/_search';
+        const login = 'czidlo_reader';
+        const password = 'dq7o8rDrXZzhiS20qm';
+
+        const headers = new HttpHeaders({
+            Authorization: 'Basic ' + btoa(`${login}:${password}`),
+            'Content-Type': 'application/json',
+        });
+
+        return this.http.post(url, body, { headers }).pipe(
+            tap({
+                next: (data) => {
+                    console.log('Records data received:', data);
+                },
+                error: (error) => {
+                    console.error('Error fetching records:', error);
+                },
+                complete: () => {
+                    console.log('Records fetch complete');
+                },
+            })
+        );
     }
     getRecordCount(body?: any): Observable<number> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_2/_count';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_3/_count';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -308,26 +329,103 @@ export class ApiService {
 
         return this.http.get(url, { headers }).pipe(catchError(this.handleError));
     }
-    getRecords3(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_3/_search';
-        const login = 'czidlo_reader';
-        const password = 'dq7o8rDrXZzhiS20qm';
 
-        const headers = new HttpHeaders({
-            Authorization: 'Basic ' + btoa(`${login}:${password}`),
-            'Content-Type': 'application/json',
-        });
-
-        return this.http.post(url, body, { headers }).pipe(tap({
-            next: (data) => {
-                console.log('Records data received:', data);
-            },
-            error: (error) => {
-                console.error('Error fetching records:', error);
-            },
-            complete: () => {
-                console.log('Records fetch complete');
-            },
-        }));
+    getRecordByUrnnbn(urnnbn: string): Observable<any> {
+        // const url = `https://resolver.nkp.cz/api/v6/resolver/${urnnbn}?format=json`;
+        // return this.http.get(url).pipe(catchError(this.handleError));
+        return of(this.testRecord).pipe( delay(500) );
     }
+
+    testRecord = {
+        digitalDocument: {
+            id: 3347809,
+            urnNbn: 'urn:nbn:cz:nk-0076n5',
+            created: '2023-05-15T17:33:40.811+02:00',
+            monograph: {
+                created: '2023-05-15T17:33:40.767+02:00',
+                titleInfo: {
+                    title: 'Bojujeme s nákazou =',
+                    subTitle: '[Wir kämpfen gegen die Ansteckung]',
+                },
+                ccnb: 'cnb000760137',
+                digitalBorn: false,
+                primaryOriginator: {
+                    type: 'AUTHOR',
+                    value: 'Babička, Josef',
+                },
+                otherOriginator: 'Semerád, Alois',
+                publication: {
+                    place: 'Praha',
+                    year: 1943,
+                },
+            },
+            technicalMetadata: {
+                format: {
+                    format: 'image/jp2',
+                    version: '1.0',
+                },
+                extent: '144 x JPEG2000',
+                resolution: {
+                    horizontal: 302,
+                    vertical: 302,
+                },
+                compression: {
+                    standard: 'JPEG2000',
+                },
+                color: {
+                    model: 'RGB',
+                    depth: 8,
+                },
+                pictureSize: {
+                    width: 1761,
+                    height: 2454,
+                },
+            },
+            registrarScopeIdentifiers: [
+                {
+                    type: 'uuid',
+                    value: '9a455640-b41d-11ed-a764-005056827e51',
+                },
+            ],
+            registrar: {
+                id: 73,
+                code: 'nk',
+                name: 'Národní knihovna České republiky',
+                created: '2013-01-09T15:40:37.740+01:00',
+                modified: '2018-02-28T09:26:22.562+01:00',
+                registrationModes: {
+                    BY_RESOLVER: true,
+                    BY_REGISTRAR: false,
+                    BY_RESERVATION: true,
+                },
+            },
+            archiver: {
+                id: 45,
+                name: 'Národní knihovna České republiky',
+                description: 'nk',
+                created: '2012-04-18T15:21:37.227+02:00',
+                modified: '2014-01-14T12:25:14.994+01:00',
+            },
+            digitalInstances: [
+                {
+                    id: 1705917,
+                    active: true,
+                    url: 'http://www.digitalniknihovna.cz/mzk/uuid/uuid:9a455640-b41d-11ed-a764-005056827e51',
+                    format: 'jpg;jp2;pdf',
+                    accessibility: 'chráněno autorskými právy',
+                    access_restriction: 'UNKNOWN',
+                    created: '2023-05-15T20:58:48.841+02:00',
+                },
+                {
+                    id: 1705916,
+                    active: true,
+                    url: 'http://kramerius4.nkp.cz/search/handle/uuid:9a455640-b41d-11ed-a764-005056827e51',
+                    format: 'jpg;jp2;pdf',
+                    accessibility: 'chráněno autorskými právy',
+                    access_restriction: 'UNKNOWN',
+                    created: '2023-05-15T20:58:47.597+02:00',
+                },
+            ],
+        },
+    };
 }

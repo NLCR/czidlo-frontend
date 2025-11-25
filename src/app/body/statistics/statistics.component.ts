@@ -12,13 +12,13 @@ import { ApiService } from '../../services/api.service';
 export class StatisticsComponent {
     isActive = 'registered';
 
-    chartData = signal<Array<{ name: string; value: number }>>([]);
-    chartDataByYears = signal<Array<{ year: string; count: number }>>([]);
-    records = signal<Array<any>>([]);
-    recordsCount = signal<number>(0);
-    chartDataByMonths = signal<any[]>([]);
-    selectedYear = signal<string | null>(null);
+    chartDataByDate = signal<Array<{ name: string; value: number }>>([]);
     chartDataByRegistrar = signal<any[]>([]);
+    chartDataByEntityTypes = signal<any[]>([]);
+
+    records = signal<Array<any>>([]);
+    selectedYear = signal<string | null>(null);
+    selectedRegistrar = signal<string | null>(null);
 
     colorScheme: any = {
         domain: ['#0080a8', '#00bcd4', '#4dd0e1'],
@@ -40,15 +40,6 @@ export class StatisticsComponent {
                 this.router.navigate(['assignments'], { relativeTo: this.route });
             }
         });
-        // STRUCTURE
-        this.apiService.getElasticStructure().subscribe({
-            next: (response) => {
-                console.log('Elastic structure for statistics:', response);
-            },
-            error: (error) => {
-                console.error('Error fetching elastic structure for statistics:', error);
-            },
-        });
         // RECORDS
         this.statisticsService.getRecords().subscribe({
             next: (response) => {
@@ -59,71 +50,81 @@ export class StatisticsComponent {
                 console.error('Error fetching records count for statistics:', error);
             },
         });
-        // RECORDS COUNT
-        this.statisticsService.getRecordsCount().subscribe({
-            next: (response) => {
-                console.log('Records count for statistics:', response);
-                this.recordsCount.set(response.count);
-            },
-            error: (error) => {
-                console.error('Error fetching records count for statistics:', error);
-            },
-        });
-        // COUNT BY ENTITY TYPES
-        this.statisticsService.getCountByEntityTypes().subscribe({
-            next: (response) => {
-                console.log('Entity types for statistics:', response);
-                this.chartData.set(response);
-            },
-            error: (error) => {
-                console.error('Error fetching records count for statistics:', error);
-            },
-        });
         // COUNT BY YEARS
-        this.statisticsService.getCountByYears().subscribe({
+        this.statisticsService.getCountByDate().subscribe({
             next: (response) => {
                 console.log('Records by years for statistics:', response);
-                this.chartDataByYears.set(response);
+                this.chartDataByDate.set(response);
             },
         });
         // COUNT BY REGISTRARS
         this.statisticsService.getCountByRegistrar().subscribe({
             next: (data) => this.chartDataByRegistrar.set(data),
         });
-        const body = {
-            query: {
-                match_all: {},
-            },
-            size: 100, // kolik chceš – max 10k
-        };
-
-        this.apiService.getRecords3(body).subscribe({
-            next: (response) => {
-                console.log('Records 3 for statistics:', response);
-            },
-            error: (error) => {
-                console.error('Error fetching records 3 for statistics:', error);
-            },
-        });
     }
+
     onYearClick(event: any) {
+        if (this.selectedYear()) {
+            return;
+        }
         const year = event.name; // '2012'
-        console.log('Clicked year:', event);
-        this.loadMonthsForYear(year);
-        this.statisticsService.getCountByRegistrarForYear(year).subscribe({
-            next: (data) => this.chartDataByRegistrar.set(data),
-        });
-    }
-    loadMonthsForYear(year: string) {
         this.selectedYear.set(year);
+        const registrar = this.selectedRegistrar() || null;
+        console.log('Clicked year:', event, registrar);
 
-        this.statisticsService.getCountByMonths(year).subscribe({
-            next: (data) => this.chartDataByMonths.set(data),
+        this.statisticsService.getCountByDate(registrar, year).subscribe({
+            next: (data) => this.chartDataByDate.set(data),
             error: (err) => console.error('Error loading months:', err),
         });
+        if (registrar) {
+            this.statisticsService.getCountByEntityTypes(registrar, year).subscribe({
+                next: (data) => this.chartDataByEntityTypes.set(data),
+            });
+        } else {
+            this.statisticsService.getCountByRegistrar(year).subscribe({
+                next: (data) => this.chartDataByRegistrar.set(data),
+            });
+        }
     }
-    onBackClick() {
+
+    onRegistrarClick(event: any) {
+        const registrar = event.name; // 'XYZ'
+        this.selectedRegistrar.set(registrar);
+        const year = this.selectedYear() || null;
+        console.log('Clicked registrar:', event);
+
+        this.statisticsService.getCountByEntityTypes(registrar).subscribe({
+            next: (data) => this.chartDataByEntityTypes.set(data),
+            error: (err) => console.error('Error loading entity types:', err),
+        });
+
+        if (year) {
+            this.statisticsService.getCountByEntityTypes(registrar, year).subscribe({
+                next: (data) => this.chartDataByEntityTypes.set(data),
+            });
+            this.statisticsService.getCountByDate(registrar, year).subscribe({
+                next: (data) => this.chartDataByDate.set(data),
+            });
+        } else {
+            this.statisticsService.getCountByRegistrar().subscribe({
+                next: (data) => this.chartDataByRegistrar.set(data),
+            });
+            this.statisticsService.getCountByDate(registrar).subscribe({
+                next: (data) => this.chartDataByDate.set(data),
+            });
+        }
+    }
+
+    onYearCancel() {
         this.selectedYear.set(null);
-        this.chartDataByMonths.set([]);
+        this.statisticsService.getCountByRegistrar().subscribe({
+            next: (data) => this.chartDataByRegistrar.set(data),
+        });
+        this.statisticsService.getCountByDate().subscribe({
+            next: (data) => this.chartDataByDate.set(data),
+        });
+    }
+    onRegistrarCancel() {
+        this.selectedRegistrar.set(null);
     }
 }

@@ -1,8 +1,96 @@
 <div class="app-search-container">
     <div class="app-search">
-        <input #searchInput id="search-input" type="text" placeholder="Hledat..." />
-        <app-button variant="primary" size="l" iconLeft="" iconRight="">
-            <span>{{ 'search' | translate }}</span>
+        <input
+            #searchInput
+            id="search-input"
+            type="text"
+            placeholder="Hledat..."
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch(searchInput.value)"
+        />
+        <app-button variant="primary" size="l" iconLeft="" iconRight="" (click)="onSearch(searchInput.value)">
+            <span>{{ 'buttons.search' | translate }}</span>
         </app-button>
+    </div>
+    <div class="app-action">
+        <mat-form-field appearance="outline">
+            <mat-label>Typ dokumentu</mat-label>
+            <mat-select [(ngModel)]="selectedType" (selectionChange)="onTypeSelected()">
+                <mat-option value="">Vše</mat-option>
+                <mat-option value="MONOGRAPH">Monografie</mat-option>
+                <mat-option value="MONOGRAPH_VOLUME">Svazek monografie</mat-option>
+                <mat-option value="PERIODICAL">Periodikum</mat-option>
+                <mat-option value="PERIODICAL_VOLUME">Ročník periodika</mat-option>
+                <mat-option value="PERIODICAL_ISSUE">Číslo periodika</mat-option>
+                <mat-option value="ANALYTICAL">Článek</mat-option>
+                <mat-option value="THESIS">Thesis</mat-option>
+                <mat-option value="OTHER">Ostatní</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <div class="app-records-count">
+            {{ 'search.records-found' | translate }}: {{ searchService.recordsCount() }}
+        </div>
+    </div>
+    <div class="app-search-results">
+        <div class="app-search-card" *ngFor="let item of searchService.searchResults()" >
+            <div class="app-card-header" (click)="onSelectItem(item)">
+                <img src="assets/icons/arrow-down2.svg" />
+                <div class="app-card-title">
+                    <div class="app-title-part">{{ item.title }}</div>
+                    <div class="app-title-part" *ngIf="item.volume_title">- {{ item.volume_title }}</div>
+                    <div class="app-title-part">({{ item.ie_type }})</div>
+                </div>
+            </div>
+            <div class="app-card-content" [ngClass]="{ opened: item.opened }" *ngIf="item.opened">
+                <div class="app-ie-info">
+                    <div class="app-ie-field app-link-cnb" *ngIf="item.ccnb">
+                        <a href="{{ item.ccnb }}" target="_blank" rel="noopener">
+                            {{ 'search.cnb-link' | translate }}
+                        </a>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.title">
+                        <div class="app-label">{{ 'search.title' | translate }}:</div>
+                        <div class="app-value">{{ item.title }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.subtitle">
+                        <div class="app-label">{{ 'search.subtitle' | translate }}:</div>
+                        <div class="app-value">{{ item.subtitle }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.volume_title">
+                        <div class="app-label">{{ 'search.volume_title' | translate }}:</div>
+                        <div class="app-value">{{ item.volume_title }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.ccnb">
+                        <div class="app-label">{{ 'search.ccnb' | translate }}:</div>
+                        <div class="app-value">{{ item.ccnb }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.issn">
+                        <div class="app-label">{{ 'search.issn' | translate }}:</div>
+                        <div class="app-value">{{ item.issn }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.isbn">
+                        <div class="app-label">{{ 'search.isbn' | translate }}:</div>
+                        <div class="app-value">{{ item.isbn }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.author">
+                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-value">{{ item.author }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.otheroriginator">
+                        <div class="app-label">{{ 'search.otheroriginator' | translate }}:</div>
+                        <div class="app-value">{{ item.otheroriginator }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.created">
+                        <div class="app-label">{{ 'search.created' | translate }}:</div>
+                        <div class="app-value">{{ item.created | date }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.modified">
+                        <div class="app-label">{{ 'search.modified' | translate }}:</div>
+                        <div class="app-value">{{ item.modified | date }}</div>
+                    </div>
+                </div>
+                <pre>{{ item | json }}</pre>
+            </div>
+        </div>
     </div>
 </div>

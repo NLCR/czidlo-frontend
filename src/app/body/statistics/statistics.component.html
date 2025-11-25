@@ -24,14 +24,19 @@
                 </div>
             </div> -->
             <div class="app-content">
-                <div class="app-chart app-chart-years" *ngIf="!selectedYear()">
+                <div class="app-chart app-chart-years">
                     <div class="app-chart-header">
-                        {{ 'statistics.all-years' | translate }}
+                        <div class="app-chart-header-item" *ngIf="!selectedYear()">{{ 'statistics.all-years' | translate }}</div>
+                        <div class="app-chart-header-item" *ngIf="selectedYear()">
+                            <app-button variant="tertiary" size="s" [icon]="true" iconLeft="arrow-left.svg" (click)="onYearCancel()"></app-button>
+                            {{ selectedYear() }}
+                        </div>
                     </div>
+                    <!-- DATA BY YEARS -->
                     <ngx-charts-bar-vertical
                         [scheme]="colorScheme"
-                        [view]="[800, 350]"
-                        [results]="chartDataByYears()"
+                        [view]="[800, 300]"
+                        [results]="chartDataByDate()"
                         [gradient]="false"
                         [xAxis]="true"
                         [yAxis]="true"
@@ -40,24 +45,42 @@
                         (select)="onYearClick($event)"
                     ></ngx-charts-bar-vertical>
                 </div>
-                <div class="app-chart app-chart-months" *ngIf="selectedYear()">
+
+                <!-- DATA BY REGISTRARS -->
+                <div class="app-chart app-chart-pie" *ngIf="!selectedRegistrar()">
                     <div class="app-chart-header">
-                        <app-button variant="tertiary" size="s" [icon]="true" iconLeft="arrow-left.svg" (click)="onBackClick()"></app-button>
-                        {{ selectedYear() }}
+                        <div class="app-chart-header-item">{{ 'statistics.all-registrars' | translate }}</div>
                     </div>
-                    <ngx-charts-bar-vertical
-                        [scheme]="colorScheme"
-                        [view]="[800, 350]"
-                        [results]="chartDataByMonths()"
-                        [xAxis]="true"
-                        [yAxis]="true"
-                        [legend]="false"
-                    ></ngx-charts-bar-vertical>
-                </div>
-                <div class="app-chart app-chart-pie">
                     <ngx-charts-pie-chart
                         [results]="chartDataByRegistrar()"
-                        [view]="[800, 350]"
+                        [view]="[800, 300]"
+                        [legend]="true"
+                        [labels]="true"
+                        [doughnut]="false"
+                        [explodeSlices]="false"
+                        [gradient]="false"
+                        [scheme]="colorScheme"
+                        (select)="onRegistrarClick($event)"
+                    ></ngx-charts-pie-chart>
+                </div>
+
+                <!-- DATA BY ENTITY TYPES FOR REGISTRAR -->
+                <div class="app-chart app-chart-pie" *ngIf="selectedRegistrar()">
+                    <div class="app-chart-header">
+                        <div class="app-chart-header-item">
+                            <app-button
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="arrow-left.svg"
+                                (click)="onRegistrarCancel()"
+                            ></app-button>
+                            {{ selectedRegistrar() }}
+                        </div>
+                    </div>
+                    <ngx-charts-pie-chart
+                        [results]="chartDataByEntityTypes()"
+                        [view]="[800, 300]"
                         [legend]="true"
                         [labels]="true"
                         [doughnut]="false"
@@ -67,17 +90,6 @@
                     ></ngx-charts-pie-chart>
                 </div>
             </div>
-            <!-- <div class="app-chart app-chart-entities">
-                <ngx-charts-bar-vertical
-                    [scheme]="colorScheme"
-                    [results]="chartData()"
-                    [gradient]="false"
-                    [xAxis]="true"
-                    [yAxis]="true"
-                    [legend]="false"
-                    [showDataLabel]="false"
-                ></ngx-charts-bar-vertical>
-            </div> -->
         </div>
         <div class="app-resolvations app-tab-content" *ngIf="isActive === 'resolvations'">
             <div class="app-title">

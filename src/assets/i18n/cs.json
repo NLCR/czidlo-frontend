@@ -1,6 +1,5 @@
 {
     "czidlo": "ČIDLO",
-    "search": "Hledat",
     "actions": "Akce",
     "ID": "ID",
     "not-logged-in-message": "Pro přístup k této části aplikace se prosím přihlaste.",
@@ -92,7 +91,8 @@
         "import-record": "Vložit",
         "logout": "Odhlásit se",
         "open": "Otevřít",
-        "details": "Podrobnosti"
+        "details": "Podrobnosti",
+        "search": "Hledat"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
@@ -321,6 +321,20 @@
         "resolvations": "Resolvování",
         "assignments-title": "Souhrnné statistiky přiřazení URN:NBN",
         "resolvations-title": "Souhrnné statistiky resolvování URN:NBN",
-        "all-years": "Všechny roky"
+        "all-years": "Všechny roky",
+        "all-registrars": "Všichni registrátoři"
+    },
+    "search": {
+        "cnb-link": "Zobrazit v ČNB",
+        "title": "název",
+        "subtitle": "podnázev",
+        "volume_title": "název svazku",
+        "issue_title": "název čísla",
+        "ccnb": "čČNB",
+        "isbn": "ISBN",
+        "issn": "ISSN",
+        "created": "vytvořeno",
+        "modified": "naposledy změněno",
+        "records-found": "Nalezené záznamy"
     }
 }

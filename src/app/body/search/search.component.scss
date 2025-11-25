@@ -1,15 +1,110 @@
 .app-search-container {
     display: flex;
     width: 800px;
-    padding: 24px 0 40px 16px;
+    padding: 24px 0px 0px 16px;
     flex-direction: column;
     align-items: flex-start;
     gap: 24px;
-    flex-shrink: 0;
+    overflow: hidden;
     .app-search {
         display: flex;
         align-items: flex-start;
         gap: 16px;
         align-self: stretch;
+    }
+    .app-search-results {
+        display: flex;
+        width: 800px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 0px 16px 40px 0px;
+        overflow: auto;
+        .app-search-card {
+            display: flex;
+            // padding: 20px 16px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            align-self: stretch;
+            border-radius: 4px;
+            background: var(--BG-Main-Light, #f6f7f9);
+            .app-card-header {
+                display: flex;
+                padding: 20px 16px;
+                gap: 16px;
+                align-self: stretch;
+                cursor: pointer;
+                .app-card-title {
+                    display: flex;
+                    gap: 8px;
+                    color: #000;
+                    /* Typesettings/XL/Medium */
+                    font-family: 'IBM Plex Sans';
+                    font-size: 20px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 32px; /* 160% */
+                }
+            }
+            .app-card-content {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                align-self: stretch;
+                padding: 0 16px 0 62px;
+                pre {
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                }
+                .app-ie-info {
+                    display: flex;
+                    flex-direction: column;
+                    .app-link-cnb {
+                        a {
+                            color: var(--Text-Link, #0080a8);
+
+                            /* Typesettings/M/Regular */
+                            font-family: 'IBM Plex Sans';
+                            font-size: 16px;
+                            font-style: normal;
+                            font-weight: 400;
+                            line-height: 24px; /* 150% */
+                            text-decoration-line: underline;
+                            text-decoration-style: solid;
+                            text-decoration-skip-ink: none;
+                            text-decoration-thickness: auto;
+                            text-underline-offset: auto;
+                            text-underline-position: from-font;
+                        }
+                        &:hover {
+                            text-decoration: underline;
+                        }
+                    }
+                }
+                .app-ie-field {
+                    display: flex;
+                    gap: 8px;
+                    .app-label {
+                        color: var(--Text-Light, #4c6580);
+                        /* Typesettings/M/Regular */
+                        font-family: 'IBM Plex Sans';
+                        font-size: 16px;
+                        font-style: normal;
+                        font-weight: 400;
+                        line-height: 24px; /* 150% */
+                    }
+                    .app-value {
+                        color: var(--Text-Secondary, #263340);
+                        /* Typesettings/M/Regular */
+                        font-family: 'IBM Plex Sans';
+                        font-size: 16px;
+                        font-style: normal;
+                        font-weight: 400;
+                        line-height: 24px;
+                    }
+                }
+            }
+        }
     }
 }
