@@ -35,21 +35,28 @@
     </div>
     <div class="app-search-results" *ngIf="searchService.searchResults().length > 0">
         <div class="app-search-card" *ngFor="let item of searchService.searchResults()">
-            <div class="app-card-header" (click)="onSelectItem(item)">
-                <img src="assets/icons/arrow-down2.svg" />
+            <div class="app-card-header" [ngClass]="{ opened: item.opened }" (click)="onSelectItem(item)">
+                <img [src]="item.opened ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                 <div class="app-card-title">
                     <div class="app-title-part">{{ item.title }}</div>
-                    <div class="app-title-part" *ngIf="item.volume_title">- {{ item.volume_title }}</div>
-                    <div class="app-title-part">({{ item.ie_type }})</div>
+                    <div class="app-title-part" *ngIf="item.volumetitle">- {{ item.volumetitle }}</div>
+                    <div class="app-title-part" *ngIf="item.sdtitle">({{ item.sdtitle }})</div>
+                    <div class="app-title-part" *ngIf="item.entitytype">({{ item.entitytype }})</div>
                 </div>
             </div>
             <div class="app-card-content" [ngClass]="{ opened: item.opened }" *ngIf="item.opened">
                 <div class="app-ie-info">
                     <div class="app-ie-field app-link-cnb" *ngIf="item.ccnb">
-                        <a href="https://aleph.nkp.cz/F/?func=direct&doc_number={{ item.ccnb.split('cnb')[1] }}&local_base=CNB" target="_blank" rel="noopener">
+                        <a
+                            href="https://aleph.nkp.cz/F/?func=direct&doc_number={{ item.ccnb.split('cnb')[1] }}&local_base=CNB"
+                            target="_blank"
+                            rel="noopener"
+                        >
                             {{ 'search.cnb-link' | translate }}
                         </a>
                     </div>
+
+                    <!-- TITLE -->
                     <div class="app-ie-field" *ngIf="item.title">
                         <div class="app-label">{{ 'search.title' | translate }}:</div>
                         <div class="app-value">{{ item.title }}</div>
@@ -58,23 +65,17 @@
                         <div class="app-label">{{ 'search.subtitle' | translate }}:</div>
                         <div class="app-value">{{ item.subtitle }}</div>
                     </div>
-                    <div class="app-ie-field" *ngIf="item.volume_title">
-                        <div class="app-label">{{ 'search.volume_title' | translate }}:</div>
-                        <div class="app-value">{{ item.volume_title }}</div>
+                    <div class="app-ie-field" *ngIf="item.volumetitle">
+                        <div class="app-label">{{ 'search.volumetitle' | translate }}:</div>
+                        <div class="app-value">{{ item.volumetitle }}</div>
                     </div>
-                    <div class="app-ie-field" *ngIf="item.ccnb">
-                        <div class="app-label">{{ 'search.ccnb' | translate }}:</div>
-                        <div class="app-value">{{ item.ccnb }}</div>
+                    <div class="app-ie-field" *ngIf="item.issuetitle">
+                        <div class="app-label">{{ 'search.issuetitle' | translate }}:</div>
+                        <div class="app-value">{{ item.issuetitle }}</div>
                     </div>
-                    <div class="app-ie-field" *ngIf="item.issn">
-                        <div class="app-label">{{ 'search.issn' | translate }}:</div>
-                        <div class="app-value">{{ item.issn }}</div>
-                    </div>
-                    <div class="app-ie-field" *ngIf="item.isbn">
-                        <div class="app-label">{{ 'search.isbn' | translate }}:</div>
-                        <div class="app-value">{{ item.isbn }}</div>
-                    </div>
-                    <div class="app-ie-field" *ngIf="item.author">
+
+                    <!-- AUTHORS -->
+                    <div class="app-ie-field" *ngIf="item.author?.length > 0">
                         <div class="app-label">{{ 'search.author' | translate }}:</div>
                         <div class="app-value">{{ item.author }}</div>
                     </div>
@@ -82,72 +83,247 @@
                         <div class="app-label">{{ 'search.otheroriginator' | translate }}:</div>
                         <div class="app-value">{{ item.otheroriginator }}</div>
                     </div>
-                    <div class="app-ie-field" *ngIf="item.created">
-                        <div class="app-label">{{ 'search.created' | translate }}:</div>
-                        <div class="app-value">{{ item.created | date }}</div>
-                    </div>
-                    <div class="app-ie-field" *ngIf="item.modified">
-                        <div class="app-label">{{ 'search.modified' | translate }}:</div>
-                        <div class="app-value">{{ item.modified | date }}</div>
-                    </div>
-                </div>
-                <pre>{{ item | json }}</pre>
-            </div>
-        </div>
-    </div>
-    <div class="app-no-results" *ngIf="pages.length === 0">
-        <h1 class="app-no-results-title">{{ 'search.no-results-title' | translate }}</h1>
-        <div class="app-no-results-text">{{ 'search.no-results-text-1' | translate }}</div>
-        <div class="app-no-results-text">
-            {{ 'search.no-results-text-2' | translate }}
-            <a href="mailto:resolver-podpora@nkp.cz">resolver-podpora&#64;nkp.cz</a>
-            .
-        </div>
-    </div>
-</div>
 
-<div class="app-search-footer">
-    <div class="app-paginator" *ngIf="pages.length > 1">
-        <div class="app-pages">
-            <div class="app-page-items">
-                <div
-                    class="app-page"
-                    *ngFor="let page of displayedFirstPages"
-                    [ngClass]="{ 'app-active': page === currentPage }"
-                    (click)="changePage(page)"
-                >
-                    {{ page }}
-                </div>
-            </div>
-            <div class="app-dots" *ngIf="pages.length > 4">...</div>
-            <div class="app-page-items" *ngIf="displayedMiddlePages.length > 0">
-                <div
-                    class="app-page"
-                    *ngFor="let page of displayedMiddlePages"
-                    [ngClass]="{ 'app-active': page === currentPage }"
-                    (click)="changePage(page)"
-                >
-                    {{ page }}
-                </div>
-            </div>
-            <div class="app-dots" *ngIf="displayedMiddlePages.length > 0">...</div>
-            <div class="app-page-items" *ngIf="pages.length > 4">
-                <div
-                    class="app-page"
-                    *ngFor="let page of displayedLastPages"
-                    [ngClass]="{ 'app-active': page === currentPage }"
-                    (click)="changePage(page)"
-                >
-                    {{ page }}
+                    <!-- ZDROJOVY DOKUMENT -->
+                    <div class="app-ie-source-document" [ngClass]="{ opened: item.sdtitleopen }" *ngIf="item.sdtitle">
+                        <div class="app-ie-header app-ie-source-document-header" (click)="toggleSdInfo(item)">
+                            <img [src]="item.sdtitleopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                            <div class="app-part-title">
+                                <div class="app-label">{{ 'search.sd' | translate }}:</div>
+                                <div>{{ item.sdtitle }}</div>
+                                <div>{{ item.sdvolumetitle }}</div>
+                                <div>{{ item.sdissuetitle }}</div>
+                            </div>
+                        </div>
+                        <div class="app-ie-content app-ie-source-document-content" *ngIf="item.sdtitleopen">
+                            <div class="app-ie-field" *ngIf="item.sdtitle">
+                                <div class="app-label">{{ 'search.title' | translate }}:</div>
+                                <div class="app-value">{{ item.sdtitle }}</div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.sdvolumetitle">
+                                <div class="app-label">{{ 'search.volumetitle' | translate }}:</div>
+                                <div class="app-value">{{ item.sdvolumetitle }}</div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.sdissuetitle">
+                                <div class="app-label">{{ 'search.issuetitle' | translate }}:</div>
+                                <div class="app-value">{{ item.sdissuetitle }}</div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.ccnb">
+                                <div class="app-label">{{ 'search.ccnb' | translate }}:</div>
+                                <div class="app-value">{{ item.ccnb }}</div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.issn">
+                                <div class="app-label">{{ 'search.issn' | translate }}:</div>
+                                <div class="app-value">{{ item.issn }}</div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.isbn">
+                                <div class="app-label">{{ 'search.isbn' | translate }}:</div>
+                                <div class="app-value">{{ item.isbn }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DIGITALNI DOKUMENT -->
+                    <div class="app-ie-digital-document" [ngClass]="{ opened: item.ddopen }" *ngIf="item.details?.digitalDocument">
+                        <div class="app-ie-header app-ie-digital-document-header" (click)="item.ddopen = !item.ddopen">
+                            <img [src]="item.ddopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                            <div class="app-part-title">
+                                <div class="app-label">{{ 'search.dd' | translate }}</div>
+                                <app-button variant="tertiary" size="xs">XML →</app-button>
+                                <app-button variant="tertiary" size="xs">JSON →</app-button>
+                            </div>
+                        </div>
+                        <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.ddopen">
+                            <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.urnNbn">
+                                <!-- <div class="app-label">{{ 'search.urnNbn' | translate }}:</div> -->
+                                <div class="app-value">{{ item.details.digitalDocument.urnNbn }}</div>
+                                <div class="app-value-2">
+                                    ({{ 'search.registered' | translate }} {{ item.details.digitalDocument.created | date }})
+                                </div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.registrar">
+                                <div class="app-label">{{ 'search.registrar' | translate }}:</div>
+                                <div class="app-value">{{ item.details.digitalDocument?.registrar?.name }}</div>
+                                <div class="app-value-2">({{ item.details.digitalDocument?.registrar?.code }})</div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.archiver">
+                                <div class="app-label">{{ 'search.archiver' | translate }}:</div>
+                                <div class="app-value">{{ item.details.digitalDocument?.archiver?.name }}</div>
+                                <div class="app-value-2" *ngIf="item.details.digitalDocument?.archiver?.description">
+                                    ({{ item.details.digitalDocument?.archiver?.description }})
+                                </div>
+                            </div>
+                            <!-- TECHNICKA METADATA -->
+                            <div
+                                class="app-ie-technical-metadata"
+                                [ngClass]="{ opened: item.tmopen }"
+                                *ngIf="item.details?.digitalDocument?.technicalMetadata"
+                            >
+                                <div class="app-ie-header" (click)="item.tmopen = !item.tmopen">
+                                    <img [src]="item.tmopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                                    <div class="app-part-title">
+                                        <div class="app-label-2">{{ 'search.tm' | translate }}</div>
+                                    </div>
+                                </div>
+                                <div class="app-ie-content" *ngIf="item.tmopen">
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.format">
+                                        <div class="app-label">{{ 'search.format' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.format.format }}</div>
+                                        <div class="app-value-2">
+                                            ({{ 'search.version' | translate }}
+                                            {{ item.details?.digitalDocument?.technicalMetadata?.format.version }})
+                                        </div>
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.extent">
+                                        <div class="app-label">{{ 'search.extent' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.extent }}</div>
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.resolution">
+                                        <div class="app-label">{{ 'search.resolution' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.resolution.horizontal }}</div>
+                                        x
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.resolution.vertical }}</div>
+                                        dpi
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.compression">
+                                        <div class="app-label">{{ 'search.compression' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.compression.standard }}</div>
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.color">
+                                        <div class="app-label">{{ 'search.color' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.color.model }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.color.depth }}bit</div>
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.pictureSize">
+                                        <div class="app-label">{{ 'search.pictureSize' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.pictureSize.width }}</div>
+                                        x
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.pictureSize.height }}</div>
+                                        px
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- RSI -->
+                            <div
+                                class="app-ie-rsi"
+                                [ngClass]="{ opened: item.rsiopen }"
+                                *ngIf="item.details?.digitalDocument?.registrarScopeIdentifiers?.length > 0"
+                            >
+                                <div class="app-ie-header" (click)="item.rsiopen = !item.rsiopen">
+                                    <img [src]="item.rsiopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                                    <div class="app-part-title">
+                                        <div class="app-label-2">{{ 'search.rsi' | translate }}</div>
+                                    </div>
+                                </div>
+                                <div class="app-ie-content" *ngIf="item.rsiopen">
+                                    <div class="app-ie-field" *ngFor="let rsi of item.details?.digitalDocument?.registrarScopeIdentifiers">
+                                        <div class="app-label">{{ rsi?.type }}:</div>
+                                        <div class="app-value">{{ rsi?.value }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--DIGITAL INSTANCES -->
+                            <div class="app-ie-di" *ngIf="item.details?.digitalDocument?.digitalInstances?.length > 0">
+                                <div *ngFor="let di of item.details?.digitalDocument?.digitalInstances">
+                                    <div class="app-ie-header" (click)="di.diopen = !di.diopen">
+                                        <img [src]="di.diopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                                        <div class="app-part-title app-part-title-di">
+                                            <div class="app-label-2 app-di-url-label">
+                                                <a href="{{ di.url }}" target="_blank" rel="noopener noreferrer">{{ di.url }}</a>
+                                            </div>
+                                            <app-button variant="tertiary" size="xs">XML →</app-button>
+                                            <app-button variant="tertiary" size="xs">JSON →</app-button>
+                                        </div>
+                                    </div>
+                                    <div class="app-ie-content" *ngIf="di.diopen">
+                                        <div class="app-ie-field" *ngIf="di.active">
+                                            <div class="app-label">{{ 'search.active' | translate }}:</div>
+                                            <div class="app-value">{{ 'search.' + di.active | translate }}</div>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.digitalLibrary">
+                                            <div class="app-label">{{ 'search.digitalLibrary' | translate }}:</div>
+                                            <div class="app-value">{{ di.digitalLibrary.name }}</div>
+                                            <app-button variant="tertiary" size="xs">{{'search.didetails' | translate }} →</app-button>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.format">
+                                            <div class="app-label">{{ 'search.format' | translate }}:</div>
+                                            <div class="app-value">{{ di.format }}</div>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.accessibility">
+                                            <div class="app-label">{{ 'search.accessibility' | translate }}:</div>
+                                            <div class="app-value">{{ di.accessibility }}</div>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.access_restriction">
+                                            <div class="app-label">{{ 'search.access_restriction' | translate }}:</div>
+                                            <div class="app-value">{{ di.access_restriction }}</div>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.created">
+                                            <div class="app-label">{{ 'search.created' | translate }}:</div>
+                                            <div class="app-value">{{ di.created | date }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <pre>{{ item | json }}</pre> -->
                 </div>
             </div>
         </div>
-        <div class="app-navigation">
-            <div class="app-navigation-button" (click)="changePage(currentPage - 1)" [ngClass]="{ disabled: currentPage === 1 }">
-                <img class="app-navigation-icon" src="assets/icons/arrow-left-white.svg" />
+        <div class="app-no-results" *ngIf="pages.length === 0">
+            <h1 class="app-no-results-title">{{ 'search.no-results-title' | translate }}</h1>
+            <div class="app-no-results-text">{{ 'search.no-results-text-1' | translate }}</div>
+            <div class="app-no-results-text">
+                {{ 'search.no-results-text-2' | translate }}
+                <a href="mailto:resolver-podpora@nkp.cz">resolver-podpora&#64;nkp.cz</a>
+                .
             </div>
-            <div class="app-navigation-button" (click)="changePage(currentPage + 1)" [ngClass]="{ disabled: currentPage === lastPage }">
-                <img class="app-navigation-icon" src="assets/icons/arrow-right-white.svg" />
+        </div>
+    </div>
+
+    <div class="app-search-footer">
+        <div class="app-paginator" *ngIf="pages.length > 1">
+            <div class="app-pages">
+                <div class="app-page-items">
+                    <div
+                        class="app-page"
+                        *ngFor="let page of displayedFirstPages"
+                        [ngClass]="{ 'app-active': page === currentPage }"
+                        (click)="changePage(page)"
+                    >
+                        {{ page }}
+                    </div>
+                </div>
+                <div class="app-dots" *ngIf="pages.length > 4">...</div>
+                <div class="app-page-items" *ngIf="displayedMiddlePages.length > 0">
+                    <div
+                        class="app-page"
+                        *ngFor="let page of displayedMiddlePages"
+                        [ngClass]="{ 'app-active': page === currentPage }"
+                        (click)="changePage(page)"
+                    >
+                        {{ page }}
+                    </div>
+                </div>
+                <div class="app-dots" *ngIf="displayedMiddlePages.length > 0">...</div>
+                <div class="app-page-items" *ngIf="pages.length > 4">
+                    <div
+                        class="app-page"
+                        *ngFor="let page of displayedLastPages"
+                        [ngClass]="{ 'app-active': page === currentPage }"
+                        (click)="changePage(page)"
+                    >
+                        {{ page }}
+                    </div>
+                </div>
+            </div>
+            <div class="app-navigation">
+                <div class="app-navigation-button" (click)="changePage(currentPage - 1)" [ngClass]="{ disabled: currentPage === 1 }">
+                    <img class="app-navigation-icon" src="assets/icons/arrow-left-white.svg" />
+                </div>
+                <div class="app-navigation-button" (click)="changePage(currentPage + 1)" [ngClass]="{ disabled: currentPage === lastPage }">
+                    <img class="app-navigation-icon" src="assets/icons/arrow-right-white.svg" />
+                </div>
             </div>
         </div>
     </div>

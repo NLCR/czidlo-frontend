@@ -32,7 +32,6 @@
             // padding: 20px 16px;
             flex-direction: column;
             align-items: flex-start;
-            gap: 4px;
             align-self: stretch;
             border-radius: 4px;
             background: var(--BG-Main-Light, #f6f7f9);
@@ -42,6 +41,9 @@
                 gap: 16px;
                 align-self: stretch;
                 cursor: pointer;
+                &.opened {
+                    padding: 20px 16px 8px 16px;
+                }
                 .app-card-title {
                     display: flex;
                     gap: 8px;
@@ -59,7 +61,7 @@
                 flex-direction: column;
                 align-items: flex-start;
                 align-self: stretch;
-                padding: 0 16px 0 62px;
+                padding: 0 16px 20px 58px;
                 pre {
                     white-space: pre-wrap;
                     word-break: break-word;
@@ -91,7 +93,8 @@
                 }
                 .app-ie-field {
                     display: flex;
-                    gap: 8px;
+                    align-items: center;
+                    gap: 2px;
                     .app-label {
                         color: var(--Text-Light, #4c6580);
                         /* Typesettings/M/Regular */
@@ -100,6 +103,7 @@
                         font-style: normal;
                         font-weight: 400;
                         line-height: 24px; /* 150% */
+                        margin-right: 4px;
                     }
                     .app-value {
                         color: var(--Text-Secondary, #263340);
@@ -109,6 +113,20 @@
                         font-style: normal;
                         font-weight: 400;
                         line-height: 24px;
+                    }
+                    .app-value-2 {
+                        color: var(--Text-Light, #4c6580);
+
+                        /* Typesettings/M/Regular */
+                        font-family: 'IBM Plex Sans';
+                        font-size: 16px;
+                        font-style: normal;
+                        font-weight: 400;
+                        line-height: 24px;
+                        margin-left: 4px;
+                    }
+                    app-button {
+                        margin-left: 8px;
                     }
                 }
             }
@@ -234,4 +252,71 @@
             }
         }
     }
+}
+.app-ie-header {
+    display: flex;
+    align-items: flex-start;
+    padding: 4px 0;
+    gap: 8px;
+    cursor: pointer;
+    img {
+        width: 20px;
+        height: 20px;
+        margin-top: 4px;
+    }
+    .app-part-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        &.app-part-title-di {
+            align-items: flex-end;
+        }
+        .app-label {
+            color: #000;
+            /* Typesettings/L/Medium */
+            font-family: 'IBM Plex Sans';
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 28px; /* 155.556% */
+        }
+        .app-label-2 {
+            color: #000;
+
+            /* Typesettings/M/Medium */
+            font-family: 'IBM Plex Sans';
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px; /* 150% */
+            &.app-di-url-label {
+                width: 450px;
+            }
+            a {
+                color: var(--Text-Link, #0080a8);
+
+                /* Typesettings/M/Medium */
+                font-family: 'IBM Plex Sans';
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px; /* 150% */
+                text-decoration: none;
+                &:hover {
+                    text-decoration-line: underline;
+                    text-decoration-style: solid;
+                    text-decoration-skip-ink: none;
+                    text-decoration-thickness: auto;
+                    text-underline-offset: auto;
+                    text-underline-position: from-font;
+                }
+            }
+        }
+    }
+}
+.app-ie-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 0 0 32px;
 }

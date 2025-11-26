@@ -43,6 +43,13 @@ export class SearchService {
                     registrarcode: registratorCode,
                 },
             });
+        } else if (term.startsWith('cnb')) {
+            // 🔍 2) Hledání CNB – speciální režim
+            body.query.bool.must.push({
+                match_phrase: {
+                    ccnb: term,
+                },
+            });
         } else {
             body.query.bool.must.push({
                 multi_match: {
@@ -69,11 +76,16 @@ export class SearchService {
         return this.apiService.getRecords(body).pipe(
             tap({
                 next: (data) => {
+                    let recordsCount = data.hits.total.value;
                     let results = data.hits.hits.map((hit: any) => ({
                         ...hit._source,
-                        urnnbn: hit._source.registrarcode && hit._source.documentcode ? `urn:nbn:cz:${hit._source.registrarcode}-${hit._source.documentcode}` : null,
+                        urnnbn:
+                            hit._source.registrarcode && hit._source.documentcode
+                                ? `urn:nbn:cz:${hit._source.registrarcode}-${hit._source.documentcode}`
+                                : null,
+
                     }));
-                    let recordsCount = data.hits.total.value;
+
                     this.searchResults.set(results);
                     this.recordsCount.set(recordsCount);
                     this.isLoading.set(false);

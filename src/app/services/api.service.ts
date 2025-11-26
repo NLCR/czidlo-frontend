@@ -402,6 +402,23 @@ export class ApiService {
                     accessibility: 'chráněno autorskými právy',
                     access_restriction: 'UNKNOWN',
                     created: '2023-05-15T20:58:48.841+02:00',
+                    digitalLibrary: {
+                        id: 29,
+                        name: 'Digitální knihovna NK ČR',
+                        code: 'DK-NKCR',
+                        registrar: {
+                            id: 73,
+                            code: 'nk',
+                            name: 'Národní knihovna České republiky',
+                            created: '2013-01-09T15:40:37.740+01:00',
+                            modified: '2018-02-28T09:26:22.562+01:00',
+                            registrationModes: {
+                                BY_RESOLVER: true,
+                                BY_REGISTRAR: false,
+                                BY_RESERVATION: true,
+                            },
+                        },
+                    },
                 },
                 {
                     id: 1705916,
