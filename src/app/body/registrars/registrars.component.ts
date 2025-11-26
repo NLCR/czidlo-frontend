@@ -98,6 +98,7 @@ export class RegistrarsComponent {
             },
         });
     }
+
     loadArchiverDetails(archiverId: any): void {
         this.registrarsService.getArchiver(archiverId).subscribe({
             next: (data) => {

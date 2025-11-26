@@ -30,12 +30,29 @@
                         <app-button size="s" variant="tertiary" iconRight="setting.png" (click)="openRightsSidebar(user); $event.stopPropagation()">
                             {{ 'buttons.rights' | translate }}
                         </app-button>
-                        <app-button size="s" variant="tertiary" iconRight="lock.png" (click)="openChangePasswordDialog(user); $event.stopPropagation()">
+                        <app-button
+                            size="s"
+                            variant="tertiary"
+                            iconRight="lock.png"
+                            (click)="openChangePasswordDialog(user); $event.stopPropagation()"
+                        >
                             {{ 'buttons.change-password' | translate }}
                         </app-button>
                         <div class="app-buttons">
-                            <app-button size="s" variant="tertiary" [icon]="true" iconRight="edit.png" (click)="openEditUserDialog(user); $event.stopPropagation()"></app-button>
-                            <app-button size="s" variant="tertiary" [icon]="true" iconRight="trash.png" (click)="openDeleteUserDialog(user); $event.stopPropagation()"></app-button>
+                            <app-button
+                                size="s"
+                                variant="tertiary"
+                                [icon]="true"
+                                iconRight="edit.png"
+                                (click)="openEditUserDialog(user); $event.stopPropagation()"
+                            ></app-button>
+                            <app-button
+                                size="s"
+                                variant="tertiary"
+                                [icon]="true"
+                                iconRight="trash.png"
+                                (click)="openDeleteUserDialog(user); $event.stopPropagation()"
+                            ></app-button>
                         </div>
                     </div>
                 </div>
@@ -49,7 +66,7 @@
 
 <!-- Sidebar -->
 <div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
-    <div class="app-sidebar-user" *ngIf="activeUser">
+    <div class="app-sidebar-user" *ngIf="activeUser && !rightsDetails">
         <div class="app-sidebar-header">
             <div class="app-sidebar-title">{{ 'registrars.detail' | translate }} - {{ activeUser?.login }}</div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
@@ -102,30 +119,61 @@
     </div>
     <div class="app-sidebar-rights" *ngIf="rightsDetails">
         <div class="app-sidebar-header">
-            <div class="app-sidebar-title">{{ 'users.rights-details' | translate }} - {{ rightsDetails?.userLogin }}</div>
+            <div class="app-sidebar-title">{{ 'users.rights-details' | translate }} - {{ activeUser?.login }}</div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>
         </div>
         <div class="app-sidebar-content">
             <div class="app-sections">
-                <div class="app-section" *ngFor="let registrarRight of rightsDetails?.registrarRights">
-                    <div class="app-section-title">{{ 'registrars.' + registrarRight.registrarName | translate }}</div>
+                <div class="app-section">
+                    <div class="app-section-title">{{ 'users.current-rights' | translate }}</div>
                     <div class="app-items">
-                        <div class="app-item">
-                            <span class="app-item-label">{{ 'users.rights.resolverMode' | translate }}:</span>
-                            <span class="app-item-value">{{ registrarRight.resolverMode ? 'ano' : 'ne' }}</span>
-                        </div>
-                        <div class="app-item">
-                            <span class="app-item-label">{{ 'users.rights.reservationMode' | translate }}:</span>
-                            <span class="app-item-value">{{ registrarRight.reservationMode ? 'ano' : 'ne' }}</span>
-                        </div>
-                        <div class="app-item">
-                            <span class="app-item-label">{{ 'users.rights.registrarMode' | translate }}:</span>
-                            <span class="app-item-value">{{ registrarRight.registrarMode ? 'ano' : 'ne' }}</span>
+                        <div class="app-item" *ngFor="let item of enrichedCurrentRegistrars()">
+                            <span class="app-item-value">{{ item.code }} - {{ item.name }}</span>
+                            <div class="app-selected-item-remove" (click)="removeCurrentRegistrar(item)">
+                                <img src="assets/icons/close.svg" />
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="app-section">
+                    <div class="app-section-title">{{ 'users.add-new-rights' | translate }}</div>
+                    <!-- REGISTRAR -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-multiselect">
+                            <!-- <div class="app-base-input-label">{{ 'processes.filter-by-registrar' | translate }} URN:NBN</div> -->
+                            <mat-form-field appearance="outline">
+                                <mat-select [formControl]="registrarsControl" multiple [placeholder]="'inputs.select-registrar' | translate">
+                                    <mat-select-trigger>
+                                        @if ((registrarsControl.value?.length || 0) > 0) {
+                                        {{ 'inputs.selected-items' | translate }}:
+                                        <span>{{ registrarsControl.value?.length }}</span>
+                                        }
+                                    </mat-select-trigger>
+                                    @for (reg of registrars(); track reg) {
+                                    <mat-option [value]="reg">{{ reg.code }} - {{ reg.name }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-selected-items" *ngIf="registrarsControl.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let item of registrarsControl.value">
+                                {{ item.code }}
+                                <div class="app-selected-item-remove" (click)="removeSelectedRegistrar(item)">
+                                    <img src="assets/icons/close.svg" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-sidebar-footer">
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
             </div>
         </div>
     </div>

@@ -60,7 +60,10 @@
         "add-new-user-title": "Uživatelský účet – vložení nového záznamu",
         "edit-user-title": "Uživatelský účet – úprava záznamu",
         "edit-password-title-1": "Uživatelský účet",
-        "edit-password-title-2": "změna hesla"
+        "edit-password-title-2": "změna hesla",
+        "rights-details": "Nastavení práv uživatele",
+        "current-rights": "Aktuální práva k registrátorům",
+        "add-new-rights": "Přidat práva k registrátorům"
     },
     "buttons": {
         "rights": "Práva",

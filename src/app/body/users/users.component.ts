@@ -8,6 +8,8 @@ import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dia
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EditPasswordDialogComponent } from '../../dialogs/edit-password-dialog/edit-password-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
+import { RegistrarsService } from '../../services/registrars.service';
+import { FormControl } from '@angular/forms';
 
 @Component({
     selector: 'app-users',
@@ -22,6 +24,11 @@ export class UsersComponent {
     activeUser: any = null;
     rightsDetails: any = null;
 
+    registrars = signal<Array<any>>([]);
+    selectedRegistrar = signal<any>(null);
+    registrarsControl = new FormControl();
+    enrichedCurrentRegistrars = signal<Array<any>>([]);
+
     isSidebarOpen = signal<boolean>(false);
 
     constructor(
@@ -31,7 +38,8 @@ export class UsersComponent {
         private route: ActivatedRoute,
         private dialog: MatDialog,
         private _snackBar: MatSnackBar,
-        private translate: TranslateService
+        private translate: TranslateService,
+        private registrarsService: RegistrarsService
     ) {}
 
     ngOnInit() {
@@ -44,6 +52,9 @@ export class UsersComponent {
             }
             if (url.length === 3 && url[2].path === 'rights') {
                 const userId = url[1].path;
+                if (this.activeUser == null || this.activeUser.id !== userId) {
+                    this.loadUserDetails(userId);
+                }
                 this.loadRightsDetails(userId);
             }
         });
@@ -72,17 +83,59 @@ export class UsersComponent {
             },
         });
     }
+
+    loadRegistrars(currentRegistrars: any[]) {
+        this.registrarsService.getRegistrars().subscribe({
+            next: (response) => {
+                // this.registrars.set(response.items);
+                let filteredRegistars = response.items.filter((reg: any) => {
+                    return !currentRegistrars.find((curReg) => curReg === reg.code);
+                });
+                this.registrars.set(filteredRegistars);
+
+                let enrichedRegistrars = currentRegistrars.map((regCode) => {
+                    let field = { code: regCode, name: '' };
+                    return response.items.find((r: any) => r.code === regCode)
+                        ? { code: regCode, name: response.items.find((r: any) => r.code === regCode).name }
+                        : field;
+                });
+                this.enrichedCurrentRegistrars.set(enrichedRegistrars);
+            }
+        });
+    }
+
     loadRightsDetails(userId: any) {
         console.log('loading rights details for user:', userId);
         this.usersService.getUserRights(userId).subscribe({
             next: (response) => {
+                console.log(response, this.activeUser);
                 this.rightsDetails = response;
+                this.loadRegistrars(response);
                 this.isSidebarOpen.set(true);
             },
             error: (error) => {
                 console.error('Error loading user rights details:', error);
             },
         });
+    }
+
+    removeSelectedRegistrar(item: any) {
+        const currentValues = this.registrarsControl.value || [];
+        const index = currentValues.indexOf(item);
+        if (index >= 0) {
+            currentValues.splice(index, 1);
+            this.registrarsControl.setValue([...currentValues]);
+        }
+    }
+    removeCurrentRegistrar(item: any) {
+        const currentValues = this.enrichedCurrentRegistrars();
+        const index = currentValues.findIndex((reg) => reg.code === item.code);
+        if (index >= 0) {
+            currentValues.splice(index, 1);
+            this.enrichedCurrentRegistrars.set([...currentValues]);
+            // Also update the rightsDetails to reflect removal
+            this.rightsDetails = this.rightsDetails.filter((reg: any) => reg !== item.code);
+        }
     }
     openRightsSidebar(user: any) {
         this.router.navigate(['/users', user.id, 'rights']);
