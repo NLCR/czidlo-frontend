@@ -271,13 +271,13 @@ export class ApiService {
             tap({
                 next: (data) => {
                     console.log('Statistics data received:', data);
-                }
+                },
             })
         );
     }
 
     getRecords(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_5/_search';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_6/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -301,7 +301,7 @@ export class ApiService {
         );
     }
     getRecordCount(body?: any): Observable<number> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_5/_count';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_6/_count';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -320,13 +320,20 @@ export class ApiService {
     getRecordByUrnnbn(urnnbn: string): Observable<any> {
         // const url = `https://resolver.nkp.cz/api/v6/resolver/${urnnbn}?format=json`;
         // return this.http.get(url).pipe(catchError(this.handleError));
-        return of(this.testRecord).pipe( delay(500) );
+        return of(this.testRecord).pipe(delay(500));
     }
 
     testRecord = {
         digitalDocument: {
             id: 3347809,
-            urnNbn: 'urn:nbn:cz:nk-0076n5',
+            urnNbn: {
+                value: 'urn:nbn:cz:mzk-005jh2',
+                status: 'ACTIVE',
+                registrarCode: 'mzk',
+                documentCode: '005jh2',
+                digitalDocumentId: 64440,
+                registered: '2018-07-09T20:26:00.720+02:00',
+            },
             created: '2023-05-15T17:33:40.811+02:00',
             monograph: {
                 created: '2023-05-15T17:33:40.767+02:00',

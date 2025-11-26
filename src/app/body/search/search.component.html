@@ -33,6 +33,8 @@
             {{ 'search.records-found' | translate }}: {{ searchService.recordsCount() }}
         </div>
     </div>
+
+    <!-- SEARCH RESULTS -->
     <div class="app-search-results" *ngIf="searchService.searchResults().length > 0">
         <div class="app-search-card" *ngFor="let item of searchService.searchResults()">
             <div class="app-card-header" [ngClass]="{ opened: item.opened }" (click)="onSelectItem(item)">
@@ -41,7 +43,7 @@
                     <div class="app-title-part">{{ item.title }}</div>
                     <div class="app-title-part" *ngIf="item.volumetitle">- {{ item.volumetitle }}</div>
                     <div class="app-title-part" *ngIf="item.sdtitle">({{ item.sdtitle }})</div>
-                    <div class="app-title-part" *ngIf="item.entitytype">({{ item.entitytype }})</div>
+                    <div class="app-title-part" *ngIf="item.documenttype">({{ item.documenttype }})</div>
                 </div>
             </div>
             <div class="app-card-content" [ngClass]="{ opened: item.opened }" *ngIf="item.opened">
@@ -83,9 +85,39 @@
                         <div class="app-label">{{ 'search.otheroriginator' | translate }}:</div>
                         <div class="app-value">{{ item.otheroriginator }}</div>
                     </div>
+                    <div class="app-ie-field" *ngIf="item.sdtitle">
+                        <div class="app-label">{{ 'search.sdtitle' | translate }}:</div>
+                        <div class="app-value">{{ item.sdtitle }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.sdvolumetitle">
+                        <div class="app-label">{{ 'search.sdvolumetitle' | translate }}:</div>
+                        <div class="app-value">{{ item.sdvolumetitle }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.sdissuetitle">
+                        <div class="app-label">{{ 'search.sdissuetitle' | translate }}:</div>
+                        <div class="app-value">{{ item.sdissuetitle }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.ccnb">
+                        <div class="app-label">{{ 'search.ccnb' | translate }}:</div>
+                        <div class="app-value">{{ item.ccnb }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.issn">
+                        <div class="app-label">{{ 'search.issn' | translate }}:</div>
+                        <div class="app-value">{{ item.issn }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.isbn">
+                        <div class="app-label">{{ 'search.isbn' | translate }}:</div>
+                        <div class="app-value">{{ item.isbn }}</div>
+                    </div>
+
+                    <div class="app-button-part" *ngIf="isAdmin()">
+                        <app-button variant="primary" size="s" (click)="editItem(item)">
+                            <span>{{ 'buttons.edit' | translate }}</span>
+                        </app-button>
+                    </div>
 
                     <!-- ZDROJOVY DOKUMENT -->
-                    <div class="app-ie-source-document" [ngClass]="{ opened: item.sdtitleopen }" *ngIf="item.sdtitle">
+                    <!-- <div class="app-ie-source-document" [ngClass]="{ opened: item.sdtitleopen }" *ngIf="item.sdtitle">
                         <div class="app-ie-header app-ie-source-document-header" (click)="toggleSdInfo(item)">
                             <img [src]="item.sdtitleopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                             <div class="app-part-title">
@@ -95,33 +127,8 @@
                                 <div>{{ item.sdissuetitle }}</div>
                             </div>
                         </div>
-                        <div class="app-ie-content app-ie-source-document-content" *ngIf="item.sdtitleopen">
-                            <div class="app-ie-field" *ngIf="item.sdtitle">
-                                <div class="app-label">{{ 'search.title' | translate }}:</div>
-                                <div class="app-value">{{ item.sdtitle }}</div>
-                            </div>
-                            <div class="app-ie-field" *ngIf="item.sdvolumetitle">
-                                <div class="app-label">{{ 'search.volumetitle' | translate }}:</div>
-                                <div class="app-value">{{ item.sdvolumetitle }}</div>
-                            </div>
-                            <div class="app-ie-field" *ngIf="item.sdissuetitle">
-                                <div class="app-label">{{ 'search.issuetitle' | translate }}:</div>
-                                <div class="app-value">{{ item.sdissuetitle }}</div>
-                            </div>
-                            <div class="app-ie-field" *ngIf="item.ccnb">
-                                <div class="app-label">{{ 'search.ccnb' | translate }}:</div>
-                                <div class="app-value">{{ item.ccnb }}</div>
-                            </div>
-                            <div class="app-ie-field" *ngIf="item.issn">
-                                <div class="app-label">{{ 'search.issn' | translate }}:</div>
-                                <div class="app-value">{{ item.issn }}</div>
-                            </div>
-                            <div class="app-ie-field" *ngIf="item.isbn">
-                                <div class="app-label">{{ 'search.isbn' | translate }}:</div>
-                                <div class="app-value">{{ item.isbn }}</div>
-                            </div>
-                        </div>
-                    </div>
+                        <div class="app-ie-content app-ie-source-document-content" *ngIf="item.sdtitleopen"></div>
+                    </div> -->
 
                     <!-- DIGITALNI DOKUMENT -->
                     <div class="app-ie-digital-document" [ngClass]="{ opened: item.ddopen }" *ngIf="item.details?.digitalDocument">
@@ -134,9 +141,10 @@
                             </div>
                         </div>
                         <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.ddopen">
-                            <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.urnNbn">
+                            <!-- URNNBN USER -->
+                            <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.urnNbn && !isAdmin()">
                                 <!-- <div class="app-label">{{ 'search.urnNbn' | translate }}:</div> -->
-                                <div class="app-value">{{ item.details.digitalDocument.urnNbn }}</div>
+                                <div class="app-value">{{ item.details.digitalDocument.urnNbn.value }}</div>
                                 <div class="app-value-2">
                                     ({{ 'search.registered' | translate }} {{ item.details.digitalDocument.created | date }})
                                 </div>
@@ -153,6 +161,42 @@
                                     ({{ item.details.digitalDocument?.archiver?.description }})
                                 </div>
                             </div>
+                            <div class="app-button-part">
+                                <app-button variant="primary" size="s" (click)="editDigitalDocument(item)">
+                                    <span>{{ 'buttons.edit' | translate }}</span>
+                                </app-button>
+                            </div>
+
+                            <!-- URNNBN ADMIN -->
+                            <div class="app-ie-urnnbn" *ngIf="isAdmin()">
+                                <div class="app-ie-header" (click)="item.urnopen = !item.urnopen">
+                                    <img [src]="item.urnopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                                    <div class="app-part-title">
+                                        <div class="app-label-2">{{ item.details?.digitalDocument?.urnNbn?.value }}</div>
+                                        <app-button variant="tertiary" size="xs">XML →</app-button>
+                                        <app-button variant="tertiary" size="xs">JSON →</app-button>
+                                    </div>
+                                </div>
+                                <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.urnopen">
+                                    <div class="app-ie-field">
+                                        <div class="app-label">{{ 'search.registered' | translate }}:</div>
+                                        <div class="app-value">{{ item.details.digitalDocument.urnNbn.registered | date }}</div>
+                                    </div>
+                                    <div class="app-ie-field">
+                                        <div class="app-label">{{ 'search.status' | translate }}:</div>
+                                        <div class="app-value">{{ item.details.digitalDocument.urnNbn.status }}</div>
+                                    </div>
+                                    <div class="app-button-part">
+                                        <app-button variant="primary" size="s" (click)="deactivateURNNBN(item)">
+                                            <span>{{ 'buttons.deactivate' | translate }}</span>
+                                        </app-button>
+                                        <app-button variant="primary" size="s" (click)="addInstance(item)">
+                                            <span>{{ 'buttons.add-instance' | translate }}</span>
+                                        </app-button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- TECHNICKA METADATA -->
                             <div
                                 class="app-ie-technical-metadata"
@@ -243,7 +287,7 @@
                                         <div class="app-ie-field" *ngIf="di.digitalLibrary">
                                             <div class="app-label">{{ 'search.digitalLibrary' | translate }}:</div>
                                             <div class="app-value">{{ di.digitalLibrary.name }}</div>
-                                            <app-button variant="tertiary" size="xs">{{'search.didetails' | translate }} →</app-button>
+                                            <app-button variant="tertiary" size="xs">{{ 'search.didetails' | translate }} →</app-button>
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.format">
                                             <div class="app-label">{{ 'search.format' | translate }}:</div>
@@ -270,19 +314,22 @@
                 </div>
             </div>
         </div>
-        <div class="app-no-results" *ngIf="pages.length === 0">
-            <h1 class="app-no-results-title">{{ 'search.no-results-title' | translate }}</h1>
-            <div class="app-no-results-text">{{ 'search.no-results-text-1' | translate }}</div>
-            <div class="app-no-results-text">
-                {{ 'search.no-results-text-2' | translate }}
-                <a href="mailto:resolver-podpora@nkp.cz">resolver-podpora&#64;nkp.cz</a>
-                .
-            </div>
+    </div>
+
+    <!-- NO RESULTS -->
+    <div class="app-no-results" *ngIf="searchService.recordsCount() === 0">
+        <h1 class="app-no-results-title">{{ 'search.no-results-title' | translate }}</h1>
+        <div class="app-no-results-text">{{ 'search.no-results-text-1' | translate }}</div>
+        <div class="app-no-results-text">
+            {{ 'search.no-results-text-2' | translate }}
+            <a href="mailto:resolver-podpora@nkp.cz">resolver-podpora&#64;nkp.cz</a>
+            .
         </div>
     </div>
 
-    <div class="app-search-footer">
-        <div class="app-paginator" *ngIf="pages.length > 1">
+    <!-- PAGINATOR -->
+    <div class="app-search-footer" *ngIf="pages.length > 1">
+        <div class="app-paginator">
             <div class="app-pages">
                 <div class="app-page-items">
                     <div

@@ -25,17 +25,28 @@ export class SearchComponent implements AfterViewInit {
     from: number = 0;
     to: number = 0;
     count: number = 0;
+    isAdmin = signal(true); // TODO: nahradit reálnou kontrolou práv
+
     constructor(public searchService: SearchService, private router: Router, private route: ActivatedRoute, private apiService: ApiService) {}
 
     ngOnInit() {
         this.route.queryParams.subscribe((params) => {
-            if (params['q']) {
-                this.searchQuery = params['q'];
-                this.selectedType = params['type'] || '';
-                this.currentPage = params['page'] ? parseInt(params['page'], 10) : 1;
-                this.searchService.search(this.searchQuery, this.selectedType, this.currentPage).subscribe(() => {
-                    this.updatePagination();
-                });
+            const q = params['q'] ?? '';
+            const type = params['type'] ?? '';
+            const page = params['page'] ? parseInt(params['page'], 10) : 1;
+
+            this.searchQuery = q;
+            this.selectedType = type;
+            this.currentPage = page;
+
+            this.searchService.search(q, type, page).subscribe(() => {
+                this.updatePagination();
+            });
+        });
+
+        this.apiService.getRecordCount().subscribe({
+            next: (response) => {
+                console.log('Record count received:', response);
             }
         });
     }
@@ -46,15 +57,31 @@ export class SearchComponent implements AfterViewInit {
 
     onSearch(query: string, type?: string) {
         this.currentPage = 1;
-        this.updateUrlParams();
-        this.searchService.search(query, this.selectedType);
+        this.router.navigate([], {
+            queryParams: {
+                q: query || null,
+                type: type ?? (this.selectedType || null),
+                page: 1,
+            },
+            queryParamsHandling: 'merge',
+        });
     }
 
     updateUrlParams() {
         const queryParams: any = {};
-        queryParams['page'] = this.currentPage;
-        queryParams['q'] = this.searchQuery;
-        queryParams['type'] = this.selectedType;
+        if (this.searchQuery) {
+            queryParams['q'] = this.searchQuery;
+        } else {
+            queryParams['q'] = null;
+        }
+        if (this.selectedType) {
+            queryParams['type'] = this.selectedType;
+        } else {
+            queryParams['type'] = null;
+        }
+        if (this.currentPage) {
+            queryParams['page'] = this.currentPage;
+        }
         this.router.navigate([], {
             queryParams: queryParams,
             queryParamsHandling: 'merge',
@@ -90,15 +117,33 @@ export class SearchComponent implements AfterViewInit {
         item.sdtitleopen = !item.sdtitleopen;
     }
 
+    editItem(item: any) {
+        console.log('Edit item', item);
+    }
+    editDigitalDocument(item: any) {
+        console.log('Edit digital document for item', item);
+    }
+    deactivateURNNBN(item: any) {
+        console.log('Deactivate URNNBN for item', item);
+    }
+    addInstance(item: any) {
+        console.log('Add digital instance for item', item);
+    }
+
     // PAGINATOR
     changePage(page: number) {
-        console.log(page, this.currentPage, this.lastPage);
-        if (page < 1 || page > this.lastPage) {
-            return;
-        }
-        this.currentPage = page;
-        this.updateUrlParams();
+        if (page < 1 || page > this.lastPage) return;
+
+        this.router.navigate([], {
+            queryParams: {
+                q: this.searchQuery || null,
+                type: this.selectedType || null,
+                page: page,
+            },
+            queryParamsHandling: 'merge',
+        });
     }
+
     updatePagination() {
         this.count = this.searchService.recordsCount();
 

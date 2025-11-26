@@ -92,7 +92,10 @@
         "logout": "Odhlásit se",
         "open": "Otevřít",
         "details": "Podrobnosti",
-        "search": "Hledat"
+        "search": "Hledat",
+        "deactivate": "Deaktivovat",
+        "reactivate": "Reaktivovat",
+        "add-instance": "Přidat instanci"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
@@ -337,8 +340,8 @@
         "sd": "Zdrojový dokument",
         "dd": "Digitální dokument",
         "sdtitle": "název zdrojového dokumentu",
-        "sdvolumetitle": "název svazku zdrojového dokumentu",
-        "sdissuetitle": "název čísla zdrojového dokumentu",
+        "sdvolumetitle": "ročník zdrojového dokumentu",
+        "sdissuetitle": "číslo zdrojového dokumentu",
         "ccnb": "čČNB",
         "isbn": "ISBN",
         "issn": "ISSN",
@@ -362,6 +365,7 @@
         "digitalLibrary": "digitální knihovna",
         "didetails": "Podrobnosti",
         "financed": "financováno",
+        "status": "status",
         "contractNumber": "číslo zakázky",
         "records-found": "Nalezené záznamy",
         "no-results-title": "Žádné výsledky vyhledávání",

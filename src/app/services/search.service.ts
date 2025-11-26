@@ -65,7 +65,7 @@ export class SearchService {
         if (docType) {
             body.query.bool.filter.push({
                 term: {
-                    'entitytype.keyword': docType,
+                    'documenttype.keyword': docType,
                 },
             });
         }
