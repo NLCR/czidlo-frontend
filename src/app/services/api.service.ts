@@ -277,7 +277,7 @@ export class ApiService {
     }
 
     getRecords(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_3/_search';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_5/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -301,7 +301,7 @@ export class ApiService {
         );
     }
     getRecordCount(body?: any): Observable<number> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_3/_count';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_5/_count';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -315,19 +315,6 @@ export class ApiService {
         } else {
             return this.http.post<any>(url, body, { headers });
         }
-    }
-
-    getElasticStructure(): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_2/_mapping';
-        const login = 'czidlo_reader';
-        const password = 'dq7o8rDrXZzhiS20qm';
-
-        const headers = new HttpHeaders({
-            Authorization: 'Basic ' + btoa(`${login}:${password}`),
-            'Content-Type': 'application/json',
-        });
-
-        return this.http.get(url, { headers }).pipe(catchError(this.handleError));
     }
 
     getRecordByUrnnbn(urnnbn: string): Observable<any> {

@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { from, Observable, of, throwError } from 'rxjs';
 import { tap, map, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { id } from '@swimlane/ngx-charts';
@@ -7,17 +7,19 @@ import { id } from '@swimlane/ngx-charts';
 @Injectable({ providedIn: 'root' })
 export class SearchService {
     query = signal<string>('');
+    pageSize = signal<number>(100);
     searchResults = signal<any[]>([]);
     recordsCount = signal<number>(0);
     isLoading = signal<boolean>(false);
 
     constructor(private apiService: ApiService) {}
 
-    search(term: string, docType?: string): Observable<any> {
+    search(term: string, docType?: string, page: number = 1): Observable<any> {
         this.query.set(term);
 
         const body: any = {
-            size: 200,
+            from: (page - 1) * this.pageSize(),
+            size: this.pageSize(),
             query: {
                 bool: {
                     must: [],
@@ -33,19 +35,21 @@ export class SearchService {
             let registratorCode = parts[parts.length - 1].split('-')[0];
             body.query.bool.must.push({
                 match_phrase: {
-                    'urnnbns.documentcode': code,
-                }
+                    documentcode: code,
+                },
             });
             body.query.bool.must.push({
                 match_phrase: {
-                    'urnnbns.registrarcode': registratorCode,
+                    registrarcode: registratorCode,
                 },
             });
         } else {
-            // 🔍 2) Běžný fulltext
             body.query.bool.must.push({
-                match: {
-                    'intelectualentity.ieidentifiers.idvalue': term,
+                multi_match: {
+                    query: term,
+                    fields: ['title', 'subtitle', 'volumetitle', 'issuetitle'],
+                    type: 'cross_fields',
+                    operator: 'and',
                 },
             });
         }
@@ -54,7 +58,7 @@ export class SearchService {
         if (docType) {
             body.query.bool.filter.push({
                 term: {
-                    'intelectualentity.entitytype.keyword': docType,
+                    'entitytype.keyword': docType,
                 },
             });
         }
@@ -67,32 +71,17 @@ export class SearchService {
                 next: (data) => {
                     let results = data.hits.hits.map((hit: any) => ({
                         ...hit._source,
-                        title: hit._source.intelectualentity?.ieidentifiers.find((id: any) => id.type === 'TITLE')?.idvalue
-                            ? hit._source.intelectualentity?.ieidentifiers.find((id: any) => id.type === 'TITLE').idvalue
-                            : '',
-                        subtitle: hit._source.intelectualentity?.ieidentifiers.find((id: any) => id.type === 'SUB_TITLE')?.idvalue
-                            ? hit._source.intelectualentity?.ieidentifiers.find((id: any) => id.type === 'SUB_TITLE').idvalue
-                            : '',
-                        volume_title: hit._source.intelectualentity?.ieidentifiers.find((id: any) => id.type === 'VOLUME_TITLE')?.idvalue
-                            ? hit._source.intelectualentity?.ieidentifiers.find((id: any) => id.type === 'VOLUME_TITLE').idvalue
-                            : '',
-                        ie_type: hit._source.intelectualentity?.entitytype,
-                        opened: false,
-                        ccnb: hit._source.intelectualentity?.ieidentifiers.find((id: any) => id.type === 'CCNB')?.idvalue,
-                        isbn: hit._source.intelectualentity?.ieidentifiers.find((id: any) => id.type === 'ISBN')?.idvalue,
-                        created: hit._source.intelectualentity?.created,
-                        modified: hit._source.intelectualentity?.modified,
+                        urnnbn: hit._source.registrarcode && hit._source.documentcode ? `urn:nbn:cz:${hit._source.registrarcode}-${hit._source.documentcode}` : null,
                     }));
                     let recordsCount = data.hits.total.value;
                     this.searchResults.set(results);
                     this.recordsCount.set(recordsCount);
                     this.isLoading.set(false);
-                    console.log('Search results received:', this.searchResults(), this.recordsCount());
                 },
                 error: (error) => {
                     console.error('Error during search:', error);
                     this.isLoading.set(false);
-                }
+                },
             })
         );
     }

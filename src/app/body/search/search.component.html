@@ -13,26 +13,28 @@
         </app-button>
     </div>
     <div class="app-action">
-        <mat-form-field appearance="outline">
-            <mat-label>Typ dokumentu</mat-label>
-            <mat-select [(ngModel)]="selectedType" (selectionChange)="onTypeSelected()">
-                <mat-option value="">Vše</mat-option>
-                <mat-option value="MONOGRAPH">Monografie</mat-option>
-                <mat-option value="MONOGRAPH_VOLUME">Svazek monografie</mat-option>
-                <mat-option value="PERIODICAL">Periodikum</mat-option>
-                <mat-option value="PERIODICAL_VOLUME">Ročník periodika</mat-option>
-                <mat-option value="PERIODICAL_ISSUE">Číslo periodika</mat-option>
-                <mat-option value="ANALYTICAL">Článek</mat-option>
-                <mat-option value="THESIS">Thesis</mat-option>
-                <mat-option value="OTHER">Ostatní</mat-option>
-            </mat-select>
-        </mat-form-field>
-        <div class="app-records-count">
+        <div class="app-select-type">
+            <mat-form-field appearance="outline">
+                <mat-label>Typ dokumentu</mat-label>
+                <mat-select [(ngModel)]="selectedType" (selectionChange)="onTypeSelected()">
+                    <mat-option value="">Vše</mat-option>
+                    <mat-option value="MONOGRAPH">Monografie</mat-option>
+                    <mat-option value="MONOGRAPH_VOLUME">Svazek monografie</mat-option>
+                    <mat-option value="PERIODICAL">Periodikum</mat-option>
+                    <mat-option value="PERIODICAL_VOLUME">Ročník periodika</mat-option>
+                    <mat-option value="PERIODICAL_ISSUE">Číslo periodika</mat-option>
+                    <mat-option value="ANALYTICAL">Článek</mat-option>
+                    <mat-option value="THESIS">Thesis</mat-option>
+                    <mat-option value="OTHER">Ostatní</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="app-records-count" *ngIf="searchService.recordsCount() > 0">
             {{ 'search.records-found' | translate }}: {{ searchService.recordsCount() }}
         </div>
     </div>
-    <div class="app-search-results">
-        <div class="app-search-card" *ngFor="let item of searchService.searchResults()" >
+    <div class="app-search-results" *ngIf="searchService.searchResults().length > 0">
+        <div class="app-search-card" *ngFor="let item of searchService.searchResults()">
             <div class="app-card-header" (click)="onSelectItem(item)">
                 <img src="assets/icons/arrow-down2.svg" />
                 <div class="app-card-title">
@@ -44,7 +46,7 @@
             <div class="app-card-content" [ngClass]="{ opened: item.opened }" *ngIf="item.opened">
                 <div class="app-ie-info">
                     <div class="app-ie-field app-link-cnb" *ngIf="item.ccnb">
-                        <a href="{{ item.ccnb }}" target="_blank" rel="noopener">
+                        <a href="https://aleph.nkp.cz/F/?func=direct&doc_number={{ item.ccnb.split('cnb')[1] }}&local_base=CNB" target="_blank" rel="noopener">
                             {{ 'search.cnb-link' | translate }}
                         </a>
                     </div>
@@ -90,6 +92,62 @@
                     </div>
                 </div>
                 <pre>{{ item | json }}</pre>
+            </div>
+        </div>
+    </div>
+    <div class="app-no-results" *ngIf="pages.length === 0">
+        <h1 class="app-no-results-title">{{ 'search.no-results-title' | translate }}</h1>
+        <div class="app-no-results-text">{{ 'search.no-results-text-1' | translate }}</div>
+        <div class="app-no-results-text">
+            {{ 'search.no-results-text-2' | translate }}
+            <a href="mailto:resolver-podpora@nkp.cz">resolver-podpora&#64;nkp.cz</a>
+            .
+        </div>
+    </div>
+</div>
+
+<div class="app-search-footer">
+    <div class="app-paginator" *ngIf="pages.length > 1">
+        <div class="app-pages">
+            <div class="app-page-items">
+                <div
+                    class="app-page"
+                    *ngFor="let page of displayedFirstPages"
+                    [ngClass]="{ 'app-active': page === currentPage }"
+                    (click)="changePage(page)"
+                >
+                    {{ page }}
+                </div>
+            </div>
+            <div class="app-dots" *ngIf="pages.length > 4">...</div>
+            <div class="app-page-items" *ngIf="displayedMiddlePages.length > 0">
+                <div
+                    class="app-page"
+                    *ngFor="let page of displayedMiddlePages"
+                    [ngClass]="{ 'app-active': page === currentPage }"
+                    (click)="changePage(page)"
+                >
+                    {{ page }}
+                </div>
+            </div>
+            <div class="app-dots" *ngIf="displayedMiddlePages.length > 0">...</div>
+            <div class="app-page-items" *ngIf="pages.length > 4">
+                <div
+                    class="app-page"
+                    *ngFor="let page of displayedLastPages"
+                    [ngClass]="{ 'app-active': page === currentPage }"
+                    (click)="changePage(page)"
+                >
+                    {{ page }}
+                </div>
+            </div>
+        </div>
+        <div class="app-navigation">
+            <div class="app-navigation-button" (click)="changePage(currentPage - 1)" [ngClass]="{ disabled: currentPage === 1 }">
+                <img class="app-navigation-icon" src="assets/icons/arrow-left-white.svg" />
+            </div>
+            <div class="app-navigation-button" (click)="changePage(currentPage + 1)" [ngClass]="{ disabled: currentPage === lastPage }">
+                <img class="app-navigation-icon" src="assets/icons/arrow-right-white.svg" />
             </div>
         </div>
     </div>
