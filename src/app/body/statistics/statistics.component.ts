@@ -1,7 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StatisticsService } from '../../services/statistics.service';
-import { ApiService } from '../../services/api.service';
 
 @Component({
     selector: 'app-statistics',
@@ -24,12 +23,7 @@ export class StatisticsComponent {
         domain: ['#0080a8', '#00bcd4', '#4dd0e1'],
     };
 
-    constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private statisticsService: StatisticsService,
-        private apiService: ApiService
-    ) {}
+    constructor(private router: Router, private route: ActivatedRoute, private statisticsService: StatisticsService) {}
 
     ngOnInit() {
         this.route.url.subscribe((url) => {
@@ -40,91 +34,84 @@ export class StatisticsComponent {
                 this.router.navigate(['assignments'], { relativeTo: this.route });
             }
         });
-        // RECORDS
-        this.statisticsService.getRecords().subscribe({
-            next: (response) => {
-                console.log('Records for statistics:', response);
-                this.records.set(response.hits.hits);
-            },
-            error: (error) => {
-                console.error('Error fetching records count for statistics:', error);
-            },
+        // FILTERS FROM URL
+        this.route.queryParams.subscribe((params) => {
+            const year = params['year'] || null;
+            const registrar = params['registrar'] || null;
+
+            this.selectedYear.set(year);
+            this.selectedRegistrar.set(registrar);
+
+            // vždy načteme základní dataset s filtry
+            this.reloadData(year, registrar);
         });
-        // COUNT BY YEARS
-        this.statisticsService.getCountByDate().subscribe({
-            next: (response) => {
-                console.log('Records by years for statistics:', response);
-                this.chartDataByDate.set(response);
-            },
+    }
+
+    private reloadData(year: string | null, registrar: string | null) {
+        const y = year || undefined;
+        const r = registrar || undefined;
+
+        this.statisticsService.getCountByDate(r, y).subscribe((data) => {
+            this.chartDataByDate.set(data);
         });
-        // COUNT BY REGISTRARS
-        this.statisticsService.getCountByRegistrar().subscribe({
-            next: (data) => this.chartDataByRegistrar.set(data),
+
+        this.statisticsService.getCountByRegistrar(y).subscribe((data) => {
+            this.chartDataByRegistrar.set(data);
         });
+
+        if (r) {
+            this.statisticsService.getCountByEntityTypes(r, y).subscribe((data) => {
+                this.chartDataByEntityTypes.set(data);
+            });
+        } else {
+            this.chartDataByEntityTypes.set([]);
+        }
     }
 
     onYearClick(event: any) {
         if (this.selectedYear()) {
             return;
         }
-        const year = event.name; // '2012'
-        this.selectedYear.set(year);
-        const registrar = this.selectedRegistrar() || null;
-        console.log('Clicked year:', event, registrar);
+        const year = event.name;
+        const registrar = this.selectedRegistrar();
 
-        this.statisticsService.getCountByDate(registrar, year).subscribe({
-            next: (data) => this.chartDataByDate.set(data),
-            error: (err) => console.error('Error loading months:', err),
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {
+                year,
+                registrar: registrar || null,
+            },
+            queryParamsHandling: 'merge',
         });
-        if (registrar) {
-            this.statisticsService.getCountByEntityTypes(registrar, year).subscribe({
-                next: (data) => this.chartDataByEntityTypes.set(data),
-            });
-        } else {
-            this.statisticsService.getCountByRegistrar(year).subscribe({
-                next: (data) => this.chartDataByRegistrar.set(data),
-            });
-        }
     }
 
     onRegistrarClick(event: any) {
-        const registrar = event.name; // 'XYZ'
-        this.selectedRegistrar.set(registrar);
-        const year = this.selectedYear() || null;
-        console.log('Clicked registrar:', event);
+        const registrar = event.name;
+        const year = this.selectedYear();
 
-        this.statisticsService.getCountByEntityTypes(registrar).subscribe({
-            next: (data) => this.chartDataByEntityTypes.set(data),
-            error: (err) => console.error('Error loading entity types:', err),
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {
+                registrar,
+                year: year || null,
+            },
+            queryParamsHandling: 'merge',
         });
-
-        if (year) {
-            this.statisticsService.getCountByEntityTypes(registrar, year).subscribe({
-                next: (data) => this.chartDataByEntityTypes.set(data),
-            });
-            this.statisticsService.getCountByDate(registrar, year).subscribe({
-                next: (data) => this.chartDataByDate.set(data),
-            });
-        } else {
-            this.statisticsService.getCountByRegistrar().subscribe({
-                next: (data) => this.chartDataByRegistrar.set(data),
-            });
-            this.statisticsService.getCountByDate(registrar).subscribe({
-                next: (data) => this.chartDataByDate.set(data),
-            });
-        }
     }
 
     onYearCancel() {
-        this.selectedYear.set(null);
-        this.statisticsService.getCountByRegistrar().subscribe({
-            next: (data) => this.chartDataByRegistrar.set(data),
-        });
-        this.statisticsService.getCountByDate().subscribe({
-            next: (data) => this.chartDataByDate.set(data),
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { year: null },
+            queryParamsHandling: 'merge',
         });
     }
+
     onRegistrarCancel() {
-        this.selectedRegistrar.set(null);
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { registrar: null },
+            queryParamsHandling: 'merge',
+        });
     }
 }

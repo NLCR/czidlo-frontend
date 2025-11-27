@@ -36,6 +36,8 @@
                     <ngx-charts-bar-vertical
                         [scheme]="colorScheme"
                         [view]="[800, 300]"
+                        [animations]="true"
+                        [barPadding]="2"
                         [results]="chartDataByDate()"
                         [gradient]="false"
                         [xAxis]="true"
@@ -54,6 +56,7 @@
                     <ngx-charts-pie-chart
                         [results]="chartDataByRegistrar()"
                         [view]="[800, 300]"
+                        [animations]="false"
                         [legend]="true"
                         [labels]="true"
                         [doughnut]="false"
@@ -81,6 +84,7 @@
                     <ngx-charts-pie-chart
                         [results]="chartDataByEntityTypes()"
                         [view]="[800, 300]"
+                        [animations]="false"
                         [legend]="true"
                         [labels]="true"
                         [doughnut]="false"

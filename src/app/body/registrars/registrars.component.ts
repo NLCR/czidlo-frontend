@@ -542,5 +542,6 @@ export class RegistrarsComponent {
     }
     openStatistics(registrarCode: string): void {
         console.log('Open statistics for registrar:', registrarCode);
+        this.router.navigate(['/statistics/assignments'], { queryParams: { registrar: registrarCode } });
     }
 }

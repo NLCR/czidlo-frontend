@@ -110,7 +110,6 @@ export class UsersComponent {
     addSelectedRegistrars() {
         const selectedRegs = this.registrarsControl.value || [];
         const selectedCodes = selectedRegs.map((r: any) => r.code);
-        selectedCodes.push('avs');
 
         if (selectedCodes.length === 0) return;
 
