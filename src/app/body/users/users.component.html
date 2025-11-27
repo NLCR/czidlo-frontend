@@ -147,7 +147,7 @@
                 <div class="app-section">
                     <div class="app-section-title">{{ 'users.add-new-rights' | translate }}</div>
                     <!-- REGISTRAR -->
-                    <div class="app-section-part" *ngIf="filteredRegistrars().length > 0">
+                    <div class="app-section-part app-add-registrar-part" *ngIf="filteredRegistrars().length > 0">
                         <div class="app-base-input-container">
                             <div class="app-base-input app-multiselect">
                                 <!-- <div class="app-base-input-label">{{ 'processes.filter-by-registrar' | translate }} URN:NBN</div> -->
@@ -186,7 +186,7 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" (click)="addSelectedRegistrars()" [disabled]="registrarsControl.value?.length === 0">
+                <app-button variant="primary" size="l" (click)="addSelectedRegistrars()" [disabled]="!registrarsControl.value || registrarsControl.value.length === 0">
                     {{ 'buttons.add' | translate }}
                 </app-button>
             </div>

@@ -245,11 +245,11 @@ export class ApiService {
     }
     assignUserRights(id: string, registrarId: string) {
         const url = `${this.apiUrl}/users/${id}/registrar_rights/${registrarId}`;
-        return this.http.post(url, {}).pipe(catchError(this.handleError));
+        return this.http.post(url, {});
     }
     removeUserRights(id: string, registrarId: string) {
         const url = `${this.apiUrl}/users/${id}/registrar_rights/${registrarId}`;
-        return this.http.delete(url).pipe(catchError(this.handleError));
+        return this.http.delete(url);
     }
     getUserRights(id: string): Observable<any> {
         const url = `${this.apiUrl}/users/${id}/registrar_rights`;

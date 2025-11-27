@@ -10,6 +10,8 @@ import { EditPasswordDialogComponent } from '../../dialogs/edit-password-dialog/
 import { TranslateService } from '@ngx-translate/core';
 import { RegistrarsService } from '../../services/registrars.service';
 import { FormControl } from '@angular/forms';
+import { forkJoin, of, map } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-users',
@@ -106,34 +108,60 @@ export class UsersComponent {
         });
     }
     addSelectedRegistrars() {
-        const selectedCodes = (this.registrarsControl.value || []).map((reg: any) => reg.code);
-        selectedCodes.forEach((code: string) => {
-            this.usersService.assignUserRights(this.activeUser.id, code).subscribe({
-                next: (response) => {
-                    console.log('User rights updated successfully:', response);
-                    this._snackBar.open(this.translate.instant('messages.user-rights-updated-successfully'), 'Close', { duration: 2000 });
-                    const selectedValues = this.registrarsControl.value || [];
-                    if (selectedValues.length === 0) {
-                        return;
-                    }
-                    const currentValues = this.enrichedCurrentRegistrars();
-                    selectedValues.forEach((reg: any) => {
-                        currentValues.push(reg);
-                    });
-                    this.enrichedCurrentRegistrars.set([...currentValues]);
-                    // Update filtered registrars
-                    let updatedFiltered = this.filteredRegistrars().filter((reg) => {
-                        return !selectedValues.find((selReg: any) => selReg.code === reg.code);
-                    });
-                    this.filteredRegistrars.set(updatedFiltered);
-                    // Clear selection
-                    this.registrarsControl.setValue([]);
-                },
-                error: (error) => {
-                    console.error('Error updating user rights:', error);
-                    this._snackBar.open(this.translate.instant('messages.error-updating-user-rights'), 'Close', { duration: 2000 });
-                },
-            });
+        const selectedRegs = this.registrarsControl.value || [];
+        const selectedCodes = selectedRegs.map((r: any) => r.code);
+        selectedCodes.push('avs');
+
+        if (selectedCodes.length === 0) return;
+
+        // 1) Připravíme si pole requestů – každý vrátí buď {code, success: true}
+        //    nebo {code, success: false, error}
+        const requests = selectedCodes.map((code: string) =>
+            this.usersService.assignUserRights(this.activeUser.id, code).pipe(
+                map((res) => ({
+                    code,
+                    success: true,
+                    response: res,
+                })),
+                catchError((err) =>
+                    of({
+                        code,
+                        success: false,
+                        error: err,
+                    })
+                )
+            )
+        );
+        // 2) Spustíme všechny najednou
+        forkJoin(requests).subscribe((results: any) => {
+            console.log(results);
+            const successes = results.filter((r: any) => r.success);
+            const failures = results.filter((r: any) => !r.success);
+
+            // 3) Zpracování úspěšných
+            if (successes.length > 0) {
+                const currentValues = this.enrichedCurrentRegistrars();
+                successes.forEach((s: any) => {
+                    const reg = selectedRegs.find((r: any) => r.code === s.code);
+                    if (reg) currentValues.push(reg);
+                });
+                this.enrichedCurrentRegistrars.set([...currentValues]);
+
+                // aktualizace filteredRegistrars
+                const updatedFiltered = this.filteredRegistrars().filter((reg) => !successes.find((s: any) => s.code === reg.code));
+                this.filteredRegistrars.set(updatedFiltered);
+
+                this._snackBar.open(this.translate.instant('messages.user-rights-updated-successfully'), 'Close', { duration: 2000 });
+            }
+
+            // 4) Zpracování chyb
+            if (failures.length > 0) {
+                const failedCodes = failures.map((f: any) => f.code).join(', ');
+                this._snackBar.open(this.translate.instant('messages.error-updating-user-rights') + `: ${failedCodes}`, 'Close');
+            }
+
+            // 5) Vyčištění selection
+            this.registrarsControl.setValue([]);
         });
     }
 
@@ -199,9 +227,6 @@ export class UsersComponent {
         if (index >= 0) {
             currentValues.splice(index, 1);
             this.enrichedCurrentRegistrars.set([...currentValues]);
-            // Also update the rightsDetails to reflect removal
-            // this.rightsDetails = this.rightsDetails.filter((reg: any) => reg !== item.code);
-            // Add back to available registrars
             const allRegistrars = this.allRegistrars();
             const removedRegistrar = allRegistrars.find((reg) => reg.code === item.code);
             if (removedRegistrar) {

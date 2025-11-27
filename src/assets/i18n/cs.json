@@ -135,7 +135,9 @@
         "required-length-3-30": "Délka musí být mezi 3 a 30 znaky",
         "required-length-0-200": "Délka může být maximálně 200 znaků",
         "confirm-delete-registrar-title": "Opravdu chcete smazat registrátora",
-        "confirm-remove-registrar-right-title": "Opravdu chcete odebrat práva k registrátorovi"
+        "confirm-remove-registrar-right-title": "Opravdu chcete odebrat práva k registrátorovi",
+        "user-rights-updated-successfully": "Práva uživatele byla úspěšně aktualizována",
+        "error-updating-user-rights": "Chyba při aktualizaci práv pro registrátora"
     },
     "inputs": {
         "pick-start-date": "Vyberte od",
