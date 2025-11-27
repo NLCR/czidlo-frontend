@@ -47,7 +47,7 @@ export class SearchComponent implements AfterViewInit {
         this.apiService.getRecordCount().subscribe({
             next: (response) => {
                 console.log('Record count received:', response);
-            }
+            },
         });
     }
 
@@ -97,7 +97,13 @@ export class SearchComponent implements AfterViewInit {
             },
             error: (error) => {
                 console.error('Error fetching record details:', error);
+                item.loading = false;
             },
+            complete: () => {
+                console.log('Record details fetch complete', item.details);
+                item.opened = true;
+                item.loading = false;
+            }
         });
     }
     onTypeSelected() {
@@ -108,9 +114,11 @@ export class SearchComponent implements AfterViewInit {
 
     onSelectItem(item: any) {
         if (!item.details) {
+            item.loading = true;
             this.getDetails(item);
+        } else {
+            item.opened = !item.opened;
         }
-        item.opened = !item.opened;
     }
     toggleSdInfo(item: any) {
         console.log(item.sdtitleopen);

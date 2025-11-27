@@ -38,15 +38,23 @@
     <div class="app-search-results" *ngIf="searchService.searchResults().length > 0">
         <div class="app-search-card" *ngFor="let item of searchService.searchResults()">
             <div class="app-card-header" [ngClass]="{ opened: item.opened }" (click)="onSelectItem(item)">
-                <img [src]="item.opened ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
-                <div class="app-card-title">
-                    <div class="app-title-part">{{ item.title }}</div>
-                    <div class="app-title-part" *ngIf="item.volumetitle">- {{ item.volumetitle }}</div>
-                    <div class="app-title-part" *ngIf="item.sdtitle">({{ item.sdtitle }})</div>
-                    <div class="app-title-part" *ngIf="item.documenttype">({{ item.documenttype }})</div>
+                <div class="app-card-header-left">
+                    <img *ngIf="!item.loading" [src]="item.opened ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                    <div *ngIf="item.loading" class="loader"><mat-spinner diameter="24"></mat-spinner></div>
+                    <div class="app-card-title">
+                        <div class="app-title-part">{{ item.title }}</div>
+                        <div class="app-title-part" *ngIf="item.volumetitle">- {{ item.volumetitle }}</div>
+                        <div class="app-title-part" *ngIf="item.sdtitle">({{ item.sdtitle }})</div>
+                        <div class="app-title-part" *ngIf="item.documenttype">({{ item.documenttype }})</div>
+                    </div>
+                </div>
+                <div class="app-card-header-right">
+                    <div class="app-urn-nbn" *ngIf="item.documentcode && item.registrarcode" [ngClass]="item.active ? 'app-active' : 'app-not-active'">
+                        urn:nbn:cz:{{ item.registrarcode }}-{{ item.documentcode }}
+                    </div>
                 </div>
             </div>
-            <div class="app-card-content" [ngClass]="{ opened: item.opened }" *ngIf="item.opened">
+            <div class="app-card-content" [ngClass]="{ opened: item.opened }" *ngIf="item.opened && !item.loading">
                 <div class="app-ie-info">
                     <div class="app-ie-field app-link-cnb" *ngIf="item.ccnb">
                         <a
@@ -81,10 +89,34 @@
                         <div class="app-label">{{ 'search.author' | translate }}:</div>
                         <div class="app-value">{{ item.author }}</div>
                     </div>
+                    <div class="app-ie-field" *ngIf="item.corporation?.length > 0">
+                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-value">{{ item.corporation }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.event?.length > 0">
+                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-value">{{ item.event }}</div>
+                    </div>
                     <div class="app-ie-field" *ngIf="item.otheroriginator">
                         <div class="app-label">{{ 'search.otheroriginator' | translate }}:</div>
                         <div class="app-value">{{ item.otheroriginator }}</div>
                     </div>
+
+                    <!-- PUBLICATION -->
+                     <div class="app-ie-field" *ngIf="item.details && item.details?.digitalDocument?.monograph?.publication?.place">
+                        <div class="app-label">{{ 'search.place' | translate }}:</div>
+                        <div class="app-value">{{ item.details?.digitalDocument?.monograph?.publication?.place }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.details && item.details?.digitalDocument?.monograph?.publication?.publisher">
+                        <div class="app-label">{{ 'search.publisher' | translate }}:</div>
+                        <div class="app-value">{{ item.details?.digitalDocument?.monograph?.publication?.publisher }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.details && item.details?.digitalDocument?.monograph?.publication?.year">
+                        <div class="app-label">{{ 'search.year' | translate }}:</div>
+                        <div class="app-value">{{ item.details?.digitalDocument?.monograph?.publication?.year }}</div>
+                    </div>
+
+                    <!-- SOURCE TITLE -->
                     <div class="app-ie-field" *ngIf="item.sdtitle">
                         <div class="app-label">{{ 'search.sdtitle' | translate }}:</div>
                         <div class="app-value">{{ item.sdtitle }}</div>

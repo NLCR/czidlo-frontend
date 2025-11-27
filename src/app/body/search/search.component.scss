@@ -44,6 +44,26 @@
                 &.opened {
                     padding: 20px 16px 8px 16px;
                 }
+                .app-card-header-left {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 8px;
+                    flex: 1;
+                    img, .loader {
+                        padding: 5px 0 0 0;
+                    }
+                }
+                .app-card-header-right {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 8px;
+                    justify-content: flex-end;
+                    .app-urn-nbn {
+                        &.app-not-active {
+                            color: var(--Text-Light, #839fbd);
+                        }
+                    }
+                }
                 .app-card-title {
                     display: flex;
                     gap: 8px;

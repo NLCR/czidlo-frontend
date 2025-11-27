@@ -277,7 +277,7 @@ export class ApiService {
     }
 
     getRecords(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_6/_search';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_7/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -301,7 +301,7 @@ export class ApiService {
         );
     }
     getRecordCount(body?: any): Observable<number> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_6/_count';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_7/_count';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
