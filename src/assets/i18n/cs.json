@@ -63,7 +63,9 @@
         "edit-password-title-2": "změna hesla",
         "rights-details": "Nastavení práv uživatele",
         "current-rights": "Aktuální práva k registrátorům",
-        "add-new-rights": "Přidat práva k registrátorům"
+        "add-new-rights": "Přidat práva k registrátorům",
+        "no-current-rights": "Uživatel nemá přiřazena žádná práva k registrátorům.",
+        "no-registrars-available": "Nejsou dostupní žádní registrátoři pro přiřazení."
     },
     "buttons": {
         "rights": "Práva",
@@ -75,9 +77,11 @@
         "copy": "Zkopírovat",
         "download": "Stáhnout",
         "confirm": "Potvrdit",
+        "remove": "Odebrat",
         "confirm-delete": "Ano, smazat",
         "confirm-cancel": "Ano, zrušit",
         "confirm-kill": "Ano, ukončit",
+        "confirm-remove": "Ano, odebrat",
         "plan-process": "Naplánovat proces",
         "set-process": "Nastavit proces",
         "add": "Přidat",
@@ -98,7 +102,8 @@
         "search": "Hledat",
         "deactivate": "Deaktivovat",
         "reactivate": "Reaktivovat",
-        "add-instance": "Přidat instanci"
+        "add-instance": "Přidat instanci",
+        "remove-rights": "Odebrat práva"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
@@ -129,7 +134,8 @@
         "invalid-url": "Neplatná URL adresa.",
         "required-length-3-30": "Délka musí být mezi 3 a 30 znaky",
         "required-length-0-200": "Délka může být maximálně 200 znaků",
-        "confirm-delete-registrar-title": "Opravdu chcete smazat registrátora"
+        "confirm-delete-registrar-title": "Opravdu chcete smazat registrátora",
+        "confirm-remove-registrar-right-title": "Opravdu chcete odebrat práva k registrátorovi"
     },
     "inputs": {
         "pick-start-date": "Vyberte od",

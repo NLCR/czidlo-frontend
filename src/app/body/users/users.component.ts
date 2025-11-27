@@ -24,6 +24,8 @@ export class UsersComponent {
     activeUser: any = null;
     rightsDetails: any = null;
 
+    allRegistrars = signal<Array<any>>([]);
+    filteredRegistrars = signal<Array<any>>([]);
     registrars = signal<Array<any>>([]);
     selectedRegistrar = signal<any>(null);
     registrarsControl = new FormControl();
@@ -87,11 +89,11 @@ export class UsersComponent {
     loadRegistrars(currentRegistrars: any[]) {
         this.registrarsService.getRegistrars().subscribe({
             next: (response) => {
-                // this.registrars.set(response.items);
+                this.allRegistrars.set(response.items);
                 let filteredRegistars = response.items.filter((reg: any) => {
                     return !currentRegistrars.find((curReg) => curReg === reg.code);
                 });
-                this.registrars.set(filteredRegistars);
+                this.filteredRegistrars.set(filteredRegistars);
 
                 let enrichedRegistrars = currentRegistrars.map((regCode) => {
                     let field = { code: regCode, name: '' };
@@ -100,7 +102,38 @@ export class UsersComponent {
                         : field;
                 });
                 this.enrichedCurrentRegistrars.set(enrichedRegistrars);
-            }
+            },
+        });
+    }
+    addSelectedRegistrars() {
+        const selectedCodes = (this.registrarsControl.value || []).map((reg: any) => reg.code);
+        selectedCodes.forEach((code: string) => {
+            this.usersService.assignUserRights(this.activeUser.id, code).subscribe({
+                next: (response) => {
+                    console.log('User rights updated successfully:', response);
+                    this._snackBar.open(this.translate.instant('messages.user-rights-updated-successfully'), 'Close', { duration: 2000 });
+                    const selectedValues = this.registrarsControl.value || [];
+                    if (selectedValues.length === 0) {
+                        return;
+                    }
+                    const currentValues = this.enrichedCurrentRegistrars();
+                    selectedValues.forEach((reg: any) => {
+                        currentValues.push(reg);
+                    });
+                    this.enrichedCurrentRegistrars.set([...currentValues]);
+                    // Update filtered registrars
+                    let updatedFiltered = this.filteredRegistrars().filter((reg) => {
+                        return !selectedValues.find((selReg: any) => selReg.code === reg.code);
+                    });
+                    this.filteredRegistrars.set(updatedFiltered);
+                    // Clear selection
+                    this.registrarsControl.setValue([]);
+                },
+                error: (error) => {
+                    console.error('Error updating user rights:', error);
+                    this._snackBar.open(this.translate.instant('messages.error-updating-user-rights'), 'Close', { duration: 2000 });
+                },
+            });
         });
     }
 
@@ -120,23 +153,63 @@ export class UsersComponent {
     }
 
     removeSelectedRegistrar(item: any) {
-        const currentValues = this.registrarsControl.value || [];
-        const index = currentValues.indexOf(item);
+        const selectedValues = this.registrarsControl.value || [];
+        const index = selectedValues.indexOf(item);
         if (index >= 0) {
-            currentValues.splice(index, 1);
-            this.registrarsControl.setValue([...currentValues]);
+            selectedValues.splice(index, 1);
+            this.registrarsControl.setValue([...selectedValues]);
         }
     }
+
     removeCurrentRegistrar(item: any) {
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: {
+                title: 'messages.confirm-remove-registrar-right-title',
+                data: item,
+                warning: 'buttons.confirm-remove',
+            },
+            maxWidth: '600px',
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            console.log('Remove Registrar Right dialog closed:', result);
+            if (result === true) {
+                this.confirmRemoveCurrentRegistrar(item);
+            }
+        });
+    }
+
+    confirmRemoveCurrentRegistrar(item: any) {
+        this.usersService.removeUserRights(this.activeUser.id, item.code).subscribe({
+            next: (response) => {
+                console.log('User rights updated successfully:', response);
+                this._snackBar.open(this.translate.instant('messages.user-rights-updated-successfully'), 'Close', { duration: 2000 });
+                this.updateRegistrarListsAfterRemoval(item);
+            },
+            error: (error) => {
+                console.error('Error updating user rights:', error);
+                this._snackBar.open(this.translate.instant('messages.error-updating-user-rights'), 'Close', { duration: 2000 });
+            },
+        });
+    }
+
+    updateRegistrarListsAfterRemoval(item: any) {
         const currentValues = this.enrichedCurrentRegistrars();
         const index = currentValues.findIndex((reg) => reg.code === item.code);
         if (index >= 0) {
             currentValues.splice(index, 1);
             this.enrichedCurrentRegistrars.set([...currentValues]);
             // Also update the rightsDetails to reflect removal
-            this.rightsDetails = this.rightsDetails.filter((reg: any) => reg !== item.code);
+            // this.rightsDetails = this.rightsDetails.filter((reg: any) => reg !== item.code);
+            // Add back to available registrars
+            const allRegistrars = this.allRegistrars();
+            const removedRegistrar = allRegistrars.find((reg) => reg.code === item.code);
+            if (removedRegistrar) {
+                this.filteredRegistrars.set([...this.filteredRegistrars(), removedRegistrar]);
+            }
         }
     }
+
     openRightsSidebar(user: any) {
         this.router.navigate(['/users', user.id, 'rights']);
     }

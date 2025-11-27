@@ -128,43 +128,55 @@
             <div class="app-sections">
                 <div class="app-section">
                     <div class="app-section-title">{{ 'users.current-rights' | translate }}</div>
-                    <div class="app-items">
-                        <div class="app-item" *ngFor="let item of enrichedCurrentRegistrars()">
+                    <div class="app-items app-registrars-items" *ngIf="enrichedCurrentRegistrars().length > 0">
+                        <div class="app-item app-registrar-item" *ngFor="let item of enrichedCurrentRegistrars()">
                             <span class="app-item-value">{{ item.code }} - {{ item.name }}</span>
-                            <div class="app-selected-item-remove" (click)="removeCurrentRegistrar(item)">
-                                <img src="assets/icons/close.svg" />
-                            </div>
+                            <app-button
+                                size="xs"
+                                variant="tertiary"
+                                (click)="removeCurrentRegistrar(item)"
+                            >
+                                {{ 'buttons.remove-rights' | translate }}
+                            </app-button>
                         </div>
+                    </div>
+                    <div class="app-no-items" *ngIf="enrichedCurrentRegistrars().length === 0">
+                        {{ 'users.no-current-rights' | translate }}
                     </div>
                 </div>
                 <div class="app-section">
                     <div class="app-section-title">{{ 'users.add-new-rights' | translate }}</div>
                     <!-- REGISTRAR -->
-                    <div class="app-base-input-container">
-                        <div class="app-base-input app-multiselect">
-                            <!-- <div class="app-base-input-label">{{ 'processes.filter-by-registrar' | translate }} URN:NBN</div> -->
-                            <mat-form-field appearance="outline">
-                                <mat-select [formControl]="registrarsControl" multiple [placeholder]="'inputs.select-registrar' | translate">
-                                    <mat-select-trigger>
-                                        @if ((registrarsControl.value?.length || 0) > 0) {
-                                        {{ 'inputs.selected-items' | translate }}:
-                                        <span>{{ registrarsControl.value?.length }}</span>
+                    <div class="app-section-part" *ngIf="filteredRegistrars().length > 0">
+                        <div class="app-base-input-container">
+                            <div class="app-base-input app-multiselect">
+                                <!-- <div class="app-base-input-label">{{ 'processes.filter-by-registrar' | translate }} URN:NBN</div> -->
+                                <mat-form-field appearance="outline">
+                                    <mat-select [formControl]="registrarsControl" multiple [placeholder]="'inputs.select-registrar' | translate">
+                                        <mat-select-trigger>
+                                            @if ((registrarsControl.value?.length || 0) > 0) {
+                                            {{ 'inputs.selected-items' | translate }}:
+                                            <span>{{ registrarsControl.value?.length }}</span>
+                                            }
+                                        </mat-select-trigger>
+                                        @for (reg of filteredRegistrars(); track reg) {
+                                        <mat-option [value]="reg">{{ reg.code }} - {{ reg.name }}</mat-option>
                                         }
-                                    </mat-select-trigger>
-                                    @for (reg of registrars(); track reg) {
-                                    <mat-option [value]="reg">{{ reg.code }} - {{ reg.name }}</mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                        <div class="app-selected-items" *ngIf="registrarsControl.value?.length > 0">
-                            <div class="app-selected-item" *ngFor="let item of registrarsControl.value">
-                                {{ item.code }}
-                                <div class="app-selected-item-remove" (click)="removeSelectedRegistrar(item)">
-                                    <img src="assets/icons/close.svg" />
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="app-selected-items" *ngIf="registrarsControl.value?.length > 0">
+                                <div class="app-selected-item" *ngFor="let item of registrarsControl.value">
+                                    {{ item.code }}
+                                    <div class="app-selected-item-remove" (click)="removeSelectedRegistrar(item)">
+                                        <img src="assets/icons/close.svg" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="app-no-items" *ngIf="filteredRegistrars().length === 0">
+                        {{ 'users.no-registrars-available' | translate }}
                     </div>
                 </div>
             </div>
@@ -173,6 +185,9 @@
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" (click)="addSelectedRegistrars()" [disabled]="registrarsControl.value?.length === 0">
+                    {{ 'buttons.add' | translate }}
                 </app-button>
             </div>
         </div>

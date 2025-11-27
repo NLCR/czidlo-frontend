@@ -50,8 +50,8 @@ export class UsersService {
     getUserRights(userId: string): Observable<any> {
         return this.apiService.getUserRights(userId);
     }
-    assignUserRights(userId: string, rightsData: any): Observable<any> {
-        return this.apiService.assignUserRights(userId, rightsData);
+    assignUserRights(userId: string, code: any): Observable<any> {
+        return this.apiService.assignUserRights(userId, code);
     }
     removeUserRights(userId: string, rightsData: any): Observable<any> {
         return this.apiService.removeUserRights(userId, rightsData);
