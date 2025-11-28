@@ -192,7 +192,7 @@ h4 {
     .app-table-body {
         display: flex;
         flex: 1;
-        min-width: max-content;
+        // min-width: max-content;
         flex-direction: column;
         gap: 4px;
         align-self: stretch;
@@ -310,6 +310,7 @@ h4 {
         &.app-col-name {
             flex: 1 1 auto;
             min-width: 250px;
+            max-width: 586px;
         }
         &.app-col-reg-actions {
             width: 32px;
@@ -610,10 +611,13 @@ app-search,
 .app-instances {
     display: flex;
     flex: 1;
-    flex-direction: column;
+    // flex-direction: column;
     min-height: 0; /* aby se vnořený child mohl zmenšit a scrollovat */
     min-width: 0;
     overflow: hidden; /* zabrání scrollu tady */
+}
+app-processes {
+    flex-direction: column;
 }
 app-information {
     display: flex;
@@ -1081,6 +1085,9 @@ app-information {
 }
 .mat-calendar-period-button {
     font-family: 'IBM Plex Sans' !important;
+}
+.mat-progress-spinner {
+    stroke: #0080a8 !important; /* tvoje barva */
 }
 
 @media (max-width: 1620px) {

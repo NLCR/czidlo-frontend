@@ -2,7 +2,7 @@
     display: flex;
     flex: 1;
     width: 800px;
-    padding: 24px 0px 0px 16px;
+    // padding: 24px 0px 0px 16px;
     flex-direction: column;
     align-items: flex-start;
     gap: 24px;
@@ -12,12 +12,15 @@
         align-items: flex-start;
         gap: 16px;
         align-self: stretch;
+        padding: 24px 0px 0px 16px;
     }
     .app-action {
         display: flex;
         width: 800px;
+        padding: 0px 16px 0px 16px;
         justify-content: space-between;
         gap: 8px;
+        box-sizing: border-box;
     }
     .app-search-results {
         display: flex;
@@ -25,8 +28,9 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
-        padding: 0px 16px 40px 0px;
+        padding: 0px 0px 40px 16px;
         overflow: auto;
+        box-sizing: border-box;
         .app-search-card {
             display: flex;
             // padding: 20px 16px;
@@ -49,7 +53,8 @@
                     align-items: flex-start;
                     gap: 8px;
                     flex: 1;
-                    img, .loader {
+                    img,
+                    .loader {
                         padding: 5px 0 0 0;
                     }
                 }
@@ -241,7 +246,7 @@
     flex-direction: column;
     align-items: flex-start;
     align-self: stretch;
-    padding: 20px 0;
+    padding: 20px 0 0 16px;
     gap: 8px;
 
     .app-no-results-text {
@@ -344,4 +349,79 @@
     display: flex;
     padding: 8px 16px 16px 0;
     gap: 8px;
+}
+
+.app-sidebar {
+    display: none;
+    height: 100%;
+    align-self: flex-end;
+    gap: 20px;
+    &.app-sidebar-active {
+        display: flex;
+    }
+    .app-sidebar-entity {
+        display: flex;
+        background-color: #fff;
+        flex-direction: column;
+        align-items: flex-start;
+        z-index: 101;
+        width: 800px;
+        // STYLES SCSS
+        .app-sidebar-content {
+            gap: 20px;
+        }
+        .app-sidebar-content .app-part:not(:last-child) {
+            padding-bottom: 12px;
+        }
+        .app-part {
+            gap: 20px;
+            .app-part-content {
+                gap: 20px;
+            }
+        }
+        .app-items-container {
+            display: flex;
+            align-items: flex-start;
+            align-items: center;
+            gap: 20px;
+            align-self: stretch;
+        }
+        input {
+            padding: 11px 12px;
+            border-radius: var(--Spacing-x1, 4px);
+            border: 1px solid var(--Boarder-Contrast, #bfccd9);
+            background: var(--BG-Main-Base, #fff);
+        }
+    }
+}
+.app-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100;
+}
+.app-base-input-container {
+    gap: 20px;
+}
+.app-base-input {
+    mat-error {
+        font-size: 14px;
+    }
+
+    &.app-place,
+    &.app-publisher {
+        width: 745px;
+    }
+
+    &.app-bornDigital,
+    &.app-primaryOriginatorValue {
+        align-self: flex-end;
+        height: 48px;
+    }
+    &.app-primaryOriginatorType {
+        width: 135px;
+    }
+    &.app-primaryOriginatorValue {
+        width: 588px;
+    }
 }

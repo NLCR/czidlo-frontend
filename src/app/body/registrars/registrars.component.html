@@ -12,8 +12,12 @@
             </div>
         </div>
 
+        <div class="app-loader" *ngIf="loadingRegistrars() || loadingArchivers()">
+            <mat-spinner diameter="50" color="primary"></mat-spinner>
+        </div>
+
         <!-- REGISTRARS -->
-        <div class="app-registrars" *ngIf="isActive === 'registrars'">
+        <div class="app-registrars" *ngIf="isActive === 'registrars' && !loadingRegistrars()">
             <div class="app-add app-add-registrar" *ngIf="loggedIn()">
                 <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openEditRegistrarDialog()">
                     {{ 'buttons.add-registrar' | translate }}

@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, throwError, map } from 'rxjs';
 import { delay, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { EnvironmentService } from './environment.service';
@@ -8,6 +8,7 @@ import { EnvironmentService } from './environment.service';
 export class AuthService {
     public loggedIn = signal(false);
     public isAdmin = signal(false);
+    public user = signal<string | null>(null);
 
     private readonly TOKEN_KEY = 'auth_token';
     private readonly USER_KEY = 'auth_user';
@@ -19,32 +20,58 @@ export class AuthService {
 
     /** Zkontroluje, jestli je uživatel přihlášený */
     isLoggedIn(): Observable<boolean> {
-        const logged = this.loggedIn();
-        return of(logged).pipe(
-            delay(300),
-            tap((status) => console.log('User logged in status:', status))
-        );
+        return of(this.loggedIn());
     }
 
     /** Přihlášení uživatele */
     login(username: string, password: string): Observable<boolean> {
         // Simulovaná přihlašovací logika
-        if (username === 'admin' && password === 'password') {
-            const token = 'fake-jwt-token';
-            this.setSession(token, username);
-            this.loggedIn.set(true);
-            this.isAdmin.set(true);
-            return of(true).pipe(delay(300));
-        } else if (username === 'user' && password === 'password') {
-            const token = 'fake-jwt-token';
-            this.setSession(token, username);
-            this.loggedIn.set(true);
-            this.isAdmin.set(false);
-            return of(true).pipe(delay(300));
-        }
-        else {
-            return throwError(() => 'Invalid credentials').pipe(delay(300));
-        }
+        // if (username === 'admin' && password === 'password') {
+        //     const token = 'fake-jwt-token';
+        //     this.setSession(token, username);
+        //     this.loggedIn.set(true);
+        //     this.isAdmin.set(true);
+        //     return of(true).pipe(delay(300));
+        // } else if (username === 'user' && password === 'password') {
+        //     const token = 'fake-jwt-token';
+        //     this.setSession(token, username);
+        //     this.loggedIn.set(true);
+        //     this.isAdmin.set(false);
+        //     return of(true).pipe(delay(300));
+        // } else {
+        //     return throwError(() => 'Invalid credentials').pipe(delay(300));
+        // }
+
+        // Reálná přihlašovací logika přes API
+        const apiUrl = this.envService.get('czidloApiServiceBaseUrl') + '/user';
+
+        return this.http
+            .get(apiUrl, {
+                headers: {
+                    Authorization: 'Basic ' + btoa(`${username}:${password}`),
+                },
+            })
+            .pipe(
+                tap((response) => {
+                    console.log('login',response);
+                    let admin = response && (response as any).admin === true;
+                    this.loggedIn.set(true);
+                    this.isAdmin.set(admin);
+                    this.setSession('', username); // zde by měl být skutečný token z response
+
+                    // uložit credentialy
+                    localStorage.setItem('auth_username', username);
+                    localStorage.setItem('auth_password', password);
+                }),
+                map(() => true)
+            );
+    }
+
+    getCredentials() {
+        const username = localStorage.getItem('auth_username');
+        const password = localStorage.getItem('auth_password');
+        if (!username || !password) return null;
+        return { username, password };
     }
 
     /** Odhlášení uživatele */
@@ -70,16 +97,26 @@ export class AuthService {
     }
 
     /** Obnoví session z localStorage při startu */
-    private restoreSession(): void {
-        const token = localStorage.getItem(this.TOKEN_KEY);
-        const expiresAt = localStorage.getItem(this.EXPIRES_KEY);
+    // private restoreSession(): void {
+    //     const token = localStorage.getItem(this.TOKEN_KEY);
+    //     const expiresAt = localStorage.getItem(this.EXPIRES_KEY);
 
-        if (token && expiresAt && new Date().getTime() < Number(expiresAt)) {
-            this.loggedIn.set(true);
-            this.isAdmin.set(localStorage.getItem(this.USER_KEY) === 'admin');
-            console.log('Session restored for user:', localStorage.getItem(this.USER_KEY));
-        } else {
-            this.logout();
-        }
+    //     if (token && expiresAt && new Date().getTime() < Number(expiresAt)) {
+    //         this.loggedIn.set(true);
+    //         this.isAdmin.set(localStorage.getItem(this.USER_KEY) === 'admin');
+    //         console.log('Session restored for user:', localStorage.getItem(this.USER_KEY));
+    //     } else {
+    //         this.logout();
+    //     }
+    // }
+    public restoreSession(): void {
+    const username = localStorage.getItem('auth_username');
+    const password = localStorage.getItem('auth_password');
+
+    if (username && password) {
+        this.loggedIn.set(true);
+    } else {
+        this.logout();
     }
+}
 }

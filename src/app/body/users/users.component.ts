@@ -47,8 +47,14 @@ export class UsersComponent {
     ) {}
 
     ngOnInit() {
-        this.loadUsers();
+        // this.loadUsers();
         this.route.url.subscribe((url) => {
+            console.log('users on init', this.usersService.users());
+            if (this.usersService.users().length === 0) {
+                this.loadUsers();
+            } else {
+                this.users.set(this.usersService.users());
+            }
             console.log('Route URL changed:', url);
             if (url.length === 2) {
                 const userId = url[1].path;
