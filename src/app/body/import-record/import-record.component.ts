@@ -110,19 +110,14 @@ export class ImportRecordComponent {
         console.log('sidebar', this.isSidebarOpen());
         this.translate
             .get(['import.by-resolver', 'import.by-reservation', 'import.by-registrar', 'import.author', 'import.event', 'import.corporation'])
-            // .subscribe((translations) => {
-            //     this.registrationMode = [
-            //         { value: 'resolver', label: translations['import.by-resolver'] },
-            //         { value: 'reservation', label: translations['import.by-reservation'] },
-            //         { value: 'registrar', label: translations['import.by-registrar'] },
-            //     ];
-            //     this.primaryOriginatorTypes = [
-            //         { value: 'author', label: translations['import.author'] },
-            //         { value: 'event', label: translations['import.event'] },
-            //         { value: 'corporation', label: translations['import.corporation'] },
-            //     ];
-            //     this.selectedMode = this.registrationMode[0].value;
-            // });
+            .subscribe((translations) => {
+                this.primaryOriginatorTypes = [
+                    { value: 'author', label: translations['import.author'] },
+                    { value: 'event', label: translations['import.event'] },
+                    { value: 'corporation', label: translations['import.corporation'] },
+                ];
+                this.selectedMode = this.registrationMode[0].value;
+            });
 
         this.registrarsService.getArchivers().subscribe({
             next: (data) => {
@@ -199,14 +194,197 @@ export class ImportRecordComponent {
     }
     buildRecordToImport() {
         let record: any = {};
-        if (this.selectedEntity === 'MONOGRAPH') {
-            if (this.title.valid) {
-                record.title = this.title.value;
-            } else {
-                console.error('Title is required for MONOGRAPH');
-                return null;
-            }
+
+        // REGISTRAR AND MODE
+        record.registrarCode = this.selectedRegistrar;
+        record.registrationMode = this.selectedMode;
+        record.intellectualEntity = this.selectedEntity;
+        record.archiverId = this.selectedArchiverId;
+        record.financed = this.financed.value;
+        record.contractNumber = this.contractNumber.value;
+        record.documentType = this.documentType.value;
+        record.bornDigital = this.bornDigital;
+        record.urnNbn = this.urnNbn.value;
+
+        // INTELECTUAL ENTITY
+        let intelectualEntity: any = {};
+        let titleInfo: any = {};
+
+        // TITLE INFO
+        if (this.title.value) {
+            titleInfo.title = this.title.value;
         }
+        if (this.subTitle.value) {
+            titleInfo.subTitle = this.subTitle.value;
+        }
+        if (this.monographTitle.value) {
+            titleInfo.monographTitle = this.monographTitle.value;
+        }
+        if (this.periodicalTitle.value) {
+            titleInfo.periodicalTitle = this.periodicalTitle.value;
+        }
+        if (this.volumeTitle.value) {
+            titleInfo.volumeTitle = this.volumeTitle.value;
+        }
+        if (this.issueTitle.value) {
+            titleInfo.issueTitle = this.issueTitle.value;
+        }
+        intelectualEntity.titleInfo = titleInfo;
+
+        // IDENTIFIERS
+        if (this.ccnb.valid && this.ccnb.value) {
+            intelectualEntity.ccnb = this.ccnb.value;
+        }
+        if (this.isbn.valid && this.isbn.value) {
+            intelectualEntity.isbn = this.isbn.value;
+        }
+        if (this.issn.valid && this.issn.value) {
+            intelectualEntity.issn = this.issn.value;
+        }
+        if (this.otherId.value) {
+            intelectualEntity.otherId = this.otherId.value;
+        }
+
+        // ORIGINATORS
+        let primaryOriginator: any = {};
+        if (this.primaryOriginatorValue.valid && this.primaryOriginatorValue.value) {
+            primaryOriginator.type = this.selectedOriginatorType;
+            primaryOriginator.value = this.primaryOriginatorValue.value;
+            intelectualEntity.primaryOriginator = primaryOriginator;
+        }
+        if (this.otherOriginator.value) {
+            intelectualEntity.otherOriginator = this.otherOriginator.value;
+        }
+
+        // PUBLICATION
+        let publication: any = {};
+        if (this.place.value) {
+            publication.place = this.place.value;
+        }
+        if (this.publisher.value) {
+            publication.publisher = this.publisher.value;
+        }
+        if (this.year.value) {
+            publication.year = this.year.value;
+        }
+
+        // SOURCE DOCUMENT (ANALYTICAL)
+        let sourceDocument: any = {};
+        // TITLE INFO OF SOURCE DOCUMENT
+        let sourceTitleInfo: any = {};
+        if (this.sourceDocumentTitle.value) {
+            sourceTitleInfo.title = this.sourceDocumentTitle.value;
+        }
+        if (this.sourceDocumentVolumeTitle.value) {
+            sourceTitleInfo.volumeTitle = this.sourceDocumentVolumeTitle.value;
+        }
+        if (this.sourceDocumentIssueTitle.value) {
+            sourceTitleInfo.issueTitle = this.sourceDocumentIssueTitle.value;
+        }
+        if (Object.keys(sourceTitleInfo).length > 0) {
+            sourceDocument.titleInfo = sourceTitleInfo;
+        }
+        // IDENTIFIERS OF SOURCE DOCUMENT
+        if (this.sourceDocumentCcnb.valid && this.sourceDocumentCcnb.value) {
+            sourceDocument.ccnb = this.sourceDocumentCcnb.value;
+        }
+        if (this.sourceDocumentIsbn.valid && this.sourceDocumentIsbn.value) {
+            sourceDocument.isbn = this.sourceDocumentIsbn.value;
+        }
+        if (this.sourceDocumentIssn.valid && this.sourceDocumentIssn.value) {
+            sourceDocument.issn = this.sourceDocumentIssn.value;
+        }
+        if (this.sourceDocumentOtherId.value) {
+            sourceDocument.otherId = this.sourceDocumentOtherId.value;
+        }
+        // PUBLICATION OF SOURCE DOCUMENT
+        let sourcePublication: any = {};
+        if (this.sourceDocumentPlace.value) {
+            sourcePublication.place = this.sourceDocumentPlace.value;
+        }
+        if (this.sourceDocumentPublisher.value) {
+            sourcePublication.publisher = this.sourceDocumentPublisher.value;
+        }
+        if (this.sourceDocumentYear.value) {
+            sourcePublication.year = this.sourceDocumentYear.value;
+        }
+        if (Object.keys(sourcePublication).length > 0) {
+            sourceDocument.publication = sourcePublication;
+        }
+
+        if (Object.keys(sourceDocument).length > 0) {
+            intelectualEntity.sourceDocument = sourceDocument;
+        }
+
+        // TECHNICAL METADATA
+        let technicalMetadata: any = {};
+        // FORMAT
+        let format: any = {};
+        if (this.formatVersion.value) {
+            format.version = this.formatVersion.value;
+        }
+        if (this.formatValue.value) {
+            format.format = this.formatValue.value;
+        }
+        if (Object.keys(format).length > 0) {
+            technicalMetadata.format = format;
+        }
+        // EXTENT
+        if (this.extent.value) {
+            technicalMetadata.extent = this.extent.value;
+        }
+        // RESOLUTION
+        let resolution: any = {};
+        if (this.resolutionHorizontal.value) {
+            resolution.horizontal = this.resolutionHorizontal.value;
+        }
+        if (this.resolutionVertical.value) {
+            resolution.vertical = this.resolutionVertical.value;
+        }
+        if (Object.keys(resolution).length > 0) {
+            technicalMetadata.resolution = resolution;
+        }
+        // COMPRESSION
+        let compression: any = {};
+        if (this.compressionValue.value) {
+            compression.value = this.compressionValue.value;
+        }
+        if (this.compressionRatio.value) {
+            compression.ratio = this.compressionRatio.value;
+        }
+        if (Object.keys(compression).length > 0) {
+            technicalMetadata.compression = compression;
+        }
+        // COLOR
+        let color: any = {};
+        if (this.colorModel.value) {
+            color.model = this.colorModel.value;
+        }
+        if (this.colorDepth.value) {
+            color.depth = this.colorDepth.value;
+        }
+        if (this.iccProfile.value) {
+            color.iccProfile = this.iccProfile.value;
+        }
+        if (Object.keys(color).length > 0) {
+            technicalMetadata.color = color;
+        }
+        // PICTURE SIZE
+        let pictureSize: any = {};
+        if (this.pictureSizeWidth.value) {
+            pictureSize.width = this.pictureSizeWidth.value;
+        }
+        if (this.pictureSizeHeight.value) {
+            pictureSize.height = this.pictureSizeHeight.value;
+        }
+        if (Object.keys(pictureSize).length > 0) {
+            technicalMetadata.pictureSize = pictureSize;
+        }
+        if (Object.keys(technicalMetadata).length > 0) {
+            record.technicalMetadata = technicalMetadata;
+        }
+
+        record.intellectualEntity = intelectualEntity;
         console.log('record to import', record);
         return record;
     }
