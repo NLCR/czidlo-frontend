@@ -1,7 +1,7 @@
 import { APP_INITIALIZER, NgModule, LOCALE_ID, EnvironmentInjector, inject } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
-import { HttpClient, provideHttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 // COMPONENTS
 import { AppComponent } from './app.component';
@@ -65,6 +65,7 @@ import { EditPasswordDialogComponent } from './dialogs/edit-password-dialog/edit
 import { EditRegistrarDialogComponent } from './dialogs/edit-registrar-dialog/edit-registrar-dialog.component';
 import { DetailDialogComponent } from './dialogs/detail-dialog/detail-dialog.component';
 import { EditDlCatalogDialogComponent } from './dialogs/edit-dl-catalog-dialog/edit-dl-catalog-dialog.component';
+import { BasicAuthInterceptor } from './services/basic-auth.interceptor';
 
 // Překladač
 export function HttpLoaderFactory() {
@@ -146,7 +147,7 @@ export const MY_DATE_FORMATS = {
         MatProgressSpinnerModule
     ],
     providers: [
-        provideHttpClient(),
+        provideHttpClient(withInterceptorsFromDi()),
         ApiService,
         ProcessesService,
         AuthService,
@@ -172,6 +173,7 @@ export const MY_DATE_FORMATS = {
                 suffix: '.json',
             },
         },
+        { provide: HTTP_INTERCEPTORS, useClass: BasicAuthInterceptor, multi: true }
     ],
     bootstrap: [AppComponent],
 })
