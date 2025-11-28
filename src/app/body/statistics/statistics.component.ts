@@ -1,6 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StatisticsService } from '../../services/statistics.service';
+import { combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-statistics',
@@ -15,6 +17,9 @@ export class StatisticsComponent {
     chartDataByRegistrar = signal<any[]>([]);
     chartDataByEntityTypes = signal<any[]>([]);
 
+    resolvedDataByDate = signal<Array<{ name: string; value: number }>>([]);
+    resolvedDataByRegistrar = signal<any[]>([]);
+
     records = signal<Array<any>>([]);
     selectedYear = signal<string | null>(null);
     selectedRegistrar = signal<string | null>(null);
@@ -26,24 +31,32 @@ export class StatisticsComponent {
     constructor(private router: Router, private route: ActivatedRoute, private statisticsService: StatisticsService) {}
 
     ngOnInit() {
-        this.route.url.subscribe((url) => {
-            if (url.length > 1) {
-                this.isActive = url[1].path;
-                console.log('Statistics route changed:', this.isActive);
-            } else {
-                this.router.navigate(['assignments'], { relativeTo: this.route });
-            }
-        });
-        // FILTERS FROM URL
-        this.route.queryParams.subscribe((params) => {
-            const year = params['year'] || null;
-            const registrar = params['registrar'] || null;
+        const url$ = this.route.url.pipe(
+            map((url) => {
+                if (url.length > 1) {
+                    return url[1].path;
+                } else {
+                    this.router.navigate(['assignments'], { relativeTo: this.route });
+                    return 'assignments';
+                }
+            })
+        );
 
-            this.selectedYear.set(year);
-            this.selectedRegistrar.set(registrar);
+        const filters$ = this.route.queryParams.pipe(
+            map((params) => ({
+                year: params['year'] || null,
+                registrar: params['registrar'] || null,
+            }))
+        );
 
-            // vždy načteme základní dataset s filtry
-            this.reloadData(year, registrar);
+        // 🟢 Sledujeme změny v URL *i* query parametrech
+        combineLatest([url$, filters$]).subscribe(([active, filters]) => {
+            this.isActive = active;
+
+            this.selectedYear.set(filters.year);
+            this.selectedRegistrar.set(filters.registrar);
+
+            this.reloadData(filters.year, filters.registrar);
         });
     }
 
@@ -51,21 +64,43 @@ export class StatisticsComponent {
         const y = year || undefined;
         const r = registrar || undefined;
 
+        if (this.isActive === 'assignments') {
+            this.loadRegisteredData(r, y);
+        } else if (this.isActive === 'resolvations') {
+            this.loadResolvedData(r, y);
+        }
+    }
+
+    private loadRegisteredData(r?: string, y?: string) {
         this.statisticsService.getCountByDate(r, y).subscribe((data) => {
+            // console.table(data);
             this.chartDataByDate.set(data);
         });
 
         this.statisticsService.getCountByRegistrar(y).subscribe((data) => {
+            // console.table(data);
             this.chartDataByRegistrar.set(data);
         });
 
         if (r) {
             this.statisticsService.getCountByEntityTypes(r, y).subscribe((data) => {
+                // console.table(data);
                 this.chartDataByEntityTypes.set(data);
             });
         } else {
             this.chartDataByEntityTypes.set([]);
         }
+    }
+    private loadResolvedData(r?: string, y?: string) {
+        this.statisticsService.getResolvedByDate(r, y).subscribe((data) => {
+            // console.table(data);
+            this.resolvedDataByDate.set(data);
+        });
+
+        this.statisticsService.getResolvedByRegistrar(y).subscribe((data) => {
+            console.table(data);
+            this.resolvedDataByRegistrar.set(data);
+        });
     }
 
     onYearClick(event: any) {

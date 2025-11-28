@@ -257,8 +257,10 @@ export class ApiService {
     }
 
     // ELASTICSEARCH
-    getStatisticsDataReg(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_4/_search';
+
+    // STATISTICS DATA FOR ASSIGNMENTS
+    getStatisticsDataAssign(body: any): Observable<any> {
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_8/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -275,7 +277,28 @@ export class ApiService {
             })
         );
     }
+    
+    // STATISTICS DATA FOR RESOLVATIONS
+    getStatisticsDataResolve(body: any): Observable<any> {
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_9/_search';
+        const login = 'czidlo_reader';
+        const password = 'dq7o8rDrXZzhiS20qm';
 
+        const headers = new HttpHeaders({
+            Authorization: 'Basic ' + btoa(`${login}:${password}`),
+            'Content-Type': 'application/json',
+        });
+
+        return this.http.post(url, body, { headers }).pipe(
+            tap({
+                next: (data) => {
+                    console.log('RESOLVED data received:', data);
+                },
+            })
+        );
+    }
+
+    // SEARCH RECORDS
     getRecords(body: any): Observable<any> {
         const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_7/_search';
         const login = 'czidlo_reader';

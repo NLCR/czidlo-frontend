@@ -58,7 +58,7 @@ export class StatisticsService {
             };
         }
 
-        return this.apiService.getStatisticsDataReg(body).pipe(
+        return this.apiService.getStatisticsDataAssign(body).pipe(
             map((result: any) =>
                 result.aggregations.registrations_over_time.buckets.map((b: any) => ({
                     name: b.key_as_string,
@@ -109,7 +109,7 @@ export class StatisticsService {
             body.query = query;
         }
 
-        return this.apiService.getStatisticsDataReg(body).pipe(
+        return this.apiService.getStatisticsDataAssign(body).pipe(
             map((res: any) =>
                 res.aggregations.registrar_codes.buckets.map((b: any) => ({
                     name: b.key,
@@ -151,14 +151,14 @@ export class StatisticsService {
             aggs: {
                 entity_types: {
                     terms: {
-                        field: 'entitytype.keyword',
+                        field: 'documenttype.keyword',
                         size: 100,
                     },
                 },
             },
         };
 
-        return this.apiService.getStatisticsDataReg(body).pipe(
+        return this.apiService.getStatisticsDataAssign(body).pipe(
             map((result: any) =>
                 result.aggregations.entity_types.buckets.map((bucket: any) => ({
                     name: bucket.key,
@@ -172,28 +172,114 @@ export class StatisticsService {
         );
     }
 
-    getRecords(): Observable<any> {
-        const body = {
-            query: {
-                match_all: {},
+    // RESOLVOVANI PODLE ROKU
+    getResolvedByDate(registrar?: string, year?: string): Observable<any> {
+        console.log('getResolvedByDATE', registrar, year);
+        const filters: any[] = [];
+
+        // pokud je filtr registrar
+        if (registrar) {
+            filters.push({
+                term: {
+                    'registrarcode.keyword': registrar,
+                },
+            });
+        }
+
+        // pokud je filtrován rok
+        if (year) {
+            filters.push({
+                range: {
+                    resolved: {
+                        gte: `${year}-01-01`,
+                        lt: `${year}-12-31`,
+                    },
+                },
+            });
+        }
+
+        // vyber datový interval podle toho, jestli máme rok
+        const interval = year ? 'month' : 'year';
+        const format = year ? 'yyyy-MM' : 'yyyy';
+
+        const body: any = {
+            size: 0,
+            aggs: {
+                resolved_over_time: {
+                    date_histogram: {
+                        field: 'resolved',
+                        calendar_interval: interval,
+                        format: format,
+                    },
+                },
             },
-            size: 1000, // kolik chceš – max 10k
         };
-        return this.apiService.getStatisticsDataReg(body).pipe(
-            tap({
-                next: (data) => {
-                    console.log('Statistics data received:', data);
+
+        // pokud existují filtry, přidej query
+        if (filters.length > 0) {
+            body.query = {
+                bool: {
+                    filter: filters,
                 },
-                error: (error) => {
-                    console.error('Error loading statistics:', error);
-                },
-                complete: () => {
-                    console.log('Statistics loading complete');
-                },
+            };
+        }
+
+        return this.apiService.getStatisticsDataResolve(body).pipe(
+            map((result: any) => {
+                console.log(result);
+                return result.aggregations.resolved_over_time.buckets.map((b: any) => ({
+                    name: b.key_as_string,
+                    value: b.doc_count,
+                }));
             })
         );
     }
-    getRecordsCount(): Observable<any> {
-        return this.apiService.getRecordCount();
+
+    // RESOLVOVANI PODLE REGISTRÁTORŮ
+    getResolvedByRegistrar(year?: string): Observable<any> {
+        const query: any = {
+            bool: {
+                filter: [], // efektivnější než must
+            },
+        };
+
+        // pokud mám rok → přidám range
+        if (year) {
+            query.bool.filter.push({
+                range: {
+                    resolved: {
+                        gte: `${year}-01-01`,
+                        lt: `${year}-12-31`,
+                    },
+                },
+            });
+        }
+
+        const body: any = {
+            size: 0,
+            aggs: {
+                registrar_codes: {
+                    terms: {
+                        field: 'registrarcode.keyword',
+                        size: 1000,
+                    },
+                },
+            },
+        };
+
+        // query přidáme jen pokud existuje filtr (rok)
+        if (year) {
+            body.query = query;
+        }
+
+        return this.apiService.getStatisticsDataResolve(body).pipe(
+            map((result: any) => {
+                console.log('RGISTRARS', result);
+                return result.aggregations.registrar_codes.buckets.map((b: any) => ({
+                    name: b.key,
+                    value: b.doc_count,
+                }));
+            })
+        );
     }
 }
