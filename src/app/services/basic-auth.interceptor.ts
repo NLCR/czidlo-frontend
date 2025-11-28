@@ -11,17 +11,19 @@ export class BasicAuthInterceptor implements HttpInterceptor {
     authService = inject(AuthService);
 
     // TODO: in production use AuthService to get logged in user credentials
-    private readonly loggedIn = false;
+    private readonly loggedIn = this.authService.loggedIn();
+    // private readonly loggedIn = false;
     private readonly login = 'testUser';
     private readonly password = 'testPassword';
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const credentials = this.authService.getCredentials();
+        console.log(this.loggedIn);
 
         // ignore if user not logged in
-        // if (!this.loggedIn) {
-        //     return next.handle(req);
-        // }
+        if (!this.loggedIn) {
+            return next.handle(req);
+        }
 
         // filter out requests not going to the API
         const czidloApiUrl = this.envService.get('czidloApiServiceBaseUrl');

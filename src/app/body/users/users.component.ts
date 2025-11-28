@@ -21,6 +21,7 @@ import { catchError } from 'rxjs/operators';
 })
 export class UsersComponent {
     loggedIn = computed(() => this.authService.loggedIn());
+    isAdmin = computed(() => this.authService.isAdmin());
 
     users = signal<Array<any>>([]);
     activeUser: any = null;
@@ -47,6 +48,7 @@ export class UsersComponent {
     ) {}
 
     ngOnInit() {
+        console.log('users', this.loggedIn(), this.isAdmin());
         // this.loadUsers();
         this.route.url.subscribe((url) => {
             console.log('users on init', this.usersService.users());

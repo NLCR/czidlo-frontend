@@ -35,7 +35,7 @@
                             {{ 'import.registrar' | translate }}
                         </div>
                         <mat-form-field appearance="outline">
-                            <mat-select class="app-singleselect" [(value)]="selectedRegistrar">
+                            <mat-select class="app-singleselect" [(value)]="selectedRegistrar" (valueChange)="onRegistrarChange()">
                                 @for (registrar of assignedRegistars; track registrar) {
                                 <mat-option [value]="registrar">{{ registrar }}</mat-option>
                                 }

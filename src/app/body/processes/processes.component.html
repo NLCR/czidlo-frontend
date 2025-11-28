@@ -155,7 +155,7 @@
                 <div class="no-processes" *ngIf="!loadingProcesses() && definitions().length === 0">
                     {{ 'processes.no-definitions' | translate }}
                 </div>
-                <div class="app-table-body">
+                <div class="app-table-body app-table-body-definitions">
                     <div
                         *ngFor="let definition of definitions()"
                         class="app-row app-table-row app-row-non-clicable app-row-definition"

@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RegistrarsService } from '../../services/registrars.service';
 import { AuthService } from '../../services/auth.service';
+import { UsersService } from '../../services/users.service';
 
 @Component({
     selector: 'app-import-record',
@@ -14,10 +15,8 @@ import { AuthService } from '../../services/auth.service';
 })
 export class ImportRecordComponent {
     loggedIn = computed(() => this.authService.loggedIn());
-    // assignedRegistars = [];
-    assignedRegistars = ['aba001', 'boa001'];
+    assignedRegistars = [];
     selectedRegistrar: string = '';
-
     registrationMode: Array<{ value: string; label: string }> = [];
     selectedMode: string = '';
 
@@ -103,25 +102,27 @@ export class ImportRecordComponent {
         private router: Router,
         private route: ActivatedRoute,
         private registrarsService: RegistrarsService,
-        private authService: AuthService
+        private authService: AuthService,
+        private usersService: UsersService
     ) {}
 
     ngOnInit(): void {
         console.log('sidebar', this.isSidebarOpen());
         this.translate
-            .get(['import.resolver', 'import.reservation', 'import.author', 'import.event', 'import.corporation'])
-            .subscribe((translations) => {
-                this.registrationMode = [
-                    { value: 'resolver', label: translations['import.resolver'] },
-                    { value: 'reservation', label: translations['import.reservation'] },
-                ];
-                this.primaryOriginatorTypes = [
-                    { value: 'author', label: translations['import.author'] },
-                    { value: 'event', label: translations['import.event'] },
-                    { value: 'corporation', label: translations['import.corporation'] },
-                ];
-                this.selectedMode = this.registrationMode[0].value;
-            });
+            .get(['import.by-resolver', 'import.by-reservation', 'import.by-registrar', 'import.author', 'import.event', 'import.corporation'])
+            // .subscribe((translations) => {
+            //     this.registrationMode = [
+            //         { value: 'resolver', label: translations['import.by-resolver'] },
+            //         { value: 'reservation', label: translations['import.by-reservation'] },
+            //         { value: 'registrar', label: translations['import.by-registrar'] },
+            //     ];
+            //     this.primaryOriginatorTypes = [
+            //         { value: 'author', label: translations['import.author'] },
+            //         { value: 'event', label: translations['import.event'] },
+            //         { value: 'corporation', label: translations['import.corporation'] },
+            //     ];
+            //     this.selectedMode = this.registrationMode[0].value;
+            // });
 
         this.registrarsService.getArchivers().subscribe({
             next: (data) => {
@@ -130,6 +131,40 @@ export class ImportRecordComponent {
             },
             error: (error) => {
                 console.error('Error fetching archiver IDs:', error);
+            },
+        });
+        this.usersService.getUserRights(this.authService.userInfo().id).subscribe({
+            next: (data) => {
+                this.assignedRegistars = data || [];
+                console.log('Assigned registrars:', this.assignedRegistars);
+                if (this.assignedRegistars.length > 0) {
+                    this.selectedRegistrar = this.assignedRegistars[0];
+                    this.registrarsService.getRegistrar(this.selectedRegistrar).subscribe({
+                        next: (registrarData) => {
+                            console.log('Selected registrar data:', registrarData);
+                            if (registrarData.allowedRegistrationModeByRegistrar) {
+                                this.registrationMode.push({ value: 'registrar', label: this.translate.instant('import.by-registrar') });
+                            }
+                            if (registrarData.allowedRegistrationModeByReservation) {
+                                this.registrationMode.push({ value: 'reservation', label: this.translate.instant('import.by-reservation') });
+                            }
+                            if (registrarData.allowedRegistrationModeByResolver) {
+                                this.registrationMode.push({ value: 'resolver', label: this.translate.instant('import.by-resolver') });
+                            }
+                            if (this.registrationMode.length > 0) {
+                                this.selectedMode = this.registrationMode[0].value;
+                            } else {
+                                this.selectedMode = '';
+                            }
+                        },
+                        error: (error) => {
+                            console.error('Error fetching selected registrar data:', error);
+                        },
+                    });
+                }
+            },
+            error: (error) => {
+                console.error('Error fetching assigned registrars:', error);
             },
         });
 
@@ -185,6 +220,32 @@ export class ImportRecordComponent {
         setTimeout(() => {
             this.importRecordSnackBarVisible.set(false);
         }, 3000);
+    }
+    onRegistrarChange() {
+        console.log('Selected registrar changed to:', this.selectedRegistrar);
+        this.registrationMode = [];
+        this.registrarsService.getRegistrar(this.selectedRegistrar).subscribe({
+            next: (registrarData) => {
+                console.log('Selected registrar data:', registrarData);
+                if (registrarData.allowedRegistrationModeByRegistrar) {
+                    this.registrationMode.push({ value: 'registrar', label: this.translate.instant('import.by-registrar') });
+                }
+                if (registrarData.allowedRegistrationModeByReservation) {
+                    this.registrationMode.push({ value: 'reservation', label: this.translate.instant('import.by-reservation') });
+                }
+                if (registrarData.allowedRegistrationModeByResolver) {
+                    this.registrationMode.push({ value: 'resolver', label: this.translate.instant('import.by-resolver') });
+                }
+                if (this.registrationMode.length > 0) {
+                    this.selectedMode = this.registrationMode[0].value;
+                } else {
+                    this.selectedMode = '';
+                }
+            },
+            error: (error) => {
+                console.error('Error fetching selected registrar data:', error);
+            },
+        });
     }
 
     // VALIDACNI FUNKCE

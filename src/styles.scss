@@ -195,9 +195,12 @@ h4 {
         // min-width: max-content;
         flex-direction: column;
         gap: 4px;
-        align-self: stretch;
+        // align-self: stretch;
         overflow-x: hidden;
         overflow-y: auto; /* ⬅️ vertikální scroll */
+        &.app-table-body-users, &.app-table-body-definitions {
+            width: 800px;
+        }
     }
     .app-row {
         display: flex;

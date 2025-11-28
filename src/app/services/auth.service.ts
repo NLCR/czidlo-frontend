@@ -8,7 +8,7 @@ import { EnvironmentService } from './environment.service';
 export class AuthService {
     public loggedIn = signal(false);
     public isAdmin = signal(false);
-    public user = signal<string | null>(null);
+    public userInfo = signal<any | null>(null);
 
     private readonly TOKEN_KEY = 'auth_token';
     private readonly USER_KEY = 'auth_user';
@@ -57,11 +57,14 @@ export class AuthService {
                     let admin = response && (response as any).admin === true;
                     this.loggedIn.set(true);
                     this.isAdmin.set(admin);
+                    console.log('admin', this.isAdmin());
                     this.setSession('', username); // zde by měl být skutečný token z response
 
                     // uložit credentialy
                     localStorage.setItem('auth_username', username);
                     localStorage.setItem('auth_password', password);
+                    localStorage.setItem('auth_is_admin', admin ? 'true' : 'false');
+                    localStorage.setItem('auth_user', JSON.stringify(response));
                 }),
                 map(() => true)
             );
@@ -80,19 +83,22 @@ export class AuthService {
         localStorage.removeItem(this.TOKEN_KEY);
         localStorage.removeItem(this.USER_KEY);
         localStorage.removeItem(this.EXPIRES_KEY);
+        localStorage.removeItem('auth_username');
+        localStorage.removeItem('auth_password');
+        localStorage.removeItem('auth_is_admin');
+        localStorage.removeItem('auth_user');
         console.log('User logged out');
     }
 
     /** Vrátí přihlášeného uživatele */
     getUsername(): string | null {
-        return this.loggedIn() ? localStorage.getItem(this.USER_KEY) : null;
+        return this.loggedIn() ? localStorage.getItem('auth_username') : null;
     }
 
     /** Nastaví session do localStorage na 24 hodin */
     private setSession(token: string, username: string): void {
         const expiresAt = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hodin
         localStorage.setItem(this.TOKEN_KEY, token);
-        localStorage.setItem(this.USER_KEY, username);
         localStorage.setItem(this.EXPIRES_KEY, expiresAt.toString());
     }
 
@@ -112,9 +118,14 @@ export class AuthService {
     public restoreSession(): void {
     const username = localStorage.getItem('auth_username');
     const password = localStorage.getItem('auth_password');
+    const isAdmin = localStorage.getItem('auth_is_admin') === 'true';
+    const user = localStorage.getItem('auth_user');
 
     if (username && password) {
         this.loggedIn.set(true);
+        this.isAdmin.set(isAdmin);
+        this.userInfo.set(JSON.parse(user || 'null'));
+        console.log('Session restored for user:', user);
     } else {
         this.logout();
     }
