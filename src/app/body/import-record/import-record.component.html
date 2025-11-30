@@ -510,7 +510,13 @@
                         </div>
                     </div>
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-half-width app-compressionRatio">
+                        <div class="app-base-input app-half-width app-compression">
+                            <div class="app-base-input-label">
+                                {{ 'import.compression' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="compression" />
+                        </div>
+                        <!-- <div class="app-base-input app-half-width app-compressionRatio">
                             <div class="app-base-input-label">
                                 {{ 'import.compressionRatio' | translate }}
                             </div>
@@ -521,7 +527,7 @@
                                 {{ 'import.compressionValue' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="compressionValue" />
-                        </div>
+                        </div> -->
                     </div>
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width app-colorModel">

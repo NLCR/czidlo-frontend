@@ -70,8 +70,9 @@ export class ImportRecordComponent {
     extent = new FormControl<string>('');
     resolutionHorizontal = new FormControl<string>('');
     resolutionVertical = new FormControl<string>('');
-    compressionRatio = new FormControl<string>('');
-    compressionValue = new FormControl<string>('');
+    compression = new FormControl<string>('');
+    // compressionRatio = new FormControl<string>('');
+    // compressionValue = new FormControl<string>('');
     colorModel = new FormControl<string>('');
     colorDepth = new FormControl<string>('');
     iccProfile = new FormControl<string>('');
@@ -107,16 +108,14 @@ export class ImportRecordComponent {
     ) {}
 
     ngOnInit(): void {
-        console.log('sidebar', this.isSidebarOpen());
         this.translate
             .get(['import.by-resolver', 'import.by-reservation', 'import.by-registrar', 'import.author', 'import.event', 'import.corporation'])
             .subscribe((translations) => {
                 this.primaryOriginatorTypes = [
-                    { value: 'author', label: translations['import.author'] },
-                    { value: 'event', label: translations['import.event'] },
-                    { value: 'corporation', label: translations['import.corporation'] },
+                    { value: 'AUTHOR', label: translations['import.author'] },
+                    { value: 'EVENT', label: translations['import.event'] },
+                    { value: 'CORPORATION', label: translations['import.corporation'] },
                 ];
-                this.selectedMode = this.registrationMode[0].value;
             });
 
         this.registrarsService.getArchivers().subscribe({
@@ -200,57 +199,85 @@ export class ImportRecordComponent {
         record.registrationMode = this.selectedMode;
         record.intellectualEntity = this.selectedEntity;
         record.archiverId = this.selectedArchiverId;
-        record.financed = this.financed.value;
-        record.contractNumber = this.contractNumber.value;
         record.documentType = this.documentType.value;
         record.bornDigital = this.bornDigital;
         record.urnNbn = this.urnNbn.value;
 
         // INTELECTUAL ENTITY
         let intelectualEntity: any = {};
-        let titleInfo: any = {};
+        let ieIdentifiers: any = [];
 
         // TITLE INFO
         if (this.title.value) {
-            titleInfo.title = this.title.value;
+            let titleInfo: any = {};
+            titleInfo.type = 'TITLE';
+            titleInfo.value = this.title.value;
+            ieIdentifiers.push(titleInfo);
         }
         if (this.subTitle.value) {
-            titleInfo.subTitle = this.subTitle.value;
+            let titleInfo: any = {};
+            titleInfo.type = 'SUB_TITLE';
+            titleInfo.value = this.subTitle.value;
+            ieIdentifiers.push(titleInfo);
         }
         if (this.monographTitle.value) {
-            titleInfo.monographTitle = this.monographTitle.value;
+            let titleInfo: any = {};
+            titleInfo.type = 'MONOGRAPH_TITLE';
+            titleInfo.value = this.monographTitle.value;
+            ieIdentifiers.push(titleInfo);
         }
         if (this.periodicalTitle.value) {
-            titleInfo.periodicalTitle = this.periodicalTitle.value;
+            let titleInfo: any = {};
+            titleInfo.type = 'PERIODICAL_TITLE';
+            titleInfo.value = this.periodicalTitle.value;
+            ieIdentifiers.push(titleInfo);
         }
         if (this.volumeTitle.value) {
-            titleInfo.volumeTitle = this.volumeTitle.value;
+            let titleInfo: any = {};
+            titleInfo.type = 'VOLUME_TITLE';
+            titleInfo.value = this.volumeTitle.value;
+            ieIdentifiers.push(titleInfo);
         }
         if (this.issueTitle.value) {
-            titleInfo.issueTitle = this.issueTitle.value;
+            let titleInfo: any = {};
+            titleInfo.type = 'ISSUE_TITLE';
+            titleInfo.value = this.issueTitle.value;
+            ieIdentifiers.push(titleInfo);
         }
-        intelectualEntity.titleInfo = titleInfo;
 
         // IDENTIFIERS
         if (this.ccnb.valid && this.ccnb.value) {
-            intelectualEntity.ccnb = this.ccnb.value;
+            let identifier: any = {};
+            identifier.type = 'CCNB';
+            identifier.value = this.ccnb.value;
+            ieIdentifiers.push(identifier);
         }
         if (this.isbn.valid && this.isbn.value) {
-            intelectualEntity.isbn = this.isbn.value;
+            let identifier: any = {};
+            identifier.type = 'ISBN';
+            identifier.value = this.isbn.value;
+            ieIdentifiers.push(identifier);
         }
         if (this.issn.valid && this.issn.value) {
-            intelectualEntity.issn = this.issn.value;
+            let identifier: any = {};
+            identifier.type = 'ISSN';
+            identifier.value = this.issn.value;
+            ieIdentifiers.push(identifier);
         }
         if (this.otherId.value) {
-            intelectualEntity.otherId = this.otherId.value;
+            let identifier: any = {};
+            identifier.type = 'OTHER';
+            identifier.value = this.otherId.value;
+            ieIdentifiers.push(identifier);
         }
+        intelectualEntity.ieIdentifiers = ieIdentifiers;
 
         // ORIGINATORS
-        let primaryOriginator: any = {};
+        let originator: any = {};
         if (this.primaryOriginatorValue.valid && this.primaryOriginatorValue.value) {
-            primaryOriginator.type = this.selectedOriginatorType;
-            primaryOriginator.value = this.primaryOriginatorValue.value;
-            intelectualEntity.primaryOriginator = primaryOriginator;
+            originator.type = this.selectedOriginatorType;
+            originator.value = this.primaryOriginatorValue.value;
+            intelectualEntity.originator = originator;
         }
         if (this.otherOriginator.value) {
             intelectualEntity.otherOriginator = this.otherOriginator.value;
@@ -267,22 +294,21 @@ export class ImportRecordComponent {
         if (this.year.value) {
             publication.year = this.year.value;
         }
+        if (Object.keys(publication).length > 0) {
+            intelectualEntity.publication = publication;
+        }
 
         // SOURCE DOCUMENT (ANALYTICAL)
         let sourceDocument: any = {};
         // TITLE INFO OF SOURCE DOCUMENT
-        let sourceTitleInfo: any = {};
         if (this.sourceDocumentTitle.value) {
-            sourceTitleInfo.title = this.sourceDocumentTitle.value;
+            sourceDocument.title = this.sourceDocumentTitle.value;
         }
         if (this.sourceDocumentVolumeTitle.value) {
-            sourceTitleInfo.volumeTitle = this.sourceDocumentVolumeTitle.value;
+            sourceDocument.volumeTitle = this.sourceDocumentVolumeTitle.value;
         }
         if (this.sourceDocumentIssueTitle.value) {
-            sourceTitleInfo.issueTitle = this.sourceDocumentIssueTitle.value;
-        }
-        if (Object.keys(sourceTitleInfo).length > 0) {
-            sourceDocument.titleInfo = sourceTitleInfo;
+            sourceDocument.issueTitle = this.sourceDocumentIssueTitle.value;
         }
         // IDENTIFIERS OF SOURCE DOCUMENT
         if (this.sourceDocumentCcnb.valid && this.sourceDocumentCcnb.value) {
@@ -298,18 +324,14 @@ export class ImportRecordComponent {
             sourceDocument.otherId = this.sourceDocumentOtherId.value;
         }
         // PUBLICATION OF SOURCE DOCUMENT
-        let sourcePublication: any = {};
         if (this.sourceDocumentPlace.value) {
-            sourcePublication.place = this.sourceDocumentPlace.value;
+            sourceDocument.publicationPlace = this.sourceDocumentPlace.value;
         }
         if (this.sourceDocumentPublisher.value) {
-            sourcePublication.publisher = this.sourceDocumentPublisher.value;
+            sourceDocument.publisher = this.sourceDocumentPublisher.value;
         }
         if (this.sourceDocumentYear.value) {
-            sourcePublication.year = this.sourceDocumentYear.value;
-        }
-        if (Object.keys(sourcePublication).length > 0) {
-            sourceDocument.publication = sourcePublication;
+            sourceDocument.publicationYear = this.sourceDocumentYear.value;
         }
 
         if (Object.keys(sourceDocument).length > 0) {
@@ -318,76 +340,58 @@ export class ImportRecordComponent {
 
         // TECHNICAL METADATA
         let technicalMetadata: any = {};
+
+        // FINANCED AND CONTRACT NUMBER
+        technicalMetadata.financed = this.financed.value;
+        technicalMetadata.contractNumber = this.contractNumber.value;
         // FORMAT
-        let format: any = {};
         if (this.formatVersion.value) {
-            format.version = this.formatVersion.value;
+            technicalMetadata.formatVersion = this.formatVersion.value;
         }
         if (this.formatValue.value) {
-            format.format = this.formatValue.value;
-        }
-        if (Object.keys(format).length > 0) {
-            technicalMetadata.format = format;
+            technicalMetadata.formatValue = this.formatValue.value;
         }
         // EXTENT
         if (this.extent.value) {
             technicalMetadata.extent = this.extent.value;
         }
         // RESOLUTION
-        let resolution: any = {};
         if (this.resolutionHorizontal.value) {
-            resolution.horizontal = this.resolutionHorizontal.value;
+            technicalMetadata.resolutionHorizontal = this.resolutionHorizontal.value;
         }
         if (this.resolutionVertical.value) {
-            resolution.vertical = this.resolutionVertical.value;
-        }
-        if (Object.keys(resolution).length > 0) {
-            technicalMetadata.resolution = resolution;
+            technicalMetadata.resolutionVertical = this.resolutionVertical.value;
         }
         // COMPRESSION
-        let compression: any = {};
-        if (this.compressionValue.value) {
-            compression.value = this.compressionValue.value;
-        }
-        if (this.compressionRatio.value) {
-            compression.ratio = this.compressionRatio.value;
-        }
-        if (Object.keys(compression).length > 0) {
-            technicalMetadata.compression = compression;
+        if (this.compression.value) {
+            technicalMetadata.compression = this.compression.value;
         }
         // COLOR
-        let color: any = {};
         if (this.colorModel.value) {
-            color.model = this.colorModel.value;
+            technicalMetadata.colorModel = this.colorModel.value;
         }
         if (this.colorDepth.value) {
-            color.depth = this.colorDepth.value;
+            technicalMetadata.colorDepth = this.colorDepth.value;
         }
         if (this.iccProfile.value) {
-            color.iccProfile = this.iccProfile.value;
-        }
-        if (Object.keys(color).length > 0) {
-            technicalMetadata.color = color;
+            technicalMetadata.iccProfile = this.iccProfile.value;
         }
         // PICTURE SIZE
-        let pictureSize: any = {};
         if (this.pictureSizeWidth.value) {
-            pictureSize.width = this.pictureSizeWidth.value;
+            technicalMetadata.pictureSizeWidth = this.pictureSizeWidth.value;
         }
         if (this.pictureSizeHeight.value) {
-            pictureSize.height = this.pictureSizeHeight.value;
-        }
-        if (Object.keys(pictureSize).length > 0) {
-            technicalMetadata.pictureSize = pictureSize;
+            technicalMetadata.pictureSizeHeight = this.pictureSizeHeight.value;
         }
         if (Object.keys(technicalMetadata).length > 0) {
-            record.technicalMetadata = technicalMetadata;
+            record.digitalDocument = technicalMetadata;
         }
 
         record.intellectualEntity = intelectualEntity;
         console.log('record to import', record);
         return record;
     }
+
     importRecord() {
         const record = this.buildRecordToImport();
         if (!record) {
@@ -399,6 +403,7 @@ export class ImportRecordComponent {
             this.importRecordSnackBarVisible.set(false);
         }, 3000);
     }
+
     onRegistrarChange() {
         console.log('Selected registrar changed to:', this.selectedRegistrar);
         this.registrationMode = [];
