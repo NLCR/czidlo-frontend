@@ -256,6 +256,37 @@ export class ApiService {
         return this.doGet(url);
     }
 
+    // DOCUMENTS
+    getRecordByUrnnbn(urnnbn: string): Observable<any> {
+        const url = `${this.apiUrl}/documents/${urnnbn}`;
+        return this.doGet(url);
+        // return of(this.testRecord).pipe(delay(500));
+    }
+    addDigitalInstance(urnnbn: string, newInstance: any): Observable<any> {
+        const url = `${this.apiUrl}/documents/${urnnbn}/instances`;
+        return this.http.post(url, newInstance).pipe(catchError(this.handleError));
+    }
+    editDigitalInstance(instanceId: string, updatedInstance: any): Observable<any> {
+        const url = `${this.apiUrl}/instances/${instanceId}`;
+        return this.http.put(url, updatedInstance).pipe(catchError(this.handleError));
+    }
+    deactivateInstance(instanceId: string): Observable<any> {
+        const url = `${this.apiUrl}/instances/${instanceId}/deactivation`;
+        return this.http.post(url, {}).pipe(catchError(this.handleError));
+    }
+    deactivateUrnNbn(urnnbn: string, reason: string): Observable<any> {
+        const url = `${this.apiUrl}/documents/${urnnbn}/deactivation`;
+        return this.http.post(url, reason).pipe(catchError(this.handleError));
+    }
+    reactivateUrnNbn(urnnbn: string): Observable<any> {
+        const url = `${this.apiUrl}/documents/${urnnbn}/deactivation`;
+        return this.http.delete(url).pipe(catchError(this.handleError));
+    }
+    deactivateDigitalInstance(instanceId: string, reason: string): Observable<any> {
+        const url = `${this.apiUrl}/instances/${instanceId}/deactivation`;
+        return this.http.post(url, reason).pipe(catchError(this.handleError));
+    }
+
     // ELASTICSEARCH
 
     // STATISTICS DATA FOR ASSIGNMENTS
@@ -338,12 +369,6 @@ export class ApiService {
         } else {
             return this.http.post<any>(url, body, { headers });
         }
-    }
-
-    getRecordByUrnnbn(urnnbn: string): Observable<any> {
-        const url = `${this.apiUrl}/documents/${urnnbn}`;
-        return this.doGet(url);
-        // return of(this.testRecord).pipe(delay(500));
     }
 
     testRecord = {

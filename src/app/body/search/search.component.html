@@ -227,7 +227,9 @@
                                 <div class="app-ie-header" (click)="item.urnopen = !item.urnopen">
                                     <img [src]="item.urnopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                                     <div class="app-part-title">
-                                        <div class="app-label-2">urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}</div>
+                                        <div class="app-label-2">
+                                            urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}
+                                        </div>
                                         <app-button variant="tertiary" size="xs">XML →</app-button>
                                         <app-button variant="tertiary" size="xs">JSON →</app-button>
                                     </div>
@@ -265,11 +267,7 @@
                             </div>
 
                             <!-- TECHNICKA METADATA -->
-                            <div
-                                class="app-ie-technical-metadata"
-                                [ngClass]="{ opened: item.tmopen }"
-                                *ngIf="item.details?.digitalDocument"
-                            >
+                            <div class="app-ie-technical-metadata" [ngClass]="{ opened: item.tmopen }" *ngIf="item.details?.digitalDocument">
                                 <div class="app-ie-header" (click)="item.tmopen = !item.tmopen">
                                     <img [src]="item.tmopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                                     <div class="app-part-title">
@@ -281,15 +279,19 @@
                                         <div class="app-label">{{ 'search.format' | translate }}:</div>
                                         <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.format }}</div>
                                         <div class="app-value-2">
-                                            ({{ 'search.version' | translate }}
-                                            {{ item.details?.digitalDocument?.formatVersion }})
+                                            ({{ 'search.version' | translate }} {{ item.details?.digitalDocument?.formatVersion }})
                                         </div>
                                     </div>
                                     <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.extent">
                                         <div class="app-label">{{ 'search.extent' | translate }}:</div>
                                         <div class="app-value">{{ item.details?.digitalDocument?.extent }}</div>
                                     </div>
-                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.resolutionHorizontal && item.details?.digitalDocument?.resolutionVertical">
+                                    <div
+                                        class="app-ie-field"
+                                        *ngIf="
+                                            item.details?.digitalDocument?.resolutionHorizontal && item.details?.digitalDocument?.resolutionVertical
+                                        "
+                                    >
                                         <div class="app-label">{{ 'search.resolution' | translate }}:</div>
                                         <div class="app-value">{{ item.details?.digitalDocument?.resolutionHorizontal }}</div>
                                         x
@@ -300,12 +302,18 @@
                                         <div class="app-label">{{ 'search.compression' | translate }}:</div>
                                         <div class="app-value">{{ item.details?.digitalDocument?.compression }}</div>
                                     </div>
-                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.colorModel && item.details?.digitalDocument?.colorDepth">
+                                    <div
+                                        class="app-ie-field"
+                                        *ngIf="item.details?.digitalDocument?.colorModel && item.details?.digitalDocument?.colorDepth"
+                                    >
                                         <div class="app-label">{{ 'search.color' | translate }}:</div>
                                         <div class="app-value">{{ item.details?.digitalDocument?.colorModel }}</div>
                                         <div class="app-value">{{ item.details?.digitalDocument?.colorDepth }}bit</div>
                                     </div>
-                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.pictureWidth && item.details?.digitalDocument?.pictureHeight">
+                                    <div
+                                        class="app-ie-field"
+                                        *ngIf="item.details?.digitalDocument?.pictureWidth && item.details?.digitalDocument?.pictureHeight"
+                                    >
                                         <div class="app-label">{{ 'search.pictureSize' | translate }}:</div>
                                         <div class="app-value">{{ item.details?.digitalDocument?.pictureWidth }}</div>
                                         x
@@ -324,11 +332,7 @@
                             </div>
 
                             <!-- RSI -->
-                            <div
-                                class="app-ie-rsi"
-                                [ngClass]="{ opened: item.rsiopen }"
-                                *ngIf="item.details?.registrarScopeIdentifiers?.length > 0"
-                            >
+                            <div class="app-ie-rsi" [ngClass]="{ opened: item.rsiopen }" *ngIf="item.details?.registrarScopeIdentifiers?.length > 0">
                                 <div class="app-ie-header" (click)="item.rsiopen = !item.rsiopen">
                                     <img [src]="item.rsiopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                                     <div class="app-part-title">
@@ -382,12 +386,20 @@
                                             <div class="app-label">{{ 'search.created' | translate }}:</div>
                                             <div class="app-value">{{ di.created.split('[')[0] | date }}</div>
                                         </div>
+                                        <div class="app-buttons">
+                                            <app-button variant="primary" size="s" (click)="editDigitalInstance(item, di)">
+                                                <span>{{ 'buttons.edit' | translate }}</span>
+                                            </app-button>
+                                            <app-button variant="primary" size="s" (click)="deactivateDigitalInstance(item, di)">
+                                                <span>{{ 'buttons.deactivate' | translate }}</span>
+                                            </app-button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <pre>{{ item | json }}</pre>
+                    <!-- <pre>{{ item | json }}</pre> -->
                 </div>
             </div>
         </div>
@@ -464,9 +476,7 @@
             <div class="app-sidebar-title" *ngIf="activeAction === 'edit'">
                 {{ 'import.' + selectedEntity | translate }}
             </div>
-            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance'">
-                {{ 'import.add-instance' | translate }} {{ title.value }}
-            </div>
+            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance'">{{ 'import.add-instance' | translate }} {{ title.value }}</div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>
@@ -906,7 +916,6 @@
         </div>
 
         <div class="app-sidebar-content" *ngIf="activeAction === 'add-instance'">
-
             <!-- DIGITAL DOCUMENT INSTANCE -->
             <div class="app-part">
                 <div class="app-part-content">
@@ -926,7 +935,7 @@
                         </div>
                     </div>
                     <!-- FORMAT -->
-                     <div class="app-base-input-container">
+                    <div class="app-base-input-container">
                         <div class="app-base-input app-half-width app-otherId">
                             <div class="app-base-input-label">
                                 {{ 'import.format' | translate }}
@@ -935,7 +944,7 @@
                         </div>
                     </div>
                     <!-- DOSTUPNOST -->
-                     <div class="app-base-input-container">
+                    <div class="app-base-input-container">
                         <div class="app-base-input app-half-width app-otherId">
                             <div class="app-base-input-label">
                                 {{ 'import.access' | translate }}
@@ -944,7 +953,7 @@
                         </div>
                     </div>
                     <!-- URL -->
-                     <div class="app-base-input-container">
+                    <div class="app-base-input-container">
                         <div class="app-base-input app-half-width app-otherId">
                             <div class="app-base-input-label">
                                 {{ 'import.url' | translate }}
@@ -980,7 +989,13 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" (click)="onEditRecordConfirm()" [disabled]="isButtonDisabled()" *ngIf="activeAction === 'edit'">
+                <app-button
+                    variant="primary"
+                    size="l"
+                    (click)="onEditRecordConfirm()"
+                    [disabled]="isButtonDisabled()"
+                    *ngIf="activeAction === 'edit'"
+                >
                     <span>{{ 'buttons.import-record' | translate }}</span>
                 </app-button>
                 <app-button variant="primary" size="l" (click)="onAddInstanceConfirm()" *ngIf="activeAction === 'add-instance'">

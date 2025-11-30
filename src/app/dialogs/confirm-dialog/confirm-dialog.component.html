@@ -1,7 +1,9 @@
 <div class="app-dialog app-confirm-dialog">
     <div class="app-dialog-header">
-        <div class="app-dialog-title">
-            {{ data.title | translate }} "{{ data.data?.id }} - {{ data.data?.type || data.data?.name || data.data?.login }}"?
+        <div class="app-dialog-title" *ngIf="data?.data">
+            {{ data.title | translate }}
+            <span *ngIf="data.data.id || data.data.type || data.data.name || data.data.login">{{ data.data?.id }} - {{ data.data?.type || data.data?.name || data.data?.login }}"</span>
+            ?
         </div>
         <div class="app-close" (click)="onCancel()">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -20,9 +22,19 @@
             </svg>
         </div>
     </div>
-    <div class="app-dialog-body" *ngIf="data?.message">
+    <div class="app-dialog-body" *ngIf="data?.message || data?.reason !== undefined">
         <div class="app-dialog-message">
             {{ data.message }}
+        </div>
+        <div class="app-dialog-reason" *ngIf="data?.reason !== undefined">
+            <div class="app-base-input-container">
+                <div class="app-base-input app-full-width">
+                    <div class="app-base-input-label">
+                        {{ 'search.reason' | translate }}
+                    </div>
+                    <input matInput type="text" [(ngModel)]="data.reason" />
+                </div>
+            </div>
         </div>
     </div>
 

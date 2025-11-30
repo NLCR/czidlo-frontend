@@ -6,6 +6,8 @@ import { FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors
 import { TranslateService } from '@ngx-translate/core';
 import { EnvironmentService } from '../../services/environment.service';
 import { RegistrarsService } from '../../services/registrars.service';
+import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-search',
@@ -123,7 +125,8 @@ export class SearchComponent implements AfterViewInit {
         private apiService: ApiService,
         private envService: EnvironmentService,
         private translate: TranslateService,
-        private registrarsService: RegistrarsService
+        private registrarsService: RegistrarsService,
+        private dialog: MatDialog
     ) {}
 
     ngOnInit() {
@@ -148,7 +151,16 @@ export class SearchComponent implements AfterViewInit {
         });
 
         this.translate
-            .get(['import.resolver', 'import.reservation', 'import.author', 'import.event', 'import.corporation', 'import.open', 'import.restricted', 'import.unknown'])
+            .get([
+                'import.resolver',
+                'import.reservation',
+                'import.author',
+                'import.event',
+                'import.corporation',
+                'import.open',
+                'import.restricted',
+                'import.unknown',
+            ])
             .subscribe((translations) => {
                 this.registrationMode = [
                     { value: 'resolver', label: translations['import.resolver'] },
@@ -220,6 +232,8 @@ export class SearchComponent implements AfterViewInit {
             complete: () => {
                 console.log('Record details fetch complete', item.details);
                 item.opened = true;
+                item.ddopen = true;
+                item.urnopen = true;
                 item.loading = false;
             },
         });
@@ -344,8 +358,10 @@ export class SearchComponent implements AfterViewInit {
     }
 
     addInstance(item: any) {
+        console.log(item);
         this.activeAction = 'add-instance';
         this.title = new FormControl<string>(item.title);
+        this.urnNbn = new FormControl<string>(item.urnnbn);
         let registrarCode = item.details.registrar.code;
         console.log(registrarCode);
         this.getDigitalLibrariesList(registrarCode);
@@ -353,20 +369,91 @@ export class SearchComponent implements AfterViewInit {
     }
     onAddInstanceConfirm() {
         const newInstance: any = {
-            digitalLibraryId: this.selectedDigitalLibraryId,
+            // digitalLibraryId: this.selectedDigitalLibraryId,
             format: this.diFormat.value,
             url: this.diUrl.value,
-            access: this.diAccess.value,
+            accessibility: this.diAccess.value,
             accessRestriction: this.selectedDiAccessRestrictionId,
         };
-        console.log('Adding new instance:', newInstance);
-        // Zde by následoval kód pro odeslání nové instance na server
+        console.log('Adding new instance:', newInstance, this.urnNbn.value);
+        this.searchService.addNewInstance(this.urnNbn.value || '', newInstance).subscribe({
+            next: (response) => {
+                console.log('New instance added successfully:', response);
+                this.isSidebarOpen.set(false);
+            },
+            error: (error) => {
+                console.error('Error adding new instance:', error);
+            },
+        });
     }
     deactivateURNNBN(item: any) {
-        console.log('Deactivate URNNBN for item', item);
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: { data: item, title: 'messages.confirm-deactivate-urnnbn', confirm: 'buttons.confirm-deactivate', reason: ''  },
+            maxWidth: '800px',
+            minWidth: '600px',
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result && result.confirmed) {
+                this.searchService.deactivateUrnnbn(item.urnnbn, result.reason).subscribe({
+                    next: (response) => {
+                        console.log('URNNBN deactivated successfully:', response);
+                        this.getDetails(item);
+                    },
+                    error: (error) => {
+                        console.error('Error deactivating URNNBN:', error);
+                    },
+                });
+            }
+        });
     }
     reactivateURNNBN(item: any) {
-        console.log('Reactivate URNNBN for item', item);
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: { data: item, title: 'messages.confirm-reactivate-urnnbn', confirm: 'buttons.confirm-reactivate' },
+            maxWidth: '800px',
+            minWidth: '600px',
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.searchService.reactivateUrnnbn(item.urnnbn).subscribe({
+            next: (response) => {
+                console.log('URNNBN reactivated successfully:', response);
+                this.getDetails(item);
+
+            },
+            error: (error) => {
+                console.error('Error reactivating URNNBN:', error);
+            },
+        });
+            }
+        });
+    }
+    editDigitalInstance(item: any, di: any) {
+        console.log(item, di);
+        this.activeAction = 'edit-di';
+    }
+    deactivateDigitalInstance(item: any, di: any) {
+        console.log('deactivate instance', di);
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: { data: item, title: 'messages.confirm-deactivate-di', confirm: 'buttons.confirm-deactivate'  },
+            maxWidth: '800px',
+            minWidth: '600px',
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.searchService.deactivateDigitalInstance(item.urnnbn, di.id).subscribe({
+                    next: (response) => {
+                        console.log('Digital instance deactivated successfully:', response);
+                        this.getDetails(item);
+                    },
+                    error: (error) => {
+                        console.error('Error deactivating digital instance:', error);
+                    },
+                });
+            }
+        });
     }
 
     closeSidebar() {

@@ -110,4 +110,31 @@ export class SearchService {
         );
         return this.apiService.getRecordByUrnnbn(urnnbn);
     }
+    addNewInstance(urnnbn: string, newInstance: any): Observable<any> {
+        return this.apiService.addDigitalInstance(urnnbn, newInstance).pipe(
+            tap({
+                next: (data) => {
+                    console.log('New instance added to', urnnbn, ':', data);
+                },
+                error: (error) => {
+                    console.error('Error adding new instance to', urnnbn, ':', error);
+                },
+            })
+        );
+    }
+    editInstance(instanceId: string, updatedInstance: any): Observable<any> {
+        return this.apiService.editDigitalInstance(instanceId, updatedInstance)
+    }
+    deactivateInstance(instanceId: string): Observable<any> {
+        return this.apiService.deactivateInstance(instanceId)
+    }
+    deactivateUrnnbn(urnnbn: string, reason: string): Observable<any> {
+        return this.apiService.deactivateUrnNbn(urnnbn, reason);
+    }
+    reactivateUrnnbn(urnnbn: string): Observable<any> {
+        return this.apiService.reactivateUrnNbn(urnnbn);
+    }
+    deactivateDigitalInstance(instanceId: string, reason: string): Observable<any> {
+        return this.apiService.deactivateDigitalInstance(instanceId, reason);
+    }
 }

@@ -104,7 +104,9 @@
         "deactivate": "Deaktivovat",
         "reactivate": "Reaktivovat",
         "add-instance": "Přidat instanci",
-        "remove-rights": "Odebrat práva"
+        "remove-rights": "Odebrat práva",
+        "confirm-reactivate": "Ano, reaktivovat",
+        "confirm-deactivate": "Ano, deaktivovat"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
@@ -138,7 +140,10 @@
         "confirm-delete-registrar-title": "Opravdu chcete smazat registrátora",
         "confirm-remove-registrar-right-title": "Opravdu chcete odebrat práva k registrátorovi",
         "user-rights-updated-successfully": "Práva uživatele byla úspěšně aktualizována",
-        "error-updating-user-rights": "Chyba při aktualizaci práv pro registrátora"
+        "error-updating-user-rights": "Chyba při aktualizaci práv pro registrátora",
+        "confirm-deactivate-urnnbn": "Opravdu chcete deaktivovat toto URN:NBN",
+        "confirm-reactivate-urnnbn": "Opravdu chcete reaktivovat toto URN:NBN",
+        "confirm-deactivate-di": "Opravdu chcete deaktivovat tuto digitální instanci"
     },
     "inputs": {
         "pick-start-date": "Vyberte od",
@@ -399,6 +404,7 @@
         "records-found": "Nalezené záznamy",
         "no-results-title": "Žádné výsledky vyhledávání",
         "no-results-text-1": "Výsledky hledání jsou prázdné, zkuste zadat jiný dotaz.",
-        "no-results-text-2": "Pokud máte pocit, že jde o chybu obraťte se na technickou podporu "
+        "no-results-text-2": "Pokud máte pocit, že jde o chybu obraťte se na technickou podporu ",
+        "reason": "Důvod"
     }
 }
