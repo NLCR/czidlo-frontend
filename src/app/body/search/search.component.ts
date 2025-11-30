@@ -182,7 +182,7 @@ export class SearchComponent implements AfterViewInit {
     }
 
     getDetails(item: any) {
-        this.searchService.getRecordDetails('urn:nbn:cz:nk-0076n5').subscribe({
+        this.searchService.getRecordDetails(item.urnnbn).subscribe({
             next: (response) => {
                 console.log('Record details received:', response);
                 this.selectedItem.set(response);
@@ -274,6 +274,9 @@ export class SearchComponent implements AfterViewInit {
     }
     deactivateURNNBN(item: any) {
         console.log('Deactivate URNNBN for item', item);
+    }
+    reactivateURNNBN(item: any) {
+        console.log('Reactivate URNNBN for item', item);
     }
     addInstance(item: any) {
         console.log('Add digital instance for item', item);

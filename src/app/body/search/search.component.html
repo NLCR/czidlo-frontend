@@ -107,17 +107,21 @@
                     </div>
 
                     <!-- PUBLICATION -->
-                    <div class="app-ie-field" *ngIf="item.details && item.details?.digitalDocument?.monograph?.publication?.place">
+                    <div class="app-ie-field" *ngIf="item.details && item.details?.intelectualEntity?.publication?.place">
                         <div class="app-label">{{ 'search.place' | translate }}:</div>
-                        <div class="app-value">{{ item.details?.digitalDocument?.monograph?.publication?.place }}</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.publication?.place }}</div>
                     </div>
-                    <div class="app-ie-field" *ngIf="item.details && item.details?.digitalDocument?.monograph?.publication?.publisher">
+                    <div class="app-ie-field" *ngIf="item.details && item.details?.intelectualEntity?.publication?.publisher">
                         <div class="app-label">{{ 'search.publisher' | translate }}:</div>
-                        <div class="app-value">{{ item.details?.digitalDocument?.monograph?.publication?.publisher }}</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.publication?.publisher }}</div>
                     </div>
-                    <div class="app-ie-field" *ngIf="item.details && item.details?.digitalDocument?.monograph?.publication?.year">
+                    <div class="app-ie-field" *ngIf="item.details && item.details?.intelectualEntity?.publication?.year">
                         <div class="app-label">{{ 'search.year' | translate }}:</div>
-                        <div class="app-value">{{ item.details?.digitalDocument?.monograph?.publication?.year }}</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.publication?.year }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.details && item.details?.intelectualEntity?.digitalBorn.toString()">
+                        <div class="app-label">{{ 'search.digital-born' | translate }}:</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.digitalBorn ? 'true' : ('false' | translate) }}</div>
                     </div>
 
                     <!-- SOURCE TITLE -->
@@ -144,6 +148,20 @@
                     <div class="app-ie-field" *ngIf="item.isbn">
                         <div class="app-label">{{ 'search.isbn' | translate }}:</div>
                         <div class="app-value">{{ item.isbn }}</div>
+                    </div>
+                    <div class="app-ie-fields" *ngIf="item.details.intelectualEntity?.ieIdentifiers?.length > 0">
+                        <div class="app-ie-field" *ngFor="let id of item.details.intelectualEntity?.ieIdentifiers">
+                            <div class="app-label">{{ 'search.' + id.type.toLowerCase() | translate }}:</div>
+                            <div class="app-value">{{ id.value }}</div>
+                        </div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.details.intelectualEntity?.created">
+                        <div class="app-label">{{ 'search.created' | translate }}:</div>
+                        <div class="app-value">{{ item.details.intelectualEntity?.created.split('[')[0] | date }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.details.intelectualEntity?.modified">
+                        <div class="app-label">{{ 'search.modified' | translate }}:</div>
+                        <div class="app-value">{{ item.details.intelectualEntity?.modified.split('[')[0] | date }}</div>
                     </div>
 
                     <div class="app-button-part" *ngIf="isAdmin()">
@@ -178,24 +196,25 @@
                         </div>
                         <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.ddopen">
                             <!-- URNNBN USER -->
-                            <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.urnNbn && !isAdmin()">
+                            <div class="app-ie-field" *ngIf="item.details.urnNbn && !isAdmin()">
                                 <!-- <div class="app-label">{{ 'search.urnNbn' | translate }}:</div> -->
-                                <div class="app-value">{{ item.details.digitalDocument.urnNbn.value }}</div>
-                                <div class="app-value-2">
-                                    ({{ 'search.registered' | translate }} {{ item.details.digitalDocument.created | date }})
-                                </div>
+                                <div class="app-value">urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}</div>
+                                <div class="app-value-2">({{ 'search.registered' | translate }} {{ item.details.urnNbn.registered | date }})</div>
                             </div>
-                            <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.registrar">
+                            <div class="app-ie-field" *ngIf="item.details.urnNbn?.status === 'DEACTIVATED' && !isAdmin()">
+                                <div class="app-label">{{ 'search.status' | translate }}:</div>
+                                <div class="app-value">{{ item.details.urnNbn.status }}</div>
+                                <div class="app-value-2">({{ 'search.deactivated' | translate }} {{ item.details.urnNbn.deactivated | date }})</div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.details?.registrar">
                                 <div class="app-label">{{ 'search.registrar' | translate }}:</div>
-                                <div class="app-value">{{ item.details.digitalDocument?.registrar?.name }}</div>
-                                <div class="app-value-2">({{ item.details.digitalDocument?.registrar?.code }})</div>
+                                <div class="app-value">{{ item.details.registrar?.name }}</div>
+                                <div class="app-value-2">({{ item.details.registrar?.code }})</div>
                             </div>
-                            <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.archiver">
+                            <div class="app-ie-field" *ngIf="item.details?.archiver">
                                 <div class="app-label">{{ 'search.archiver' | translate }}:</div>
-                                <div class="app-value">{{ item.details.digitalDocument?.archiver?.name }}</div>
-                                <div class="app-value-2" *ngIf="item.details.digitalDocument?.archiver?.description">
-                                    ({{ item.details.digitalDocument?.archiver?.description }})
-                                </div>
+                                <div class="app-value">{{ item.details.archiver?.name }}</div>
+                                <div class="app-value-2" *ngIf="item.details.archiver?.description">({{ item.details.archiver?.description }})</div>
                             </div>
                             <div class="app-button-part">
                                 <app-button variant="primary" size="s" (click)="editDigitalDocument(item)">
@@ -208,7 +227,7 @@
                                 <div class="app-ie-header" (click)="item.urnopen = !item.urnopen">
                                     <img [src]="item.urnopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                                     <div class="app-part-title">
-                                        <div class="app-label-2">{{ item.details?.digitalDocument?.urnNbn?.value }}</div>
+                                        <div class="app-label-2">urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}</div>
                                         <app-button variant="tertiary" size="xs">XML →</app-button>
                                         <app-button variant="tertiary" size="xs">JSON →</app-button>
                                     </div>
@@ -216,17 +235,29 @@
                                 <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.urnopen">
                                     <div class="app-ie-field">
                                         <div class="app-label">{{ 'search.registered' | translate }}:</div>
-                                        <div class="app-value">{{ item.details.digitalDocument.urnNbn.registered | date }}</div>
+                                        <div class="app-value">{{ item.details.urnNbn.registered.split('[')[0] | date }}</div>
                                     </div>
                                     <div class="app-ie-field">
                                         <div class="app-label">{{ 'search.status' | translate }}:</div>
-                                        <div class="app-value">{{ item.details.digitalDocument.urnNbn.status }}</div>
+                                        <div class="app-value">{{ item.details.urnNbn.status }}</div>
                                     </div>
+                                    <div class="app-ie-field" *ngIf="item.details.urnNbn.status === 'DEACTIVATED'">
+                                        <div class="app-label">{{ 'search.deactivated' | translate }}:</div>
+                                        <div class="app-value">{{ item.details.urnNbn.deactivated.split('[')[0] | date }}</div>
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details.urnNbn.deactivationNote">
+                                        <div class="app-label">{{ 'search.deactivation-note' | translate }}:</div>
+                                        <div class="app-value">{{ item.details.urnNbn.deactivationNote }}</div>
+                                    </div>
+                                    <!-- TODO PRECEDESSORS AND SUCCESSORS -->
                                     <div class="app-button-part">
-                                        <app-button variant="primary" size="s" (click)="deactivateURNNBN(item)">
+                                        <app-button variant="primary" size="s" (click)="deactivateURNNBN(item)" *ngIf="item.details?.urnNbn.active">
                                             <span>{{ 'buttons.deactivate' | translate }}</span>
                                         </app-button>
-                                        <app-button variant="primary" size="s" (click)="addInstance(item)">
+                                        <app-button variant="primary" size="s" (click)="reactivateURNNBN(item)" *ngIf="!item.details?.urnNbn.active">
+                                            <span>{{ 'buttons.reactivate' | translate }}</span>
+                                        </app-button>
+                                        <app-button variant="primary" size="s" (click)="addInstance(item)" *ngIf="item.details?.urnNbn.active">
                                             <span>{{ 'buttons.add-instance' | translate }}</span>
                                         </app-button>
                                     </div>
@@ -237,7 +268,7 @@
                             <div
                                 class="app-ie-technical-metadata"
                                 [ngClass]="{ opened: item.tmopen }"
-                                *ngIf="item.details?.digitalDocument?.technicalMetadata"
+                                *ngIf="item.details?.digitalDocument"
                             >
                                 <div class="app-ie-header" (click)="item.tmopen = !item.tmopen">
                                     <img [src]="item.tmopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
@@ -246,48 +277,57 @@
                                     </div>
                                 </div>
                                 <div class="app-ie-content" *ngIf="item.tmopen">
-                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.format">
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.format">
                                         <div class="app-label">{{ 'search.format' | translate }}:</div>
-                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.format.format }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.format }}</div>
                                         <div class="app-value-2">
                                             ({{ 'search.version' | translate }}
-                                            {{ item.details?.digitalDocument?.technicalMetadata?.format.version }})
+                                            {{ item.details?.digitalDocument?.formatVersion }})
                                         </div>
                                     </div>
-                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.extent">
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.extent">
                                         <div class="app-label">{{ 'search.extent' | translate }}:</div>
-                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.extent }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.extent }}</div>
                                     </div>
-                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.resolution">
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.resolutionHorizontal && item.details?.digitalDocument?.resolutionVertical">
                                         <div class="app-label">{{ 'search.resolution' | translate }}:</div>
-                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.resolution.horizontal }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.resolutionHorizontal }}</div>
                                         x
-                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.resolution.vertical }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.resolutionVertical }}</div>
                                         dpi
                                     </div>
-                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.compression">
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.compression">
                                         <div class="app-label">{{ 'search.compression' | translate }}:</div>
-                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.compression.standard }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.compression }}</div>
                                     </div>
-                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.color">
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.colorModel && item.details?.digitalDocument?.colorDepth">
                                         <div class="app-label">{{ 'search.color' | translate }}:</div>
-                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.color.model }}</div>
-                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.color.depth }}bit</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.colorModel }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.colorDepth }}bit</div>
                                     </div>
-                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.technicalMetadata?.pictureSize">
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.pictureWidth && item.details?.digitalDocument?.pictureHeight">
                                         <div class="app-label">{{ 'search.pictureSize' | translate }}:</div>
-                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.pictureSize.width }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.pictureWidth }}</div>
                                         x
-                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.pictureSize.height }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.pictureHeight }}</div>
                                         px
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.created">
+                                        <div class="app-label">{{ 'search.created' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.created.split(['['])[0] | date }}</div>
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.modified">
+                                        <div class="app-label">{{ 'search.modified' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.modified.split(['['])[0] | date }}</div>
                                     </div>
                                 </div>
                             </div>
+
                             <!-- RSI -->
                             <div
                                 class="app-ie-rsi"
                                 [ngClass]="{ opened: item.rsiopen }"
-                                *ngIf="item.details?.digitalDocument?.registrarScopeIdentifiers?.length > 0"
+                                *ngIf="item.details?.registrarScopeIdentifiers?.length > 0"
                             >
                                 <div class="app-ie-header" (click)="item.rsiopen = !item.rsiopen">
                                     <img [src]="item.rsiopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
@@ -296,15 +336,16 @@
                                     </div>
                                 </div>
                                 <div class="app-ie-content" *ngIf="item.rsiopen">
-                                    <div class="app-ie-field" *ngFor="let rsi of item.details?.digitalDocument?.registrarScopeIdentifiers">
+                                    <div class="app-ie-field" *ngFor="let rsi of item.details?.registrarScopeIdentifiers">
                                         <div class="app-label">{{ rsi?.type }}:</div>
                                         <div class="app-value">{{ rsi?.value }}</div>
                                     </div>
                                 </div>
                             </div>
+
                             <!--DIGITAL INSTANCES -->
-                            <div class="app-ie-di" *ngIf="item.details?.digitalDocument?.digitalInstances?.length > 0">
-                                <div *ngFor="let di of item.details?.digitalDocument?.digitalInstances">
+                            <div class="app-ie-di" *ngIf="item.details?.digitalInstances?.length > 0">
+                                <div *ngFor="let di of item.details?.digitalInstances">
                                     <div class="app-ie-header" (click)="di.diopen = !di.diopen">
                                         <img [src]="di.diopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                                         <div class="app-part-title app-part-title-di">
@@ -320,9 +361,9 @@
                                             <div class="app-label">{{ 'search.active' | translate }}:</div>
                                             <div class="app-value">{{ 'search.' + di.active | translate }}</div>
                                         </div>
-                                        <div class="app-ie-field" *ngIf="di.digitalLibrary">
+                                        <div class="app-ie-field" *ngIf="di.library">
                                             <div class="app-label">{{ 'search.digitalLibrary' | translate }}:</div>
-                                            <div class="app-value">{{ di.digitalLibrary.name }}</div>
+                                            <div class="app-value">{{ di.library.name }}</div>
                                             <app-button variant="tertiary" size="xs">{{ 'search.didetails' | translate }} →</app-button>
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.format">
@@ -339,14 +380,14 @@
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.created">
                                             <div class="app-label">{{ 'search.created' | translate }}:</div>
-                                            <div class="app-value">{{ di.created | date }}</div>
+                                            <div class="app-value">{{ di.created.split('[')[0] | date }}</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <pre>{{ item | json }}</pre>
+                    <!-- <pre>{{ item | json }}</pre> -->
                 </div>
             </div>
         </div>

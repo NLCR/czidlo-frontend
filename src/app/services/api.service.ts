@@ -277,7 +277,7 @@ export class ApiService {
             })
         );
     }
-    
+
     // STATISTICS DATA FOR RESOLVATIONS
     getStatisticsDataResolve(body: any): Observable<any> {
         const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_9/_search';
@@ -341,9 +341,9 @@ export class ApiService {
     }
 
     getRecordByUrnnbn(urnnbn: string): Observable<any> {
-        // const url = `https://resolver.nkp.cz/api/v6/resolver/${urnnbn}?format=json`;
-        // return this.http.get(url).pipe(catchError(this.handleError));
-        return of(this.testRecord).pipe(delay(500));
+        const url = `${this.apiUrl}/documents/${urnnbn}`;
+        return this.doGet(url);
+        // return of(this.testRecord).pipe(delay(500));
     }
 
     testRecord = {
