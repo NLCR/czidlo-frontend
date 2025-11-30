@@ -8,6 +8,7 @@ export const environment = {
     environmentCode: 'd_d', // pro produkci ziskej z promenne APP_ENV_CODE (přes env.json)
 
     czidloApiServiceBaseUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_API_SERVICE_URL (přes env.json)
+    czidloPublicApiBaseUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_PUBLIC_API_URL (přes env.json)
     
     //TODO: presunout do konfigurace
     pageInfoCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Informace.md',

@@ -4,6 +4,7 @@ import { SearchService } from '../../services/search.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { EnvironmentService } from '../../services/environment.service';
 
 @Component({
     selector: 'app-search',
@@ -105,7 +106,7 @@ export class SearchComponent implements AfterViewInit {
     importRecordSnackBarVisible = signal(false);
     isButtonDisabled = signal(true);
 
-    constructor(public searchService: SearchService, private router: Router, private route: ActivatedRoute, private apiService: ApiService, private translate: TranslateService) {}
+    constructor(public searchService: SearchService, private router: Router, private route: ActivatedRoute, private apiService: ApiService, private envService: EnvironmentService, private translate: TranslateService) {}
 
     ngOnInit() {
         this.route.queryParams.subscribe((params) => {
@@ -407,4 +408,17 @@ export class SearchComponent implements AfterViewInit {
         this.displayedMiddlePages = this.pages.slice(this.currentPage - 1, this.currentPage + 2);
         this.displayedLastPages = [this.lastPage];
     }
+
+    openDocumentXml(urnnbn: string) {
+        const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
+        const xmlUrl = `${publicApiBaseUrl}/resolver/${urnnbn}?format=xml`;
+        window.open(xmlUrl, '_blank');        
+    }
+
+    openDocumentJson(urnnbn: string) {
+        const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
+        const jsonUrl = `${publicApiBaseUrl}/resolver/${urnnbn}?format=json`;
+        window.open(jsonUrl, '_blank');
+    }
+
 }

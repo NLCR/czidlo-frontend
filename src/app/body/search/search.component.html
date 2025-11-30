@@ -190,8 +190,8 @@
                             <img [src]="item.ddopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                             <div class="app-part-title">
                                 <div class="app-label">{{ 'search.dd' | translate }}</div>
-                                <app-button variant="tertiary" size="xs">XML →</app-button>
-                                <app-button variant="tertiary" size="xs">JSON →</app-button>
+                                <app-button variant="tertiary" size="xs" (click)="openDocumentXml(item.urnnbn)">XML →</app-button>
+                                <app-button variant="tertiary" size="xs" (click)="openDocumentJson(item.urnnbn)">JSON →</app-button>
                             </div>
                         </div>
                         <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.ddopen">

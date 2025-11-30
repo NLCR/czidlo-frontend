@@ -19,7 +19,8 @@ First define configuration in environment variables
 
 ```shell
 export APP_DEV_MODE=false
-export APP_CZIDLO_API_SERVICE_URL="https://czidlo-web-api.trinera.cloud/czidlo-web-api/api"
+export APP_CZIDLO_API_SERVICE_URL="https://czidlo-web-api.trinera.cloud/web-api/api"
+export APP_CZIDLO_PUBLIC_API_URL="https://resolver.nkp.cz/api/v6"
 ```
 
 Now run `npm run build` to build the project. 
@@ -75,7 +76,8 @@ Run locally built Docker image
 ```
 docker run -p 1234:80 \
   -e APP_DEV_MODE=false \
-  -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/czidlo-web-api/api \  
+  -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/web-api/api \
+  -e APP_CZIDLO_PUBLIC_API_URL=https://resolver.nkp.cz/api/v6 \
 trinera/czidlo-frontend
 ```
 
@@ -83,7 +85,8 @@ trinera/czidlo-frontend
 ```
 docker run -p 1234:80 \
   -e APP_DEV_MODE=false \
-  -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/czidlo-web-api/api \
+  -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/web-api/api \
+  -e APP_CZIDLO_PUBLIC_API_URL=https://resolver.nkp.cz/api/v6 \
 trinera/czidlo-frontend:latest
 ```
 or
@@ -91,7 +94,8 @@ or
 ```
 docker run -p 1234:80 \
   -e APP_DEV_MODE=false \
-  -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/czidlo-web-api/api \  
+  -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/web-api/api \
+  -e APP_CZIDLO_PUBLIC_API_URL=https://resolver.nkp.cz/api/v6 \  
 trinera/czidlo-frontend:0.0.0
 ```
 
@@ -105,7 +109,8 @@ Run image that someone built and pushed to Dockerhub.
 docker pull trinera/czidlo-frontend:latest
 docker run -p 1234:80 \
   -e APP_DEV_MODE=false \
-  -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/czidlo-web-api/api/ \  
+  -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/web-api/api/ \
+  -e APP_CZIDLO_PUBLIC_API_URL=https://resolver.nkp.cz/api/v6 \  
 trinera/czidlo-frontend
 ```
 
