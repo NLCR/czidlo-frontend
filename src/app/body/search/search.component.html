@@ -217,8 +217,8 @@
                                 <div class="app-value-2" *ngIf="item.details.archiver?.description">({{ item.details.archiver?.description }})</div>
                             </div>
                             <div class="app-button-part">
-                                <app-button variant="primary" size="s" (click)="editDigitalDocument(item)">
-                                    <span>{{ 'buttons.edit' | translate }}</span>
+                                <app-button variant="primary" size="s" (click)="addInstance(item)">
+                                    <span>{{ 'buttons.add-instance' | translate }}</span>
                                 </app-button>
                             </div>
 
@@ -387,7 +387,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <pre>{{ item | json }}</pre> -->
+                    <pre>{{ item | json }}</pre>
                 </div>
             </div>
         </div>
@@ -461,14 +461,17 @@
     <div class="app-sidebar-entity">
         <!-- HEADER -->
         <div class="app-sidebar-header">
-            <div class="app-sidebar-title">
+            <div class="app-sidebar-title" *ngIf="activeAction === 'edit'">
                 {{ 'import.' + selectedEntity | translate }}
+            </div>
+            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance'">
+                {{ 'import.add-instance' | translate }} {{ title.value }}
             </div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>
         </div>
-        <div class="app-sidebar-content">
+        <div class="app-sidebar-content" *ngIf="activeAction === 'edit'">
             <div class="app-field-hint">{{ 'import.mandatory' | translate }}</div>
 
             <!-- TITLE_PART -->
@@ -851,16 +854,16 @@
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width app-compressionRatio">
                             <div class="app-base-input-label">
-                                {{ 'import.compressionRatio' | translate }}
+                                {{ 'import.compression' | translate }}
                             </div>
-                            <input matInput type="text" [formControl]="compressionRatio" />
+                            <input matInput type="text" [formControl]="compression" />
                         </div>
-                        <div class="app-base-input app-half-width app-compressionValue">
+                        <!-- <div class="app-base-input app-half-width app-compressionValue">
                             <div class="app-base-input-label">
                                 {{ 'import.compressionValue' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="compressionValue" />
-                        </div>
+                        </div> -->
                     </div>
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width app-colorModel">
@@ -902,6 +905,72 @@
             </div>
         </div>
 
+        <div class="app-sidebar-content" *ngIf="activeAction === 'add-instance'">
+
+            <!-- DIGITAL DOCUMENT INSTANCE -->
+            <div class="app-part">
+                <div class="app-part-content">
+                    <!-- DIGITAL LIBRARY -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-primaryArchiverId">
+                            <div class="app-base-input-label">
+                                {{ 'import.digital-library' | translate }}
+                            </div>
+                            <mat-form-field appearance="outline">
+                                <mat-select class="app-singleselect" [(value)]="selectedDigitalLibraryId">
+                                    @for (entity of digitalLibrariesList(); track entity) {
+                                    <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <!-- FORMAT -->
+                     <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-otherId">
+                            <div class="app-base-input-label">
+                                {{ 'import.format' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="diFormat" />
+                        </div>
+                    </div>
+                    <!-- DOSTUPNOST -->
+                     <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-otherId">
+                            <div class="app-base-input-label">
+                                {{ 'import.access' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="diAccess" />
+                        </div>
+                    </div>
+                    <!-- URL -->
+                     <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-otherId">
+                            <div class="app-base-input-label">
+                                {{ 'import.url' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="diUrl" />
+                        </div>
+                    </div>
+                    <!-- OMEZENI PRISTUPU -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-primaryArchiverId">
+                            <div class="app-base-input-label">
+                                {{ 'import.access-restriction' | translate }}
+                            </div>
+                            <mat-form-field appearance="outline">
+                                <mat-select class="app-singleselect" [(value)]="selectedDiAccessRestrictionId">
+                                    @for (entity of diAccessRestrictionsList; track entity) {
+                                    <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- FOOTER -->
         <div class="app-sidebar-footer" [ngClass]="{ 'snack-bar-visible': importRecordSnackBarVisible() }">
             <div class="app-record-imported-snack-bar" *ngIf="importRecordSnackBarVisible()">
@@ -911,8 +980,11 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" (click)="onEditRecordConfirm()" [disabled]="isButtonDisabled()">
+                <app-button variant="primary" size="l" (click)="onEditRecordConfirm()" [disabled]="isButtonDisabled()" *ngIf="activeAction === 'edit'">
                     <span>{{ 'buttons.import-record' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" (click)="onAddInstanceConfirm()" *ngIf="activeAction === 'add-instance'">
+                    <span>{{ 'buttons.add-instance' | translate }}</span>
                 </app-button>
             </div>
         </div>

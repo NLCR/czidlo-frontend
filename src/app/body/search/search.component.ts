@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { EnvironmentService } from '../../services/environment.service';
+import { RegistrarsService } from '../../services/registrars.service';
 
 @Component({
     selector: 'app-search',
@@ -17,6 +18,7 @@ export class SearchComponent implements AfterViewInit {
     searchQuery: string = '';
     selectedType: string = '';
     selectedItem = signal<any>(null);
+    activeAction: string = '';
 
     // PAGINATION
     pages: any[] = [];
@@ -80,8 +82,7 @@ export class SearchComponent implements AfterViewInit {
     extent = new FormControl<string>('');
     resolutionHorizontal = new FormControl<string>('');
     resolutionVertical = new FormControl<string>('');
-    compressionRatio = new FormControl<string>('');
-    compressionValue = new FormControl<string>('');
+    compression = new FormControl<string>('');
     colorModel = new FormControl<string>('');
     colorDepth = new FormControl<string>('');
     iccProfile = new FormControl<string>('');
@@ -106,7 +107,24 @@ export class SearchComponent implements AfterViewInit {
     importRecordSnackBarVisible = signal(false);
     isButtonDisabled = signal(true);
 
-    constructor(public searchService: SearchService, private router: Router, private route: ActivatedRoute, private apiService: ApiService, private envService: EnvironmentService, private translate: TranslateService) {}
+    // DIGITAL INSTANCES
+    digitalLibrariesList = signal<Array<any>>([]);
+    selectedDigitalLibraryId = '';
+    diFormat = new FormControl<string>('');
+    diUrl = new FormControl<string>('');
+    diAccess = new FormControl<string>('');
+    selectedDiAccessRestrictionId = '';
+    diAccessRestrictionsList: Array<{ value: string; label: string }> = [];
+
+    constructor(
+        public searchService: SearchService,
+        private router: Router,
+        private route: ActivatedRoute,
+        private apiService: ApiService,
+        private envService: EnvironmentService,
+        private translate: TranslateService,
+        private registrarsService: RegistrarsService
+    ) {}
 
     ngOnInit() {
         this.route.queryParams.subscribe((params) => {
@@ -130,7 +148,7 @@ export class SearchComponent implements AfterViewInit {
         });
 
         this.translate
-            .get(['import.resolver', 'import.reservation', 'import.author', 'import.event', 'import.corporation'])
+            .get(['import.resolver', 'import.reservation', 'import.author', 'import.event', 'import.corporation', 'import.open', 'import.restricted', 'import.unknown'])
             .subscribe((translations) => {
                 this.registrationMode = [
                     { value: 'resolver', label: translations['import.resolver'] },
@@ -141,7 +159,13 @@ export class SearchComponent implements AfterViewInit {
                     { value: 'event', label: translations['import.event'] },
                     { value: 'corporation', label: translations['import.corporation'] },
                 ];
+                this.diAccessRestrictionsList = [
+                    { value: 'UNKNOWN', label: translations['import.unknown'] },
+                    { value: 'OPEN', label: translations['import.open'] },
+                    { value: 'RESTRICTED', label: translations['import.restricted'] },
+                ];
                 this.selectedMode = this.registrationMode[0].value;
+                this.selectedDiAccessRestrictionId = this.diAccessRestrictionsList[0].value;
             });
     }
 
@@ -218,60 +242,125 @@ export class SearchComponent implements AfterViewInit {
         console.log(item.sdtitleopen);
         item.sdtitleopen = !item.sdtitleopen;
     }
+    getArchiversList(selectedArchiverId: string) {
+        return this.registrarsService.getArchivers().subscribe({
+            next: (response) => {
+                console.log('Archivers received:', response);
+                this.archiverIdsList.set(response.items);
+                this.selectedArchiverId = selectedArchiverId;
+            },
+            error: (error) => {
+                console.error('Error fetching archivers:', error);
+                return [];
+            },
+            complete: () => {
+                console.log('Archivers fetch complete');
+            },
+        });
+    }
+    getDigitalLibrariesList(registrarCode: string) {
+        return this.registrarsService.getDigitalLibrariesByRegistrar(registrarCode).subscribe({
+            next: (response) => {
+                console.log('Digital libraries received:', response);
+                this.digitalLibrariesList.set(response.digitalLibraries || []);
+                this.selectedDigitalLibraryId = response.digitalLibraries.length > 0 ? response.digitalLibraries[0].id : '';
+            },
+            error: (error) => {
+                console.error('Error fetching digital libraries:', error);
+                return [];
+            },
+            complete: () => {
+                console.log('Digital libraries fetch complete');
+            },
+        });
+    }
 
     editItem(item: any) {
+        this.activeAction = 'edit';
         this.selectedItem.set(item);
-        let editedItem = item.details.digitalDocument;
+        this.getArchiversList(item.details.archiver?.id || '');
+        let editedItem = item.details;
         this.selectedEntity = item.documenttype;
         let entity = this.selectedEntity.toLowerCase();
-        console.log('entity', entity);
-        this.title = new FormControl<string>(editedItem[entity].titleInfo.title, [Validators.required]);
-        this.subTitle = new FormControl<string>(editedItem[entity].titleInfo.subtitle);
-        this.ccnb = new FormControl<string>(editedItem[entity].ccnb || '', [this.ccnbValidator()]);
-        this.isbn = new FormControl<string>(editedItem[entity].isbn || '', [this.isbnValidator()]);
-        this.issn = new FormControl<string>(editedItem[entity].issn || '', [this.issnValidator()]);
-        this.otherId = new FormControl<string>(editedItem[entity].otherId || '');
-        this.selectedOriginatorType = editedItem[entity].primaryOriginator.type.toLowerCase() || 'author';
-        this.primaryOriginatorValue = new FormControl<string>(editedItem[entity].primaryOriginator.value || '');
-        this.otherOriginator = new FormControl<string>(editedItem[entity].otherOriginator || '');
-        this.place = new FormControl<string>(editedItem[entity].publication?.place || '');
-        this.publisher = new FormControl<string>(editedItem[entity].publication?.publisher || '');
-        this.year = new FormControl<string>(editedItem[entity].publication?.year || '');
+        // BASIC DETAILS
+        this.title = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'TITLE')?.value || '', [
+            Validators.required,
+        ]);
+        this.subTitle = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'SUB_TITLE')?.value || '');
+        this.ccnb = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'CCNB')?.value || '', [
+            this.ccnbValidator(),
+        ]);
+        this.isbn = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'ISBN')?.value || '', [
+            this.isbnValidator(),
+        ]);
+        this.issn = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'ISSN')?.value || '', [
+            this.issnValidator(),
+        ]);
+        this.otherId = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'OTHER')?.value || '');
+        this.selectedOriginatorType = editedItem.intelectualEntity?.originator.type.toLowerCase() || 'author';
+        this.primaryOriginatorValue = new FormControl<string>(editedItem.intelectualEntity?.originator.value || '');
+        this.otherOriginator = new FormControl<string>(editedItem.intelectualEntity?.otherOriginator || '');
+        this.place = new FormControl<string>(editedItem.intelectualEntity?.publication?.place || '');
+        this.publisher = new FormControl<string>(editedItem.intelectualEntity?.publication?.publisher || '');
+        this.year = new FormControl<string>(editedItem.intelectualEntity?.publication?.year || '');
+
         this.financed = new FormControl<string>(editedItem.financed || '');
         this.contractNumber = new FormControl<string>(editedItem.contractNumber || '');
+        this.selectedArchiverId = item.details.archiver?.id || '';
+
         this.urnNbn = new FormControl<string>(editedItem.urnNbn || '');
-        this.formatValue = new FormControl<string>(editedItem.technicalMetadata?.format.format || '');
-        this.formatVersion = new FormControl<string>(editedItem.technicalMetadata?.format.version || '');
-        this.extent = new FormControl<string>(editedItem.technicalMetadata?.extent || '');
-        this.resolutionHorizontal = new FormControl<string>(editedItem.technicalMetadata?.resolution.horizontal || '');
-        this.resolutionVertical = new FormControl<string>(editedItem.technicalMetadata?.resolution.vertical || '');
-        this.compressionRatio = new FormControl<string>(editedItem.technicalMetadata?.compression.standard || '');
-        this.compressionValue = new FormControl<string>(editedItem.technicalMetadata?.compression.value || '');
-        this.colorModel = new FormControl<string>(editedItem.technicalMetadata?.color.model || '');
-        this.colorDepth = new FormControl<string>(editedItem.technicalMetadata?.color.depth || '');
-        this.iccProfile = new FormControl<string>(editedItem.technicalMetadata?.iccProfile || '');
-        this.pictureSizeWidth = new FormControl<string>(editedItem.technicalMetadata?.pictureSize.width || '');
-        this.pictureSizeHeight = new FormControl<string>(editedItem.technicalMetadata?.pictureSize.height || '');
+        // TECHNICAL METADATA
+        this.formatValue = new FormControl<string>(editedItem.digitalDocument?.format || '');
+        this.formatVersion = new FormControl<string>(editedItem.digitalDocument?.formatVersion || '');
+        this.extent = new FormControl<string>(editedItem.digitalDocument?.extent || '');
+        this.resolutionHorizontal = new FormControl<string>(editedItem.digitalDocument?.resolutionHorizontal || '');
+        this.resolutionVertical = new FormControl<string>(editedItem.digitalDocument?.resolutionVertical || '');
+        this.compression = new FormControl<string>(editedItem.digitalDocument?.compression || '');
+        // this.compressionRatio = new FormControl<string>(editedItem.digitalDocument?.compression || '');
+        // this.compressionValue = new FormControl<string>(editedItem.digitalDocument?.compression.value || '');
+        this.colorModel = new FormControl<string>(editedItem.digitalDocument?.colorModel || '');
+        this.colorDepth = new FormControl<string>(editedItem.digitalDocument?.colorDepth || '');
+        this.iccProfile = new FormControl<string>(editedItem.digitalDocument?.iccProfile || '');
+        this.pictureSizeWidth = new FormControl<string>(editedItem.digitalDocument?.pictureWidth || '');
+        this.pictureSizeHeight = new FormControl<string>(editedItem.digitalDocument?.pictureHeight || '');
+
         if (this.selectedEntity === 'THESIS') {
             this.degreeAwardingInstitution = new FormControl<string>(editedItem[entity].degreeAwardingInstitution || '');
         }
         if (this.selectedEntity === 'ANALYTICAL') {
-            this.sourceDocumentTitle = new FormControl<string>(editedItem[entity].sourceDocument?.title || '');
-            this.sourceDocumentVolumeTitle = new FormControl<string>(editedItem[entity].sourceDocument?.volumeTitle || '');
-            this.sourceDocumentIssueTitle = new FormControl<string>(editedItem[entity].sourceDocument?.issueTitle || '');
-            this.sourceDocumentCcnb = new FormControl<string>(editedItem[entity].sourceDocument?.ccnb || '', [this.ccnbValidator()]);
-            this.sourceDocumentIsbn = new FormControl<string>(editedItem[entity].sourceDocument?.isbn || '', [this.isbnValidator()]);
-            this.sourceDocumentIssn = new FormControl<string>(editedItem[entity].sourceDocument?.issn || '', [this.issnValidator()]);
-            this.sourceDocumentOtherId = new FormControl<string>(editedItem[entity].sourceDocument?.otherId || '');
-            this.sourceDocumentPlace = new FormControl<string>(editedItem[entity].sourceDocument?.publication?.place || '');
-            this.sourceDocumentPublisher = new FormControl<string>(editedItem[entity].sourceDocument?.publication?.publisher || '');
-            this.sourceDocumentYear = new FormControl<string>(editedItem[entity].sourceDocument?.publication?.year || '');
+            this.sourceDocumentTitle = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.title || '');
+            this.sourceDocumentVolumeTitle = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.volumeTitle || '');
+            this.sourceDocumentIssueTitle = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.issueTitle || '');
+            this.sourceDocumentCcnb = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.ccnb || '', [this.ccnbValidator()]);
+            this.sourceDocumentIsbn = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.isbn || '', [this.isbnValidator()]);
+            this.sourceDocumentIssn = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.issn || '', [this.issnValidator()]);
+            this.sourceDocumentOtherId = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.otherId || '');
+            this.sourceDocumentPlace = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.publication?.place || '');
+            this.sourceDocumentPublisher = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.publication?.publisher || '');
+            this.sourceDocumentYear = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.publication?.year || '');
         }
 
         this.isSidebarOpen.set(true);
     }
-    editDigitalDocument(item: any) {
-        console.log('Edit digital document for item', item);
+
+    addInstance(item: any) {
+        this.activeAction = 'add-instance';
+        this.title = new FormControl<string>(item.title);
+        let registrarCode = item.details.registrar.code;
+        console.log(registrarCode);
+        this.getDigitalLibrariesList(registrarCode);
+        this.isSidebarOpen.set(true);
+    }
+    onAddInstanceConfirm() {
+        const newInstance: any = {
+            digitalLibraryId: this.selectedDigitalLibraryId,
+            format: this.diFormat.value,
+            url: this.diUrl.value,
+            access: this.diAccess.value,
+            accessRestriction: this.selectedDiAccessRestrictionId,
+        };
+        console.log('Adding new instance:', newInstance);
+        // Zde by následoval kód pro odeslání nové instance na server
     }
     deactivateURNNBN(item: any) {
         console.log('Deactivate URNNBN for item', item);
@@ -279,9 +368,7 @@ export class SearchComponent implements AfterViewInit {
     reactivateURNNBN(item: any) {
         console.log('Reactivate URNNBN for item', item);
     }
-    addInstance(item: any) {
-        console.log('Add digital instance for item', item);
-    }
+
     closeSidebar() {
         this.isSidebarOpen.set(false);
     }
@@ -412,7 +499,7 @@ export class SearchComponent implements AfterViewInit {
     openDocumentXml(urnnbn: string) {
         const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
         const xmlUrl = `${publicApiBaseUrl}/resolver/${urnnbn}?format=xml`;
-        window.open(xmlUrl, '_blank');        
+        window.open(xmlUrl, '_blank');
     }
 
     openDocumentJson(urnnbn: string) {
@@ -420,5 +507,4 @@ export class SearchComponent implements AfterViewInit {
         const jsonUrl = `${publicApiBaseUrl}/resolver/${urnnbn}?format=json`;
         window.open(jsonUrl, '_blank');
     }
-
 }

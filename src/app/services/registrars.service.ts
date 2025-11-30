@@ -95,4 +95,8 @@ export class RegistrarsService {
     deleteCatalogue(registrarCode: string, catalogId: string): Observable<any> {
         return this.apiService.deleteRegistrarCatalogue(registrarCode, catalogId);
     }
+
+    getDigitalLibrariesByRegistrar(registrarCode: string): Observable<any> {
+        return this.apiService.getRegistrar(registrarCode);
+    }
 }
