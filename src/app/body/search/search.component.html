@@ -490,14 +490,16 @@
                     {{ 'import.title_part' | translate }}
                 </div>
                 <div class="app-part-content">
-                    <div
-                        class="app-base-input-container"
-                        *ngIf="
-                            selectedEntity !== 'MONOGRAPH_VOLUME' && selectedEntity !== 'PERIODICAL_VOLUME' && selectedEntity !== 'PERIODICAL_ISSUE'
-                        "
-                    >
+                    <!-- TITLE -->
+                    <div class="app-base-input-container">
                         <div class="app-base-input app-full-width app-title">
-                            <div class="app-base-input-label">
+                            <div class="app-base-input-label" *ngIf="selectedEntity == 'PERIODICAL_VOLUME' || selectedEntity == 'PERIODICAL_ISSUE'">
+                                {{ 'import.periodicalTitle' | translate }}
+                            </div>
+                            <div class="app-base-input-label" *ngIf="selectedEntity == 'MONOGRAPH_VOLUME'">
+                                {{ 'import.monographTitle' | translate }}
+                            </div>
+                            <div class="app-base-input-label" *ngIf="selectedEntity !== 'PERIODICAL_VOLUME' && selectedEntity !== 'PERIODICAL_ISSUE' && selectedEntity !== 'MONOGRAPH_VOLUME'">
                                 {{ 'import.title' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="title" />
@@ -506,6 +508,7 @@
                             </mat-error>
                         </div>
                     </div>
+                    <!-- SUBTITLE -->
                     <div
                         class="app-base-input-container"
                         *ngIf="
@@ -519,22 +522,7 @@
                             <input matInput type="text" [formControl]="subTitle" />
                         </div>
                     </div>
-                    <div class="app-base-input-container" *ngIf="selectedEntity === 'MONOGRAPH_VOLUME'">
-                        <div class="app-base-input app-full-width app-monographTitle">
-                            <div class="app-base-input-label">
-                                {{ 'import.monographTitle' | translate }}
-                            </div>
-                            <input matInput type="text" [formControl]="monographTitle" />
-                        </div>
-                    </div>
-                    <div class="app-base-input-container" *ngIf="selectedEntity === 'PERIODICAL_VOLUME' || selectedEntity === 'PERIODICAL_ISSUE'">
-                        <div class="app-base-input app-full-width app-periodicalTitle">
-                            <div class="app-base-input-label">
-                                {{ 'import.periodicalTitle' | translate }}
-                            </div>
-                            <input matInput type="text" [formControl]="periodicalTitle" />
-                        </div>
-                    </div>
+                    <!-- VOLUME TITLE -->
                     <div
                         class="app-base-input-container"
                         *ngIf="
@@ -548,6 +536,7 @@
                             <input matInput type="text" [formControl]="volumeTitle" />
                         </div>
                     </div>
+                    <!-- ISSUE TITLE -->
                     <div class="app-base-input-container" *ngIf="selectedEntity === 'PERIODICAL_ISSUE'">
                         <div class="app-base-input app-full-width app-issueTitle">
                             <div class="app-base-input-label">
@@ -989,14 +978,8 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
-                <app-button
-                    variant="primary"
-                    size="l"
-                    (click)="onEditRecordConfirm()"
-                    [disabled]="isButtonDisabled()"
-                    *ngIf="activeAction === 'edit'"
-                >
-                    <span>{{ 'buttons.import-record' | translate }}</span>
+                <app-button variant="primary" size="l" (click)="onEditRecordConfirm()" *ngIf="activeAction === 'edit'">
+                    <span>{{ 'buttons.save-record' | translate }}</span>
                 </app-button>
                 <app-button variant="primary" size="l" (click)="onAddInstanceConfirm()" *ngIf="activeAction === 'add-instance'">
                     <span>{{ 'buttons.add-instance' | translate }}</span>

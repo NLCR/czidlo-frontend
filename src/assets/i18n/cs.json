@@ -106,7 +106,8 @@
         "add-instance": "Přidat instanci",
         "remove-rights": "Odebrat práva",
         "confirm-reactivate": "Ano, reaktivovat",
-        "confirm-deactivate": "Ano, deaktivovat"
+        "confirm-deactivate": "Ano, deaktivovat",
+        "save-record": "Uložit záznam"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
@@ -285,6 +286,8 @@
         "mandatory": "Povinné pole *",
         "title_part": "Základní údaje",
         "title": "Název *",
+        "periodicalTitle": "Název periodika *",
+        "issueTitle": "Název čísla",
         "subTitle": "Podnázev",
         "identifiers": "Identifikátory",
         "ccnb": "ČCNB",

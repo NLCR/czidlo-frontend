@@ -38,6 +38,7 @@ export class SearchComponent implements AfterViewInit {
 
     // EDIT RECORD
     selectedEntity: string = '';
+    registrarCode: string = '';
     registrationMode: Array<{ value: string; label: string }> = [];
     selectedMode: string = '';
 
@@ -45,8 +46,6 @@ export class SearchComponent implements AfterViewInit {
     // BASIC DETAILS
     title = new FormControl<string>('', [Validators.required]);
     subTitle = new FormControl<string>('');
-    monographTitle = new FormControl<string>('', [Validators.required]);
-    periodicalTitle = new FormControl<string>('', [Validators.required]);
     volumeTitle = new FormControl<string>('', [Validators.required]);
     issueTitle = new FormControl<string>('', [Validators.required]);
     // IDENTIFIERS
@@ -55,7 +54,7 @@ export class SearchComponent implements AfterViewInit {
     issn = new FormControl<string>('', [this.issnValidator()]);
     otherId = new FormControl<string>('');
 
-    documentType = new FormControl<string>('', [Validators.required]);
+    documentType = new FormControl<string>('');
     bornDigital: boolean = false;
 
     // ORIGINATORS
@@ -167,9 +166,9 @@ export class SearchComponent implements AfterViewInit {
                     { value: 'reservation', label: translations['import.reservation'] },
                 ];
                 this.primaryOriginatorTypes = [
-                    { value: 'author', label: translations['import.author'] },
-                    { value: 'event', label: translations['import.event'] },
-                    { value: 'corporation', label: translations['import.corporation'] },
+                    { value: 'AUTHOR', label: translations['import.author'] },
+                    { value: 'EVENT', label: translations['import.event'] },
+                    { value: 'CORPORATION', label: translations['import.corporation'] },
                 ];
                 this.diAccessRestrictionsList = [
                     { value: 'UNKNOWN', label: translations['import.unknown'] },
@@ -290,17 +289,27 @@ export class SearchComponent implements AfterViewInit {
     }
 
     editItem(item: any) {
+        console.log(item);
+        this.registrarCode = item.details.registrar.code;
         this.activeAction = 'edit';
         this.selectedItem.set(item);
+        this.selectedEntity = item.details?.intellectualEntity?.entityType || item.documenttype;
         this.getArchiversList(item.details.archiver?.id || '');
         let editedItem = item.details;
-        this.selectedEntity = item.documenttype;
-        let entity = this.selectedEntity.toLowerCase();
+
         // BASIC DETAILS
         this.title = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'TITLE')?.value || '', [
             Validators.required,
         ]);
         this.subTitle = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'SUB_TITLE')?.value || '');
+        this.volumeTitle = new FormControl<string>(
+            editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'VOLUME_TITLE')?.value || '',
+            [Validators.required]
+        );
+        this.issueTitle = new FormControl<string>(
+            editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'ISSUE_TITLE')?.value || '',
+            [Validators.required]
+        );
         this.ccnb = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'CCNB')?.value || '', [
             this.ccnbValidator(),
         ]);
@@ -311,8 +320,8 @@ export class SearchComponent implements AfterViewInit {
             this.issnValidator(),
         ]);
         this.otherId = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'OTHER')?.value || '');
-        this.selectedOriginatorType = editedItem.intelectualEntity?.originator.type.toLowerCase() || 'author';
-        this.primaryOriginatorValue = new FormControl<string>(editedItem.intelectualEntity?.originator.value || '');
+        this.selectedOriginatorType = editedItem.intelectualEntity?.originator?.type || 'AUTHOR';
+        this.primaryOriginatorValue = new FormControl<string>(editedItem.intelectualEntity?.originator?.value || '');
         this.otherOriginator = new FormControl<string>(editedItem.intelectualEntity?.otherOriginator || '');
         this.place = new FormControl<string>(editedItem.intelectualEntity?.publication?.place || '');
         this.publisher = new FormControl<string>(editedItem.intelectualEntity?.publication?.publisher || '');
@@ -321,6 +330,8 @@ export class SearchComponent implements AfterViewInit {
         this.financed = new FormControl<string>(editedItem.financed || '');
         this.contractNumber = new FormControl<string>(editedItem.contractNumber || '');
         this.selectedArchiverId = item.details.archiver?.id || '';
+        this.documentType = new FormControl<string>(editedItem.intelectualEntity?.documentType || '');
+        this.bornDigital = editedItem.intelectualEntity?.bornDigital || false;
 
         this.urnNbn = new FormControl<string>(editedItem.urnNbn || '');
         // TECHNICAL METADATA
@@ -339,7 +350,7 @@ export class SearchComponent implements AfterViewInit {
         this.pictureSizeHeight = new FormControl<string>(editedItem.digitalDocument?.pictureHeight || '');
 
         if (this.selectedEntity === 'THESIS') {
-            this.degreeAwardingInstitution = new FormControl<string>(editedItem[entity].degreeAwardingInstitution || '');
+            this.degreeAwardingInstitution = new FormControl<string>(editedItem.intelectualEntity.degreeAwardingInstitution || '');
         }
         if (this.selectedEntity === 'ANALYTICAL') {
             this.sourceDocumentTitle = new FormControl<string>(editedItem.intelectualEntity?.sourceDocument?.title || '');
@@ -388,7 +399,7 @@ export class SearchComponent implements AfterViewInit {
     }
     deactivateURNNBN(item: any) {
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-            data: { data: item, title: 'messages.confirm-deactivate-urnnbn', confirm: 'buttons.confirm-deactivate', reason: ''  },
+            data: { data: item, title: 'messages.confirm-deactivate-urnnbn', confirm: 'buttons.confirm-deactivate', reason: '' },
             maxWidth: '800px',
             minWidth: '600px',
         });
@@ -417,15 +428,14 @@ export class SearchComponent implements AfterViewInit {
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.searchService.reactivateUrnnbn(item.urnnbn).subscribe({
-            next: (response) => {
-                console.log('URNNBN reactivated successfully:', response);
-                this.getDetails(item);
-
-            },
-            error: (error) => {
-                console.error('Error reactivating URNNBN:', error);
-            },
-        });
+                    next: (response) => {
+                        console.log('URNNBN reactivated successfully:', response);
+                        this.getDetails(item);
+                    },
+                    error: (error) => {
+                        console.error('Error reactivating URNNBN:', error);
+                    },
+                });
             }
         });
     }
@@ -436,7 +446,7 @@ export class SearchComponent implements AfterViewInit {
     deactivateDigitalInstance(item: any, di: any) {
         console.log('deactivate instance', di);
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-            data: { data: item, title: 'messages.confirm-deactivate-di', confirm: 'buttons.confirm-deactivate'  },
+            data: { data: item, title: 'messages.confirm-deactivate-di', confirm: 'buttons.confirm-deactivate' },
             maxWidth: '800px',
             minWidth: '600px',
         });
@@ -468,16 +478,196 @@ export class SearchComponent implements AfterViewInit {
         console.log('Importing record:', record);
         // Zde by následoval kód pro odeslání záznamu na server
     }
+
     buildRecordToImport() {
         let record: any = {};
-        if (this.selectedEntity === 'MONOGRAPH') {
-            if (this.title.valid) {
-                record.title = this.title.value;
-            } else {
-                console.error('Title is required for MONOGRAPH');
-                return null;
-            }
+
+        // REGISTRAR AND MODE
+        record.registrarCode = this.registrarCode;
+        record.archiverId = this.selectedArchiverId;
+        record.urnNbn = this.urnNbn.value;
+
+        // INTELECTUAL ENTITY
+        let intelectualEntity: any = {};
+        intelectualEntity.entityType = this.selectedEntity;
+        intelectualEntity.digitalBorn = this.bornDigital;
+        intelectualEntity.documentType = this.documentType.value;
+
+        let ieIdentifiers: any = [];
+
+        // TITLE INFO
+        if (this.title.value) {
+            let titleInfo: any = {};
+            titleInfo.type = 'TITLE';
+            titleInfo.value = this.title.value;
+            ieIdentifiers.push(titleInfo);
         }
+        if (this.subTitle.value) {
+            let titleInfo: any = {};
+            titleInfo.type = 'SUB_TITLE';
+            titleInfo.value = this.subTitle.value;
+            ieIdentifiers.push(titleInfo);
+        }
+        if (this.volumeTitle.value) {
+            let titleInfo: any = {};
+            titleInfo.type = 'VOLUME_TITLE';
+            titleInfo.value = this.volumeTitle.value;
+            ieIdentifiers.push(titleInfo);
+        }
+        if (this.issueTitle.value) {
+            let titleInfo: any = {};
+            titleInfo.type = 'ISSUE_TITLE';
+            titleInfo.value = this.issueTitle.value;
+            ieIdentifiers.push(titleInfo);
+        }
+
+        // IDENTIFIERS
+        if (this.ccnb.valid && this.ccnb.value) {
+            let identifier: any = {};
+            identifier.type = 'CCNB';
+            identifier.value = this.ccnb.value;
+            ieIdentifiers.push(identifier);
+        }
+        if (this.isbn.valid && this.isbn.value) {
+            let identifier: any = {};
+            identifier.type = 'ISBN';
+            identifier.value = this.isbn.value;
+            ieIdentifiers.push(identifier);
+        }
+        if (this.issn.valid && this.issn.value) {
+            let identifier: any = {};
+            identifier.type = 'ISSN';
+            identifier.value = this.issn.value;
+            ieIdentifiers.push(identifier);
+        }
+        if (this.otherId.value) {
+            let identifier: any = {};
+            identifier.type = 'OTHER';
+            identifier.value = this.otherId.value;
+            ieIdentifiers.push(identifier);
+        }
+        intelectualEntity.ieIdentifiers = ieIdentifiers;
+
+        // ORIGINATORS
+        let originator: any = {};
+        if (this.primaryOriginatorValue.valid && this.primaryOriginatorValue.value) {
+            originator.type = this.selectedOriginatorType;
+            originator.value = this.primaryOriginatorValue.value;
+            intelectualEntity.originator = originator;
+        }
+        if (this.otherOriginator.value) {
+            intelectualEntity.otherOriginator = this.otherOriginator.value;
+        }
+
+        // PUBLICATION
+        let publication: any = {};
+        if (this.place.value) {
+            publication.place = this.place.value;
+        }
+        if (this.publisher.value) {
+            publication.publisher = this.publisher.value;
+        }
+        if (this.year.value) {
+            publication.year = this.year.value;
+        }
+        if (Object.keys(publication).length > 0) {
+            intelectualEntity.publication = publication;
+        }
+
+        // SOURCE DOCUMENT (ANALYTICAL)
+        let sourceDocument: any = {};
+        // TITLE INFO OF SOURCE DOCUMENT
+        if (this.sourceDocumentTitle.value) {
+            sourceDocument.title = this.sourceDocumentTitle.value;
+        }
+        if (this.sourceDocumentVolumeTitle.value) {
+            sourceDocument.volumeTitle = this.sourceDocumentVolumeTitle.value;
+        }
+        if (this.sourceDocumentIssueTitle.value) {
+            sourceDocument.issueTitle = this.sourceDocumentIssueTitle.value;
+        }
+        // IDENTIFIERS OF SOURCE DOCUMENT
+        if (this.sourceDocumentCcnb.valid && this.sourceDocumentCcnb.value) {
+            sourceDocument.ccnb = this.sourceDocumentCcnb.value;
+        }
+        if (this.sourceDocumentIsbn.valid && this.sourceDocumentIsbn.value) {
+            sourceDocument.isbn = this.sourceDocumentIsbn.value;
+        }
+        if (this.sourceDocumentIssn.valid && this.sourceDocumentIssn.value) {
+            sourceDocument.issn = this.sourceDocumentIssn.value;
+        }
+        if (this.sourceDocumentOtherId.value) {
+            sourceDocument.otherId = this.sourceDocumentOtherId.value;
+        }
+        // PUBLICATION OF SOURCE DOCUMENT
+        if (this.sourceDocumentPlace.value) {
+            sourceDocument.publicationPlace = this.sourceDocumentPlace.value;
+        }
+        if (this.sourceDocumentPublisher.value) {
+            sourceDocument.publisher = this.sourceDocumentPublisher.value;
+        }
+        if (this.sourceDocumentYear.value) {
+            sourceDocument.publicationYear = this.sourceDocumentYear.value;
+        }
+
+        if (Object.keys(sourceDocument).length > 0) {
+            intelectualEntity.sourceDocument = sourceDocument;
+        }
+
+        // TECHNICAL METADATA
+        let technicalMetadata: any = {};
+
+        // FINANCED AND CONTRACT NUMBER
+        if (this.financed.value) {
+            technicalMetadata.financed = this.financed.value;
+        }
+        if (this.contractNumber.value) {
+            technicalMetadata.contractNumber = this.contractNumber.value;
+        }
+        // FORMAT
+        if (this.formatVersion.value) {
+            technicalMetadata.formatVersion = this.formatVersion.value;
+        }
+        if (this.formatValue.value) {
+            technicalMetadata.format = this.formatValue.value;
+        }
+        // EXTENT
+        if (this.extent.value) {
+            technicalMetadata.extent = this.extent.value;
+        }
+        // RESOLUTION
+        if (this.resolutionHorizontal.value) {
+            technicalMetadata.resolutionHorizontal = this.resolutionHorizontal.value;
+        }
+        if (this.resolutionVertical.value) {
+            technicalMetadata.resolutionVertical = this.resolutionVertical.value;
+        }
+        // COMPRESSION
+        if (this.compression.value) {
+            technicalMetadata.compression = this.compression.value;
+        }
+        // COLOR
+        if (this.colorModel.value) {
+            technicalMetadata.colorModel = this.colorModel.value;
+        }
+        if (this.colorDepth.value) {
+            technicalMetadata.colorDepth = this.colorDepth.value;
+        }
+        if (this.iccProfile.value) {
+            technicalMetadata.iccProfile = this.iccProfile.value;
+        }
+        // PICTURE SIZE
+        if (this.pictureSizeWidth.value) {
+            technicalMetadata.pictureSizeWidth = this.pictureSizeWidth.value;
+        }
+        if (this.pictureSizeHeight.value) {
+            technicalMetadata.pictureSizeHeight = this.pictureSizeHeight.value;
+        }
+        if (Object.keys(technicalMetadata).length > 0) {
+            record.digitalDocument = technicalMetadata;
+        }
+
+        record.intellectualEntity = intelectualEntity;
         console.log('record to import', record);
         return record;
     }

@@ -30,8 +30,6 @@ export class ImportRecordComponent {
     // BASIC DETAILS
     title = new FormControl<string>('', [Validators.required]);
     subTitle = new FormControl<string>('');
-    monographTitle = new FormControl<string>('', [Validators.required]);
-    periodicalTitle = new FormControl<string>('', [Validators.required]);
     volumeTitle = new FormControl<string>('', [Validators.required]);
     issueTitle = new FormControl<string>('', [Validators.required]);
 
@@ -197,14 +195,16 @@ export class ImportRecordComponent {
         // REGISTRAR AND MODE
         record.registrarCode = this.selectedRegistrar;
         record.registrationMode = this.selectedMode;
-        record.intellectualEntity = this.selectedEntity;
         record.archiverId = this.selectedArchiverId;
-        record.documentType = this.documentType.value;
-        record.bornDigital = this.bornDigital;
+
         record.urnNbn = this.urnNbn.value;
 
         // INTELECTUAL ENTITY
         let intelectualEntity: any = {};
+
+        intelectualEntity.documentType = this.documentType.value;
+        intelectualEntity.bornDigital = this.bornDigital;
+
         let ieIdentifiers: any = [];
 
         // TITLE INFO
@@ -218,18 +218,6 @@ export class ImportRecordComponent {
             let titleInfo: any = {};
             titleInfo.type = 'SUB_TITLE';
             titleInfo.value = this.subTitle.value;
-            ieIdentifiers.push(titleInfo);
-        }
-        if (this.monographTitle.value) {
-            let titleInfo: any = {};
-            titleInfo.type = 'MONOGRAPH_TITLE';
-            titleInfo.value = this.monographTitle.value;
-            ieIdentifiers.push(titleInfo);
-        }
-        if (this.periodicalTitle.value) {
-            let titleInfo: any = {};
-            titleInfo.type = 'PERIODICAL_TITLE';
-            titleInfo.value = this.periodicalTitle.value;
             ieIdentifiers.push(titleInfo);
         }
         if (this.volumeTitle.value) {
@@ -342,14 +330,19 @@ export class ImportRecordComponent {
         let technicalMetadata: any = {};
 
         // FINANCED AND CONTRACT NUMBER
-        technicalMetadata.financed = this.financed.value;
-        technicalMetadata.contractNumber = this.contractNumber.value;
+
+        if (this.financed.value) {
+            technicalMetadata.financed = this.financed.value;
+        }
+        if (this.contractNumber.value) {
+            technicalMetadata.contractNumber = this.contractNumber.value;
+        }
         // FORMAT
         if (this.formatVersion.value) {
             technicalMetadata.formatVersion = this.formatVersion.value;
         }
         if (this.formatValue.value) {
-            technicalMetadata.formatValue = this.formatValue.value;
+            technicalMetadata.format = this.formatValue.value;
         }
         // EXTENT
         if (this.extent.value) {
