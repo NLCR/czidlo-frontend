@@ -199,7 +199,7 @@ export class ImportRecordComponent {
         record.registrationMode = this.selectedMode;
         record.archiverId = this.selectedArchiverId;
 
-        // record.urnNbn = this.urnNbn.value;
+        record.urnNbn = this.urnNbn.value;
 
         // INTELECTUAL ENTITY
         let intelectualEntity: any = {};
@@ -392,6 +392,7 @@ export class ImportRecordComponent {
 
     importRecord() {
         const record = this.buildRecordToImport();
+        console.log(record.urnnbn);
         if (!record) {
             console.error('Record is invalid, cannot import.');
             return;
@@ -422,13 +423,13 @@ export class ImportRecordComponent {
             next: (registrarData) => {
                 console.log('Selected registrar data:', registrarData);
                 if (registrarData.allowedRegistrationModeByRegistrar) {
-                    this.registrationMode.push({ value: 'registrar', label: this.translate.instant('import.by-registrar') });
+                    this.registrationMode.push({ value: 'BY_REGISTRAR', label: this.translate.instant('import.by-registrar') });
                 }
                 if (registrarData.allowedRegistrationModeByReservation) {
-                    this.registrationMode.push({ value: 'reservation', label: this.translate.instant('import.by-reservation') });
+                    this.registrationMode.push({ value: 'BY_RESERVATION', label: this.translate.instant('import.by-reservation') });
                 }
                 if (registrarData.allowedRegistrationModeByResolver) {
-                    this.registrationMode.push({ value: 'resolver', label: this.translate.instant('import.by-resolver') });
+                    this.registrationMode.push({ value: 'BY_RESOLVER', label: this.translate.instant('import.by-resolver') });
                 }
                 if (this.registrationMode.length > 0) {
                     this.selectedMode = this.registrationMode[0].value;
