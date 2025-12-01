@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { RegistrarsService } from '../../services/registrars.service';
 import { AuthService } from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
+import { ApiService } from '../../services/api.service';
 
 @Component({
     selector: 'app-import-record',
@@ -102,8 +103,9 @@ export class ImportRecordComponent {
         private route: ActivatedRoute,
         private registrarsService: RegistrarsService,
         private authService: AuthService,
-        private usersService: UsersService
-    ) {}
+        private usersService: UsersService,
+        private apiService: ApiService
+    ) { }
 
     ngOnInit(): void {
         this.translate
@@ -391,10 +393,24 @@ export class ImportRecordComponent {
             console.error('Record is invalid, cannot import.');
             return;
         }
-        this.importRecordSnackBarVisible.set(true);
-        setTimeout(() => {
-            this.importRecordSnackBarVisible.set(false);
-        }, 3000);
+
+        this.apiService.addRecord(record).subscribe({
+            next: (data) => {
+                console.log('Record imported successfully:', data);
+                //TODO: vyčistit formulář pro nové vkládání a nabídnout vytvořený přes odkaz v snackbaru 
+                //přes přiřazené/potvrezené urnnbn v odpovědi
+                //(protože to nebude zaindexované úplně hned, tak proto ne hned router.navigate)
+                this.importRecordSnackBarVisible.set(true);
+                setTimeout(() => {
+                    this.importRecordSnackBarVisible.set(false);
+                }, 3000);
+            },
+            error: (error) => {
+                //TODO: snackbar s chybou
+                console.error('Error importing record:', error);
+
+            },
+        });
     }
 
     onRegistrarChange() {

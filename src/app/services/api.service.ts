@@ -257,6 +257,10 @@ export class ApiService {
     }
 
     // DOCUMENTS
+    addRecord(record: any): Observable<any> {
+        const url = `${this.apiUrl}/documents`;
+        return this.http.post(url, record).pipe(catchError(this.handleError));
+    }
     getRecordByUrnnbn(urnnbn: string): Observable<any> {
         const url = `${this.apiUrl}/documents/${urnnbn}`;
         return this.doGet(url);
