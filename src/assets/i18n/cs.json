@@ -410,6 +410,7 @@
         "no-results-title": "Žádné výsledky vyhledávání",
         "no-results-text-1": "Výsledky hledání jsou prázdné, zkuste zadat jiný dotaz.",
         "no-results-text-2": "Pokud máte pocit, že jde o chybu obraťte se na technickou podporu ",
-        "reason": "Důvod"
+        "reason": "Důvod",
+        "sub_title": "podnázev"
     }
 }

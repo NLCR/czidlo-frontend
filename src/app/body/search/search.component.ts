@@ -221,22 +221,45 @@ export class SearchComponent implements AfterViewInit {
     }
 
     getDetails(item: any) {
+        console.log('getDetail for item: ', item);
         this.searchService.getRecordDetails(item.urnnbn).subscribe({
             next: (response) => {
                 console.log('Record details received:', response);
-                this.selectedItem.set(response);
                 item.details = response;
+                this.selectedItem.set(item);
             },
             error: (error) => {
                 console.error('Error fetching record details:', error);
                 item.loading = false;
             },
             complete: () => {
-                console.log('Record details fetch complete', item.details);
                 item.opened = true;
                 item.ddopen = true;
                 item.urnopen = true;
                 item.loading = false;
+            },
+        });
+    }
+    renewDetails(item: any) {
+        this.searchService.getRecordDetails(item.urnnbn).subscribe({
+            next: (response) => {
+                this.searchService.searchResults.update((list) =>
+                    list.map((i) =>
+                        i.urnnbn === item.urnnbn
+                            ? {
+                                  ...i, // nový objekt → změna reference
+                                  details: response,
+                                  opened: true,
+                                  ddopen: true,
+                                  urnopen: true,
+                                  loading: false,
+                              }
+                            : i
+                    )
+                );
+            },
+            error: (error) => {
+                console.error('Error fetching record details:', error);
             },
         });
     }
@@ -449,7 +472,6 @@ export class SearchComponent implements AfterViewInit {
             error: (error) => {
                 console.error('Error adding new instance:', error);
                 this.snackBar.open('Error adding new instance: ' + error.error.message, 'Close');
-
             },
         });
     }
@@ -534,15 +556,15 @@ export class SearchComponent implements AfterViewInit {
         this.apiService.editRecordByUrnnbn(urnNbn, record).subscribe({
             next: (data) => {
                 console.log('Record updated successfully:', data);
-                //TODO: zavřít editační formulář, překreslit detail aktualizovaným záznamem
-                this.importRecordSnackBarVisible.set(true);
-                setTimeout(() => {
-                    this.importRecordSnackBarVisible.set(false);
-                }, 3000);
+                data.urnnbn = urnNbn;
+                this.renewDetails(data);
+                this.closeSidebar();
+                this.snackBar.open('Record updated successfully', 'Close', { duration: 3000 });
             },
             error: (error) => {
                 //TODO: snackbar s chybou
                 console.error('Error updating record:', error);
+                this.snackBar.open('Error updating record', 'Close', { duration: 3000 });
             },
         });
     }
@@ -555,12 +577,10 @@ export class SearchComponent implements AfterViewInit {
         record.archiverId = this.selectedArchiverId;
         record.urnNbn = this.urnNbn.value;
 
-
         // INTELECTUAL ENTITY
         let intelectualEntity: any = {};
 
         if (this.selectedItem) {
-            console.log('Selected item exists:', this.selectedItem());
             intelectualEntity.id = this.selectedItem()?.details?.intelectualEntity?.id;
         }
 
