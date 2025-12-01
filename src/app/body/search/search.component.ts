@@ -846,30 +846,29 @@ export class SearchComponent implements AfterViewInit {
         const xmlUrl = `${publicApiBaseUrl}/resolver/${urnnbn}?format=xml`;
         window.open(xmlUrl, '_blank');
     }
-
     openDocumentJson(urnnbn: string) {
         const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
         const jsonUrl = `${publicApiBaseUrl}/resolver/${urnnbn}?format=json`;
         window.open(jsonUrl, '_blank');
     }
-    openDocumentXmlForUrnnbn(urnnbn: string) {
+
+    openUrnnbnXml(urnnbn: string) {
         const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
         const xmlUrl = `${publicApiBaseUrl}/urnnbn/${urnnbn}?format=xml`;
         window.open(xmlUrl, '_blank');
     }
-
-    openDocumentJsonForUrnnbn(urnnbn: string) {
+    openUrnnbnJson(urnnbn: string) {
         const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
         const jsonUrl = `${publicApiBaseUrl}/urnnbn/${urnnbn}?format=json`;
         window.open(jsonUrl, '_blank');
     }
 
-    openDocumentXmlForDiId(diId: string) {
+    openDiXml(diId: string) {
         const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
         const xmlUrl = `${publicApiBaseUrl}/digitalInstances/id/${diId}?format=xml`;
         window.open(xmlUrl, '_blank');
     }
-    openDocumentJsonForDiId(diId: string) {
+    openDiJson(diId: string) {
         const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
         const jsonUrl = `${publicApiBaseUrl}/digitalInstances/id/${diId}?format=json`;
         window.open(jsonUrl, '_blank');

@@ -190,10 +190,10 @@
                             <img [src]="item.ddopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                             <div class="app-part-title">
                                 <div class="app-label">{{ 'search.dd' | translate }}</div>
-                                <app-button variant="tertiary" size="xs" (click)="openDocumentXmlForUrnnbn(item.urnnbn); $event.stopPropagation()">
+                                <app-button variant="tertiary" size="xs" (click)="openDocumentXml(item.urnnbn); $event.stopPropagation()">
                                     XML →
                                 </app-button>
-                                <app-button variant="tertiary" size="xs" (click)="openDocumentJsonForUrnnbn(item.urnnbn); $event.stopPropagation()">
+                                <app-button variant="tertiary" size="xs" (click)="openDocumentJson(item.urnnbn); $event.stopPropagation()">
                                     JSON →
                                 </app-button>
                             </div>
@@ -237,14 +237,14 @@
                                         <app-button
                                             variant="tertiary"
                                             size="xs"
-                                            (click)="openDocumentXmlForUrnnbn(item.urnnbn); $event.stopPropagation()"
+                                            (click)="openUrnnbnXml(item.urnnbn); $event.stopPropagation()"
                                         >
                                             XML →
                                         </app-button>
                                         <app-button
                                             variant="tertiary"
                                             size="xs"
-                                            (click)="openDocumentJsonForUrnnbn(item.urnnbn); $event.stopPropagation()"
+                                            (click)="openUrnnbnJson(item.urnnbn); $event.stopPropagation()"
                                         >
                                             JSON →
                                         </app-button>
@@ -375,14 +375,14 @@
                                             <app-button
                                                 variant="tertiary"
                                                 size="xs"
-                                                (click)="openDocumentXmlForDiId(di.id); $event.stopPropagation()"
+                                                (click)="openDiXml(di.id); $event.stopPropagation()"
                                             >
                                                 XML →
                                             </app-button>
                                             <app-button
                                                 variant="tertiary"
                                                 size="xs"
-                                                (click)="openDocumentJsonForDiId(di.id); $event.stopPropagation()"
+                                                (click)="openDiJson(di.id); $event.stopPropagation()"
                                             >
                                                 JSON →
                                             </app-button>
