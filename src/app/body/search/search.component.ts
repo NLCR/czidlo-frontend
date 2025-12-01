@@ -784,4 +784,8 @@ export class SearchComponent implements AfterViewInit {
         const jsonUrl = `${publicApiBaseUrl}/resolver/${urnnbn}?format=json`;
         window.open(jsonUrl, '_blank');
     }
+
+    isDevMode() {
+        return this.envService.get('devMode');
+    }
 }
