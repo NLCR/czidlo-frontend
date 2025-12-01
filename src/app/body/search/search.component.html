@@ -1,5 +1,5 @@
 <div class="app-search-container">
-    <div class="app-search">
+    <div class="app-search-header">
         <input
             #searchInput
             id="search-input"
@@ -45,7 +45,7 @@
                         <div class="app-title-part">{{ item.title }}</div>
                         <div class="app-title-part" *ngIf="item.volumetitle">- {{ item.volumetitle }}</div>
                         <div class="app-title-part" *ngIf="item.sdtitle">({{ item.sdtitle }})</div>
-                        <div class="app-title-part" *ngIf="item.documenttype">({{ item.documenttype }})</div>
+                        <div class="app-title-part" *ngIf="item.entitytype">({{ item.entitytype }})</div>
                     </div>
                 </div>
                 <div class="app-card-header-right">
@@ -190,8 +190,8 @@
                             <img [src]="item.ddopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                             <div class="app-part-title">
                                 <div class="app-label">{{ 'search.dd' | translate }}</div>
-                                <app-button variant="tertiary" size="xs" (click)="openDocumentXml(item.urnnbn)">XML →</app-button>
-                                <app-button variant="tertiary" size="xs" (click)="openDocumentJson(item.urnnbn)">JSON →</app-button>
+                                <app-button variant="tertiary" size="xs" (click)="openDocumentXmlForUrnnbn(item.urnnbn); $event.stopPropagation()">XML →</app-button>
+                                <app-button variant="tertiary" size="xs" (click)="openDocumentJsonForUrnnbn(item.urnnbn); $event.stopPropagation()">JSON →</app-button>
                             </div>
                         </div>
                         <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.ddopen">
@@ -230,8 +230,8 @@
                                         <div class="app-label-2">
                                             urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}
                                         </div>
-                                        <app-button variant="tertiary" size="xs">XML →</app-button>
-                                        <app-button variant="tertiary" size="xs">JSON →</app-button>
+                                        <app-button variant="tertiary" size="xs" (click)="openDocumentXmlForUrnnbn(item.urnnbn); $event.stopPropagation()">XML →</app-button>
+                                        <app-button variant="tertiary" size="xs" (click)="openDocumentJsonForUrnnbn(item.urnnbn); $event.stopPropagation()">JSON →</app-button>
                                     </div>
                                 </div>
                                 <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.urnopen">
@@ -356,8 +356,8 @@
                                             <div class="app-label-2 app-di-url-label">
                                                 <a href="{{ di.url }}" target="_blank" rel="noopener noreferrer">{{ di.url }}</a>
                                             </div>
-                                            <app-button variant="tertiary" size="xs">XML →</app-button>
-                                            <app-button variant="tertiary" size="xs">JSON →</app-button>
+                                            <app-button variant="tertiary" size="xs" (click)="openDocumentXmlForDiId(di.id); $event.stopPropagation()">XML →</app-button>
+                                            <app-button variant="tertiary" size="xs" (click)="openDocumentJsonForDiId(di.id); $event.stopPropagation()">JSON →</app-button>
                                         </div>
                                     </div>
                                     <div class="app-ie-content" *ngIf="di.diopen">

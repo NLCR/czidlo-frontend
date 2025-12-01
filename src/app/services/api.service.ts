@@ -299,7 +299,7 @@ export class ApiService {
 
     // STATISTICS DATA FOR ASSIGNMENTS
     getStatisticsDataAssign(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_8/_search';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_11/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -339,7 +339,7 @@ export class ApiService {
 
     // SEARCH RECORDS
     getRecords(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_7/_search';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_10/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 

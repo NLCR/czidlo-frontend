@@ -7,8 +7,9 @@
     align-items: flex-start;
     gap: 24px;
     overflow: hidden;
-    .app-search {
+    .app-search-header {
         display: flex;
+        width: 800px;
         align-items: flex-start;
         gap: 16px;
         align-self: stretch;

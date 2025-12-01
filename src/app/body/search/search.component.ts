@@ -126,7 +126,7 @@ export class SearchComponent implements AfterViewInit {
         private translate: TranslateService,
         private registrarsService: RegistrarsService,
         private dialog: MatDialog
-    ) { }
+    ) {}
 
     ngOnInit() {
         this.route.queryParams.subscribe((params) => {
@@ -293,7 +293,7 @@ export class SearchComponent implements AfterViewInit {
         this.registrarCode = item.details.registrar.code;
         this.activeAction = 'edit';
         this.selectedItem.set(item);
-        this.selectedEntity = item.details?.intellectualEntity?.entityType || item.documenttype;
+        this.selectedEntity = item.details?.intelectualEntity?.entityType || item.entitytype;
         this.getArchiversList(item.details.archiver?.id || '');
         let editedItem = item.details;
 
@@ -489,7 +489,6 @@ export class SearchComponent implements AfterViewInit {
             error: (error) => {
                 //TODO: snackbar s chybou
                 console.error('Error updating record:', error);
-
             },
         });
     }
@@ -504,9 +503,12 @@ export class SearchComponent implements AfterViewInit {
 
         // INTELECTUAL ENTITY
         let intelectualEntity: any = {};
+
         intelectualEntity.entityType = this.selectedEntity;
         intelectualEntity.digitalBorn = this.bornDigital;
-        intelectualEntity.documentType = this.documentType.value;
+        if (this.documentType.value) {
+            intelectualEntity.documentType = this.documentType.value;
+        }
 
         let ieIdentifiers: any = [];
 
@@ -682,7 +684,7 @@ export class SearchComponent implements AfterViewInit {
             record.digitalDocument = technicalMetadata;
         }
 
-        record.intellectualEntity = intelectualEntity;
+        record.intelectualEntity = intelectualEntity;
         console.log('record to import', record);
         return record;
     }
@@ -797,6 +799,28 @@ export class SearchComponent implements AfterViewInit {
     openDocumentJson(urnnbn: string) {
         const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
         const jsonUrl = `${publicApiBaseUrl}/resolver/${urnnbn}?format=json`;
+        window.open(jsonUrl, '_blank');
+    }
+    openDocumentXmlForUrnnbn(urnnbn: string) {
+        const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
+        const xmlUrl = `${publicApiBaseUrl}/urnnbn/${urnnbn}?format=xml`;
+        window.open(xmlUrl, '_blank');
+    }
+
+    openDocumentJsonForUrnnbn(urnnbn: string) {
+        const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
+        const jsonUrl = `${publicApiBaseUrl}/urnnbn/${urnnbn}?format=json`;
+        window.open(jsonUrl, '_blank');
+    }
+
+    openDocumentXmlForDiId(diId: string) {
+        const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
+        const xmlUrl = `${publicApiBaseUrl}/digitalInstances/id/${diId}?format=xml`;
+        window.open(xmlUrl, '_blank');
+    }
+    openDocumentJsonForDiId(diId: string) {
+        const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
+        const jsonUrl = `${publicApiBaseUrl}/digitalInstances/id/${diId}?format=json`;
         window.open(jsonUrl, '_blank');
     }
 

@@ -151,7 +151,7 @@ export class StatisticsService {
             aggs: {
                 entity_types: {
                     terms: {
-                        field: 'documenttype.keyword',
+                        field: 'entitytype.keyword',
                         size: 100,
                     },
                 },
