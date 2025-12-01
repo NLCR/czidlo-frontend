@@ -336,6 +336,9 @@
                     text-underline-offset: auto;
                     text-underline-position: from-font;
                 }
+                &.app-not-active {
+                    color: var(--Text-Light, #839fbd);
+                }
             }
         }
     }

@@ -370,7 +370,7 @@
                                         <img [src]="di.diopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                                         <div class="app-part-title app-part-title-di">
                                             <div class="app-label-2 app-di-url-label">
-                                                <a href="{{ di.url }}" target="_blank" rel="noopener noreferrer">{{ di.url }}</a>
+                                                <a [ngClass]="{ 'app-not-active': di.active === false }" href="{{ di.url }}" target="_blank" rel="noopener noreferrer">{{ di.url }}</a>
                                             </div>
                                             <app-button
                                                 variant="tertiary"
@@ -389,7 +389,7 @@
                                         </div>
                                     </div>
                                     <div class="app-ie-content" *ngIf="di.diopen">
-                                        <div class="app-ie-field" *ngIf="di.active">
+                                        <div class="app-ie-field" *ngIf="di.active && di.active === true || di.active === false">
                                             <div class="app-label">{{ 'search.active' | translate }}:</div>
                                             <div class="app-value">{{ 'search.' + di.active | translate }}</div>
                                         </div>
@@ -406,19 +406,23 @@
                                             <div class="app-label">{{ 'search.accessibility' | translate }}:</div>
                                             <div class="app-value">{{ di.accessibility }}</div>
                                         </div>
-                                        <div class="app-ie-field" *ngIf="di.access_restriction">
+                                        <div class="app-ie-field" *ngIf="di.accessRestriction">
                                             <div class="app-label">{{ 'search.access_restriction' | translate }}:</div>
-                                            <div class="app-value">{{ di.access_restriction }}</div>
+                                            <div class="app-value">{{ di.accessRestriction }}</div>
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.created">
                                             <div class="app-label">{{ 'search.created' | translate }}:</div>
                                             <div class="app-value">{{ di.created.split('[')[0] | date }}</div>
                                         </div>
+                                        <div class="app-ie-field" *ngIf="di.deactivated">
+                                            <div class="app-label">{{ 'search.deactivated' | translate }}:</div>
+                                            <div class="app-value">{{ di.deactivated.split('[')[0] | date }}</div>
+                                        </div>
                                         <div class="app-buttons">
                                             <app-button variant="primary" size="s" (click)="editDigitalInstance(item, di)">
                                                 <span>{{ 'buttons.edit' | translate }}</span>
                                             </app-button>
-                                            <app-button variant="primary" size="s" (click)="deactivateDigitalInstance(item, di)">
+                                            <app-button *ngIf="di.active" variant="primary" size="s" (click)="deactivateDigitalInstance(item, di)">
                                                 <span>{{ 'buttons.deactivate' | translate }}</span>
                                             </app-button>
                                         </div>

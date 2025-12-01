@@ -379,6 +379,12 @@ export class SearchComponent implements AfterViewInit {
         let registrarCode = item.details.registrar.code;
         console.log(registrarCode);
         this.getDigitalLibrariesList(registrarCode);
+        this.selectedDiId = '';
+        this.selectedDigitalLibraryId = '';
+        this.diFormat = new FormControl<string>('');
+        this.diUrl = new FormControl<string>('https://');
+        this.diAccess = new FormControl<string>('');
+        this.selectedDiAccessRestrictionId = this.diAccessRestrictionsList[0].value;
         this.isSidebarOpen.set(true);
     }
     editDigitalInstance(item: any, di: any) {
@@ -398,6 +404,7 @@ export class SearchComponent implements AfterViewInit {
         this.isSidebarOpen.set(true);
     }
     onAddInstanceConfirm() {
+        let urnNbn = this.urnNbn.value || '';
         if (this.selectedDiId && this.activeAction === 'edit-instance') {
             console.log('Editing instance:', this.selectedDiId);
             const updatedInstance: any = {
@@ -411,6 +418,8 @@ export class SearchComponent implements AfterViewInit {
             this.searchService.editInstance(this.selectedDiId, updatedInstance).subscribe({
                 next: (response) => {
                     console.log('Digital instance updated successfully:', response);
+                    response.urnnbn = urnNbn;
+                    this.getDetails(response);
                     this.isSidebarOpen.set(false);
                     this.snackBar.open('Digital instance updated successfully', 'Close', { duration: 3000 });
                 },
@@ -422,20 +431,24 @@ export class SearchComponent implements AfterViewInit {
             return;
         }
         const newInstance: any = {
-            // digitalLibraryId: this.selectedDigitalLibraryId,
+            libraryId: this.selectedDigitalLibraryId,
             format: this.diFormat.value,
             url: this.diUrl.value,
             accessibility: this.diAccess.value,
             accessRestriction: this.selectedDiAccessRestrictionId,
         };
-        console.log('Adding new instance:', newInstance, this.urnNbn.value);
-        this.searchService.addNewInstance(this.urnNbn.value || '', newInstance).subscribe({
+        console.log('Adding new instance:', newInstance, urnNbn);
+        this.searchService.addNewInstance(urnNbn, newInstance).subscribe({
             next: (response) => {
+                response.urnnbn = urnNbn;
                 console.log('New instance added successfully:', response);
+                this.getDetails(response);
                 this.isSidebarOpen.set(false);
+                this.snackBar.open('New digital instance added successfully', 'Close', { duration: 3000 });
             },
             error: (error) => {
                 console.error('Error adding new instance:', error);
+                this.snackBar.open('Error adding new instance: ' + error.error.message, 'Close');
 
             },
         });
