@@ -266,6 +266,10 @@ export class ApiService {
         return this.doGet(url);
         // return of(this.testRecord).pipe(delay(500));
     }
+    editRecordByUrnnbn(urnnbn: string, updatedRecord: any): Observable<any> {
+        const url = `${this.apiUrl}/documents/${urnnbn}`;
+        return this.http.put(url, updatedRecord).pipe(catchError(this.handleError));
+    }
     addDigitalInstance(urnnbn: string, newInstance: any): Observable<any> {
         const url = `${this.apiUrl}/documents/${urnnbn}/instances`;
         return this.http.post(url, newInstance).pipe(catchError(this.handleError));

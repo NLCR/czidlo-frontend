@@ -475,8 +475,23 @@ export class SearchComponent implements AfterViewInit {
             console.error('Record is invalid, cannot import.');
             return;
         }
-        console.log('Importing record:', record);
-        // Zde by následoval kód pro odeslání záznamu na server
+        console.log('Updating record:', record);
+        const urnNbn = `urn:nbn:cz:${record.urnNbn.registrarCode}-${record.urnNbn.documentCode}`;
+        this.apiService.editRecordByUrnnbn(urnNbn, record).subscribe({
+            next: (data) => {
+                console.log('Record updated successfully:', data);
+                //TODO: zavřít editační formulář, překreslit detail aktualizovaným záznamem
+                this.importRecordSnackBarVisible.set(true);
+                setTimeout(() => {
+                    this.importRecordSnackBarVisible.set(false);
+                }, 3000);
+            },
+            error: (error) => {
+                //TODO: snackbar s chybou
+                console.error('Error updating record:', error);
+
+            },
+        });
     }
 
     buildRecordToImport() {
