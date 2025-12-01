@@ -16,7 +16,9 @@ export class RegistrarsService {
             tap({
                 next: (data) => {
                     console.log('Archivers data received:', data);
-                    this.archivers.set(data.items);
+                    console.log(data.items);
+                    let sortedItems = data.items.sort((a: any, b: any) => a.name.localeCompare(b.name));
+                    this.archivers.set(sortedItems);
                     console.log('Archivers loaded:', this.archivers());
                 },
                 error: (error) => {
@@ -48,7 +50,8 @@ export class RegistrarsService {
             tap({
                 next: (data) => {
                     console.log('Registrars data received:', data);
-                    this.registrars.set(data.items);
+                    let sortedItems = data.items.sort((a: any, b: any) => a.code.localeCompare(b.code));
+                    this.registrars.set(sortedItems);
                     console.log('Registrars loaded:', this.registrars());
                 },
                 error: (error) => {

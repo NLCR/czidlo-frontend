@@ -13,7 +13,8 @@ export class UsersService {
         return this.apiService.getUsers().pipe(
             tap({
                 next: (data) => {
-                    this.users.set(data.items.map((item: any) => ({
+                    let sortedUsers = data.items.sort((a: any, b: any) => a.login.localeCompare(b.login));
+                    this.users.set(sortedUsers.map((item: any) => ({
                         id: item.id,
                         login: item.login,
                         email: item.email,
