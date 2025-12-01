@@ -126,7 +126,7 @@ export class SearchComponent implements AfterViewInit {
         private translate: TranslateService,
         private registrarsService: RegistrarsService,
         private dialog: MatDialog
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.route.queryParams.subscribe((params) => {
@@ -453,7 +453,7 @@ export class SearchComponent implements AfterViewInit {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.searchService.deactivateDigitalInstance(item.urnnbn, di.id).subscribe({
+                this.searchService.deactivateDigitalInstance(di.id).subscribe({
                     next: (response) => {
                         console.log('Digital instance deactivated successfully:', response);
                         this.getDetails(item);

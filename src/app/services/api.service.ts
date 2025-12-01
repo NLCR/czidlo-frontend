@@ -282,9 +282,9 @@ export class ApiService {
         const url = `${this.apiUrl}/documents/${urnnbn}/deactivation`;
         return this.http.delete(url).pipe(catchError(this.handleError));
     }
-    deactivateDigitalInstance(instanceId: string, reason: string): Observable<any> {
+    deactivateDigitalInstance(instanceId: string): Observable<any> {
         const url = `${this.apiUrl}/instances/${instanceId}/deactivation`;
-        return this.http.post(url, reason).pipe(catchError(this.handleError));
+        return this.http.post(url, null).pipe(catchError(this.handleError));
     }
 
     // ELASTICSEARCH

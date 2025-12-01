@@ -12,7 +12,7 @@ export class SearchService {
     recordsCount = signal<number>(0);
     isLoading = signal<boolean>(false);
 
-    constructor(private apiService: ApiService) {}
+    constructor(private apiService: ApiService) { }
 
     search(term: string, docType?: string, page: number = 1): Observable<any> {
         this.query.set(term);
@@ -134,7 +134,7 @@ export class SearchService {
     reactivateUrnnbn(urnnbn: string): Observable<any> {
         return this.apiService.reactivateUrnNbn(urnnbn);
     }
-    deactivateDigitalInstance(instanceId: string, reason: string): Observable<any> {
-        return this.apiService.deactivateDigitalInstance(instanceId, reason);
+    deactivateDigitalInstance(instanceId: string): Observable<any> {
+        return this.apiService.deactivateDigitalInstance(instanceId);
     }
 }
