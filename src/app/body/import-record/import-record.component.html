@@ -440,7 +440,7 @@
                             </mat-form-field>
                         </div>
                     </div>
-                    <div class="app-base-input-container" *ngIf="selectedMode === 'reservation'">
+                    <div class="app-base-input-container" *ngIf="selectedMode === 'BY_RESERVATION' || selectedMode === 'BY_REGISTRAR'">
                         <div class="app-base-input app-half-width app-urnNbn">
                             <div class="app-base-input-label">{{ 'import.urnNbn' | translate }}{{ selectedRegistrar }}-</div>
                             <input matInput type="text" [formControl]="urnNbn" />
