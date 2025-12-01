@@ -190,8 +190,12 @@
                             <img [src]="item.ddopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                             <div class="app-part-title">
                                 <div class="app-label">{{ 'search.dd' | translate }}</div>
-                                <app-button variant="tertiary" size="xs" (click)="openDocumentXmlForUrnnbn(item.urnnbn); $event.stopPropagation()">XML →</app-button>
-                                <app-button variant="tertiary" size="xs" (click)="openDocumentJsonForUrnnbn(item.urnnbn); $event.stopPropagation()">JSON →</app-button>
+                                <app-button variant="tertiary" size="xs" (click)="openDocumentXmlForUrnnbn(item.urnnbn); $event.stopPropagation()">
+                                    XML →
+                                </app-button>
+                                <app-button variant="tertiary" size="xs" (click)="openDocumentJsonForUrnnbn(item.urnnbn); $event.stopPropagation()">
+                                    JSON →
+                                </app-button>
                             </div>
                         </div>
                         <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.ddopen">
@@ -230,8 +234,20 @@
                                         <div class="app-label-2">
                                             urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}
                                         </div>
-                                        <app-button variant="tertiary" size="xs" (click)="openDocumentXmlForUrnnbn(item.urnnbn); $event.stopPropagation()">XML →</app-button>
-                                        <app-button variant="tertiary" size="xs" (click)="openDocumentJsonForUrnnbn(item.urnnbn); $event.stopPropagation()">JSON →</app-button>
+                                        <app-button
+                                            variant="tertiary"
+                                            size="xs"
+                                            (click)="openDocumentXmlForUrnnbn(item.urnnbn); $event.stopPropagation()"
+                                        >
+                                            XML →
+                                        </app-button>
+                                        <app-button
+                                            variant="tertiary"
+                                            size="xs"
+                                            (click)="openDocumentJsonForUrnnbn(item.urnnbn); $event.stopPropagation()"
+                                        >
+                                            JSON →
+                                        </app-button>
                                     </div>
                                 </div>
                                 <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.urnopen">
@@ -356,8 +372,20 @@
                                             <div class="app-label-2 app-di-url-label">
                                                 <a href="{{ di.url }}" target="_blank" rel="noopener noreferrer">{{ di.url }}</a>
                                             </div>
-                                            <app-button variant="tertiary" size="xs" (click)="openDocumentXmlForDiId(di.id); $event.stopPropagation()">XML →</app-button>
-                                            <app-button variant="tertiary" size="xs" (click)="openDocumentJsonForDiId(di.id); $event.stopPropagation()">JSON →</app-button>
+                                            <app-button
+                                                variant="tertiary"
+                                                size="xs"
+                                                (click)="openDocumentXmlForDiId(di.id); $event.stopPropagation()"
+                                            >
+                                                XML →
+                                            </app-button>
+                                            <app-button
+                                                variant="tertiary"
+                                                size="xs"
+                                                (click)="openDocumentJsonForDiId(di.id); $event.stopPropagation()"
+                                            >
+                                                JSON →
+                                            </app-button>
                                         </div>
                                     </div>
                                     <div class="app-ie-content" *ngIf="di.diopen">
@@ -476,7 +504,7 @@
             <div class="app-sidebar-title" *ngIf="activeAction === 'edit'">
                 {{ 'import.' + selectedEntity | translate }}
             </div>
-            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance'">{{ 'import.add-instance' | translate }} {{ title.value }}</div>
+            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">{{ 'import.add-instance' | translate }} {{ title.value }}</div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>
@@ -499,7 +527,14 @@
                             <div class="app-base-input-label" *ngIf="selectedEntity == 'MONOGRAPH_VOLUME'">
                                 {{ 'import.monographTitle' | translate }}
                             </div>
-                            <div class="app-base-input-label" *ngIf="selectedEntity !== 'PERIODICAL_VOLUME' && selectedEntity !== 'PERIODICAL_ISSUE' && selectedEntity !== 'MONOGRAPH_VOLUME'">
+                            <div
+                                class="app-base-input-label"
+                                *ngIf="
+                                    selectedEntity !== 'PERIODICAL_VOLUME' &&
+                                    selectedEntity !== 'PERIODICAL_ISSUE' &&
+                                    selectedEntity !== 'MONOGRAPH_VOLUME'
+                                "
+                            >
                                 {{ 'import.title' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="title" />
@@ -904,7 +939,7 @@
             </div>
         </div>
 
-        <div class="app-sidebar-content" *ngIf="activeAction === 'add-instance'">
+        <div class="app-sidebar-content" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">
             <!-- DIGITAL DOCUMENT INSTANCE -->
             <div class="app-part">
                 <div class="app-part-content">
@@ -981,8 +1016,9 @@
                 <app-button variant="primary" size="l" (click)="onEditRecordConfirm()" *ngIf="activeAction === 'edit'">
                     <span>{{ 'buttons.save-record' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" (click)="onAddInstanceConfirm()" *ngIf="activeAction === 'add-instance'">
-                    <span>{{ 'buttons.add-instance' | translate }}</span>
+                <app-button variant="primary" size="l" (click)="onAddInstanceConfirm()" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">
+                    <span *ngIf="activeAction === 'add-instance'">{{ 'buttons.add-instance' | translate }}</span>
+                    <span *ngIf="activeAction === 'edit-instance'">{{ 'buttons.edit-instance' | translate }}</span>
                 </app-button>
             </div>
         </div>

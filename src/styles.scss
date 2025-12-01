@@ -204,7 +204,8 @@ h4 {
     }
     .app-row {
         display: flex;
-        min-width: max-content;
+        // width: 100%;
+        // min-width: max-content;
         padding: 8px 24px;
         align-items: center;
         gap: 16px;
@@ -230,6 +231,7 @@ h4 {
         }
         &.app-row-header {
             padding: 12px 24px;
+            // width: fit-content;
             line-height: 16px;
             align-self: stretch;
             background: var(--BG-Main-Contrast, #dfe5ec);

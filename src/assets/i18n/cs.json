@@ -107,7 +107,8 @@
         "remove-rights": "Odebrat práva",
         "confirm-reactivate": "Ano, reaktivovat",
         "confirm-deactivate": "Ano, deaktivovat",
-        "save-record": "Uložit záznam"
+        "save-record": "Uložit záznam",
+        "edit-instance": "Upravit instanci"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",

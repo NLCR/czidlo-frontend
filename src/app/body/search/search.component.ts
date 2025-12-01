@@ -8,6 +8,7 @@ import { EnvironmentService } from '../../services/environment.service';
 import { RegistrarsService } from '../../services/registrars.service';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
     selector: 'app-search',
@@ -41,6 +42,7 @@ export class SearchComponent implements AfterViewInit {
     registrarCode: string = '';
     registrationMode: Array<{ value: string; label: string }> = [];
     selectedMode: string = '';
+    selectedDiId: string = '';
 
     // FORM CONTROLS
     // BASIC DETAILS
@@ -125,7 +127,8 @@ export class SearchComponent implements AfterViewInit {
         private envService: EnvironmentService,
         private translate: TranslateService,
         private registrarsService: RegistrarsService,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private snackBar: MatSnackBar
     ) {}
 
     ngOnInit() {
@@ -172,8 +175,8 @@ export class SearchComponent implements AfterViewInit {
                 ];
                 this.diAccessRestrictionsList = [
                     { value: 'UNKNOWN', label: translations['import.unknown'] },
-                    { value: 'OPEN', label: translations['import.open'] },
-                    { value: 'RESTRICTED', label: translations['import.restricted'] },
+                    { value: 'UNLIMITED_ACCESS', label: translations['import.open'] },
+                    { value: 'LIMITED_ACCESS', label: translations['import.restricted'] },
                 ];
                 this.selectedMode = this.registrationMode[0].value;
                 this.selectedDiAccessRestrictionId = this.diAccessRestrictionsList[0].value;
@@ -378,7 +381,46 @@ export class SearchComponent implements AfterViewInit {
         this.getDigitalLibrariesList(registrarCode);
         this.isSidebarOpen.set(true);
     }
+    editDigitalInstance(item: any, di: any) {
+        console.log(item, di);
+        this.activeAction = 'edit-instance';
+        this.title = new FormControl<string>(item.title);
+        this.urnNbn = new FormControl<string>(item.urnnbn);
+        let registrarCode = item.details.registrar.code;
+        this.getDigitalLibrariesList(registrarCode);
+        console.log(di.id);
+        this.selectedDiId = di.id;
+        this.selectedDigitalLibraryId = di.digitalLibrary;
+        this.diFormat = new FormControl<string>(di.format);
+        this.diUrl = new FormControl<string>(di.url);
+        this.diAccess = new FormControl<string>(di.accessibility);
+        this.selectedDiAccessRestrictionId = di.accessRestriction;
+        this.isSidebarOpen.set(true);
+    }
     onAddInstanceConfirm() {
+        if (this.selectedDiId && this.activeAction === 'edit-instance') {
+            console.log('Editing instance:', this.selectedDiId);
+            const updatedInstance: any = {
+                digitalLibrary: this.selectedDigitalLibraryId,
+                format: this.diFormat.value,
+                url: this.diUrl.value,
+                accessibility: this.diAccess.value,
+                accessRestriction: this.selectedDiAccessRestrictionId,
+            };
+            console.log('Updating instance:', updatedInstance, this.selectedDiId);
+            this.searchService.editInstance(this.selectedDiId, updatedInstance).subscribe({
+                next: (response) => {
+                    console.log('Digital instance updated successfully:', response);
+                    this.isSidebarOpen.set(false);
+                    this.snackBar.open('Digital instance updated successfully', 'Close', { duration: 3000 });
+                },
+                error: (error) => {
+                    console.error('Error updating digital instance:', error);
+                    this.snackBar.open('Error updating digital instance: ' + error.error.message, 'Close');
+                },
+            });
+            return;
+        }
         const newInstance: any = {
             // digitalLibraryId: this.selectedDigitalLibraryId,
             format: this.diFormat.value,
@@ -394,6 +436,7 @@ export class SearchComponent implements AfterViewInit {
             },
             error: (error) => {
                 console.error('Error adding new instance:', error);
+
             },
         });
     }
@@ -439,10 +482,7 @@ export class SearchComponent implements AfterViewInit {
             }
         });
     }
-    editDigitalInstance(item: any, di: any) {
-        console.log(item, di);
-        this.activeAction = 'edit-di';
-    }
+
     deactivateDigitalInstance(item: any, di: any) {
         console.log('deactivate instance', di);
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -477,6 +517,7 @@ export class SearchComponent implements AfterViewInit {
         }
         console.log('Updating record:', record);
         const urnNbn = `urn:nbn:cz:${record.urnNbn.registrarCode}-${record.urnNbn.documentCode}`;
+        record.urnNbn = urnNbn;
         this.apiService.editRecordByUrnnbn(urnNbn, record).subscribe({
             next: (data) => {
                 console.log('Record updated successfully:', data);
@@ -501,8 +542,14 @@ export class SearchComponent implements AfterViewInit {
         record.archiverId = this.selectedArchiverId;
         record.urnNbn = this.urnNbn.value;
 
+
         // INTELECTUAL ENTITY
         let intelectualEntity: any = {};
+
+        if (this.selectedItem) {
+            console.log('Selected item exists:', this.selectedItem());
+            intelectualEntity.id = this.selectedItem()?.details?.intelectualEntity?.id;
+        }
 
         intelectualEntity.entityType = this.selectedEntity;
         intelectualEntity.digitalBorn = this.bornDigital;
@@ -634,6 +681,10 @@ export class SearchComponent implements AfterViewInit {
         // TECHNICAL METADATA
         let technicalMetadata: any = {};
 
+        if (this.selectedItem()?.details?.digitalDocument) {
+            technicalMetadata.id = this.selectedItem()?.details?.digitalDocument?.id;
+        }
+
         // FINANCED AND CONTRACT NUMBER
         if (this.financed.value) {
             technicalMetadata.financed = this.financed.value;
@@ -675,10 +726,10 @@ export class SearchComponent implements AfterViewInit {
         }
         // PICTURE SIZE
         if (this.pictureSizeWidth.value) {
-            technicalMetadata.pictureSizeWidth = this.pictureSizeWidth.value;
+            technicalMetadata.pictureWidth = this.pictureSizeWidth.value;
         }
         if (this.pictureSizeHeight.value) {
-            technicalMetadata.pictureSizeHeight = this.pictureSizeHeight.value;
+            technicalMetadata.pictureHeight = this.pictureSizeHeight.value;
         }
         if (Object.keys(technicalMetadata).length > 0) {
             record.digitalDocument = technicalMetadata;
