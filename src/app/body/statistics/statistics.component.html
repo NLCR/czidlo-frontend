@@ -1,0 +1,174 @@
+<div class="app-statistics-container">
+    <div class="app-statistics">
+        <!-- TABS -->
+        <div class="app-tabs-header app-statistics-header">
+            <div class="app-tabs">
+                <div class="app-tab app-tab-first" [ngClass]="{ 'app-tab-active': isActive === 'assignments' }" routerLink="/statistics/assignments">
+                    {{ 'statistics.assignments' | translate }}
+                </div>
+                <div class="app-tab app-tab-last" [ngClass]="{ 'app-tab-active': isActive === 'resolvations' }" routerLink="/statistics/resolvations">
+                    {{ 'statistics.resolvations' | translate }}
+                </div>
+            </div>
+        </div>
+        <div class="app-assignments app-tab-content" *ngIf="isActive === 'assignments'">
+            <div class="app-title">
+                {{ 'statistics.assignments-title' | translate }}
+            </div>
+            <!-- <div class="app-actions">
+                <div class="app-left-part">select</div>
+                <div class="app-right-part">
+                    <div class="app-tags">
+                        <div class="app-tag">všechno: {{ recordsCount() }}</div>
+                    </div>
+                </div>
+            </div> -->
+            <div class="app-content">
+                <div class="app-chart app-chart-years">
+                    <div class="app-chart-header">
+                        <div class="app-chart-header-item" *ngIf="!selectedYear()">{{ 'statistics.all-years' | translate }}</div>
+                        <div class="app-chart-header-item" *ngIf="selectedYear()">
+                            <app-button variant="tertiary" size="s" [icon]="true" iconLeft="arrow-left.svg" (click)="onYearCancel()"></app-button>
+                            {{ selectedYear() }}
+                        </div>
+                    </div>
+                    <!-- DATA BY YEARS -->
+                    <ngx-charts-bar-vertical
+                        *ngIf="chartDataByDate()"
+                        [scheme]="colorScheme"
+                        [view]="[800, 300]"
+                        [animations]="true"
+                        [barPadding]="2"
+                        [results]="chartDataByDate()"
+                        [gradient]="false"
+                        [xAxis]="true"
+                        [yAxis]="true"
+                        [legend]="false"
+                        [showDataLabel]="false"
+                        (select)="onYearClick($event)"
+                    ></ngx-charts-bar-vertical>
+                </div>
+
+                <!-- DATA BY REGISTRARS -->
+                <div class="app-chart app-chart-pie" *ngIf="!selectedRegistrar()">
+                    <div class="app-chart-header">
+                        <div class="app-chart-header-item">{{ 'statistics.all-registrars' | translate }}</div>
+                    </div>
+                    <ngx-charts-pie-chart
+                        *ngIf="chartDataByRegistrar()"
+                        [results]="chartDataByRegistrar()"
+                        [view]="[800, 300]"
+                        [animations]="false"
+                        [legend]="true"
+                        [labels]="true"
+                        [doughnut]="false"
+                        [explodeSlices]="false"
+                        [gradient]="false"
+                        [scheme]="colorScheme"
+                        (select)="onRegistrarClick($event)"
+                    ></ngx-charts-pie-chart>
+                </div>
+
+                <!-- DATA BY ENTITY TYPES FOR REGISTRAR -->
+                <div class="app-chart app-chart-pie" *ngIf="selectedRegistrar()">
+                    <div class="app-chart-header">
+                        <div class="app-chart-header-item">
+                            <app-button
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="arrow-left.svg"
+                                (click)="onRegistrarCancel()"
+                            ></app-button>
+                            {{ selectedRegistrar() }}
+                        </div>
+                    </div>
+                    <ngx-charts-pie-chart
+                        *ngIf="chartDataByEntityTypes()"
+                        [results]="chartDataByEntityTypes()"
+                        [view]="[800, 300]"
+                        [animations]="false"
+                        [legend]="true"
+                        [labels]="true"
+                        [doughnut]="false"
+                        [explodeSlices]="false"
+                        [gradient]="false"
+                        [scheme]="colorScheme"
+                    ></ngx-charts-pie-chart>
+                </div>
+            </div>
+        </div>
+        <div class="app-resolvations app-tab-content" *ngIf="isActive === 'resolvations'">
+            <div class="app-title">
+                {{ 'statistics.resolvations-title' | translate }}
+            </div>
+            <!-- <div class="app-actions">
+                <div class="app-left-part">select</div>
+                <div class="app-right-part">
+                    <div class="app-tags">
+                        <div class="app-tag">tag1</div>
+                        <div class="app-tag">tag2</div>
+                    </div>
+                </div>
+            </div> -->
+            <div class="app-content">
+                <div class="app-chart app-chart-years">
+                    <div class="app-chart-header">
+                        <div class="app-chart-header-item" *ngIf="!selectedYear()">{{ 'statistics.all-years' | translate }}</div>
+                        <div class="app-chart-header-item" *ngIf="selectedYear()">
+                            <app-button variant="tertiary" size="s" [icon]="true" iconLeft="arrow-left.svg" (click)="onYearCancel()"></app-button>
+                            {{ selectedYear() }}
+                        </div>
+                    </div>
+                    <!-- DATA BY YEARS -->
+                    <ngx-charts-bar-vertical
+                        *ngIf="resolvedDataByDate()"
+                        [scheme]="colorScheme"
+                        [view]="[800, 300]"
+                        [animations]="true"
+                        [barPadding]="2"
+                        [results]="resolvedDataByDate()"
+                        [gradient]="false"
+                        [xAxis]="true"
+                        [yAxis]="true"
+                        [legend]="false"
+                        [showDataLabel]="false"
+                        (select)="onYearClick($event)"
+                    ></ngx-charts-bar-vertical>
+
+                    <!-- DATA BY REGISTRARS -->
+                    <div class="app-chart app-chart-pie">
+                        <div class="app-chart-header" *ngIf="!selectedRegistrar()">
+                            <div class="app-chart-header-item">{{ 'statistics.all-registrars' | translate }}</div>
+                        </div>
+                        <div class="app-chart-header" *ngIf="selectedRegistrar()">
+                            <div class="app-chart-header-item">
+                                <app-button
+                                    variant="tertiary"
+                                    size="s"
+                                    [icon]="true"
+                                    iconLeft="arrow-left.svg"
+                                    (click)="onRegistrarCancel()"
+                                ></app-button>
+                                {{ selectedRegistrar() }}
+                            </div>
+                        </div>
+                        <ngx-charts-pie-chart
+                            *ngIf="resolvedDataByRegistrar()"
+                            [results]="resolvedDataByRegistrar()"
+                            [view]="[800, 300]"
+                            [animations]="false"
+                            [legend]="true"
+                            [labels]="true"
+                            [doughnut]="false"
+                            [explodeSlices]="false"
+                            [gradient]="false"
+                            [scheme]="colorScheme"
+                            (select)="onRegistrarClick($event)"
+                        ></ngx-charts-pie-chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

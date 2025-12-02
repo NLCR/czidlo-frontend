@@ -1,0 +1,1030 @@
+<div class="app-search-container">
+    <div class="app-search-header">
+        <input
+            #searchInput
+            id="search-input"
+            type="text"
+            placeholder="Hledat..."
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch(searchInput.value)"
+        />
+        <app-button variant="primary" size="l" iconLeft="" iconRight="" (click)="onSearch(searchInput.value)">
+            <span>{{ 'buttons.search' | translate }}</span>
+        </app-button>
+    </div>
+    <div class="app-action">
+        <div class="app-select-type">
+            <mat-form-field appearance="outline">
+                <mat-label>Typ dokumentu</mat-label>
+                <mat-select [(ngModel)]="selectedType" (selectionChange)="onTypeSelected()">
+                    <mat-option value="">Vše</mat-option>
+                    <mat-option value="MONOGRAPH">Monografie</mat-option>
+                    <mat-option value="MONOGRAPH_VOLUME">Svazek monografie</mat-option>
+                    <mat-option value="PERIODICAL">Periodikum</mat-option>
+                    <mat-option value="PERIODICAL_VOLUME">Ročník periodika</mat-option>
+                    <mat-option value="PERIODICAL_ISSUE">Číslo periodika</mat-option>
+                    <mat-option value="ANALYTICAL">Článek</mat-option>
+                    <mat-option value="THESIS">Thesis</mat-option>
+                    <mat-option value="OTHER">Ostatní</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="app-records-count" *ngIf="searchService.recordsCount() > 0">
+            {{ 'search.records-found' | translate }}: {{ searchService.recordsCount() }}
+        </div>
+    </div>
+
+    <!-- SEARCH RESULTS -->
+    <div class="app-search-results" *ngIf="searchService.searchResults().length > 0">
+        <div class="app-search-card" *ngFor="let item of searchService.searchResults()">
+            <div class="app-card-header" [ngClass]="{ opened: item.opened }" (click)="onSelectItem(item)">
+                <div class="app-card-header-left">
+                    <img *ngIf="!item.loading" [src]="item.opened ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                    <div *ngIf="item.loading" class="loader"><mat-spinner diameter="24"></mat-spinner></div>
+                    <div class="app-card-title">
+                        <div class="app-title-part">{{ item.title }}</div>
+                        <div class="app-title-part" *ngIf="item.volumetitle">- {{ item.volumetitle }}</div>
+                        <div class="app-title-part" *ngIf="item.sdtitle">({{ item.sdtitle }})</div>
+                        <div class="app-title-part" *ngIf="item.entitytype">({{ item.entitytype }})</div>
+                    </div>
+                </div>
+                <div class="app-card-header-right">
+                    <div
+                        class="app-urn-nbn"
+                        *ngIf="item.documentcode && item.registrarcode"
+                        [ngClass]="item.active ? 'app-active' : 'app-not-active'"
+                    >
+                        urn:nbn:cz:{{ item.registrarcode }}-{{ item.documentcode }}
+                    </div>
+                </div>
+            </div>
+            <div class="app-card-content" [ngClass]="{ opened: item.opened }" *ngIf="item.opened && !item.loading">
+                <div class="app-ie-info">
+                    <div class="app-ie-field app-link-cnb" *ngIf="item.ccnb">
+                        <a
+                            href="https://aleph.nkp.cz/F/?func=direct&doc_number={{ item.ccnb.split('cnb')[1] }}&local_base=CNB"
+                            target="_blank"
+                            rel="noopener"
+                        >
+                            {{ 'search.cnb-link' | translate }}
+                        </a>
+                    </div>
+
+                    <!-- TITLE -->
+                    <div class="app-ie-field" *ngIf="item.title">
+                        <div class="app-label">{{ 'search.title' | translate }}:</div>
+                        <div class="app-value">{{ item.title }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.subtitle">
+                        <div class="app-label">{{ 'search.subtitle' | translate }}:</div>
+                        <div class="app-value">{{ item.subtitle }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.volumetitle">
+                        <div class="app-label">{{ 'search.volumetitle' | translate }}:</div>
+                        <div class="app-value">{{ item.volumetitle }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.issuetitle">
+                        <div class="app-label">{{ 'search.issuetitle' | translate }}:</div>
+                        <div class="app-value">{{ item.issuetitle }}</div>
+                    </div>
+
+                    <!-- AUTHORS -->
+                    <div class="app-ie-field" *ngIf="item.author?.length > 0">
+                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-value">{{ item.author }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.corporation?.length > 0">
+                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-value">{{ item.corporation }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.event?.length > 0">
+                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-value">{{ item.event }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.otheroriginator">
+                        <div class="app-label">{{ 'search.otheroriginator' | translate }}:</div>
+                        <div class="app-value">{{ item.otheroriginator }}</div>
+                    </div>
+
+                    <!-- PUBLICATION -->
+                    <div class="app-ie-field" *ngIf="item.details && item.details?.intelectualEntity?.publication?.place">
+                        <div class="app-label">{{ 'search.place' | translate }}:</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.publication?.place }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.details && item.details?.intelectualEntity?.publication?.publisher">
+                        <div class="app-label">{{ 'search.publisher' | translate }}:</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.publication?.publisher }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.details && item.details?.intelectualEntity?.publication?.year">
+                        <div class="app-label">{{ 'search.year' | translate }}:</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.publication?.year }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.details && item.details?.intelectualEntity?.digitalBorn.toString()">
+                        <div class="app-label">{{ 'search.digital-born' | translate }}:</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.digitalBorn ? 'true' : ('false' | translate) }}</div>
+                    </div>
+
+                    <!-- SOURCE TITLE -->
+                    <div class="app-ie-field" *ngIf="item.sdtitle">
+                        <div class="app-label">{{ 'search.sdtitle' | translate }}:</div>
+                        <div class="app-value">{{ item.sdtitle }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.sdvolumetitle">
+                        <div class="app-label">{{ 'search.sdvolumetitle' | translate }}:</div>
+                        <div class="app-value">{{ item.sdvolumetitle }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.sdissuetitle">
+                        <div class="app-label">{{ 'search.sdissuetitle' | translate }}:</div>
+                        <div class="app-value">{{ item.sdissuetitle }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.ccnb">
+                        <div class="app-label">{{ 'search.ccnb' | translate }}:</div>
+                        <div class="app-value">{{ item.ccnb }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.issn">
+                        <div class="app-label">{{ 'search.issn' | translate }}:</div>
+                        <div class="app-value">{{ item.issn }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.isbn">
+                        <div class="app-label">{{ 'search.isbn' | translate }}:</div>
+                        <div class="app-value">{{ item.isbn }}</div>
+                    </div>
+                    <div class="app-ie-fields" *ngIf="item.details.intelectualEntity?.ieIdentifiers?.length > 0">
+                        <div class="app-ie-field" *ngFor="let id of item.details.intelectualEntity?.ieIdentifiers">
+                            <div class="app-label">{{ 'search.' + id.type.toLowerCase() | translate }}:</div>
+                            <div class="app-value">{{ id.value }}</div>
+                        </div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.details.intelectualEntity?.created">
+                        <div class="app-label">{{ 'search.created' | translate }}:</div>
+                        <div class="app-value">{{ item.details.intelectualEntity?.created.split('[')[0] | date }}</div>
+                    </div>
+                    <div class="app-ie-field" *ngIf="item.details.intelectualEntity?.modified">
+                        <div class="app-label">{{ 'search.modified' | translate }}:</div>
+                        <div class="app-value">{{ item.details.intelectualEntity?.modified.split('[')[0] | date }}</div>
+                    </div>
+
+                    <div class="app-button-part" *ngIf="isAdmin()">
+                        <app-button variant="primary" size="s" (click)="editItem(item)">
+                            <span>{{ 'buttons.edit' | translate }}</span>
+                        </app-button>
+                    </div>
+
+                    <!-- ZDROJOVY DOKUMENT -->
+                    <!-- <div class="app-ie-source-document" [ngClass]="{ opened: item.sdtitleopen }" *ngIf="item.sdtitle">
+                        <div class="app-ie-header app-ie-source-document-header" (click)="toggleSdInfo(item)">
+                            <img [src]="item.sdtitleopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                            <div class="app-part-title">
+                                <div class="app-label">{{ 'search.sd' | translate }}:</div>
+                                <div>{{ item.sdtitle }}</div>
+                                <div>{{ item.sdvolumetitle }}</div>
+                                <div>{{ item.sdissuetitle }}</div>
+                            </div>
+                        </div>
+                        <div class="app-ie-content app-ie-source-document-content" *ngIf="item.sdtitleopen"></div>
+                    </div> -->
+
+                    <!-- DIGITALNI DOKUMENT -->
+                    <div class="app-ie-digital-document" [ngClass]="{ opened: item.ddopen }" *ngIf="item.details?.digitalDocument">
+                        <div class="app-ie-header app-ie-digital-document-header" (click)="item.ddopen = !item.ddopen">
+                            <img [src]="item.ddopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                            <div class="app-part-title">
+                                <div class="app-label">{{ 'search.dd' | translate }}</div>
+                                <app-button variant="tertiary" size="xs" (click)="openDocumentXml(item.urnnbn); $event.stopPropagation()">
+                                    XML →
+                                </app-button>
+                                <app-button variant="tertiary" size="xs" (click)="openDocumentJson(item.urnnbn); $event.stopPropagation()">
+                                    JSON →
+                                </app-button>
+                            </div>
+                        </div>
+                        <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.ddopen">
+                            <!-- URNNBN USER -->
+                            <div class="app-ie-field" *ngIf="item.details.urnNbn && !isAdmin()">
+                                <!-- <div class="app-label">{{ 'search.urnNbn' | translate }}:</div> -->
+                                <div class="app-value">urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}</div>
+                                <div class="app-value-2">({{ 'search.registered' | translate }} {{ item.details.urnNbn.registered | date }})</div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.details.urnNbn?.status === 'DEACTIVATED' && !isAdmin()">
+                                <div class="app-label">{{ 'search.status' | translate }}:</div>
+                                <div class="app-value">{{ item.details.urnNbn.status }}</div>
+                                <div class="app-value-2">({{ 'search.deactivated' | translate }} {{ item.details.urnNbn.deactivated | date }})</div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.details?.registrar">
+                                <div class="app-label">{{ 'search.registrar' | translate }}:</div>
+                                <div class="app-value">{{ item.details.registrar?.name }}</div>
+                                <div class="app-value-2">({{ item.details.registrar?.code }})</div>
+                            </div>
+                            <div class="app-ie-field" *ngIf="item.details?.archiver">
+                                <div class="app-label">{{ 'search.archiver' | translate }}:</div>
+                                <div class="app-value">{{ item.details.archiver?.name }}</div>
+                                <div class="app-value-2" *ngIf="item.details.archiver?.description">({{ item.details.archiver?.description }})</div>
+                            </div>
+                            <div class="app-button-part">
+                                <app-button variant="primary" size="s" (click)="addInstance(item)">
+                                    <span>{{ 'buttons.add-instance' | translate }}</span>
+                                </app-button>
+                            </div>
+
+                            <!-- URNNBN ADMIN -->
+                            <div class="app-ie-urnnbn" *ngIf="isAdmin()">
+                                <div class="app-ie-header" (click)="item.urnopen = !item.urnopen">
+                                    <img [src]="item.urnopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                                    <div class="app-part-title">
+                                        <div class="app-label-2">
+                                            urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}
+                                        </div>
+                                        <app-button
+                                            variant="tertiary"
+                                            size="xs"
+                                            (click)="openUrnnbnXml(item.urnnbn); $event.stopPropagation()"
+                                        >
+                                            XML →
+                                        </app-button>
+                                        <app-button
+                                            variant="tertiary"
+                                            size="xs"
+                                            (click)="openUrnnbnJson(item.urnnbn); $event.stopPropagation()"
+                                        >
+                                            JSON →
+                                        </app-button>
+                                    </div>
+                                </div>
+                                <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.urnopen">
+                                    <div class="app-ie-field">
+                                        <div class="app-label">{{ 'search.registered' | translate }}:</div>
+                                        <div class="app-value">{{ item.details.urnNbn.registered.split('[')[0] | date }}</div>
+                                    </div>
+                                    <div class="app-ie-field">
+                                        <div class="app-label">{{ 'search.status' | translate }}:</div>
+                                        <div class="app-value">{{ item.details.urnNbn.status }}</div>
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details.urnNbn.status === 'DEACTIVATED'">
+                                        <div class="app-label">{{ 'search.deactivated' | translate }}:</div>
+                                        <div class="app-value">{{ item.details.urnNbn.deactivated.split('[')[0] | date }}</div>
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details.urnNbn.deactivationNote">
+                                        <div class="app-label">{{ 'search.deactivation-note' | translate }}:</div>
+                                        <div class="app-value">{{ item.details.urnNbn.deactivationNote }}</div>
+                                    </div>
+                                    <!-- TODO PRECEDESSORS AND SUCCESSORS -->
+                                    <div class="app-button-part">
+                                        <app-button variant="primary" size="s" (click)="deactivateURNNBN(item)" *ngIf="item.details?.urnNbn.active">
+                                            <span>{{ 'buttons.deactivate' | translate }}</span>
+                                        </app-button>
+                                        <app-button variant="primary" size="s" (click)="reactivateURNNBN(item)" *ngIf="!item.details?.urnNbn.active">
+                                            <span>{{ 'buttons.reactivate' | translate }}</span>
+                                        </app-button>
+                                        <app-button variant="primary" size="s" (click)="addInstance(item)" *ngIf="item.details?.urnNbn.active">
+                                            <span>{{ 'buttons.add-instance' | translate }}</span>
+                                        </app-button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TECHNICKA METADATA -->
+                            <div class="app-ie-technical-metadata" [ngClass]="{ opened: item.tmopen }" *ngIf="item.details?.digitalDocument">
+                                <div class="app-ie-header" (click)="item.tmopen = !item.tmopen">
+                                    <img [src]="item.tmopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                                    <div class="app-part-title">
+                                        <div class="app-label-2">{{ 'search.tm' | translate }}</div>
+                                    </div>
+                                </div>
+                                <div class="app-ie-content" *ngIf="item.tmopen">
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.format">
+                                        <div class="app-label">{{ 'search.format' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.format }}</div>
+                                        <div class="app-value-2">
+                                            ({{ 'search.version' | translate }} {{ item.details?.digitalDocument?.formatVersion }})
+                                        </div>
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.extent">
+                                        <div class="app-label">{{ 'search.extent' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.extent }}</div>
+                                    </div>
+                                    <div
+                                        class="app-ie-field"
+                                        *ngIf="
+                                            item.details?.digitalDocument?.resolutionHorizontal && item.details?.digitalDocument?.resolutionVertical
+                                        "
+                                    >
+                                        <div class="app-label">{{ 'search.resolution' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.resolutionHorizontal }}</div>
+                                        x
+                                        <div class="app-value">{{ item.details?.digitalDocument?.resolutionVertical }}</div>
+                                        dpi
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.compression">
+                                        <div class="app-label">{{ 'search.compression' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.compression }}</div>
+                                    </div>
+                                    <div
+                                        class="app-ie-field"
+                                        *ngIf="item.details?.digitalDocument?.colorModel && item.details?.digitalDocument?.colorDepth"
+                                    >
+                                        <div class="app-label">{{ 'search.color' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.colorModel }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.colorDepth }}bit</div>
+                                    </div>
+                                    <div
+                                        class="app-ie-field"
+                                        *ngIf="item.details?.digitalDocument?.pictureWidth && item.details?.digitalDocument?.pictureHeight"
+                                    >
+                                        <div class="app-label">{{ 'search.pictureSize' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.pictureWidth }}</div>
+                                        x
+                                        <div class="app-value">{{ item.details?.digitalDocument?.pictureHeight }}</div>
+                                        px
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.created">
+                                        <div class="app-label">{{ 'search.created' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.created.split(['['])[0] | date }}</div>
+                                    </div>
+                                    <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.modified">
+                                        <div class="app-label">{{ 'search.modified' | translate }}:</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.modified.split(['['])[0] | date }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- RSI -->
+                            <div class="app-ie-rsi" [ngClass]="{ opened: item.rsiopen }" *ngIf="item.details?.registrarScopeIdentifiers?.length > 0">
+                                <div class="app-ie-header" (click)="item.rsiopen = !item.rsiopen">
+                                    <img [src]="item.rsiopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                                    <div class="app-part-title">
+                                        <div class="app-label-2">{{ 'search.rsi' | translate }}</div>
+                                    </div>
+                                </div>
+                                <div class="app-ie-content" *ngIf="item.rsiopen">
+                                    <div class="app-ie-field" *ngFor="let rsi of item.details?.registrarScopeIdentifiers">
+                                        <div class="app-label">{{ rsi?.type }}:</div>
+                                        <div class="app-value">{{ rsi?.value }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--DIGITAL INSTANCES -->
+                            <div class="app-ie-di" *ngIf="item.details?.digitalInstances?.length > 0">
+                                <div *ngFor="let di of item.details?.digitalInstances">
+                                    <div class="app-ie-header" (click)="di.diopen = !di.diopen">
+                                        <img [src]="di.diopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                                        <div class="app-part-title app-part-title-di">
+                                            <div class="app-label-2 app-di-url-label">
+                                                <a [ngClass]="{ 'app-not-active': di.active === false }" href="{{ di.url }}" target="_blank" rel="noopener noreferrer">{{ di.url }}</a>
+                                            </div>
+                                            <app-button
+                                                variant="tertiary"
+                                                size="xs"
+                                                (click)="openDiXml(di.id); $event.stopPropagation()"
+                                            >
+                                                XML →
+                                            </app-button>
+                                            <app-button
+                                                variant="tertiary"
+                                                size="xs"
+                                                (click)="openDiJson(di.id); $event.stopPropagation()"
+                                            >
+                                                JSON →
+                                            </app-button>
+                                        </div>
+                                    </div>
+                                    <div class="app-ie-content" *ngIf="di.diopen">
+                                        <div class="app-ie-field" *ngIf="di.active && di.active === true || di.active === false">
+                                            <div class="app-label">{{ 'search.active' | translate }}:</div>
+                                            <div class="app-value">{{ 'search.' + di.active | translate }}</div>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.library">
+                                            <div class="app-label">{{ 'search.digitalLibrary' | translate }}:</div>
+                                            <div class="app-value">{{ di.library.name }}</div>
+                                            <app-button variant="tertiary" size="xs">{{ 'search.didetails' | translate }} →</app-button>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.format">
+                                            <div class="app-label">{{ 'search.format' | translate }}:</div>
+                                            <div class="app-value">{{ di.format }}</div>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.accessibility">
+                                            <div class="app-label">{{ 'search.accessibility' | translate }}:</div>
+                                            <div class="app-value">{{ di.accessibility }}</div>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.accessRestriction">
+                                            <div class="app-label">{{ 'search.access_restriction' | translate }}:</div>
+                                            <div class="app-value">{{ di.accessRestriction }}</div>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.created">
+                                            <div class="app-label">{{ 'search.created' | translate }}:</div>
+                                            <div class="app-value">{{ di.created.split('[')[0] | date }}</div>
+                                        </div>
+                                        <div class="app-ie-field" *ngIf="di.deactivated">
+                                            <div class="app-label">{{ 'search.deactivated' | translate }}:</div>
+                                            <div class="app-value">{{ di.deactivated.split('[')[0] | date }}</div>
+                                        </div>
+                                        <div class="app-buttons">
+                                            <app-button variant="primary" size="s" (click)="editDigitalInstance(item, di)">
+                                                <span>{{ 'buttons.edit' | translate }}</span>
+                                            </app-button>
+                                            <app-button *ngIf="di.active" variant="primary" size="s" (click)="deactivateDigitalInstance(item, di)">
+                                                <span>{{ 'buttons.deactivate' | translate }}</span>
+                                            </app-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <pre *ngIf="isDevMode()">{{ item | json }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NO RESULTS -->
+    <div class="app-no-results" *ngIf="searchService.recordsCount() === 0">
+        <h1 class="app-no-results-title">{{ 'search.no-results-title' | translate }}</h1>
+        <div class="app-no-results-text">{{ 'search.no-results-text-1' | translate }}</div>
+        <div class="app-no-results-text">
+            {{ 'search.no-results-text-2' | translate }}
+            <a href="mailto:resolver-podpora@nkp.cz">resolver-podpora&#64;nkp.cz</a>
+            .
+        </div>
+    </div>
+
+    <!-- PAGINATOR -->
+    <div class="app-search-footer" *ngIf="pages.length > 1">
+        <div class="app-paginator">
+            <div class="app-pages">
+                <div class="app-page-items">
+                    <div
+                        class="app-page"
+                        *ngFor="let page of displayedFirstPages"
+                        [ngClass]="{ 'app-active': page === currentPage }"
+                        (click)="changePage(page)"
+                    >
+                        {{ page }}
+                    </div>
+                </div>
+                <div class="app-dots" *ngIf="pages.length > 4">...</div>
+                <div class="app-page-items" *ngIf="displayedMiddlePages.length > 0">
+                    <div
+                        class="app-page"
+                        *ngFor="let page of displayedMiddlePages"
+                        [ngClass]="{ 'app-active': page === currentPage }"
+                        (click)="changePage(page)"
+                    >
+                        {{ page }}
+                    </div>
+                </div>
+                <div class="app-dots" *ngIf="displayedMiddlePages.length > 0">...</div>
+                <div class="app-page-items" *ngIf="pages.length > 4">
+                    <div
+                        class="app-page"
+                        *ngFor="let page of displayedLastPages"
+                        [ngClass]="{ 'app-active': page === currentPage }"
+                        (click)="changePage(page)"
+                    >
+                        {{ page }}
+                    </div>
+                </div>
+            </div>
+            <div class="app-navigation">
+                <div class="app-navigation-button" (click)="changePage(currentPage - 1)" [ngClass]="{ disabled: currentPage === 1 }">
+                    <img class="app-navigation-icon" src="assets/icons/arrow-left-white.svg" />
+                </div>
+                <div class="app-navigation-button" (click)="changePage(currentPage + 1)" [ngClass]="{ disabled: currentPage === lastPage }">
+                    <img class="app-navigation-icon" src="assets/icons/arrow-right-white.svg" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
+    <div class="app-sidebar-entity">
+        <!-- HEADER -->
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title" *ngIf="activeAction === 'edit'">
+                {{ 'import.' + selectedEntity | translate }}
+            </div>
+            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">{{ 'import.add-instance' | translate }} {{ title.value }}</div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+        <div class="app-sidebar-content" *ngIf="activeAction === 'edit'">
+            <div class="app-field-hint">{{ 'import.mandatory' | translate }}</div>
+
+            <!-- TITLE_PART -->
+            <div class="app-part">
+                <div class="app-part-title">
+                    {{ 'import.title_part' | translate }}
+                </div>
+                <div class="app-part-content">
+                    <!-- TITLE -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-title">
+                            <div class="app-base-input-label" *ngIf="selectedEntity == 'PERIODICAL_VOLUME' || selectedEntity == 'PERIODICAL_ISSUE'">
+                                {{ 'import.periodicalTitle' | translate }}
+                            </div>
+                            <div class="app-base-input-label" *ngIf="selectedEntity == 'MONOGRAPH_VOLUME'">
+                                {{ 'import.monographTitle' | translate }}
+                            </div>
+                            <div
+                                class="app-base-input-label"
+                                *ngIf="
+                                    selectedEntity !== 'PERIODICAL_VOLUME' &&
+                                    selectedEntity !== 'PERIODICAL_ISSUE' &&
+                                    selectedEntity !== 'MONOGRAPH_VOLUME'
+                                "
+                            >
+                                {{ 'import.title' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="title" />
+                            <mat-error class="app-error-message" *ngIf="title.invalid && (title.dirty || title.touched)">
+                                {{ 'messages.title-required' | translate }}
+                            </mat-error>
+                        </div>
+                    </div>
+                    <!-- SUBTITLE -->
+                    <div
+                        class="app-base-input-container"
+                        *ngIf="
+                            selectedEntity !== 'MONOGRAPH_VOLUME' && selectedEntity !== 'PERIODICAL_VOLUME' && selectedEntity !== 'PERIODICAL_ISSUE'
+                        "
+                    >
+                        <div class="app-base-input app-full-width app-subTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.subTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="subTitle" />
+                        </div>
+                    </div>
+                    <!-- VOLUME TITLE -->
+                    <div
+                        class="app-base-input-container"
+                        *ngIf="
+                            selectedEntity === 'MONOGRAPH_VOLUME' || selectedEntity === 'PERIODICAL_VOLUME' || selectedEntity === 'PERIODICAL_ISSUE'
+                        "
+                    >
+                        <div class="app-base-input app-full-width app-volumeTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.volumeTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="volumeTitle" />
+                        </div>
+                    </div>
+                    <!-- ISSUE TITLE -->
+                    <div class="app-base-input-container" *ngIf="selectedEntity === 'PERIODICAL_ISSUE'">
+                        <div class="app-base-input app-full-width app-issueTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.issueTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="issueTitle" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IDENTIFIERS -->
+            <div class="app-part">
+                <div class="app-part-title">
+                    {{ 'import.identifiers' | translate }}
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-container" *ngIf="selectedEntity !== 'ANALYTICAL'">
+                        <div class="app-base-input app-half-width app-ccnb">
+                            <div class="app-base-input-label">
+                                {{ 'import.ccnb' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="ccnb" />
+                            <mat-error *ngIf="ccnb.hasError('invalidCcnb')">
+                                {{ 'messages.invalid-ccnb' | translate }}
+                            </mat-error>
+                        </div>
+                    </div>
+                    <div
+                        class="app-base-input-container"
+                        *ngIf="selectedEntity === 'MONOGRAPH' || selectedEntity === 'MONOGRAPH_VOLUME' || selectedEntity === 'OTHER'"
+                    >
+                        <div class="app-base-input app-half-width app-isbn">
+                            <div class="app-base-input-label">
+                                {{ 'import.isbn' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="isbn" />
+                            <mat-error *ngIf="isbn.hasError('invalidIsbn')">
+                                {{ 'messages.invalid-isbn' | translate }}
+                            </mat-error>
+                        </div>
+                    </div>
+                    <div
+                        class="app-base-input-container"
+                        *ngIf="selectedEntity === 'PERIODICAL' || selectedEntity === 'PERIODICAL_ISSUE' || selectedEntity === 'PERIODICAL_VOLUME'"
+                    >
+                        <div class="app-base-input app-half-width app-issn">
+                            <div class="app-base-input-label">
+                                {{ 'import.issn' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="issn" />
+                            <mat-error *ngIf="issn.hasError('invalidIssn')">
+                                {{ 'messages.invalid-issn' | translate }}
+                            </mat-error>
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-otherId">
+                            <div class="app-base-input-label">
+                                {{ 'import.otherId' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="otherId" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OTHER -->
+            <div class="app-part">
+                <div class="app-part-title">
+                    {{ 'import.other' | translate }}
+                </div>
+                <div class="app-part-content">
+                    <!-- DOCUMENT TYPE & BORN DIGITAL -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-documentType">
+                            <div class="app-base-input-label">
+                                {{ 'import.documentType' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="documentType" />
+                        </div>
+                        <div class="app-base-input app-toggle-container app-bornDigital" *ngIf="selectedEntity !== 'ANALYTICAL'">
+                            <app-toggle size="s" [checked]="bornDigital" (click)="bornDigital = !bornDigital"></app-toggle>
+                            <div class="app-toggle-label">{{ 'import.bornDigital' | translate }}</div>
+                        </div>
+                    </div>
+
+                    <!-- PRIMARY ORIGINATOR -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-primaryOriginatorType">
+                            <div class="app-base-input-label">
+                                {{ 'import.primaryOriginator' | translate }}
+                            </div>
+                            <mat-form-field appearance="outline">
+                                <mat-select class="app-singleselect app-primaryOriginatorType" [(value)]="selectedOriginatorType">
+                                    @for (entity of primaryOriginatorTypes; track entity) {
+                                    <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-base-input app-primaryOriginatorValue">
+                            <input matInput type="text" [formControl]="primaryOriginatorValue" />
+                        </div>
+                    </div>
+
+                    <!-- OTHER ORIGINATOR -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-otherOriginator">
+                            <div class="app-base-input-label">
+                                {{ 'import.otherOriginator' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="otherOriginator" />
+                        </div>
+                    </div>
+
+                    <!-- PUBLICATION -->
+                    <div class="app-base-input-container" *ngIf="selectedEntity !== 'ANALYTICAL'">
+                        <div class="app-base-input app-full-width app-place">
+                            <div class="app-base-input-label">
+                                {{ 'import.place' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="place" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container" *ngIf="selectedEntity !== 'ANALYTICAL'">
+                        <div class="app-base-input app-full-width app-publisher">
+                            <div class="app-base-input-label">
+                                {{ 'import.publisher' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="publisher" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container" *ngIf="selectedEntity !== 'ANALYTICAL'">
+                        <div class="app-base-input app-half-width app-year">
+                            <div class="app-base-input-label">
+                                {{ 'import.year' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="year" />
+                        </div>
+                    </div>
+                    <!-- THESIS -->
+                    <div class="app-base-input-container" *ngIf="selectedEntity === 'THESIS'">
+                        <div class="app-base-input app-full-width app-degreeAwardingInstitution">
+                            <div class="app-base-input-label">
+                                {{ 'import.degreeAwardingInstitution' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="degreeAwardingInstitution" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- SOURCE DOCUMENT (ANALYTICAL) -->
+            <div class="app-part" *ngIf="selectedEntity === 'ANALYTICAL'">
+                <div class="app-part-title">
+                    {{ 'import.sourceDocument' | translate }}
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-sourceDocumentTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.sourceDocumentTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="sourceDocumentTitle" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-sourceDocumentVolumeTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.sourceDocumentVolumeTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="sourceDocumentVolumeTitle" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-sourceDocumentIssueTitle">
+                            <div class="app-base-input-label">
+                                {{ 'import.sourceDocumentIssueTitle' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="sourceDocumentIssueTitle" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-ccnb">
+                            <div class="app-base-input-label">{{ 'import.ccnb' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentCcnb" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-isbn">
+                            <div class="app-base-input-label">{{ 'import.isbn' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentIsbn" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-issn">
+                            <div class="app-base-input-label">{{ 'import.issn' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentIssn" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-otherId">
+                            <div class="app-base-input-label">{{ 'import.otherId' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentOtherId" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-place">
+                            <div class="app-base-input-label">{{ 'import.place' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentPlace" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width app-publisher">
+                            <div class="app-base-input-label">{{ 'import.publisher' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentPublisher" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-year">
+                            <div class="app-base-input-label">{{ 'import.year' | translate }} {{ 'import.of-source-document' | translate }}</div>
+                            <input matInput type="text" [formControl]="sourceDocumentYear" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DIGITAL DOCUMENT -->
+            <div class="app-part">
+                <div class="app-part-title">
+                    {{ 'import.digital-document' | translate }}
+                </div>
+                <div class="app-part-content">
+                    <!-- ARCHIVER ID -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-primaryArchiverId">
+                            <div class="app-base-input-label">
+                                {{ 'import.archiverId' | translate }}
+                            </div>
+                            <mat-form-field appearance="outline">
+                                <mat-select class="app-singleselect" [(value)]="selectedArchiverId">
+                                    @for (entity of archiverIdsList(); track entity) {
+                                    <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="app-base-input-container" *ngIf="selectedMode === 'reservation'">
+                        <div class="app-base-input app-half-width app-urnNbn">
+                            <div class="app-base-input-label">
+                                {{ 'import.urnNbn' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="urnNbn" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-financed">
+                            <div class="app-base-input-label">
+                                {{ 'import.financed' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="financed" />
+                        </div>
+                        <div class="app-base-input app-half-width app-contractNumber">
+                            <div class="app-base-input-label">
+                                {{ 'import.contractNumber' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="contractNumber" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-part">
+                <div class="app-part-title">
+                    {{ 'import.technicalMetadata' | translate }}
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-formatValue">
+                            <div class="app-base-input-label">
+                                {{ 'import.formatValue' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="formatValue" />
+                        </div>
+                        <div class="app-base-input app-half-width app-formatVersion">
+                            <div class="app-base-input-label">
+                                {{ 'import.formatVersion' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="formatVersion" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-extent">
+                            <div class="app-base-input-label">
+                                {{ 'import.extent' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="extent" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-resolutionHorizontal">
+                            <div class="app-base-input-label">
+                                {{ 'import.resolutionHorizontal' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="resolutionHorizontal" />
+                        </div>
+                        <div class="app-base-input app-half-width app-resolutionVertical">
+                            <div class="app-base-input-label">
+                                {{ 'import.resolutionVertical' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="resolutionVertical" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-compressionRatio">
+                            <div class="app-base-input-label">
+                                {{ 'import.compression' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="compression" />
+                        </div>
+                        <!-- <div class="app-base-input app-half-width app-compressionValue">
+                            <div class="app-base-input-label">
+                                {{ 'import.compressionValue' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="compressionValue" />
+                        </div> -->
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-colorModel">
+                            <div class="app-base-input-label">
+                                {{ 'import.colorModel' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="colorModel" />
+                        </div>
+                        <div class="app-base-input app-half-width app-colorDepth">
+                            <div class="app-base-input-label">
+                                {{ 'import.colorDepth' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="colorDepth" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-iccProfile">
+                            <div class="app-base-input-label">
+                                {{ 'import.iccProfile' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="iccProfile" />
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-pictureSizeWidth">
+                            <div class="app-base-input-label">
+                                {{ 'import.pictureSizeWidth' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="pictureSizeWidth" />
+                        </div>
+                        <div class="app-base-input app-half-width app-pictureSizeHeight">
+                            <div class="app-base-input-label">
+                                {{ 'import.pictureSizeHeight' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="pictureSizeHeight" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-sidebar-content" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">
+            <!-- DIGITAL DOCUMENT INSTANCE -->
+            <div class="app-part">
+                <div class="app-part-content">
+                    <!-- DIGITAL LIBRARY -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-primaryArchiverId">
+                            <div class="app-base-input-label">
+                                {{ 'import.digital-library' | translate }}
+                            </div>
+                            <mat-form-field appearance="outline">
+                                <mat-select class="app-singleselect" [(value)]="selectedDigitalLibraryId">
+                                    @for (entity of digitalLibrariesList(); track entity) {
+                                    <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <!-- FORMAT -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-otherId">
+                            <div class="app-base-input-label">
+                                {{ 'import.format' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="diFormat" />
+                        </div>
+                    </div>
+                    <!-- DOSTUPNOST -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-otherId">
+                            <div class="app-base-input-label">
+                                {{ 'import.access' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="diAccess" />
+                        </div>
+                    </div>
+                    <!-- URL -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-otherId">
+                            <div class="app-base-input-label">
+                                {{ 'import.url' | translate }}
+                            </div>
+                            <input matInput type="text" [formControl]="diUrl" />
+                        </div>
+                    </div>
+                    <!-- OMEZENI PRISTUPU -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width app-primaryArchiverId">
+                            <div class="app-base-input-label">
+                                {{ 'import.access-restriction' | translate }}
+                            </div>
+                            <mat-form-field appearance="outline">
+                                <mat-select class="app-singleselect" [(value)]="selectedDiAccessRestrictionId">
+                                    @for (entity of diAccessRestrictionsList; track entity) {
+                                    <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="app-sidebar-footer" [ngClass]="{ 'snack-bar-visible': importRecordSnackBarVisible() }">
+            <div class="app-record-imported-snack-bar" *ngIf="importRecordSnackBarVisible()">
+                {{ 'messages.record-imported-successfully' | translate }}
+            </div>
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" (click)="onEditRecordConfirm()" *ngIf="activeAction === 'edit'">
+                    <span>{{ 'buttons.save-record' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" (click)="onAddInstanceConfirm()" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">
+                    <span *ngIf="activeAction === 'add-instance'">{{ 'buttons.add-instance' | translate }}</span>
+                    <span *ngIf="activeAction === 'edit-instance'">{{ 'buttons.edit-instance' | translate }}</span>
+                </app-button>
+            </div>
+        </div>
+    </div>
+</div>

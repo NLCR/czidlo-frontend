@@ -1,0 +1,103 @@
+.app-processes-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    .app-processes {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 16px;
+        align-self: stretch;
+        padding: 24px 0 0 0;
+        overflow: hidden;
+        // min-height: 0;
+        // min-width: 0;
+        .app-processes-header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+            flex-shrink: 0;
+            padding: 0 0 0 16px;
+            // IN STYLES.SCSS
+        }
+        .app-instances {
+            display: flex;
+            flex: 1;
+            // width: 100%;
+            // min-height: 0;
+            // min-width: 0;
+            flex-direction: column;
+            gap: 16px;
+            .app-toggle {
+                display: flex;
+                align-items: center;
+                gap: var(--Spacing-x2, 8px);
+                padding: 0 0 0 16px;
+                color: var(--Text-Secondary, #263340);
+                /* Typesettings/S/Medium */
+                font-family: 'IBM Plex Sans';
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 20px; /* 142.857% */
+            }
+            .app-table-instances {
+                padding: 0 16px 0 16px;
+            }
+        }
+        .app-definitions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            align-self: stretch;
+            .app-table-definitions {
+                padding: 0 16px 0 16px;
+                width: 800px;
+                .app-row-definition {
+                    justify-content: space-between;
+                    .app-col-def-actions {
+                        width: 104px;
+                        padding: 0 178px 0 0;
+                    }
+                    .app-col-buttons {
+                        flex: 0 0 auto;
+                    }
+                }
+            }
+            .app-col-buttons {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+        }
+    }
+}
+.app-sidebar {
+    display: none;
+    height: 100%;
+    align-self: flex-end;
+    &.app-sidebar-active {
+        display: flex;
+        position: absolute;
+    }
+    .app-sidebar-instances,
+    .app-sidebar-definitions {
+        display: flex;
+        background-color: #fff;
+        flex-direction: column;
+        align-items: flex-start;
+        z-index: 101;
+        width: 800px;
+        // STYLES SCSS
+    }
+}
+.app-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100;
+}

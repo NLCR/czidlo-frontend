@@ -1,0 +1,80 @@
+.app-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  .app-radio-circle {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid var(--Border-Contrast, #bfccd9);
+    background: white;
+    box-sizing: border-box;
+    position: relative;
+    transition: all 0.15s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #0080a8;
+      transition: all 0.15s ease;
+    }
+  }
+
+  .app-radio-label {
+    color: var(--Text-Secondary, #263340);
+    font-family: 'IBM Plex Sans';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+  }
+
+  &:hover:not(.app-radio-disabled) .app-radio-circle {
+    border-color: #1e657b;
+
+    &::after {
+      background: #1e657b;
+      transform: translate(-50%, -50%) scale(0.6);
+    }
+  }
+
+  &.app-radio-checked .app-radio-circle {
+    border-color: #0080a8;
+
+    &::after {
+      background: #0080a8;
+      transform: translate(-50%, -50%) scale(0.6);
+    }
+  }
+
+  &.app-radio-checked:hover:not(.app-radio-disabled) .app-radio-circle::after {
+    background: #1e657b;
+  }
+
+  &.app-radio-disabled {
+    cursor: default;
+
+    .app-radio-circle {
+      background: #fff;
+      border: 1px solid #eaf6fa;
+
+      &::after {
+        background: #d6eef5;
+        transform: translate(-50%, -50%) scale(0.6);
+      }
+    }
+
+    .app-radio-label {
+      opacity: 0.6;
+    }
+  }
+}

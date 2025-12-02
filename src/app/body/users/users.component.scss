@@ -1,0 +1,59 @@
+.app-users-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    .app-users {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 16px;
+        align-self: stretch;
+        padding: 24px 16px 40px 16px;
+        overflow: hidden;
+        .app-table-users {
+            width: 800px;
+        }
+    }
+}
+.app-sidebar {
+    display: none;
+    height: 100%;
+    align-self: flex-end;
+    &.app-sidebar-active {
+        display: flex;
+        // position: absolute;
+    }
+    .app-sidebar-user,
+    .app-sidebar-rights {
+        display: flex;
+        background-color: #fff;
+        flex-direction: column;
+        align-items: flex-start;
+        z-index: 101;
+        width: 800px;
+        // STYLES SCSS
+    }
+}
+.app-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100;
+}
+.app-registrars-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    .app-registrar-item {
+        display: flex;
+        gap: 12px;
+    }
+}
+.app-base-input.app-multiselect {
+    width: 350px;
+}
+.app-buttons {
+    display: flex;
+}

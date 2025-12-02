@@ -1,0 +1,197 @@
+// src/styles/_buttons.scss
+
+.btn {
+    display: flex; /* Flexbox pro uspořádání ikon a textu */
+    align-items: center; /* Vertikální zarovnání */
+    justify-content: center; /* Horizontální zarovnání */
+    font-family: var(--Font-Family);
+    font-size: var(--Font-Size-Base);
+    font-weight: var(--Font-Weight-Normal);
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none;
+
+    &:hover {
+        background-color: var(--Color-Btn-Primary-Hover, #1e657b);
+        &:focus {
+            outline: none;
+        }
+    }
+
+    &:focus-visible {
+        outline: none;
+    }
+
+    /* Default umístění ikon před textem */
+    .btn-icon-left,
+    .btn-icon-right {
+        display: flex;
+        align-items: center;
+        border-radius: 4px;
+    }
+
+    /* Varianty tlačítek */
+    &.btn-primary {
+        background-color: var(--Color-Btn-Primary, #0080a8);
+        color: var(--Color-Btn-Primary-Text, #ffffff);
+        border: 1px solid var(--Color-Btn-Primary);
+
+        &:hover {
+            background-color: var(--Color-Btn-Primary-Hover, #1e657b);
+            box-shadow: 0 6px 8px var(--Color-Shadow-Hover);
+            border: 1px solid var(--Color-Btn-Primary-Hover);
+        }
+        &:active {
+            background-color: var(--Color-Btn-Primary-Pressed);
+        }
+        &:disabled {
+            border: 1px solid var(--Border-Btn-Primary-Disabled, #D6EEF5);
+            color: var(--Text-Btn-Primary-Disable, #FFF);
+            background: var(--Color-Btn-Primary-Disabled, #D6EEF5);
+            .btn-icon-left,
+            .btn-icon-right {
+                svg {
+                    path {
+                        fill: var(--Text-Btn-Disabled, #bfccd9);
+                    }
+                }
+            }
+        }
+        &.btn-warning {
+            background-color: var(--Color-Btn-Warning, #d93025);
+            border: 1px solid var(--Color-Btn-Warning);
+            &:hover {
+                background-color: var(--Color-Btn-Warning-Hover, #b1271b);
+                border: 1px solid var(--Color-Btn-Warning-Hover);
+            }
+            &:active {
+                background-color: var(--Color-Btn-Warning-Pressed, #8c1b15);
+            }
+        }
+    }
+
+    &.btn-secondary {
+        background-color: var(--Color-Btn-Secondary);
+        color: var(--Text-Btn-Secondary-Default);
+        &:hover {
+            background-color: var(--Color-Btn-Secondary-Hover);
+            color: var(--Text-Btn-Secondary-Hover);
+        }
+        &:active {
+            background-color: var(--Color-Btn-Secondary-Pressed);
+            color: var(--Text-Btn-Secondary-Pressed);
+        }
+    }
+
+    &.btn-tertiary {
+        color: var(--Text-Btn-Tertiary-Default);
+        border: 1px solid var(--Border-Btn-Tertiary-Default, #dfe5ec);
+        background: var(--Color-Btn-Tertiary-Default);
+        color: var(--Text-Secondary, #263340);
+        &:hover {
+            border: 1px solid var(--Border-Btn-Tertiary-Hover);
+            background: var(--Color-Btn-Tertiary-Default);
+            // .btn-icon-left,
+            // .btn-icon-right {
+            //     border-radius: var(--spacing-x-05, 2px);
+            //     border-color: var(--Border-Outline-Hover, #9fb2c6);
+            // }
+            // box-shadow: 0 6px 8px $color-shadow-hover;
+        }
+        &:active {
+            outline: none;
+        }
+        .btn-icon-left,
+        .btn-icon-right {
+            svg {
+                path {
+                    fill: #0080a8;
+                }
+            }
+        }
+        &:disabled {
+            border: 1px solid var(--Border-Btn-Tertiary-Disabled, #eff2f5);
+            background: var(--Color-Btn-Tertiary-Default, #fff);
+            color: var(--Text-Btn-Disabled, #bfccd9);
+            .btn-icon-left,
+            .btn-icon-right {
+                svg {
+                    path {
+                        fill: var(--Text-Btn-Disabled, #bfccd9);
+                    }
+                }
+            }
+        }
+    }
+
+    /* Velikosti tlačítek */
+    &.btn-xs {
+        padding: 4px 8px;
+        font-size: 12px;
+        gap: 4px;
+        &.btn-icon-only {
+            padding: 4px;
+        }
+        font-family: Karla;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 16px; /* 140% */
+    }
+    &.btn-s {
+        padding: 8px 12px;
+        font-size: 12px;
+        gap: 8px;
+        &.btn-icon-only {
+            padding: 8px;
+        }
+        /* Typesettings/S/XS/Medium */
+        font-family: Karla;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 16px; /* 133.333% */
+    }
+
+    &.btn-l {
+        padding: 12px 16px;
+        gap: 12px;
+        font-size: 16px;
+        flex: 1;
+        &.btn-icon-only {
+            padding: 12px;
+        }
+    }
+
+    /* Tlačítka s ikonami */
+    &.btn-icon {
+        .btn-icon-left,
+        .btn-icon-right {
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    /* Focus state pro přístupnost */
+    // &:focus {
+    //     outline: 2px solid var(--Color-Btn-Primary-Text, #ffffff);
+    //     outline-offset: 2px;
+    // }
+}
+span {
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+:focus-visible {
+    outline: none;
+}
+
+@media screen and (max-width: 600px) {
+    .btn {
+        &.btn-large {
+            font-size: 16px;
+            padding: 12px 24px;
+        }
+    }
+}

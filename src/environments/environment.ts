@@ -8,5 +8,23 @@ export const environment = {
     environmentCode: 'd_m', // pro produkci ziskej z promenne APP_ENV_CODE (přes env.json)
 
     czidloApiServiceBaseUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_API_SERVICE_URL (přes env.json)
-        
+    czidloPublicApiBaseUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_PUBLIC_API_URL (přes env.json)
+    
+    //TODO: presunout do konfigurace
+    pageInfoCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Informace.md',
+    pageRulesCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Pravidla.md',
+    pageContactsCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Kontakty.md',
+
+    pageInfoEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Information.md',
+    pageRulesEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Rules.md',
+    pageContactsEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Contacts.md',
+
+    pageEditInfoCzUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Informace.md',
+    pageEditRulesCzUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Pravidla.md',
+    pageEditContactsCzUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Kontakty.md',
+
+    pageEditInfoEnUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Information.md',
+    pageEditRulesEnUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Rules.md',
+    pageEditContactsEnUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Contacts.md',
+    
 }

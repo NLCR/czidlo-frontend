@@ -12,6 +12,7 @@ name: Main workflow
 # - APP_ENV_NAME
 # - APP_ENV_CODE
 # - APP_CZIDLO_API_SERVICE_URL
+# - APP_CZIDLO_PUBLIC_API_URL
 
 # this workflow uses actions:
 # https://github.com/marketplace/actions/create-json
@@ -219,6 +220,7 @@ jobs:
           TF_VAR_APP_ENV_NAME: ${{ vars.APP_ENV_NAME }}
           TF_VAR_APP_ENV_CODE: ${{ vars.APP_ENV_CODE }}
           TF_VAR_APP_CZIDLO_API_SERVICE_URL: ${{ vars.APP_CZIDLO_API_SERVICE_URL }}
+          TF_VAR_APP_CZIDLO_PUBLIC_API_URL: ${{ vars.APP_CZIDLO_PUBLIC_API_URL }}
         with:
           TERRAFORM_DOCKER_IMAGE: ${DOCKER_IMAGE}
           TERRAFORM_DOCKER_CONTAINER_NAME: ${{ matrix.name }}

@@ -1,0 +1,359 @@
+<div class="app-registrars-container">
+    <div class="app-registrars-page">
+        <!-- TABS -->
+        <div class="app-tabs-header app-registrars-header">
+            <div class="app-tabs">
+                <div class="app-tab app-tab-first" [ngClass]="{ 'app-tab-active': isActive === 'registrars' }" routerLink="/registrars/registrars">
+                    {{ 'registrars.registrars-list' | translate }}
+                </div>
+                <div class="app-tab app-tab-last" [ngClass]="{ 'app-tab-active': isActive === 'archivers' }" routerLink="/registrars/archivers">
+                    {{ 'registrars.archivers-list' | translate }}
+                </div>
+            </div>
+        </div>
+
+        <div class="app-loader" *ngIf="loadingRegistrars() || loadingArchivers()">
+            <mat-spinner diameter="50" color="primary"></mat-spinner>
+        </div>
+
+        <!-- REGISTRARS -->
+        <div class="app-registrars" *ngIf="isActive === 'registrars' && !loadingRegistrars()">
+            <div class="app-add app-add-registrar" *ngIf="loggedIn()">
+                <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openEditRegistrarDialog()">
+                    {{ 'buttons.add-registrar' | translate }}
+                </app-button>
+            </div>
+            <div class="app-table app-table-registrars">
+                <!-- table header -->
+                <div class="app-row app-row-header">
+                    <div class="app-col app-col-name app-table-header-item">
+                        {{ 'registrars.Name' | translate }}
+                    </div>
+                    <div class="app-col app-col-code app-table-header-item">
+                        {{ 'registrars.Code' | translate }}
+                    </div>
+                    <div class="app-col app-col-actions app-col-reg-actions app-table-header-item">
+                        {{ 'registrars.Actions' | translate }}
+                    </div>
+                </div>
+                <!-- no registrars -->
+                <div class="no-processes" *ngIf="!loadingRegistrars() && registrars().length === 0">
+                    {{ 'registrars.no-registrars' | translate }}
+                </div>
+                <!-- table body -->
+                <div class="app-table-body">
+                    <div
+                        *ngFor="let registrar of registrars()"
+                        class="app-row app-table-row app-row-clicable"
+                        [ngClass]="{ 'app-row-active': activeRegistrar === registrar }"
+                        (click)="openSidebar(registrar)"
+                    >
+                        <div class="app-col app-col-name">{{ registrar.name }}</div>
+                        <div class="app-col app-col-code">{{ registrar.code }}</div>
+                        <div class="app-col app-col-actions app-col-reg-actions">
+                            <app-button
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="trash-blue.svg"
+                                (click)="deleteRegistrar(registrar); $event.stopPropagation()"
+                            ></app-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ARCHIVERS -->
+        <div class="app-archivers" *ngIf="isActive === 'archivers'">
+            <div class="app-add app-add-archiver" *ngIf="loggedIn()">
+                <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openEditArchiverDialog()">
+                    {{ 'buttons.add-archiver' | translate }}
+                </app-button>
+            </div>
+            <div class="app-table app-table-archivers">
+                <!-- table header -->
+                <div class="app-row app-row-header">
+                    <div class="app-col app-col-name app-table-header-item">
+                        {{ 'registrars.Name' | translate }}
+                    </div>
+                    <div class="app-col app-col-actions app-table-header-item" *ngIf="loggedIn()">
+                        {{ 'registrars.actions' | translate }}
+                    </div>
+                </div>
+                <!-- no archivers -->
+                <div class="no-records" *ngIf="!loadingArchivers() && archivers().length === 0">
+                    {{ 'registrars.no-archivers' | translate }}
+                </div>
+                <!-- table body -->
+                <div class="app-table-body app-table-body-archivers">
+                    <div
+                        *ngFor="let archiver of archivers()"
+                        class="app-row app-table-row app-row-clicable"
+                        [ngClass]="{
+                            'app-row-hidden': archiver?.hidden === true && !loggedIn(),
+                            'app-row-active': activeArchiver?.id?.toString() === archiver.id.toString(),
+                            'app-actions-invisible': !loggedIn()
+                        }"
+                        (click)="openSidebar(archiver)"
+                    >
+                        <div class="app-col app-col-name">{{ archiver.name }}</div>
+                        <div class="app-col app-col-code">{{ archiver.code }}</div>
+                        <div class="app-col app-col-actions" *ngIf="loggedIn()">
+                            <app-button
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="edit-blue.svg"
+                                (click)="openEditArchiverDialog(archiver); $event.stopPropagation()"
+                            ></app-button>
+                            <app-button
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="trash-blue.svg"
+                                (click)="deleteArchiver(archiver); $event.stopPropagation()"
+                            ></app-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div class="app-overlay" *ngIf="isSidebarOpen() && loggedIn()" (click)="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
+    <!-- Sidebar Registrar -->
+    <div class="app-sidebar-registrar" *ngIf="activeRegistrar && isActive === 'registrars'">
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">{{ 'registrars.detail' | translate }} - {{ activeRegistrar?.name }}</div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+        <div class="app-sidebar-content">
+            <div class="app-sections">
+                <div class="app-section app-section-framed">
+                    <div class="app-section-part">
+                        <!-- <div class="app-section-part-title">{{ 'registrars.detail' | translate }}</div> -->
+                        <div class="app-items">
+                            <div class="app-item" *ngIf="activeRegistrar?.name">
+                                <span class="app-item-label">{{ 'registrars.name' | translate }}:</span>
+                                <span class="app-item-value">{{ activeRegistrar?.name }}</span>
+                            </div>
+                            <div class="app-item">
+                                <span class="app-item-label">{{ 'registrars.code' | translate }}:</span>
+                                <span class="app-item-value">{{ activeRegistrar?.code }}</span>
+                            </div>
+                        </div>
+                        <div class="app-section-part">
+                            <div class="app-section-part-title">{{ 'registrars.Modes' | translate }}</div>
+                            <div class="app-items app-gap-items">
+                                <div class="app-base-input-container app-radio-toggle-checkboxes">
+                                    <div class="app-base-input app-toggle-container">
+                                        <app-toggle
+                                            size="s"
+                                            [checked]="activeRegistrar.allowedRegistrationModeByResolver"
+                                            [disabled]="true"
+                                        ></app-toggle>
+                                        <div class="app-toggle-label">{{ 'registrars.resolverMode' | translate }}</div>
+                                    </div>
+                                </div>
+                                <div class="app-base-input-container app-radio-toggle-checkboxes">
+                                    <div class="app-base-input app-toggle-container">
+                                        <app-toggle
+                                            size="s"
+                                            [checked]="activeRegistrar.allowedRegistrationModeByReservation"
+                                            [disabled]="true"
+                                        ></app-toggle>
+                                        <div class="app-toggle-label">{{ 'registrars.reservationMode' | translate }}</div>
+                                    </div>
+                                </div>
+                                <div class="app-base-input-container app-radio-toggle-checkboxes">
+                                    <div class="app-base-input app-toggle-container">
+                                        <app-toggle
+                                            size="s"
+                                            [checked]="activeRegistrar.allowedRegistrationModeByRegistrar"
+                                            [disabled]="true"
+                                        ></app-toggle>
+                                        <div class="app-toggle-label">{{ 'registrars.registrarMode' | translate }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="app-section-part">
+                            <div class="app-section-part-title">{{ 'registrars.visibility' | translate }}</div>
+                            <div class="app-items app-gap-items">
+                                <div class="app-base-input-container app-radio-toggle-checkboxes">
+                                    <div class="app-base-input app-toggle-container">
+                                        <app-toggle size="s" [checked]="activeRegistrar.hidden" [disabled]="true"></app-toggle>
+                                        <div class="app-toggle-label">{{ 'registrars.Hidden' | translate }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="app-section-part">
+                            <app-button variant="primary" size="s" (click)="openEditRegistrarDialog(activeRegistrar)">
+                                {{ 'buttons.edit' | translate }}
+                            </app-button>
+                        </div>
+                    </div>
+                </div>
+                <!-- digital libraries -->
+                <div class="app-section app-section-framed">
+                    <div class="app-section-title">{{ 'registrars.digital-libraries' | translate }}</div>
+                    <div class="app-section-part" *ngIf="activeRegistrar?.digitalLibraries?.length > 0">
+                        <div *ngFor="let library of activeRegistrar.digitalLibraries">
+                            <div class="app-item">
+                                <div>{{ library.name }}</div>
+                                <!-- <div class="app-label" (click)="showDetails(activeRegistrar.code, library)">
+                                    <div class="app-label-name">{{ 'buttons.details' | translate }}</div>
+                                    <div class="app-label-icon">→</div>
+                                </div> -->
+                                <app-button variant="tertiary" size="xs" iconRight="" (click)="showDetails(activeRegistrar.code, library, 'dl')">
+                                    {{ 'buttons.details' | translate }}
+                                </app-button>
+                                <app-button
+                                    variant="tertiary"
+                                    size="xs"
+                                    [icon]="true"
+                                    iconLeft="edit-blue.svg"
+                                    [matTooltip]="'buttons.edit' | translate"
+                                    (click)="editDigitalLibrary(activeRegistrar.code, library); $event.stopPropagation()"
+                                ></app-button>
+                                <app-button
+                                    variant="tertiary"
+                                    size="xs"
+                                    [icon]="true"
+                                    iconLeft="trash-blue.svg"
+                                    [matTooltip]="'buttons.delete' | translate"
+                                    (click)="deleteDigitalLibrary(activeRegistrar.code, library); $event.stopPropagation()"
+                                ></app-button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-section-part">
+                        <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="addNewDigitalLibrary(activeRegistrar.code)">
+                            {{ 'buttons.add' | translate }}
+                        </app-button>
+                    </div>
+                </div>
+                <!-- catalogues -->
+                <div class="app-section app-section-framed">
+                    <div class="app-section-title">{{ 'registrars.catalogues' | translate }}</div>
+                    <div class="app-section-part" *ngIf="activeRegistrar?.catalogues?.length > 0">
+                        <div *ngFor="let catalog of activeRegistrar.catalogues">
+                            <div class="app-item">
+                                <div>{{ catalog.name }}</div>
+                                <!-- <div class="app-label" (click)="showDetails(activeRegistrar.code, catalog)">
+                                    <div class="app-label-name">{{ 'buttons.details' | translate }}</div>
+                                    <div class="app-label-icon">→</div>
+                                </div> -->
+                                <app-button variant="tertiary" size="xs" (click)="showDetails(activeRegistrar.code, catalog, 'catalogue')">
+                                    {{ 'buttons.details' | translate }}
+                                </app-button>
+                                <app-button
+                                    variant="tertiary"
+                                    size="xs"
+                                    [icon]="true"
+                                    iconLeft="edit-blue.svg"
+                                    [matTooltip]="'buttons.edit' | translate"
+                                    (click)="editCatalogue(activeRegistrar.code, catalog); $event.stopPropagation()"
+                                ></app-button>
+                                <app-button
+                                    variant="tertiary"
+                                    size="xs"
+                                    [icon]="true"
+                                    iconLeft="trash-blue.svg"
+                                    [matTooltip]="'buttons.delete' | translate"
+                                    (click)="deleteCatalogue(activeRegistrar.code, catalog); $event.stopPropagation()"
+                                ></app-button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-section-part">
+                        <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="addNewCatalogue(activeRegistrar.code)">
+                            {{ 'buttons.add' | translate }}
+                        </app-button>
+                    </div>
+                </div>
+                <!-- statistics -->
+                <div class="app-section app-section-framed">
+                    <div class="app-section-title">{{ 'registrars.statistics' | translate }}</div>
+                    <div class="app-section-part">
+                        <app-button variant="primary" size="s" (click)="openStatistics(activeRegistrar.code)">
+                            {{ 'buttons.open' | translate }}
+                        </app-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-sidebar-footer">
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.close' | translate }}</span>
+                </app-button>
+                <!-- <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadProcess(activeProcess)">
+                    <span>{{ 'buttons.download' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyProcess(activeProcess)">
+                    <span>{{ 'buttons.copy' | translate }}</span>
+                </app-button> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Archiver -->
+    <div class="app-sidebar-archiver" *ngIf="activeArchiver && isActive === 'archivers'">
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">{{ 'registrars.detail' | translate }} - {{ activeArchiver?.name }}</div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+        <div class="app-sidebar-content">
+            <div class="app-sections">
+                <div class="app-section">
+                    <!-- <div class="app-section-title">{{ 'registrars.detail' | translate }}</div> -->
+                    <div class="app-items">
+                        <div class="app-item" *ngIf="activeArchiver?.name">
+                            <span class="app-item-label">{{ 'registrars.name' | translate }}:</span>
+                            <span class="app-item-value">{{ activeArchiver?.name }}</span>
+                        </div>
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'registrars.id' | translate }}:</span>
+                            <span class="app-item-value">{{ activeArchiver?.id }}</span>
+                        </div>
+                        <div class="app-item" *ngIf="activeArchiver?.description">
+                            <span class="app-item-label">{{ 'registrars.description' | translate }}:</span>
+                            <span class="app-item-value">{{ activeArchiver?.description }}</span>
+                        </div>
+                        <div class="app-item" *ngIf="activeArchiver?.created">
+                            <span class="app-item-label">{{ 'registrars.created' | translate }}:</span>
+                            <span class="app-item-value">{{ activeArchiver?.created }}</span>
+                        </div>
+                        <div class="app-item" *ngIf="activeArchiver?.modified">
+                            <span class="app-item-label">{{ 'registrars.modified' | translate }}:</span>
+                            <span class="app-item-value">{{ activeArchiver?.modified }}</span>
+                        </div>
+                        <div class="app-item" *ngIf="activeArchiver?.hidden !== undefined && loggedIn()">
+                            <span class="app-item-label">{{ 'registrars.hidden' | translate }}:</span>
+                            <span class="app-item-value">{{ activeArchiver?.hidden ? 'Ano' : 'Ne' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-sidebar-footer">
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.close' | translate }}</span>
+                </app-button>
+            </div>
+        </div>
+    </div>
+</div>

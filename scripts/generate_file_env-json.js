@@ -20,7 +20,8 @@ const config = {
   environmentName: process.env.APP_ENV_NAME || 'local npm run build & serve',
   environmentCode: process.env.APP_ENV_CODE || 'l-nrbs',
   
-  czidloApiServiceBaseUrl: process.env.APP_CZIDLO_API_SERVICE_URL || ''
+  czidloApiServiceBaseUrl: process.env.APP_CZIDLO_API_SERVICE_URL || '',
+  czidloPublicApiBaseUrl: process.env.APP_CZIDLO_PUBLIC_API_URL || '',
 
 };
 

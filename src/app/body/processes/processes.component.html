@@ -1,0 +1,734 @@
+<div class="app-not-logged-in" *ngIf="!loggedIn()">
+    <div class="app-not-logged-in-content">
+        <div class="app-not-logged-in-message">
+            {{ 'not-logged-in-message' | translate }}
+        </div>
+    </div>
+</div>
+<div class="app-processes-container" *ngIf="loggedIn()">
+    <div class="app-processes">
+        <div class="app-tabs-header app-processes-header">
+            <div class="app-tabs">
+                <div class="app-tab app-tab-first" [ngClass]="{ 'app-tab-active': isActive === 'instances' }" routerLink="/processes/instances">
+                    {{ 'processes.instances' | translate }}
+                </div>
+                <div class="app-tab app-tab-last" [ngClass]="{ 'app-tab-active': isActive === 'definitions' }" routerLink="/processes/definitions">
+                    {{ 'processes.definitions' | translate }}
+                </div>
+            </div>
+        </div>
+
+        <!-- INSTANCES -->
+        <div class="app-instances" *ngIf="isActive === 'instances'">
+            <div class="app-toggle">
+                <app-toggle [disabled]="loadingProcesses()" size="s" [checked]="showMyProcesses" (click)="toggleShowMyProcesses()"></app-toggle>
+                {{ 'processes.show-my-processes' | translate }}
+            </div>
+            <div class="app-table app-table-instances">
+                <div class="app-row app-row-header">
+                    <div class="app-col app-col-40px app-table-header-item">
+                        {{ 'ID' | translate }}
+                    </div>
+                    <div class="app-col app-table-header-item app-col-process-type">
+                        {{ 'processes.type' | translate }}
+                    </div>
+                    <div class="app-col app-col-180px app-table-header-item">
+                        {{ 'processes.ownerLogin' | translate }}
+                    </div>
+                    <div class="app-col app-col-100px app-table-header-item">
+                        {{ 'processes.state' | translate }}
+                    </div>
+                    <div class="app-col app-col-120px app-table-header-item">
+                        {{ 'processes.scheduled' | translate }}
+                    </div>
+                    <div class="app-col app-col-120px app-table-header-item">
+                        {{ 'processes.started' | translate }}
+                    </div>
+                    <div class="app-col app-col-120px app-table-header-item">
+                        {{ 'processes.finished' | translate }}
+                    </div>
+                    <div class="app-col app-col-120px app-table-header-item">
+                        {{ 'processes.duration' | translate }}
+                    </div>
+                    <div class="app-col app-col-72px app-table-header-item">
+                        {{ 'actions' | translate }}
+                    </div>
+                </div>
+                <div class="no-processes" *ngIf="!loadingProcesses() && processes().length === 0">
+                    {{ 'processes.no-processes' | translate }}
+                </div>
+                <div class="app-table-body">
+                    <div
+                        *ngFor="let process of processes()"
+                        class="app-row app-table-row app-row-clicable"
+                        [ngClass]="{ 'app-row-active': activeProcess?.id.toString() === process.id.toString() }"
+                        (click)="openSidebar(process)"
+                    >
+                        <div class="app-col app-col-40px app-table-item">
+                            {{ process.id }}
+                        </div>
+                        <div class="app-col app-table-item app-col-process-type">
+                            {{ process.type }}
+                        </div>
+                        <div class="app-col app-col-180px app-table-item">
+                            {{ process.ownerLogin }}
+                        </div>
+                        <div class="app-col app-col-100px app-table-item app-col-state">
+                            <div class="app-state-indicator" [ngClass]="'app-state-' + process.state.toLowerCase()">
+                                {{ process.state }}
+                            </div>
+                        </div>
+                        <div class="app-col app-col-120px app-table-item">
+                            {{ process.scheduled }}
+                        </div>
+                        <div class="app-col app-col-120px app-table-item">
+                            {{ process.started }}
+                        </div>
+                        <div class="app-col app-col-120px app-table-item">
+                            {{ process.finished }}
+                        </div>
+                        <div class="app-col app-col-120px app-table-item">
+                            {{ process.duration }}
+                        </div>
+                        <div class="app-col app-col-72px app-table-item">
+                            <app-button
+                                *ngIf="
+                                    process.state === 'FAILED' ||
+                                    process.state === 'COMPLETED' ||
+                                    process.state === 'CANCELED' ||
+                                    process.state === 'KILLED' ||
+                                    process.state === 'FINISHED'
+                                "
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="download-blue.svg"
+                                (click)="downloadProcessOutput(process.id); $event.stopPropagation()"
+                            ></app-button>
+                            <app-button
+                                *ngIf="
+                                    process.state === 'FAILED' ||
+                                    process.state === 'COMPLETED' ||
+                                    process.state === 'CANCELED' ||
+                                    process.state === 'KILLED' ||
+                                    process.state === 'FINISHED'
+                                "
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="trash-blue.svg"
+                                (click)="deleteProcess(process); $event.stopPropagation()"
+                            ></app-button>
+                            <app-button
+                                *ngIf="process.state === 'RUNNING'"
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="close-blue.svg"
+                                (click)="killProcess(process); $event.stopPropagation()"
+                            ></app-button>
+                            <app-button
+                                *ngIf="process.state === 'SCHEDULED'"
+                                variant="tertiary"
+                                size="s"
+                                [icon]="true"
+                                iconLeft="close-blue.svg"
+                                (click)="cancelProcess(process); $event.stopPropagation()"
+                            ></app-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEFINITIONS -->
+        <div class="app-definitions" *ngIf="isActive === 'definitions'">
+            <div class="app-table app-table-definitions">
+                <div class="app-row app-row-header app-row-non-clicable app-row-definition">
+                    <div class="app-col app-table-header-item">
+                        {{ 'processes.title' | translate }}
+                    </div>
+                    <div class="app-col app-table-header-item app-col-def-actions">
+                        {{ 'actions' | translate }}
+                    </div>
+                </div>
+                <div class="no-processes" *ngIf="!loadingProcesses() && definitions().length === 0">
+                    {{ 'processes.no-definitions' | translate }}
+                </div>
+                <div class="app-table-body app-table-body-definitions">
+                    <div
+                        *ngFor="let definition of definitions()"
+                        class="app-row app-table-row app-row-non-clicable app-row-definition"
+                        [ngClass]="{ 'app-row-active': activeProcess === definition }"
+                    >
+                        <div class="app-col app-table-item app-col-definition">
+                            {{ 'definitions.' + definition.type | translate }}
+                        </div>
+                        <div class="app-col app-col-buttons app-table-item">
+                            <app-button
+                                *ngIf="definition.type === 'OAI_ADAPTER'"
+                                variant="tertiary"
+                                size="s"
+                                iconRight="settings.svg"
+                                (click)="openProcess('set', definition.type); $event.stopPropagation()"
+                            >
+                                <div>{{ 'processes.settings' | translate }}</div>
+                            </app-button>
+                            <app-button
+                                variant="tertiary"
+                                size="s"
+                                iconRight="clock.svg"
+                                (click)="openProcess('plan', definition.type); $event.stopPropagation()"
+                            >
+                                <div>{{ 'processes.plan-process' | translate }}</div>
+                            </app-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
+    <!-- Sidebar Instances -->
+    <div class="app-sidebar-instances" *ngIf="activeProcess && isActive === 'instances'">
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">{{ activeProcess?.id }} - {{ activeProcess?.type }}</div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+
+        <div class="app-sidebar-content">
+            <pre class="app-sidebar-content-item" *ngIf="activeProcess">{{ activeProcess | json }}</pre>
+            <div class="app-sidebar-content-item" *ngIf="activeProcess?.log">{{ activeProcess.log | json }}</div>
+            <div class="app-sidebar-content-item" *ngIf="activeProcess?.logError">
+                <div class="app-base-input-hint app-base-input-error">
+                    error: {{ activeProcess.logError | translate }} ({{ displayLogError(activeProcess) | translate }})
+                </div>
+            </div>
+        </div>
+
+        <div class="app-sidebar-footer">
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadLog(activeProcess)">
+                    <span>{{ 'buttons.download' | translate }}</span>
+                </app-button>
+                <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyLog(activeProcess)">
+                    <span>{{ 'buttons.copy' | translate }}</span>
+                </app-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Definitions - Process Planning -->
+    <div class="app-sidebar-definitions" *ngIf="isActive === 'definitions'">
+        <!-- HEADER -->
+        <div class="app-sidebar-header">
+            <div class="app-sidebar-title">
+                {{ 'processes.action-' + activeAction | translate }} - {{ 'definitions.' + activeDefinition() | translate }}
+            </div>
+            <div class="app-sidebar-close" (click)="closeSidebar()">
+                <img src="assets/icons/close.svg" />
+            </div>
+        </div>
+
+        <!-- SETTINGS OAI ADAPTER -->
+        <div class="app-sidebar-content" *ngIf="activeAction === 'set' && activeDefinition() === 'OAI_ADAPTER'">
+            <div class="app-part app-set-oai-adapter">
+                <div class="app-part-title">{{ 'processes.transform-rdd' | translate }}</div>
+                <div class="app-part-buttons">
+                    <app-button variant="primary" size="s" iconLeft="add-white.svg">
+                        <div>{{ 'buttons.add' | translate }}</div>
+                    </app-button>
+                </div>
+            </div>
+            <div class="app-part app-set-oai-adapter">
+                <div class="app-part-title">{{ 'processes.transform-ids' | translate }}</div>
+                <div class="app-part-buttons">
+                    <app-button variant="primary" size="s" iconLeft="add-white.svg">
+                        <div>{{ 'buttons.add' | translate }}</div>
+                    </app-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLAN OAI ADAPTER -->
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition() === 'OAI_ADAPTER'">
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.basic-settings' | translate }} OAI</div>
+            </div>
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.registration-rules' | translate }}</div>
+            </div>
+
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.diff-tolerance' | translate }}</div>
+            </div>
+        </div>
+
+        <!-- PLAN EXPORT URN:NBN -->
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition() === 'REGISTRARS_URN_NBN_CSV_EXPORT'">
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.filter-by' | translate }}</div>
+                <div class="app-part-content">
+                    <!-- DATEPICKER -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input">
+                            <div class="app-base-input-label">{{ 'processes.filter-by-date' | translate }} URN:NBN</div>
+
+                            <div class="app-datepicker-container">
+                                <div class="app-datepicker-item">
+                                    <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
+                                        <input
+                                            matInput
+                                            [matDatepicker]="startDatePicker"
+                                            [formControl]="startDateControl"
+                                            [placeholder]="'inputs.pick-start-date' | translate"
+                                        />
+                                        <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+                                            <mat-icon matDatepickerToggleIcon>
+                                                <img src="assets/icons/calendar.svg" alt="calendar" />
+                                            </mat-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #startDatePicker></mat-datepicker>
+                                        <mat-error
+                                            *ngIf="
+                                                startDateControl.hasError('matDatepickerParse') ||
+                                                startDateControl.hasError('invalidDate') ||
+                                                startDateControl.hasError('required')
+                                            "
+                                        >
+                                            {{ 'messages.invalid-date' | translate }}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="app-datepicker-spacer">-</div>
+                                <div class="app-datepicker-item">
+                                    <mat-form-field appearance="outline" class="app-datepicker">
+                                        <input
+                                            matInput
+                                            [matDatepicker]="endDatePicker"
+                                            [formControl]="endDateControl"
+                                            [placeholder]="'inputs.pick-end-date' | translate"
+                                        />
+                                        <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+                                            <mat-icon matDatepickerToggleIcon>
+                                                <img src="assets/icons/calendar.svg" alt="calendar" />
+                                            </mat-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #endDatePicker></mat-datepicker>
+                                        <mat-error
+                                            *ngIf="
+                                                endDateControl.hasError('matDatepickerParse') ||
+                                                endDateControl.hasError('invalidDate') ||
+                                                endDateControl.hasError('required')
+                                            "
+                                        >
+                                            {{ 'messages.invalid-date' | translate }}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- REGISTRARS FILTER -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-multiselect">
+                            <div class="app-base-input-label">{{ 'processes.filter-by-registrar' | translate }} URN:NBN</div>
+                            <mat-form-field appearance="outline">
+                                <mat-select [formControl]="registrars" multiple [placeholder]="'inputs.select-registrar' | translate">
+                                    <mat-select-trigger>
+                                        @if ((registrars.value?.length || 0) > 0) {
+                                        {{ 'inputs.selected-items' | translate }}:
+                                        <span>{{ registrars.value?.length }}</span>
+                                        }
+                                    </mat-select-trigger>
+                                    @for (reg of registrarList(); track reg) {
+                                    <mat-option [value]="reg">{{ reg }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-selected-items" *ngIf="registrars.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let item of registrars.value">
+                                {{ item }}
+                                <div class="app-selected-item-remove" (click)="removeSelectedRegistrar(item)">
+                                    <img src="assets/icons/close.svg" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- INTELLECTUAL ENTITIES FILTER -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-multiselect">
+                            <div class="app-base-input-label">{{ 'processes.filter-by-entity' | translate }}</div>
+                            <mat-form-field appearance="outline">
+                                <mat-select [formControl]="intellectualEntities" multiple [placeholder]="'inputs.select-entity' | translate">
+                                    <mat-select-trigger>
+                                        @if ((intellectualEntities.value?.length || 0) > 0) {
+                                        {{ 'inputs.selected-items' | translate }}:
+                                        <span>{{ intellectualEntities.value?.length }}</span>
+                                        }
+                                    </mat-select-trigger>
+                                    @for (entity of intellectualEntitiesList(); track entity) {
+                                    <mat-option [value]="entity">{{ entity }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-selected-items" *ngIf="intellectualEntities.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let entity of intellectualEntities.value">
+                                {{ entity }}
+                                <div class="app-selected-item-remove" (click)="removeSelectedEntity(entity)">
+                                    <img src="assets/icons/close.svg" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- IDENTIFIERS FILTER -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-radio-toggle-checkboxes">
+                            <div class="app-base-input-label">{{ 'processes.filter-by-missing-id' | translate }}</div>
+                            <div class="app-checkbox-container">
+                                <app-checkbox [(checked)]="missingCNB" label="{{ 'processes.cnb' | translate }}"></app-checkbox>
+                                <app-checkbox [(checked)]="missingISSN" label="{{ 'processes.issn' | translate }}"></app-checkbox>
+                                <app-checkbox [(checked)]="missingISBN" label="{{ 'processes.isbn' | translate }}"></app-checkbox>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- STATES FILTER -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-radio-toggle-checkboxes">
+                            <div class="app-base-input-label">{{ 'processes.filter-by-state' | translate }}</div>
+
+                            <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedState" (valueChange)="onStateChange($event)">
+                                @for (state of states; track state) {
+                                <app-radio-button label="{{ 'processes.' + state | translate }}" value="{{ state }}"></app-radio-button>
+                                }
+                            </app-radio-group>
+                        </div>
+                    </div>
+                    <!-- DEACTIVATION DATE FILTER -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input">
+                            <div class="app-base-input-label">{{ 'processes.filter-by-deactivation-date' | translate }}</div>
+                            <div class="app-datepicker-container">
+                                <div class="app-datepicker-item">
+                                    <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
+                                        <input
+                                            matInput
+                                            [matDatepicker]="deactivationStartDatePicker"
+                                            [formControl]="deactivationStartControl"
+                                            [placeholder]="'inputs.pick-start-date' | translate"
+                                        />
+                                        <mat-datepicker-toggle matSuffix [for]="deactivationStartDatePicker">
+                                            <mat-icon matDatepickerToggleIcon>
+                                                <img src="assets/icons/calendar.svg" alt="calendar" />
+                                            </mat-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #deactivationStartDatePicker></mat-datepicker>
+                                        <mat-error
+                                            *ngIf="
+                                                deactivationStartControl.hasError('matDatepickerParse') ||
+                                                deactivationStartControl.hasError('invalidDate') ||
+                                                deactivationStartControl.hasError('required')
+                                            "
+                                        >
+                                            {{ 'messages.invalid-date' | translate }}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="app-datepicker-spacer">-</div>
+                                <div class="app-datepicker-item">
+                                    <mat-form-field appearance="outline" class="app-datepicker">
+                                        <input
+                                            matInput
+                                            [matDatepicker]="deactivationEndDatePicker"
+                                            [formControl]="deactivationEndControl"
+                                            [placeholder]="'inputs.pick-end-date' | translate"
+                                        />
+                                        <mat-datepicker-toggle matSuffix [for]="deactivationEndDatePicker">
+                                            <mat-icon matDatepickerToggleIcon>
+                                                <img src="assets/icons/calendar.svg" alt="calendar" />
+                                            </mat-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #deactivationEndDatePicker></mat-datepicker>
+                                        <mat-error
+                                            *ngIf="
+                                                deactivationEndControl.hasError('matDatepickerParse') ||
+                                                deactivationEndControl.hasError('invalidDate') ||
+                                                deactivationEndControl.hasError('required')
+                                            "
+                                        >
+                                            {{ 'messages.invalid-date' | translate }}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- COUNT DIGITAL INSTANCES FILTER -->
+            <div class="app-part">
+                <div class="app-part-content app-radio-toggle-checkboxes">
+                    <div class="app-base-input-container app-radio-toggle-checkboxes">
+                        <div class="app-base-input app-toggle-container">
+                            <app-toggle size="s" [checked]="selectedIncludeCount" (click)="toggleIncludeCount()">
+                                {{ 'processes.include-counts' | translate }}
+                            </app-toggle>
+                            <div class="app-toggle-label">{{ 'processes.count-digital-instances' | translate }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLAN DI URL AVAILABILITY CHECK -->
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition() === 'DI_URL_AVAILABILITY_CHECK'">
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.digital-document' | translate }}</div>
+                <div class="app-part-content">
+                    <!-- REGISTRARS -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-multiselect">
+                            <div class="app-base-input-label">{{ 'processes.registrar' | translate }}</div>
+                            <mat-form-field appearance="outline">
+                                <mat-select [formControl]="registrars" multiple [placeholder]="'inputs.select-registrar' | translate">
+                                    <mat-select-trigger>
+                                        @if ((registrars.value?.length || 0) > 0) {
+                                        {{ 'inputs.selected-items' | translate }}:
+                                        <span>{{ registrars.value?.length }}</span>
+                                        }
+                                    </mat-select-trigger>
+                                    @for (reg of registrarList(); track reg) {
+                                    <mat-option [value]="reg">{{ reg }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-selected-items" *ngIf="registrars.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let item of registrars.value">
+                                {{ item }}
+                                <div class="app-selected-item-remove" (click)="removeSelectedRegistrar(item)">
+                                    <img src="assets/icons/close.svg" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- INTELLECTUAL ENTITIES -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-multiselect">
+                            <div class="app-base-input-label">{{ 'processes.intellectual-entity' | translate }}</div>
+                            <mat-form-field appearance="outline">
+                                <mat-select [formControl]="intellectualEntities" multiple [placeholder]="'inputs.select-entity' | translate">
+                                    <mat-select-trigger>
+                                        @if ((intellectualEntities.value?.length || 0) > 0) {
+                                        {{ 'inputs.selected-items' | translate }}:
+                                        <span>{{ intellectualEntities.value?.length }}</span>
+                                        }
+                                    </mat-select-trigger>
+                                    @for (entity of intellectualEntitiesList(); track entity) {
+                                    <mat-option [value]="entity">{{ entity }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-selected-items" *ngIf="intellectualEntities.value?.length > 0">
+                            <div class="app-selected-item" *ngFor="let entity of intellectualEntities.value">
+                                {{ entity }}
+                                <div class="app-selected-item-remove" (click)="removeSelectedEntity(entity)">
+                                    <img src="assets/icons/close.svg" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- URN:NBN STATE -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-radio-toggle-checkboxes">
+                            <div class="app-base-input-label">{{ 'processes.urn-nbn-state' | translate }}</div>
+                            <div class="app-base-input-container app-radio-toggle-checkboxes">
+                                <app-radio-group
+                                    orientation="horizontal"
+                                    [gap]="16"
+                                    [(value)]="selectedUrnNbnState"
+                                    (valueChange)="onStateChange($event)"
+                                >
+                                    @for (state of states; track state) {
+                                    <app-radio-button label="{{ 'processes.' + state | translate }}" value="{{ state }}"></app-radio-button>
+                                    }
+                                </app-radio-group>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-part">
+                <div class="app-part-title">{{ 'processes.digital-instance' | translate }}</div>
+                <div class="app-part-content">
+                    .....
+                    <div class="app-base-input-label">{{ 'processes.created-deactivated' | translate }}</div>
+                    <div class="app-datepicker-container">
+                        <div class="app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
+                                <input
+                                    matInput
+                                    [matDatepicker]="startDatePicker"
+                                    [formControl]="startDateControl"
+                                    [placeholder]="'inputs.pick-start-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #startDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        startDateControl.hasError('matDatepickerParse') ||
+                                        startDateControl.hasError('invalidDate') ||
+                                        startDateControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-datepicker-spacer">-</div>
+                        <div class="app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker">
+                                <input
+                                    matInput
+                                    [matDatepicker]="endDatePicker"
+                                    [formControl]="endDateControl"
+                                    [placeholder]="'inputs.pick-end-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #endDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        endDateControl.hasError('matDatepickerParse') ||
+                                        endDateControl.hasError('invalidDate') ||
+                                        endDateControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.di-state' | translate }}</div>
+                    <div class="app-base-input">
+                        <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedDIState" (valueChange)="onStateChange($event)">
+                            @for (state of states; track state) {
+                            <app-radio-button [value]="state" label="{{ 'processes.' + state | translate }}"></app-radio-button>
+                            }
+                        </app-radio-group>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLAN INDEXATION -->
+        <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition() === 'INDEXATION'">
+            <div class="app-part">
+                <div class="app-part-content">
+                    <div class="app-base-input-label">{{ 'processes.filter-by-date' | translate }} *</div>
+                    <div class="app-datepicker-container">
+                        <div class="app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
+                                <input
+                                    matInput
+                                    [matDatepicker]="startDatePicker"
+                                    [formControl]="startDateControl"
+                                    [placeholder]="'inputs.pick-start-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #startDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        startDateControl.hasError('matDatepickerParse') ||
+                                        startDateControl.hasError('invalidDate') ||
+                                        startDateControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="app-datepicker-spacer">-</div>
+                        <div class="app-datepicker-item">
+                            <mat-form-field appearance="outline" class="app-datepicker">
+                                <input
+                                    matInput
+                                    [matDatepicker]="endDatePicker"
+                                    [formControl]="endDateControl"
+                                    [placeholder]="'inputs.pick-end-date' | translate"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+                                    <mat-icon matDatepickerToggleIcon>
+                                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                                    </mat-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #endDatePicker></mat-datepicker>
+                                <mat-error
+                                    *ngIf="
+                                        endDateControl.hasError('matDatepickerParse') ||
+                                        endDateControl.hasError('invalidDate') ||
+                                        endDateControl.hasError('required')
+                                    "
+                                >
+                                    {{ 'messages.invalid-date' | translate }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="app-sidebar-footer" [ngClass]="{ 'snack-bar-visible': processPlannedSnackBarVisible() }">
+            <div class="app-process-planned-snack-bar" *ngIf="processPlannedSnackBarVisible()">
+                {{ 'messages.process-planned-successfully' | translate }}
+            </div>
+            <div class="app-button-container">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                    <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
+                <app-button
+                    *ngIf="activeAction === 'plan'"
+                    variant="primary"
+                    size="l"
+                    (click)="planProcess(activeDefinition())"
+                    [disabled]="isPlanButtonDisabled()"
+                >
+                    <span>{{ 'buttons.plan-process' | translate }}</span>
+                </app-button>
+                <app-button *ngIf="activeAction === 'set'" variant="primary" size="l" (click)="setProcess(activeDefinition())">
+                    <span>{{ 'buttons.set-process' | translate }}</span>
+                </app-button>
+            </div>
+        </div>
+    </div>
+</div>

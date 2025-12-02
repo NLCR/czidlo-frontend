@@ -1,0 +1,10 @@
+<div
+    class="app-radio-group"
+    [ngClass]="{
+        'app-radio-group-horizontal': orientation === 'horizontal',
+        'app-radio-group-vertical': orientation === 'vertical'
+    }"
+    [style.--gap]="gap + 'px'"
+>
+    <ng-content></ng-content>
+</div>

@@ -1,7 +1,7 @@
 // This service is responsible for loading and providing the environment configuration for the application.
 // It loads both runtime and build-time configurations.
 // The runtime configuration is loaded from a JSON file (env.json) or from the static environment file (environment.ts), depending on the value of `useStaticRuntimeConfig` in the environment file.
-// The build-time configuration is loaded from a JSON file (build-info.json). 
+// The build-time configuration is loaded from a JSON file (build-info.json).
 
 import { Injectable } from '@angular/core';
 import { environment as staticEnv } from '../../environments/environment';
@@ -11,6 +11,7 @@ export class EnvironmentService {
 
     private configRuntime: any = {};
     private configBuildtime: any = {};
+    private devMode: boolean = !staticEnv.devMode;
 
     public async load(): Promise<void> {
         // Load runtime configuration from env.json or static environment (environment.ts)

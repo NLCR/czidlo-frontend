@@ -1,0 +1,17 @@
+<label class="chk" [ngClass]="[checked ? 'chk-checked' : '', disabled ? 'chk-disabled' : '']" (click)="toggle()">
+    <div class="chk-box" *ngIf="!checked">
+    </div>
+    <div class="chk-icon" *ngIf="checked">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect width="16" height="16" rx="4" fill="#1E657B" />
+            <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M12.9567 4.86191C13.217 5.12226 13.217 5.54437 12.9567 5.80472L6.82844 11.933L3.52861 8.63314C3.26826 8.37279 3.26826 7.95068 3.52861 7.69033C3.78896 7.42998 4.21107 7.42998 4.47141 7.69033L6.82844 10.0474L12.0139 4.86191C12.2742 4.60156 12.6963 4.60156 12.9567 4.86191Z"
+                fill="white"
+            />
+        </svg>
+    </div>
+    <span class="chk-label" *ngIf="label">{{ label }}</span>
+    <ng-content></ng-content>
+</label>

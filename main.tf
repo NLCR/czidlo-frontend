@@ -25,6 +25,10 @@ variable "APP_CZIDLO_API_SERVICE_URL" {
   type = string
 }
 
+variable "APP_CZIDLO_PUBLIC_API_URL" {
+  type = string
+}
+
 variable "docker_host_uri" {
   type = string
 }
@@ -74,6 +78,7 @@ resource "docker_container" "czidlo_frontend" {
   count             = 1
   image             = docker_image.czidlo_frontend.image_id
   name              = var.docker_container_name
+  memory            = 256
   must_run          = true
   publish_all_ports = true
   restart           = "always" # default "no"
@@ -81,7 +86,8 @@ resource "docker_container" "czidlo_frontend" {
     "APP_DEV_MODE=${var.APP_DEV_MODE}",
     "APP_ENV_NAME=${var.APP_ENV_NAME}",
     "APP_ENV_CODE=${var.APP_ENV_CODE}",
-    "APP_CZIDLO_API_SERVICE_URL=${var.APP_CZIDLO_API_SERVICE_URL}"
+    "APP_CZIDLO_API_SERVICE_URL=${var.APP_CZIDLO_API_SERVICE_URL}",
+    "APP_CZIDLO_PUBLIC_API_URL=${var.APP_CZIDLO_PUBLIC_API_URL}"
   ]
 
   labels {

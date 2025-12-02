@@ -1,0 +1,320 @@
+.app-menu-container {
+    display: flex;
+    flex-direction: column;
+    width: 317px;
+    height: 100%;
+    border-right: 1px solid var(--Boarder-Bright, #dfe5ec);
+    box-sizing: border-box;
+    overflow: hidden;
+    .app-header {
+        display: flex;
+        padding: 16px 24px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 8px;
+        align-self: stretch;
+        border-bottom: 1px solid var(--Boarder-Bright, #dfe5ec);
+        .app-logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            .app-logo-text {
+                display: flex;
+                color: var(--Text-Base, #0a0d10);
+            }
+        }
+        .app-desc {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            /* Typesettings/S/Regular */
+            font-family: 'IBM Plex Sans';
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 20px; /* 142.857% */
+            .app-desc-cz {
+                align-self: stretch;
+                color: var(--Text-Secondary, #263340);
+                margin-bottom: 8px;
+            }
+            .app-desc-text {
+                align-self: stretch;
+                color: var(--Text-Light, #4c6580);
+            }
+            .app-version {
+                color: var(--Text-Light, #4c6580);
+            }
+        }
+    }
+    .app-menu-wrapper {
+        position: relative;
+        flex: 1 0 0;
+        overflow: hidden; // zabrání, aby fades scrollovaly pryč
+        box-sizing: border-box;
+        // padding: 0 0 16px 0; // padding dole, aby nebyl poslední item nalepený na fade
+        .top-fade,
+        .bottom-fade {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 80px; // jak velký přechod chceš
+            pointer-events: none; // aby fade nepřekážel kliknutí
+        }
+
+        .top-fade {
+            top: 0;
+            background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0) 100%);
+        }
+
+        .bottom-fade {
+            bottom: 0;
+            background: linear-gradient(0deg, #fff 0%, rgba(255, 255, 255, 0) 100%);
+        }
+        .hidden {
+            opacity: 0;
+        }
+    }
+    .app-menu {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        flex: 1 0 0;
+        align-self: stretch;
+        height: 100%;
+        overflow: auto;
+        padding: 16px 16px 16px 16px;
+        box-sizing: border-box;
+        .app-menu-items {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--Spacing-x1, 4px);
+            align-self: stretch;
+            .app-menu-item {
+                display: flex;
+                padding: 16px;
+                align-items: center;
+                gap: 12px;
+                align-self: stretch;
+                border-radius: var(--Spacing-x1, 4px);
+                text-decoration: none;
+                color: var(--Text-Base, #0a0d10);
+                .icon-active {
+                    display: none;
+                }
+                svg path {
+                    fill: var(--Icon-Tertiary-Default, #8099b3);
+                }
+
+                &:hover {
+                    background: var(--BG-Main-Light, #f6f7f9);
+                    cursor: pointer;
+                    svg path {
+                        fill: var(--Icon-Tertiary-Hover, #4c6580);
+                    }
+                }
+                &.active {
+                    background: var(--Icon-Primary-Default, #0080a8);
+                    color: var(--Text-On-Color, #fff);
+                    svg path {
+                        fill: var(--Text-On-Color, #fff);
+                    }
+                    .icon-active {
+                        display: block;
+                    }
+                    .icon-inactive {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+    .app-footer {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        align-self: stretch;
+        .app-actions-container {
+            display: flex;
+            padding: 24px 16px 24px 16px;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            align-self: stretch;
+            border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
+            .app-item {
+                display: flex;
+                padding: 16px;
+                align-items: center;
+                gap: 12px;
+                align-self: stretch;
+                border-radius: var(--Spacing-x1, 4px);
+                border: 1px solid var(--Boarder-Bright, #dfe5ec);
+                cursor: pointer;
+                &:hover {
+                    background: var(--BG-Main-Light, #f6f7f9);
+                }
+            }
+            .app-login {
+                .app-user-name {
+                    display: flex;
+                    flex: 1;
+                }
+                .app-login-pic {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 40px;
+                    background: var(--BG-Other-Strong-Teal, #30a4c7);
+                    color: var(--Text-On-Color, #fff);
+                    font-size: 16px;
+                    font-weight: 500;
+                }
+                .app-logout {
+                    cursor: pointer;
+                    margin: 0;
+                    height: 24px;
+                    svg {
+                        &:hover {
+                            path {
+                                fill: var(--Icon-Tertiary-Hover, #4c6580);
+                            }
+                        }
+                    }
+                }
+            }
+            .app-lang-dropdown {
+                position: relative;
+                .app-current-lang {
+                    display: flex;
+                    flex: 1 0 0;
+                    justify-content: space-between;
+                    .app-lang {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                }
+                .app-lang-menu {
+                    position: absolute;
+                    top: 64px;
+                    left: -1px;
+                    display: flex;
+                    width: calc(100%);
+                    padding: 4px 0 4px 0;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    border-radius: var(--Spacing-x1, 4px);
+                    border: 1px solid var(--Boarder-Primary-Default, #0063cc);
+                    background: var(--BG-Main-Base, #fff);
+                    .app-lang-menu-item {
+                        display: flex;
+                        padding: var(--Spacing-x2, 8px) var(--Spacing-x4, 16px);
+                        align-items: center;
+                        gap: var(--Spacing-x3, 12px);
+                        flex: 1 0 0;
+                        width: 100%;
+                        box-sizing: border-box;
+                        &:hover {
+                            background: var(--BG-Main-Light, #f6f7f9);
+                            cursor: pointer;
+                            border-radius: 4px;
+                        }
+                    }
+                }
+            }
+        }
+        .app-logos-container {
+            display: flex;
+            padding: 16px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+            align-self: stretch;
+            border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
+            .app-text {
+                align-self: stretch;
+                color: var(--Text-Light, #4c6580);
+
+                /* Typesettings/S/Medium */
+                font-family: 'IBM Plex Sans';
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 20px; /* 142.857% */
+            }
+            .app-logos {
+                display: flex;
+                // flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                .app-logo-1 img {
+                    width: 156px;
+                    height: 30px;
+                }
+                .app-logo-2 img {
+                    width: 117px;
+                    height: 39px;
+                    aspect-ratio: 3/1;
+                }
+            }
+        }
+    }
+}
+
+.app-menu {
+    overflow-y: auto;
+
+    /* šířka scrollbar */
+    &::-webkit-scrollbar {
+        width: 4px;
+        border-radius: var(--Spacing-x1, 4px);
+        background: var(--BG-Main-Contrast, #dfe5ec);
+    }
+
+    /* dráha */
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    /* posuvník */
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+
+    /* při hoveru */
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+.app-sidebar {
+    display: none;
+    height: 100%;
+    align-self: flex-end;
+    &.app-sidebar-active {
+        display: flex;
+        position: absolute;
+        right: 0;
+        background-color: #fff;
+        flex-direction: column;
+        align-items: flex-start;
+        z-index: 102;
+        width: 800px;
+    }
+}
+.app-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100;
+}

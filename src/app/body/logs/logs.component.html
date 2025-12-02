@@ -1,0 +1,93 @@
+<div class="app-not-logged-in" *ngIf="!loggedIn()">
+    <div class="app-not-logged-in-content">
+        <div class="app-not-logged-in-message">
+            {{ 'not-logged-in-message' | translate }}
+        </div>
+    </div>
+</div>
+<div class="app-logs-container" *ngIf="loggedIn()">
+    <div class="app-logs-header">
+        <div class="app-logs-title">
+            {{ 'logs.title' | translate }}
+        </div>
+    </div>
+    <div class="app-logs-actions">
+        <!-- <app-button size="s" variant="primary" (click)="onDownloadLogs('this_year')">
+            {{ 'buttons.download-logs-this-year' | translate }}
+        </app-button> -->
+        <app-button size="s" variant="primary" (click)="onDownloadLogs('last_month')">
+            {{ 'buttons.download-logs-last-month' | translate }}
+        </app-button>
+        <app-button size="s" variant="primary" (click)="onDownloadLogs('this_month')">
+            {{ 'buttons.download-logs-this-month' | translate }}
+        </app-button>
+        <app-button size="s" variant="primary" (click)="openDatePicker()">
+            <ng-container *ngIf="!datePickerOpened; else removeRange">
+                {{ 'buttons.add-date-range' | translate }}
+            </ng-container>
+            <ng-template #removeRange>
+                {{ 'buttons.remove-date-range' | translate }}
+            </ng-template>
+        </app-button>
+    </div>
+    <!-- DATEPICKER -->
+    <div class="app-datepicker-container" *ngIf="datePickerOpened">
+        <div class="app-datepicker-item">
+            <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
+                <input
+                    matInput
+                    [matDatepicker]="startDatePicker"
+                    [formControl]="startDateControl"
+                    [placeholder]="'inputs.pick-start-date' | translate"
+                />
+                <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+                    <mat-icon matDatepickerToggleIcon>
+                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                    </mat-icon>
+                </mat-datepicker-toggle>
+                <mat-datepicker #startDatePicker></mat-datepicker>
+                <mat-error
+                    *ngIf="
+                        startDateControl.hasError('matDatepickerParse') ||
+                        startDateControl.hasError('invalidDate') ||
+                        startDateControl.hasError('required')
+                    "
+                >
+                    {{ 'messages.invalid-date' | translate }}
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="app-datepicker-spacer">-</div>
+        <div class="app-datepicker-item">
+            <mat-form-field appearance="outline" class="app-datepicker">
+                <input matInput [matDatepicker]="endDatePicker" [formControl]="endDateControl" [placeholder]="'inputs.pick-end-date' | translate" />
+                <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+                    <mat-icon matDatepickerToggleIcon>
+                        <img src="assets/icons/calendar.svg" alt="calendar" />
+                    </mat-icon>
+                </mat-datepicker-toggle>
+                <mat-datepicker #endDatePicker></mat-datepicker>
+                <mat-error
+                    *ngIf="
+                        endDateControl.hasError('matDatepickerParse') || endDateControl.hasError('invalidDate') || endDateControl.hasError('required')
+                    "
+                >
+                    {{ 'messages.invalid-date' | translate }}
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <app-button
+            size="s"
+            variant="primary"
+            (click)="onDownloadLogsWithDateRange()"
+            [disabled]="!startDateControl.valid || !endDateControl.valid"
+        >
+            {{ 'buttons.download-logs' | translate }}
+        </app-button>
+    </div>
+    <div class="app-logs-body">
+        <div class="app-logs-content">
+            <pre>{{ logs }}</pre>
+        </div>
+    </div>
+</div>

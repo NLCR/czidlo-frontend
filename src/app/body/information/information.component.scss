@@ -1,0 +1,43 @@
+.app-information-container {
+    display: flex;
+    padding: 24px 0px 0px 0px;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 0 0;
+    .app-info-part {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        align-self: stretch;
+        padding: 0 16px 0px 16px;
+        &.app-scrollable {
+            overflow-y: auto;
+            padding-bottom: 28px;
+            flex: 1 0 0;
+        }
+        &.app-info-nav {
+            margin-top: 40px;
+        }
+        .app-nav-container {
+            display: flex;
+            align-items: flex-start;
+            align-self: stretch;
+        }
+        .app-info-content {
+            width: 800px;
+        }
+        &.app-info-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
+        }
+        .app-info-description {
+            width: 800px;
+            font-family: 'IBM Plex Sans';
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 28px;
+        }
+    }
+}
