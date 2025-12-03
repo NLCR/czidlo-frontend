@@ -19,12 +19,12 @@ export const environment = {
     pageRulesEnUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Rules.md',
     pageContactsEnUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Contacts.md',
 
-    pageEditInfoCzUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Informace.md',
-    pageEditRulesCzUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Pravidla.md',
-    pageEditContactsCzUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Kontakty.md',
+    pageEditInfoCzUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Informace.md',
+    pageEditRulesCzUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Pravidla.md',
+    pageEditContactsCzUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Kontakty.md',
 
-    pageEditInfoEnUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Information.md',
-    pageEditRulesEnUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Rules.md',
-    pageEditContactsEnUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Contacts.md',
+    pageEditInfoEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Information.md',
+    pageEditRulesEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Rules.md',
+    pageEditContactsEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Contacts.md',
 
 }
