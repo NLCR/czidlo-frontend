@@ -4,6 +4,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { LoginDialogComponent } from '../dialogs/login-dialog/login-dialog.component';
 import { LanguageService } from '../services/language.service';
 import { EditPasswordDialogComponent } from '../dialogs/edit-password-dialog/edit-password-dialog.component';
+import { UsersService } from '../services/users.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-menu',
@@ -22,9 +25,18 @@ export class MenuComponent {
     atTop = true;
     atBottom = false;
 
+    userData: any = null;
+
     isSidebarOpen = signal(false);
 
-    constructor(private authService: AuthService, private dialog: MatDialog, public language: LanguageService) {
+    constructor(
+        private authService: AuthService,
+        private dialog: MatDialog,
+        public language: LanguageService,
+        private usersService: UsersService,
+        private _snackBar: MatSnackBar,
+        private translate: TranslateService
+    ) {
         effect(() => {
             console.log('🌐 Aktuální jazyk:', this.language.currentLang());
         });
@@ -50,6 +62,8 @@ export class MenuComponent {
     }
     onLoginClick() {
         if (this.loggedIn()) {
+            this.userData = this.authService.getUserInfo();
+            console.log('User data loaded:', this.userData);
             this.isSidebarOpen.set(!this.isSidebarOpen());
             return;
         }
@@ -62,6 +76,8 @@ export class MenuComponent {
                 if (result === true) {
                     this.loggedIn.set(true);
                     this.user = this.authService.getUsername() || '';
+                    this.userData = this.authService.userInfo();
+                    console.log('User logged in:', this.user);
                 }
             });
     }
@@ -96,19 +112,22 @@ export class MenuComponent {
 
         dialogRef.afterClosed().subscribe((result) => {
             console.log('Change Password dialog closed:', result);
-            // if (result && result.password) {
-            //     this.usersService.updateUserPassword(user.id, result.password).subscribe({
-            //         next: (response) => {
-            //             console.log('Password updated successfully:', response);
-            //             this.loadUsers();
-            //             this._snackBar.open(this.translate.instant('messages.password-updated-successfully'), 'Close', { duration: 2000 });
-            //         },
-            //         error: (error) => {
-            //             console.error('Error updating password:', error);
-            //             this._snackBar.open(this.translate.instant('messages.error-updating-password'), 'Close', { duration: 2000 });
-            //         },
-            //     });
-            // }
+            if (result && result.password) {
+                this.usersService.updateUserPassword(this.userData.id, result.password).subscribe({
+                    next: (response) => {
+                        console.log('Password updated successfully:', response);
+                        this._snackBar.open(this.translate.instant('messages.password-updated'), 'Close', { duration: 2000 });
+                        this.authService.logout();
+                        this.authService.login(this.userData.login, result.password).subscribe(() => {
+                            this.loggedIn.set(true);
+                        });
+                    },
+                    error: (error) => {
+                        console.error('Error updating password:', error);
+                        this._snackBar.open(this.translate.instant('messages.error-updating-password'), 'Close', { duration: 2000 });
+                    },
+                });
+            }
         });
     }
 }

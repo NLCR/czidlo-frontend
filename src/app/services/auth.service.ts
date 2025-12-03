@@ -28,22 +28,6 @@ export class AuthService {
 
     /** Přihlášení uživatele */
     login(username: string, password: string): Observable<boolean> {
-        // Simulovaná přihlašovací logika
-        // if (username === 'admin' && password === 'password') {
-        //     const token = 'fake-jwt-token';
-        //     this.setSession(token, username);
-        //     this.loggedIn.set(true);
-        //     this.isAdmin.set(true);
-        //     return of(true).pipe(delay(300));
-        // } else if (username === 'user' && password === 'password') {
-        //     const token = 'fake-jwt-token';
-        //     this.setSession(token, username);
-        //     this.loggedIn.set(true);
-        //     this.isAdmin.set(false);
-        //     return of(true).pipe(delay(300));
-        // } else {
-        //     return throwError(() => 'Invalid credentials').pipe(delay(300));
-        // }
 
         // Reálná přihlašovací logika přes API
         const apiUrl = this.envService.get('czidloApiServiceBaseUrl') + '/user';
@@ -96,6 +80,10 @@ export class AuthService {
     /** Vrátí přihlášeného uživatele */
     getUsername(): string | null {
         return this.loggedIn() ? localStorage.getItem('auth_username') : null;
+    }
+
+    getUserInfo(): any | null {
+        return this.loggedIn() ? JSON.parse(localStorage.getItem('auth_user') || 'null') : null;
     }
 
     /** Nastaví session do localStorage na 24 hodin */

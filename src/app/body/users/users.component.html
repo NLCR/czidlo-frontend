@@ -1,12 +1,10 @@
 <div class="app-not-logged-in" *ngIf="!loggedIn() || !isAdmin()">
-    <div class="app-not-logged-in-content">
+    <div class="app-not-logged-in-content" *ngIf="!loggedIn()">
         <div class="app-not-logged-in-message">
             {{ 'not-logged-in-message' | translate }}
         </div>
     </div>
-</div>
-<div class="app-not-logged-in" *ngIf="!isAdmin() && loggedIn()">
-    <div class="app-not-logged-in-content">
+    <div class="app-not-logged-in-content" *ngIf="loggedIn() && !isAdmin()">
         <div class="app-not-logged-in-message">
             {{ 'not-admin-message' | translate }}
         </div>

@@ -18,10 +18,10 @@ export class BasicAuthInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const credentials = this.authService.getCredentials();
-        console.log(this.loggedIn);
+        console.log(this.loggedIn());
 
         // ignore if user not logged in
-        if (!this.loggedIn || !credentials) {
+        if (!this.loggedIn() || !credentials) {
             return next.handle(req);
         }
 
