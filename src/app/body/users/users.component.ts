@@ -57,7 +57,6 @@ export class UsersComponent {
             } else {
                 this.users.set(this.usersService.users());
             }
-            console.log('Route URL changed:', url);
             if (url.length === 2) {
                 const userId = url[1].path;
                 this.loadUserDetails(userId);
@@ -74,6 +73,10 @@ export class UsersComponent {
 
     loadUsers() {
         console.log('Loading users...');
+        if (!this.isAdmin()) {
+            console.warn('User is not an administrator. Cannot load users.');
+            return;
+        }
         this.usersService.getUsers().subscribe({
             next: (response) => {
                 this.users.set(this.usersService.users());

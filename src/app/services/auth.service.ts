@@ -22,6 +22,9 @@ export class AuthService {
     isLoggedIn(): Observable<boolean> {
         return of(this.loggedIn());
     }
+    isAdministrator(): Observable<boolean> {
+        return of(this.isAdmin());
+    }
 
     /** Přihlášení uživatele */
     login(username: string, password: string): Observable<boolean> {
@@ -53,7 +56,7 @@ export class AuthService {
             })
             .pipe(
                 tap((response) => {
-                    console.log('login',response);
+                    console.log('login', response);
                     let admin = response && (response as any).admin === true;
                     this.loggedIn.set(true);
                     this.isAdmin.set(admin);
@@ -116,18 +119,19 @@ export class AuthService {
     //     }
     // }
     public restoreSession(): void {
-    const username = localStorage.getItem('auth_username');
-    const password = localStorage.getItem('auth_password');
-    const isAdmin = localStorage.getItem('auth_is_admin') === 'true';
-    const user = localStorage.getItem('auth_user');
+        console.log('restoring session');
+        const username = localStorage.getItem('auth_username');
+        const password = localStorage.getItem('auth_password');
+        const isAdmin = localStorage.getItem('auth_is_admin') === 'true';
+        const user = localStorage.getItem('auth_user');
 
-    if (username && password) {
-        this.loggedIn.set(true);
-        this.isAdmin.set(isAdmin);
-        this.userInfo.set(JSON.parse(user || 'null'));
-        console.log('Session restored for user:', user);
-    } else {
-        this.logout();
+        if (username && password) {
+            this.loggedIn.set(true);
+            this.isAdmin.set(isAdmin);
+            this.userInfo.set(JSON.parse(user || 'null'));
+            console.log('Session restored for user:', user);
+        } else {
+            this.logout();
+        }
     }
-}
 }
