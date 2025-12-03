@@ -9,22 +9,22 @@ export const environment = {
 
     czidloApiServiceBaseUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_API_SERVICE_URL (přes env.json)
     czidloPublicApiBaseUrl: '', // pro produkci ziskej z promenne APP_CZIDLO_PUBLIC_API_URL (přes env.json)
-    
+
     //TODO: presunout do konfigurace
-    pageInfoCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Informace.md',
-    pageRulesCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Pravidla.md',
-    pageContactsCzUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Kontakty.md',
+    pageInfoCzUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Informace.md',
+    pageRulesCzUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Pravidla.md',
+    pageContactsCzUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Kontakty.md',
 
-    pageInfoEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Information.md',
-    pageRulesEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Rules.md',
-    pageContactsEnUrl: 'https://raw.githubusercontent.com/trineracz/czidlo-frontend-tmp/refs/heads/main/Contacts.md',
+    pageInfoEnUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Information.md',
+    pageRulesEnUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Rules.md',
+    pageContactsEnUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Contacts.md',
 
-    pageEditInfoCzUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Informace.md',
-    pageEditRulesCzUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Pravidla.md',
-    pageEditContactsCzUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Kontakty.md',
+    pageEditInfoCzUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Informace.md',
+    pageEditRulesCzUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Pravidla.md',
+    pageEditContactsCzUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Kontakty.md',
 
-    pageEditInfoEnUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Information.md',
-    pageEditRulesEnUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Rules.md',
-    pageEditContactsEnUrl: 'https://github.com/trineracz/czidlo-frontend-tmp/edit/main/Contacts.md',
-    
+    pageEditInfoEnUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Information.md',
+    pageEditRulesEnUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Rules.md',
+    pageEditContactsEnUrl: 'https://github.com/trineracz/NLCR/czidlo-frontend/edit/main/docs/Contacts.md',
+
 }
