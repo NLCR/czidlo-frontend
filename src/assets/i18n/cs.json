@@ -146,7 +146,15 @@
         "confirm-deactivate-urnnbn": "Opravdu chcete deaktivovat toto URN:NBN",
         "confirm-reactivate-urnnbn": "Opravdu chcete reaktivovat toto URN:NBN",
         "confirm-deactivate-di": "Opravdu chcete deaktivovat tuto digitální instanci",
-        "record-imported-successfully": "Záznam byl úspěšně vložen"
+        "record-imported-successfully": "Záznam byl úspěšně vložen",
+        "edit-running": "Probíhá ukládání záznamu...",
+        "edit-completed": "Záznam byl úspěšně upraven.",
+        "edit-error": "Chyba při úpravě záznamu: ",
+        "add-running": "Probíhá vložení záznamu...",
+        "add-completed": "Záznam byl úspěšně vložen.",
+        "add-error": "Chyba při vkládání záznamu: ",
+        "di-deactivated-successfully": "Digitální instance byla úspěšně deaktivována.",
+        "di-deactivate-error": "Chyba při deaktivaci digitální instance."
     },
     "inputs": {
         "pick-start-date": "Vyberte od",
@@ -411,6 +419,9 @@
         "no-results-text-1": "Výsledky hledání jsou prázdné, zkuste zadat jiný dotaz.",
         "no-results-text-2": "Pokud máte pocit, že jde o chybu obraťte se na technickou podporu ",
         "reason": "Důvod",
-        "sub_title": "podnázev"
+        "sub_title": "podnázev",
+        "UNKNOWN": "neznámá",
+        "UNLIMITED_ACCESS": "bez omezení",
+        "LIMITED_ACCESS": "s omezeními"
     }
 }

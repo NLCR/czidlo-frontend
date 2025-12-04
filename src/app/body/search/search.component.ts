@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, signal } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, signal, computed } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { SearchService } from '../../services/search.service';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -9,6 +9,7 @@ import { RegistrarsService } from '../../services/registrars.service';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-search',
@@ -23,6 +24,9 @@ export class SearchComponent implements AfterViewInit {
     selectedItem = signal<any>(null);
     activeAction: string = '';
 
+    isLoggedIn = computed(() => this.authService.loggedIn());
+    isAdmin = computed(() => this.authService.isAdmin());
+
     // PAGINATION
     pages: any[] = [];
     displayedFirstPages: any[] = [];
@@ -33,9 +37,9 @@ export class SearchComponent implements AfterViewInit {
     from: number = 0;
     to: number = 0;
     count: number = 0;
-    isAdmin = signal(true); // TODO: nahradit reálnou kontrolou práv
 
     isSidebarOpen = signal(false);
+    loadingButton = signal(false);
 
     // EDIT RECORD
     selectedEntity: string = '';
@@ -108,6 +112,7 @@ export class SearchComponent implements AfterViewInit {
     sourceDocumentYear = new FormControl<string>('');
 
     importRecordSnackBarVisible = signal(false);
+    progressBar = signal({ state: false, value: '', error: '' });
     isButtonDisabled = signal(true);
 
     // DIGITAL INSTANCES
@@ -128,7 +133,8 @@ export class SearchComponent implements AfterViewInit {
         private translate: TranslateService,
         private registrarsService: RegistrarsService,
         private dialog: MatDialog,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
+        private authService: AuthService
     ) {}
 
     ngOnInit() {
@@ -263,6 +269,7 @@ export class SearchComponent implements AfterViewInit {
             },
         });
     }
+
     onTypeSelected() {
         console.log(this.selectedType);
         this.currentPage = 1;
@@ -427,8 +434,10 @@ export class SearchComponent implements AfterViewInit {
         this.isSidebarOpen.set(true);
     }
     onAddInstanceConfirm() {
+        // EDIT INSTANCE
         let urnNbn = this.urnNbn.value || '';
         if (this.selectedDiId && this.activeAction === 'edit-instance') {
+            this.progressBar.set({ state: true, value: 'edit-running', error: '' });
             console.log('Editing instance:', this.selectedDiId);
             const updatedInstance: any = {
                 digitalLibrary: this.selectedDigitalLibraryId,
@@ -443,16 +452,24 @@ export class SearchComponent implements AfterViewInit {
                     console.log('Digital instance updated successfully:', response);
                     response.urnnbn = urnNbn;
                     this.getDetails(response);
-                    this.isSidebarOpen.set(false);
-                    this.snackBar.open('Digital instance updated successfully', 'Close', { duration: 3000 });
+                    this.progressBar.set({ state: true, value: 'edit-completed', error: '' });
+                    setTimeout(() => {
+                        this.progressBar.set({ state: false, value: '', error: '' });
+                        this.isSidebarOpen.set(false);
+                    }, 1000);
                 },
                 error: (error) => {
                     console.error('Error updating digital instance:', error);
-                    this.snackBar.open('Error updating digital instance: ' + error.error.message, 'Close');
+                    this.progressBar.set({ state: true, value: 'edit-error', error: error.error.message });
+                    setTimeout(() => {
+                        this.progressBar.set({ state: false, value: '', error: '' });
+                    }, 10000);
                 },
             });
             return;
         }
+        // ADD INSTANCE
+        this.progressBar.set({ state: true, value: 'add-running', error: '' });
         const newInstance: any = {
             libraryId: this.selectedDigitalLibraryId,
             format: this.diFormat.value,
@@ -460,18 +477,21 @@ export class SearchComponent implements AfterViewInit {
             accessibility: this.diAccess.value,
             accessRestriction: this.selectedDiAccessRestrictionId,
         };
-        console.log('Adding new instance:', newInstance, urnNbn);
         this.searchService.addNewInstance(urnNbn, newInstance).subscribe({
             next: (response) => {
                 response.urnnbn = urnNbn;
-                console.log('New instance added successfully:', response);
+                this.progressBar.set({ state: true, value: 'add-completed', error: '' });
+                setTimeout(() => {
+                    this.progressBar.set({ state: false, value: '', error: '' });
+                    this.isSidebarOpen.set(false);
+                }, 1000);
                 this.getDetails(response);
-                this.isSidebarOpen.set(false);
-                this.snackBar.open('New digital instance added successfully', 'Close', { duration: 3000 });
             },
             error: (error) => {
-                console.error('Error adding new instance:', error);
-                this.snackBar.open('Error adding new instance: ' + error.error.message, 'Close');
+                this.progressBar.set({ state: true, value: 'add-error', error: error.error.message });
+                setTimeout(() => {
+                    this.progressBar.set({ state: false, value: '', error: ''});
+                }, 10000);
             },
         });
     }
@@ -517,7 +537,6 @@ export class SearchComponent implements AfterViewInit {
             }
         });
     }
-
     deactivateDigitalInstance(item: any, di: any) {
         console.log('deactivate instance', di);
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -531,10 +550,12 @@ export class SearchComponent implements AfterViewInit {
                 this.searchService.deactivateDigitalInstance(di.id).subscribe({
                     next: (response) => {
                         console.log('Digital instance deactivated successfully:', response);
+                        this.snackBar.open(this.translate.instant('messages.di-deactivated-successfully'), '', { duration: 3000 });
                         this.getDetails(item);
                     },
                     error: (error) => {
                         console.error('Error deactivating digital instance:', error);
+                        this.snackBar.open(this.translate.instant('messages.di-deactivate-error'), '', { duration: 3000 });
                     },
                 });
             }
@@ -542,9 +563,11 @@ export class SearchComponent implements AfterViewInit {
     }
 
     closeSidebar() {
+        this.progressBar.set({ state: false, value: '', error: '' });
         this.isSidebarOpen.set(false);
     }
     onEditRecordConfirm() {
+        this.progressBar.set({ state: true, value: 'edit-running', error: '' });
         const record = this.buildRecordToImport();
         if (!record) {
             console.error('Record is invalid, cannot import.');
@@ -558,13 +581,18 @@ export class SearchComponent implements AfterViewInit {
                 console.log('Record updated successfully:', data);
                 data.urnnbn = urnNbn;
                 this.renewDetails(data);
-                this.closeSidebar();
-                this.snackBar.open('Record updated successfully', 'Close', { duration: 3000 });
+                this.progressBar.set({ state: true, value: 'edit-completed', error: '' });
+                setTimeout(() => {
+                    this.progressBar.set({ state: false, value: '', error: '' });
+                    this.closeSidebar();
+                }, 1000);
             },
             error: (error) => {
-                //TODO: snackbar s chybou
                 console.error('Error updating record:', error);
-                this.snackBar.open('Error updating record', 'Close', { duration: 3000 });
+                this.progressBar.set({ state: true, value: 'edit-error', error: error.error.message });
+                setTimeout(() => {
+                    this.progressBar.set({ state: false, value: '', error: '' });
+                }, 10000);
             },
         });
     }
@@ -771,6 +799,10 @@ export class SearchComponent implements AfterViewInit {
         record.intelectualEntity = intelectualEntity;
         console.log('record to import', record);
         return record;
+    }
+
+    hasRightToRegistrar(code: string): boolean {
+        return this.authService.hasRightToRegistrar(code);
     }
 
     // VALIDACNI FUNKCE

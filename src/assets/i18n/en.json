@@ -146,7 +146,15 @@
         "confirm-deactivate-urnnbn": "Are you sure you want to deactivate this URN:NBN",
         "confirm-reactivate-urnnbn": "Are you sure you want to reactivate this URN:NBN",
         "confirm-deactivate-di": "Are you sure you want to deactivate this digital instance",
-        "record-imported-successfully": "Record was imported successfully"
+        "record-imported-successfully": "Record was imported successfully",
+        "edit-running": "Editing record in progress...",
+        "edit-completed": "Record was successfully edited.",
+        "edit-error": "Error editing record: ",
+        "add-running": "Adding record in progress...",
+        "add-completed": "Record was successfully added.",
+        "add-error": "Error adding record: ",
+        "di-deactivated-successfully": "Digital instance was successfully deactivated.",
+        "di-deactivate-error": "Error deactivating digital instance."
     },
     "inputs": {
         "pick-start-date": "Pick from",
@@ -411,6 +419,9 @@
         "no-results-text-1": "The search results are empty, try entering a different query.",
         "no-results-text-2": "If you feel this is an error, contact technical support ",
         "reason": "Reason",
-        "sub_title": "subtitle"
+        "sub_title": "subtitle",
+        "UNKNOWN": "unknown",
+        "UNLIMITED_ACCESS": "unlimited access",
+        "LIMITED_ACCESS": "limited access"
     }
 }

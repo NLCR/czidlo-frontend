@@ -48,8 +48,6 @@ export class UsersComponent {
     ) {}
 
     ngOnInit() {
-        console.log('users', this.loggedIn(), this.isAdmin());
-        // this.loadUsers();
         this.route.url.subscribe((url) => {
             console.log('users on init', this.usersService.users());
             if (this.usersService.users().length === 0) {

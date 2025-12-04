@@ -585,10 +585,9 @@ h4 {
 }
 .app-sidebar-footer {
     display: flex;
-    padding: 12px 24px;
     justify-content: center;
     align-items: center;
-    gap: 56px;
+    // gap: 56px;
     flex-shrink: 0;
     align-self: stretch;
     border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
@@ -599,8 +598,31 @@ h4 {
     }
     .app-button-container {
         display: flex;
+        padding: 12px 24px;
         align-items: center;
         gap: 16px;
+    }
+    &.progress-bar-visible {
+        flex-direction: column;
+        .app-record-progress-bar {
+            display: flex;
+            padding: 16px 24px;
+            justify-content: center;
+            align-self: stretch;
+            color: var(--Text-Secondary, #263340);
+            /* Typesettings/S big/Medium */
+            font-family: Karla;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 20px; /* 142.857% */
+            &.edit-completed, &.add-completed {
+                background-color: var(--States-available-BG-default, #DFF1C3);
+            }
+            &.edit-error, &.add-error {
+                background: var(--States-high-efford-BG-default, #FDE5E4);
+            }
+        }
     }
 }
 

@@ -18,7 +18,6 @@ export class BasicAuthInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const credentials = this.authService.getCredentials();
-        console.log(this.loggedIn());
 
         // ignore if user not logged in
         if (!this.loggedIn() || !credentials) {
@@ -32,7 +31,7 @@ export class BasicAuthInterceptor implements HttpInterceptor {
         }
 
         const basic = btoa(`${credentials?.username}:${credentials?.password}`);
-        console.log(`Basic ${basic}`, credentials?.username, credentials?.password);
+        // console.log(`Basic ${basic}`, credentials?.username, credentials?.password);
 
         const authReq = req.clone({
             setHeaders: {

@@ -78,7 +78,7 @@
 </div>
 
 <!-- No Registrars -->
-<div class="app-no-registrars" *ngIf="assignedRegistars.length === 0">
+<div class="app-no-registrars" *ngIf="assignedRegistars.length === 0 && loggedIn()">
     <div class="app-no-registrars-header">
         <div class="app-no-registrars-header-title">{{ 'import.no-registrar-title' | translate }}</div>
         <div class="app-no-registrars-header-subtitle">{{ 'import.no-registrar-subtitle' | translate }}</div>
@@ -564,8 +564,8 @@
         </div>
 
         <!-- FOOTER -->
-        <div class="app-sidebar-footer" [ngClass]="{ 'snack-bar-visible': importRecordSnackBarVisible() }">
-            <div class="app-record-imported-snack-bar" *ngIf="importRecordSnackBarVisible()">
+        <div class="app-sidebar-footer" [ngClass]="{ 'progress-bar-visible': importRecordSnackBarVisible() }">
+            <div class="app-progress-bar" *ngIf="importRecordSnackBarVisible()">
                 {{ 'messages.record-imported-successfully' | translate }}
             </div>
             <div class="app-button-container">

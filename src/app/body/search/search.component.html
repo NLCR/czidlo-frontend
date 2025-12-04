@@ -164,7 +164,7 @@
                         <div class="app-value">{{ item.details.intelectualEntity?.modified.split('[')[0] | date }}</div>
                     </div>
 
-                    <div class="app-button-part" *ngIf="isAdmin()">
+                    <div class="app-button-part" *ngIf="hasRightToRegistrar(item.registrarcode)">
                         <app-button variant="primary" size="s" (click)="editItem(item)">
                             <span>{{ 'buttons.edit' | translate }}</span>
                         </app-button>
@@ -203,12 +203,12 @@
                             <div class="app-ie-field" *ngIf="item.details.urnNbn && !isAdmin()">
                                 <!-- <div class="app-label">{{ 'search.urnNbn' | translate }}:</div> -->
                                 <div class="app-value">urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}</div>
-                                <div class="app-value-2">({{ 'search.registered' | translate }} {{ item.details.urnNbn.registered | date }})</div>
+                                <div class="app-value-2">({{ 'search.registered' | translate }} {{ item.details.urnNbn.registered.split('[')[0] | date }})</div>
                             </div>
                             <div class="app-ie-field" *ngIf="item.details.urnNbn?.status === 'DEACTIVATED' && !isAdmin()">
                                 <div class="app-label">{{ 'search.status' | translate }}:</div>
                                 <div class="app-value">{{ item.details.urnNbn.status }}</div>
-                                <div class="app-value-2">({{ 'search.deactivated' | translate }} {{ item.details.urnNbn.deactivated | date }})</div>
+                                <div class="app-value-2">({{ 'search.deactivated' | translate }} {{ item.details.urnNbn.deactivated.split('[')[0] | date }})</div>
                             </div>
                             <div class="app-ie-field" *ngIf="item.details?.registrar">
                                 <div class="app-label">{{ 'search.registrar' | translate }}:</div>
@@ -366,8 +366,8 @@
                             <!--DIGITAL INSTANCES -->
                             <div class="app-ie-di" *ngIf="item.details?.digitalInstances?.length > 0">
                                 <div *ngFor="let di of item.details?.digitalInstances">
-                                    <div class="app-ie-header" (click)="di.diopen = !di.diopen">
-                                        <img [src]="di.diopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                                    <div class="app-ie-header">
+                                        <img [src]="di.diopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" (click)="di.diopen = !di.diopen" />
                                         <div class="app-part-title app-part-title-di">
                                             <div class="app-label-2 app-di-url-label">
                                                 <a [ngClass]="{ 'app-not-active': di.active === false }" href="{{ di.url }}" target="_blank" rel="noopener noreferrer">{{ di.url }}</a>
@@ -408,7 +408,7 @@
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.accessRestriction">
                                             <div class="app-label">{{ 'search.access_restriction' | translate }}:</div>
-                                            <div class="app-value">{{ di.accessRestriction }}</div>
+                                            <div class="app-value">{{ 'search.' + di.accessRestriction | translate}}</div>
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.created">
                                             <div class="app-label">{{ 'search.created' | translate }}:</div>
@@ -1009,16 +1009,17 @@
         </div>
 
         <!-- FOOTER -->
-        <div class="app-sidebar-footer" [ngClass]="{ 'snack-bar-visible': importRecordSnackBarVisible() }">
-            <div class="app-record-imported-snack-bar" *ngIf="importRecordSnackBarVisible()">
-                {{ 'messages.record-imported-successfully' | translate }}
+        <div class="app-sidebar-footer" [ngClass]="{ 'progress-bar-visible': progressBar().state }">
+            <div class="app-record-progress-bar" [ngClass]="progressBar().value" *ngIf="progressBar().state">
+                {{ 'messages.' + progressBar().value | translate }} {{ progressBar().error }}
             </div>
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
                 <app-button variant="primary" size="l" (click)="onEditRecordConfirm()" *ngIf="activeAction === 'edit'">
-                    <span>{{ 'buttons.save-record' | translate }}</span>
+                    <span *ngIf="!loadingButton()">{{ 'buttons.save-record' | translate }}</span>
+                    <mat-spinner diameter="25" color="primary" *ngIf="loadingButton()"></mat-spinner>
                 </app-button>
                 <app-button variant="primary" size="l" (click)="onAddInstanceConfirm()" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">
                     <span *ngIf="activeAction === 'add-instance'">{{ 'buttons.add-instance' | translate }}</span>

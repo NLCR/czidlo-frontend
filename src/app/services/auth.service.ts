@@ -86,6 +86,10 @@ export class AuthService {
         return this.loggedIn() ? JSON.parse(localStorage.getItem('auth_user') || 'null') : null;
     }
 
+    hasRightToRegistrar(code: string): boolean {
+        return this.loggedIn() ? JSON.parse(localStorage.getItem('auth_user') || 'null')?.registrarRights?.includes(code) || this.isAdmin() : false;
+    }
+
     /** Nastaví session do localStorage na 24 hodin */
     private setSession(token: string, username: string): void {
         const expiresAt = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hodin
