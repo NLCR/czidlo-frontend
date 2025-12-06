@@ -12,9 +12,9 @@ export class SearchService {
     recordsCount = signal<number>(0);
     isLoading = signal<boolean>(false);
 
-    constructor(private apiService: ApiService) { }
+    constructor(private apiService: ApiService) {}
 
-    search(term: string, docType?: string, page: number = 1): Observable<any> {
+    search(term: string, docType?: string, filter?: string, registrar?: string, page: number = 1): Observable<any> {
         this.query.set(term);
 
         const body: any = {
@@ -50,11 +50,31 @@ export class SearchService {
                     ccnb: term,
                 },
             });
+        } else if (filter === 'author') {
+            // 🔍 3) Hledání podle autora
+            body.query.bool.must.push({
+                multi_match: {
+                    query: term,
+                    fields: ['author', 'otheroriginator'],
+                    type: 'cross_fields',
+                    operator: 'and',
+                },
+            });
         } else {
             body.query.bool.must.push({
                 multi_match: {
                     query: term,
-                    fields: ['title', 'subtitle', 'volumetitle', 'issuetitle'],
+                    fields: [
+                        'title',
+                        'subtitle',
+                        'volumetitle',
+                        'issuetitle',
+                        'author',
+                        'otheroriginator',
+                        'sdtitle',
+                        'sdvolumetitle',
+                        'sdissuetitle',
+                    ],
                     type: 'cross_fields',
                     operator: 'and',
                 },
@@ -66,6 +86,14 @@ export class SearchService {
             body.query.bool.filter.push({
                 term: {
                     'entitytype.keyword': docType,
+                },
+            });
+        }
+        // 🎯 Filtr registrátora
+        if (registrar) {
+            body.query.bool.filter.push({
+                term: {
+                    'registrarcode.keyword': registrar,
                 },
             });
         }
@@ -83,7 +111,6 @@ export class SearchService {
                             hit._source.registrarcode && hit._source.documentcode
                                 ? `urn:nbn:cz:${hit._source.registrarcode}-${hit._source.documentcode}`
                                 : null,
-
                     }));
 
                     this.searchResults.set(results);
@@ -123,10 +150,10 @@ export class SearchService {
         );
     }
     editInstance(instanceId: string, updatedInstance: any): Observable<any> {
-        return this.apiService.editDigitalInstance(instanceId, updatedInstance)
+        return this.apiService.editDigitalInstance(instanceId, updatedInstance);
     }
     deactivateInstance(instanceId: string): Observable<any> {
-        return this.apiService.deactivateInstance(instanceId)
+        return this.apiService.deactivateInstance(instanceId);
     }
     deactivateUrnnbn(urnnbn: string, reason: string): Observable<any> {
         return this.apiService.deactivateUrnNbn(urnnbn, reason);

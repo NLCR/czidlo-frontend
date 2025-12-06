@@ -10,6 +10,7 @@ import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dia
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-search',
@@ -18,11 +19,22 @@ import { AuthService } from '../../services/auth.service';
     styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent implements AfterViewInit {
+    loadingResults = signal(false);
+    searchedQuery = signal('');
+    registrarsLoaded = signal(false);
+
     @ViewChild('searchInput') searchInput!: ElementRef;
     searchQuery: string = '';
+    advancedSearch = signal(false);
+    entityTypesList: any[] = [];
     selectedType: string = '';
+    filterFieldsList: any[] = [];
+    selectedField: string = '';
     selectedItem = signal<any>(null);
     activeAction: string = '';
+    allRegistrars: Array<{ code: string; name: string }> = [];
+    registrarCodeList: any[] = [];
+    selectedRegistrar: string = '';
 
     isLoggedIn = computed(() => this.authService.loggedIn());
     isAdmin = computed(() => this.authService.isAdmin());
@@ -138,24 +150,40 @@ export class SearchComponent implements AfterViewInit {
     ) {}
 
     ngOnInit() {
+        this.loadingResults.set(true);
+        this.loadRegistrarCodes();
         this.route.queryParams.subscribe((params) => {
             const q = params['q'] ?? '';
+            this.searchedQuery.set(q);
             const type = params['type'] ?? '';
             const page = params['page'] ? parseInt(params['page'], 10) : 1;
+            const filter = params['filter'] ?? '';
+            const registrar = params['registrar'] || '';
 
             this.searchQuery = q;
             this.selectedType = type;
             this.currentPage = page;
+            this.selectedField = filter;
+            this.selectedRegistrar = registrar || '';
 
-            this.searchService.search(q, type, page).subscribe(() => {
-                this.updatePagination();
+            if (this.selectedType || this.selectedRegistrar) {
+                this.advancedSearch.set(true);
+            } else {
+                this.advancedSearch.set(false);
+            }
+
+            this.searchService.search(q, type, filter, registrar, page).subscribe({
+                next: () => {
+                    this.updatePagination();
+                    this.tryFilterRegistrars();
+                },
+                error: (error) => {
+                    console.error('Error during search:', error);
+                },
+                complete: () => {
+                    this.loadingResults.set(false);
+                },
             });
-        });
-
-        this.apiService.getRecordCount().subscribe({
-            next: (response) => {
-                console.log('Record count received:', response);
-            },
         });
 
         this.translate
@@ -168,6 +196,19 @@ export class SearchComponent implements AfterViewInit {
                 'import.open',
                 'import.restricted',
                 'import.unknown',
+                'MONOGRAPH',
+                'MONOGRAPH_VOLUME',
+                'PERIODICAL',
+                'PERIODICAL_VOLUME',
+                'PERIODICAL_ISSUE',
+                'ANALYTICAL',
+                'THESIS',
+                'OTHER',
+                'SOUND_COLLECTION',
+                'all',
+                'search.authors',
+                'search.titles',
+                'search.all-registrars',
             ])
             .subscribe((translations) => {
                 this.registrationMode = [
@@ -184,21 +225,47 @@ export class SearchComponent implements AfterViewInit {
                     { value: 'UNLIMITED_ACCESS', label: translations['import.open'] },
                     { value: 'LIMITED_ACCESS', label: translations['import.restricted'] },
                 ];
+                this.entityTypesList = [
+                    { value: '', label: translations['all'] },
+                    { value: 'MONOGRAPH', label: translations['MONOGRAPH'] },
+                    { value: 'MONOGRAPH_VOLUME', label: translations['MONOGRAPH_VOLUME'] },
+                    { value: 'PERIODICAL', label: translations['PERIODICAL'] },
+                    { value: 'PERIODICAL_VOLUME', label: translations['PERIODICAL_VOLUME'] },
+                    { value: 'PERIODICAL_ISSUE', label: translations['PERIODICAL_ISSUE'] },
+                    { value: 'ANALYTICAL', label: translations['ANALYTICAL'] },
+                    { value: 'THESIS', label: translations['THESIS'] },
+                    { value: 'OTHER', label: translations['OTHER'] },
+                    { value: 'SOUND_COLLECTION', label: translations['SOUND_COLLECTION'] },
+                ];
+                this.filterFieldsList = [
+                    { value: '', label: translations['all'] },
+                    { value: 'author', label: translations['search.authors'] },
+                    { value: 'titles', label: translations['search.titles'] },
+                ];
+
                 this.selectedMode = this.registrationMode[0].value;
                 this.selectedDiAccessRestrictionId = this.diAccessRestrictionsList[0].value;
             });
+
+        this.apiService.getRecordCount().subscribe({
+            next: (response) => {
+                console.log('Vse v indexu:', response);
+            },
+        });
     }
 
     ngAfterViewInit() {
         this.searchInput.nativeElement.focus();
     }
 
-    onSearch(query: string, type?: string) {
+    onSearch(query: string, type?: string, fields?: string, registrar?: string) {
         this.currentPage = 1;
         this.router.navigate([], {
             queryParams: {
                 q: query || null,
                 type: type ?? (this.selectedType || null),
+                filter: fields ?? (this.selectedField || null),
+                registrar: registrar ?? (this.selectedRegistrar || null),
                 page: 1,
             },
             queryParamsHandling: 'merge',
@@ -217,6 +284,17 @@ export class SearchComponent implements AfterViewInit {
         } else {
             queryParams['type'] = null;
         }
+        if (this.selectedField) {
+            queryParams['filter'] = this.selectedField;
+        } else {
+            queryParams['filter'] = null;
+        }
+
+        if (this.selectedRegistrar !== '') {
+            queryParams['registrar'] = this.selectedRegistrar;
+        } else {
+            queryParams['registrar'] = undefined; // odstraní parametr z URL
+        }
         if (this.currentPage) {
             queryParams['page'] = this.currentPage;
         }
@@ -230,12 +308,11 @@ export class SearchComponent implements AfterViewInit {
         console.log('getDetail for item: ', item);
         this.searchService.getRecordDetails(item.urnnbn).subscribe({
             next: (response) => {
-                console.log('Record details received:', response);
                 item.details = response;
                 this.selectedItem.set(item);
             },
             error: (error) => {
-                console.error('Error fetching record details:', error);
+                console.error('Chyba při načítání detailů záznamu:', error);
                 item.loading = false;
             },
             complete: () => {
@@ -270,10 +347,49 @@ export class SearchComponent implements AfterViewInit {
         });
     }
 
-    onTypeSelected() {
-        console.log(this.selectedType);
+    loadRegistrarCodes() {
+        this.registrarsService.getRegistrars().subscribe({
+            next: (response) => {
+                this.allRegistrars = response.items.map((r: any) => ({
+                    code: r.code,
+                    name: r.name,
+                }));
+                this.registrarCodeList = [...this.allRegistrars]; // defaultně všichni
+                this.registrarsLoaded.set(true);
+                this.tryFilterRegistrars();
+            },
+        });
+    }
+    tryFilterRegistrars() {
+        if (this.loadingResults() || !this.registrarsLoaded()) {
+            return; // čekáme, až budou obě data
+        }
+
+        this.filterRegistrarsByResults();
+    }
+    filterRegistrarsByResults() {
+        const results = this.searchService.searchResults();
+
+        // není aktivní vyhledávání → zobraz všechny
+        if (!this.searchQuery || results.length === 0) {
+            this.registrarCodeList = [...this.allRegistrars];
+            return;
+        }
+
+        // extrahuj kódy registrátorů z výsledků
+        const resultRegistrars = new Set(
+            results
+                .map((item: any) => item.registrarcode) // ⬅️ uprav podle skutečného pole
+                .filter((code: string | undefined) => !!code)
+        );
+
+        // filtruj seznam registrátorů
+        this.registrarCodeList = this.allRegistrars.filter((reg) => resultRegistrars.has(reg.code));
+    }
+
+    onFilterSelected() {
         this.currentPage = 1;
-        this.onSearch(this.searchQuery, this.selectedType);
+        this.onSearch(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar);
     }
 
     onSelectItem(item: any) {
@@ -285,13 +401,11 @@ export class SearchComponent implements AfterViewInit {
         }
     }
     toggleSdInfo(item: any) {
-        console.log(item.sdtitleopen);
         item.sdtitleopen = !item.sdtitleopen;
     }
     getArchiversList(selectedArchiverId: string) {
         return this.registrarsService.getArchivers().subscribe({
             next: (response) => {
-                console.log('Archivers received:', response);
                 this.archiverIdsList.set(response.items);
                 this.selectedArchiverId = selectedArchiverId;
             },
@@ -299,15 +413,11 @@ export class SearchComponent implements AfterViewInit {
                 console.error('Error fetching archivers:', error);
                 return [];
             },
-            complete: () => {
-                console.log('Archivers fetch complete');
-            },
         });
     }
     getDigitalLibrariesList(registrarCode: string) {
         return this.registrarsService.getDigitalLibrariesByRegistrar(registrarCode).subscribe({
             next: (response) => {
-                console.log('Digital libraries received:', response);
                 this.digitalLibrariesList.set(response.digitalLibraries || []);
                 this.selectedDigitalLibraryId = response.digitalLibraries.length > 0 ? response.digitalLibraries[0].id : '';
             },
@@ -315,14 +425,10 @@ export class SearchComponent implements AfterViewInit {
                 console.error('Error fetching digital libraries:', error);
                 return [];
             },
-            complete: () => {
-                console.log('Digital libraries fetch complete');
-            },
         });
     }
 
     editItem(item: any) {
-        console.log(item);
         this.registrarCode = item.details.registrar.code;
         this.activeAction = 'edit';
         this.selectedItem.set(item);
@@ -402,12 +508,10 @@ export class SearchComponent implements AfterViewInit {
     }
 
     addInstance(item: any) {
-        console.log(item);
         this.activeAction = 'add-instance';
         this.title = new FormControl<string>(item.title);
         this.urnNbn = new FormControl<string>(item.urnnbn);
         let registrarCode = item.details.registrar.code;
-        console.log(registrarCode);
         this.getDigitalLibrariesList(registrarCode);
         this.selectedDiId = '';
         this.selectedDigitalLibraryId = '';
@@ -418,13 +522,11 @@ export class SearchComponent implements AfterViewInit {
         this.isSidebarOpen.set(true);
     }
     editDigitalInstance(item: any, di: any) {
-        console.log(item, di);
         this.activeAction = 'edit-instance';
         this.title = new FormControl<string>(item.title);
         this.urnNbn = new FormControl<string>(item.urnnbn);
         let registrarCode = item.details.registrar.code;
         this.getDigitalLibrariesList(registrarCode);
-        console.log(di.id);
         this.selectedDiId = di.id;
         this.selectedDigitalLibraryId = di.digitalLibrary;
         this.diFormat = new FormControl<string>(di.format);
@@ -438,7 +540,6 @@ export class SearchComponent implements AfterViewInit {
         let urnNbn = this.urnNbn.value || '';
         if (this.selectedDiId && this.activeAction === 'edit-instance') {
             this.progressBar.set({ state: true, value: 'edit-running', error: '' });
-            console.log('Editing instance:', this.selectedDiId);
             const updatedInstance: any = {
                 digitalLibrary: this.selectedDigitalLibraryId,
                 format: this.diFormat.value,
@@ -446,10 +547,8 @@ export class SearchComponent implements AfterViewInit {
                 accessibility: this.diAccess.value,
                 accessRestriction: this.selectedDiAccessRestrictionId,
             };
-            console.log('Updating instance:', updatedInstance, this.selectedDiId);
             this.searchService.editInstance(this.selectedDiId, updatedInstance).subscribe({
                 next: (response) => {
-                    console.log('Digital instance updated successfully:', response);
                     response.urnnbn = urnNbn;
                     this.getDetails(response);
                     this.progressBar.set({ state: true, value: 'edit-completed', error: '' });
@@ -490,7 +589,7 @@ export class SearchComponent implements AfterViewInit {
             error: (error) => {
                 this.progressBar.set({ state: true, value: 'add-error', error: error.error.message });
                 setTimeout(() => {
-                    this.progressBar.set({ state: false, value: '', error: ''});
+                    this.progressBar.set({ state: false, value: '', error: '' });
                 }, 10000);
             },
         });
@@ -538,7 +637,6 @@ export class SearchComponent implements AfterViewInit {
         });
     }
     deactivateDigitalInstance(item: any, di: any) {
-        console.log('deactivate instance', di);
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
             data: { data: item, title: 'messages.confirm-deactivate-di', confirm: 'buttons.confirm-deactivate' },
             maxWidth: '800px',
@@ -578,7 +676,6 @@ export class SearchComponent implements AfterViewInit {
         record.urnNbn = urnNbn;
         this.apiService.editRecordByUrnnbn(urnNbn, record).subscribe({
             next: (data) => {
-                console.log('Record updated successfully:', data);
                 data.urnnbn = urnNbn;
                 this.renewDetails(data);
                 this.progressBar.set({ state: true, value: 'edit-completed', error: '' });

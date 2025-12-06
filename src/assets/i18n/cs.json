@@ -6,6 +6,16 @@
     "not-admin-message": "Pro přístup k této části aplikace musíte být administrátor.",
     "true": "Ano",
     "false": "Ne",
+    "all": "Vše",
+    "MONOGRAPH": "Monografie",
+    "MONOGRAPH_VOLUME": "Svazek monografie",
+    "PERIODICAL": "Periodikum",
+    "PERIODICAL_VOLUME": "Svazek periodika",
+    "PERIODICAL_ISSUE": "Číslo periodika",
+    "ANALYTICAL": "Článek",
+    "THESIS": "Vysokoškolská kvalifikační práce",
+    "OTHER": "Jiný dokument",
+    "SOUND_COLLECTION": "Zvukový dokument",
     "menu": {
         "logo": "ČIDLO",
         "desc-cz": "Český systém pro IDentifikaci a LOkalizaci digitálních dokumentů českého kulturního dědictví",
@@ -422,6 +432,19 @@
         "sub_title": "podnázev",
         "UNKNOWN": "neznámá",
         "UNLIMITED_ACCESS": "bez omezení",
-        "LIMITED_ACCESS": "s omezeními"
+        "LIMITED_ACCESS": "s omezeními",
+        "filter-by-type": "Filtrovat podle typu dokumentu",
+        "filter-by-fields": "Filtrovat podle polí",
+        "authors": "Autoři",
+        "titles": "Názvy",
+        "show-advanced-search": "Zobrazit pokročilé vyhledávání",
+        "hide-advanced-search": "Skrýt pokročilé vyhledávání",
+        "search-placeholder": "Zadejte vyhledávací dotaz...",
+        "no-query-title": "Zadejte vyhledávací dotaz",
+        "no-query-text-1": "Pro zahájení vyhledávání zadejte dotaz do vyhledávacího pole výše.",
+        "no-query-text-2": "Lze vyhledávat konkrétní urn:nbn, zadat libovolný textový nebo použít pokročilé vyhledávací filtry.",
+        "for-example": "Příklady vyhledávacích dotazů:",
+        "all-registrars": "Všichni registrátoři",
+        "filter-by-registrar": "Filtrovat podle registrátora"
     }
 }

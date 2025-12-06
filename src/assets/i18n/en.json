@@ -6,6 +6,16 @@
     "not-admin-message": "You must be an administrator to access this part of the application.",
     "true": "Yes",
     "false": "No",
+    "all": "All",
+    "MONOGRAPH": "Monograph",
+    "MONOGRAPH_VOLUME": "Monograph Volume",
+    "PERIODICAL": "Periodical",
+    "PERIODICAL_VOLUME": "Periodical Volume",
+    "PERIODICAL_ISSUE": "Periodical Issue",
+    "ANALYTICAL": "Analytical",
+    "THESIS": "Thesis",
+    "OTHER": "Other",
+    "SOUND_COLLECTION": "Sound Collection",
     "menu": {
         "logo": "CZIDLO",
         "desc-cz": "Český systém pro IDentifikaci a LOkalizaci digitálních dokumentů českého kulturního dědictví",
@@ -26,7 +36,7 @@
         "en": "English",
         "user-account": "User Account"
     },
-   "users": {
+    "users": {
         "list-of-users": "List of Users",
         "add-new-user": "Add New User",
         "title": "Login",

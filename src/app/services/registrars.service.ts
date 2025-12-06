@@ -49,10 +49,8 @@ export class RegistrarsService {
         return this.apiService.getRegistrars().pipe(
             tap({
                 next: (data) => {
-                    console.log('Registrars data received:', data);
                     let sortedItems = data.items.sort((a: any, b: any) => a.code.localeCompare(b.code));
                     this.registrars.set(sortedItems);
-                    console.log('Registrars loaded:', this.registrars());
                 },
                 error: (error) => {
                     console.error('Error loading registrars:', error);

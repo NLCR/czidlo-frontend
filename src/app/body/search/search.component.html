@@ -1,6 +1,14 @@
 <div class="app-search-container">
     <div class="app-search-header">
+        <mat-form-field class="app-fields-filter" appearance="outline">
+            <mat-select [(ngModel)]="selectedField" (selectionChange)="onFilterSelected()">
+                @for (entity of filterFieldsList; track entity) {
+                <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
         <input
+        class="app-fields-input"
             #searchInput
             id="search-input"
             type="text"
@@ -13,29 +21,51 @@
         </app-button>
     </div>
     <div class="app-action">
-        <div class="app-select-type">
-            <mat-form-field appearance="outline">
-                <mat-label>Typ dokumentu</mat-label>
-                <mat-select [(ngModel)]="selectedType" (selectionChange)="onTypeSelected()">
-                    <mat-option value="">Vše</mat-option>
-                    <mat-option value="MONOGRAPH">Monografie</mat-option>
-                    <mat-option value="MONOGRAPH_VOLUME">Svazek monografie</mat-option>
-                    <mat-option value="PERIODICAL">Periodikum</mat-option>
-                    <mat-option value="PERIODICAL_VOLUME">Ročník periodika</mat-option>
-                    <mat-option value="PERIODICAL_ISSUE">Číslo periodika</mat-option>
-                    <mat-option value="ANALYTICAL">Článek</mat-option>
-                    <mat-option value="THESIS">Thesis</mat-option>
-                    <mat-option value="OTHER">Ostatní</mat-option>
-                </mat-select>
-            </mat-form-field>
+        <div class="app-advanced-search-text" (click)="advancedSearch.set(!advancedSearch())">
+            {{ advancedSearch() ? ('search.hide-advanced-search' | translate) : ('search.show-advanced-search' | translate) }}
         </div>
         <div class="app-records-count" *ngIf="searchService.recordsCount() > 0">
             {{ 'search.records-found' | translate }}: {{ searchService.recordsCount() }}
         </div>
     </div>
 
+    <!-- ENTITY TYPE -->
+    <div class="app-advanced-search" *ngIf="advancedSearch()">
+        <div class="app-base-input-container">
+            <div class="app-base-input">
+                <div class="app-base-input-label">
+                    {{ 'search.filter-by-type' | translate }}
+                </div>
+                <mat-form-field appearance="outline">
+                    <mat-select [(ngModel)]="selectedType" (selectionChange)="onFilterSelected()">
+                        @for (entity of entityTypesList; track entity) {
+                        <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <!-- REGISTRAR -->
+        <div class="app-base-input-container">
+            <div class="app-base-input">
+                <div class="app-base-input-label">
+                    {{ 'search.filter-by-registrar' | translate }}
+                </div>
+                <mat-form-field appearance="outline">
+                    <mat-select [(ngModel)]="selectedRegistrar" (selectionChange)="onFilterSelected()">
+                        <mat-option [value]="''">{{ 'search.all-registrars' | translate }}</mat-option>
+                        @for (entity of registrarCodeList; track entity) {
+                        <mat-option [value]="entity.code">{{ entity.code }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
     <!-- SEARCH RESULTS -->
-    <div class="app-search-results" *ngIf="searchService.searchResults().length > 0">
+    <div class="app-search-results" *ngIf="searchService.searchResults().length > 0 && !loadingResults()">
         <div class="app-search-card" *ngFor="let item of searchService.searchResults()">
             <div class="app-card-header" [ngClass]="{ opened: item.opened }" (click)="onSelectItem(item)">
                 <div class="app-card-header-left">
@@ -45,10 +75,9 @@
                         <div class="app-title-part">{{ item.title }}</div>
                         <div class="app-title-part" *ngIf="item.volumetitle">- {{ item.volumetitle }}</div>
                         <div class="app-title-part" *ngIf="item.sdtitle">({{ item.sdtitle }})</div>
-                        <div class="app-title-part" *ngIf="item.entitytype">({{ item.entitytype }})</div>
                     </div>
                 </div>
-                <div class="app-card-header-right">
+                <div class="app-card-header-right" (click)="$event.stopPropagation()">
                     <div
                         class="app-urn-nbn"
                         *ngIf="item.documentcode && item.registrarcode"
@@ -56,6 +85,7 @@
                     >
                         urn:nbn:cz:{{ item.registrarcode }}-{{ item.documentcode }}
                     </div>
+                    <div class="app-title-part" *ngIf="item.entitytype">{{ item.entitytype | translate }}</div>
                 </div>
             </div>
             <div class="app-card-content" [ngClass]="{ opened: item.opened }" *ngIf="item.opened && !item.loading">
@@ -203,12 +233,16 @@
                             <div class="app-ie-field" *ngIf="item.details.urnNbn && !isAdmin()">
                                 <!-- <div class="app-label">{{ 'search.urnNbn' | translate }}:</div> -->
                                 <div class="app-value">urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}</div>
-                                <div class="app-value-2">({{ 'search.registered' | translate }} {{ item.details.urnNbn.registered.split('[')[0] | date }})</div>
+                                <div class="app-value-2">
+                                    ({{ 'search.registered' | translate }} {{ item.details.urnNbn.registered.split('[')[0] | date }})
+                                </div>
                             </div>
                             <div class="app-ie-field" *ngIf="item.details.urnNbn?.status === 'DEACTIVATED' && !isAdmin()">
                                 <div class="app-label">{{ 'search.status' | translate }}:</div>
                                 <div class="app-value">{{ item.details.urnNbn.status }}</div>
-                                <div class="app-value-2">({{ 'search.deactivated' | translate }} {{ item.details.urnNbn.deactivated.split('[')[0] | date }})</div>
+                                <div class="app-value-2">
+                                    ({{ 'search.deactivated' | translate }} {{ item.details.urnNbn.deactivated.split('[')[0] | date }})
+                                </div>
                             </div>
                             <div class="app-ie-field" *ngIf="item.details?.registrar">
                                 <div class="app-label">{{ 'search.registrar' | translate }}:</div>
@@ -234,18 +268,10 @@
                                         <div class="app-label-2">
                                             urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}
                                         </div>
-                                        <app-button
-                                            variant="tertiary"
-                                            size="xs"
-                                            (click)="openUrnnbnXml(item.urnnbn); $event.stopPropagation()"
-                                        >
+                                        <app-button variant="tertiary" size="xs" (click)="openUrnnbnXml(item.urnnbn); $event.stopPropagation()">
                                             XML →
                                         </app-button>
-                                        <app-button
-                                            variant="tertiary"
-                                            size="xs"
-                                            (click)="openUrnnbnJson(item.urnnbn); $event.stopPropagation()"
-                                        >
+                                        <app-button variant="tertiary" size="xs" (click)="openUrnnbnJson(item.urnnbn); $event.stopPropagation()">
                                             JSON →
                                         </app-button>
                                     </div>
@@ -367,29 +393,31 @@
                             <div class="app-ie-di" *ngIf="item.details?.digitalInstances?.length > 0">
                                 <div *ngFor="let di of item.details?.digitalInstances">
                                     <div class="app-ie-header">
-                                        <img [src]="di.diopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" (click)="di.diopen = !di.diopen" />
+                                        <img
+                                            [src]="di.diopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'"
+                                            (click)="di.diopen = !di.diopen"
+                                        />
                                         <div class="app-part-title app-part-title-di">
                                             <div class="app-label-2 app-di-url-label">
-                                                <a [ngClass]="{ 'app-not-active': di.active === false }" href="{{ di.url }}" target="_blank" rel="noopener noreferrer">{{ di.url }}</a>
+                                                <a
+                                                    [ngClass]="{ 'app-not-active': di.active === false }"
+                                                    href="{{ di.url }}"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {{ di.url }}
+                                                </a>
                                             </div>
-                                            <app-button
-                                                variant="tertiary"
-                                                size="xs"
-                                                (click)="openDiXml(di.id); $event.stopPropagation()"
-                                            >
+                                            <app-button variant="tertiary" size="xs" (click)="openDiXml(di.id); $event.stopPropagation()">
                                                 XML →
                                             </app-button>
-                                            <app-button
-                                                variant="tertiary"
-                                                size="xs"
-                                                (click)="openDiJson(di.id); $event.stopPropagation()"
-                                            >
+                                            <app-button variant="tertiary" size="xs" (click)="openDiJson(di.id); $event.stopPropagation()">
                                                 JSON →
                                             </app-button>
                                         </div>
                                     </div>
                                     <div class="app-ie-content" *ngIf="di.diopen">
-                                        <div class="app-ie-field" *ngIf="di.active && di.active === true || di.active === false">
+                                        <div class="app-ie-field" *ngIf="(di.active && di.active === true) || di.active === false">
                                             <div class="app-label">{{ 'search.active' | translate }}:</div>
                                             <div class="app-value">{{ 'search.' + di.active | translate }}</div>
                                         </div>
@@ -408,7 +436,7 @@
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.accessRestriction">
                                             <div class="app-label">{{ 'search.access_restriction' | translate }}:</div>
-                                            <div class="app-value">{{ 'search.' + di.accessRestriction | translate}}</div>
+                                            <div class="app-value">{{ 'search.' + di.accessRestriction | translate }}</div>
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.created">
                                             <div class="app-label">{{ 'search.created' | translate }}:</div>
@@ -431,14 +459,39 @@
                             </div>
                         </div>
                     </div>
-                    <pre *ngIf="isDevMode()">{{ item | json }}</pre>
+                    <!-- DEV MODE - JSON VIEWER -->
+                    <div class="app-ie-digital-document" [ngClass]="{ opened: item.jsonOpen }" *ngIf="isDevMode()">
+                        <div class="app-ie-header app-ie-digital-document-header" (click)="item.jsonOpen = !item.jsonOpen">
+                            <img [src]="item.jsonOpen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                            <div class="app-part-title">
+                                <div class="app-label">json (DEV mode)</div>
+                            </div>
+                        </div>
+                        <pre *ngIf="item.jsonOpen">{{ item | json }}</pre>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- NO QUERY -->
+    <div class="app-no-results app-no-query" *ngIf="!searchedQuery() && !loadingResults()">
+        <h1 class="app-no-query-title">{{ 'search.no-query-title' | translate }}</h1>
+        <div class="app-no-query-text">{{ 'search.no-query-text-1' | translate }}</div>
+        <div class="app-no-query-text">{{ 'search.no-query-text-2' | translate }}</div>
+        <div class="app-no-query-text app-example">
+            <div class="app-example-label">{{ 'search.for-example' | translate }}</div>
+            <div class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'urn:nbn:cz:aba001-000ovg' }">urn:nbn:cz:aba001-000ovg</div>
+            <div class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'babička' }">babička</div>
+            <div class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'babička', type: 'MONOGRAPH' }">babička + MONOGRAPH</div>
+        </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="app-loading" *ngIf="loadingResults()"><mat-spinner diameter="40"></mat-spinner></div>
+
     <!-- NO RESULTS -->
-    <div class="app-no-results" *ngIf="searchService.recordsCount() === 0">
+    <div class="app-no-results" *ngIf="searchedQuery() && searchService.recordsCount() === 0 && !loadingResults()">
         <h1 class="app-no-results-title">{{ 'search.no-results-title' | translate }}</h1>
         <div class="app-no-results-text">{{ 'search.no-results-text-1' | translate }}</div>
         <div class="app-no-results-text">
@@ -508,7 +561,9 @@
             <div class="app-sidebar-title" *ngIf="activeAction === 'edit'">
                 {{ 'import.' + selectedEntity | translate }}
             </div>
-            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">{{ 'import.add-instance' | translate }} {{ title.value }}</div>
+            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">
+                {{ 'import.add-instance' | translate }} {{ title.value }}
+            </div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>
@@ -1021,7 +1076,12 @@
                     <span *ngIf="!loadingButton()">{{ 'buttons.save-record' | translate }}</span>
                     <mat-spinner diameter="25" color="primary" *ngIf="loadingButton()"></mat-spinner>
                 </app-button>
-                <app-button variant="primary" size="l" (click)="onAddInstanceConfirm()" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">
+                <app-button
+                    variant="primary"
+                    size="l"
+                    (click)="onAddInstanceConfirm()"
+                    *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'"
+                >
                     <span *ngIf="activeAction === 'add-instance'">{{ 'buttons.add-instance' | translate }}</span>
                     <span *ngIf="activeAction === 'edit-instance'">{{ 'buttons.edit-instance' | translate }}</span>
                 </app-button>
