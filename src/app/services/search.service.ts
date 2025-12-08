@@ -55,7 +55,7 @@ export class SearchService {
             body.query.bool.must.push({
                 multi_match: {
                     query: term,
-                    fields: ['originatorvalue', 'otheroriginator'], 
+                    fields: ['originatorvalue', 'otheroriginator', 'publisher'], 
                     type: 'cross_fields',
                     operator: 'and',
                 },
@@ -69,12 +69,13 @@ export class SearchService {
                         'subtitle',
                         'volumetitle',
                         'issuetitle',
-                        'author',
+                        'originatorvalue',
                         'otheroriginator',
                         'sdtitle',
                         'sdvolumetitle',
                         'sdissuetitle',
                         'rsidvalues',
+                        'publisher'
                     ],
                     type: 'cross_fields',
                     operator: 'and',
