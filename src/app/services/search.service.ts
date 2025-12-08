@@ -45,7 +45,7 @@ export class SearchService {
             });
         } else if (term.startsWith('cnb')) {
             // 🔍 2) Hledání CNB – speciální režim
-            body.query.bool.must.push({
+            body.query.bool.must.push({ //TODO: opravit. Nefunguje, viz urn:nbn:cz:ope301-00038f s cnb000358651
                 match_phrase: {
                     ccnb: term,
                 },
@@ -55,7 +55,7 @@ export class SearchService {
             body.query.bool.must.push({
                 multi_match: {
                     query: term,
-                    fields: ['author', 'otheroriginator'],
+                    fields: ['originatorvalue', 'otheroriginator'], 
                     type: 'cross_fields',
                     operator: 'and',
                 },
