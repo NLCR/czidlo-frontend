@@ -74,6 +74,7 @@ export class SearchService {
                         'sdtitle',
                         'sdvolumetitle',
                         'sdissuetitle',
+                        'rsidvalues',
                     ],
                     type: 'cross_fields',
                     operator: 'and',
