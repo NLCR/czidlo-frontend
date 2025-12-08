@@ -299,7 +299,8 @@ export class ApiService {
 
     // STATISTICS DATA FOR ASSIGNMENTS
     getStatisticsDataAssign(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_11/_search';
+        //const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_11/_search';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_assign_1/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -319,7 +320,8 @@ export class ApiService {
 
     // STATISTICS DATA FOR RESOLVATIONS
     getStatisticsDataResolve(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_9/_search';
+        //const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_9/_search';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_resolve_1/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -339,7 +341,8 @@ export class ApiService {
 
     // SEARCH RECORDS
     getRecords(body: any): Observable<any> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_10/_search';
+        //const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_10/_search';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_search_1/_search';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
@@ -363,7 +366,8 @@ export class ApiService {
         );
     }
     getRecordCount(body?: any): Observable<number> {
-        const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_7/_count';
+        //const url = 'https://es8.dev-service.trinera.cloud/czidlo_registrations_7/_count';
+        const url = 'https://es8.dev-service.trinera.cloud/czidlo_search_1/_count';
         const login = 'czidlo_reader';
         const password = 'dq7o8rDrXZzhiS20qm';
 
