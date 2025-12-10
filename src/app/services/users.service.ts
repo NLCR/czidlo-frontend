@@ -33,6 +33,9 @@ export class UsersService {
             })
         );
     }
+    getCurrentUser(): Observable<any> {
+        return this.apiService.getCurrentUser();
+    }
     getUser(userId: string): Observable<any> {
         return this.apiService.getUser(userId);
     }

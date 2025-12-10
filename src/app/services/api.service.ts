@@ -219,6 +219,10 @@ export class ApiService {
     }
 
     // USERS
+    getCurrentUser(): Observable<any> {
+        const url = `${this.apiUrl}/user`;
+        return this.doGet(url);
+    }
     getUsers(): Observable<any> {
         const url = `${this.apiUrl}/users`;
         return this.doGet(url);

@@ -62,9 +62,15 @@ export class MenuComponent {
     }
     onLoginClick() {
         if (this.loggedIn()) {
-            this.userData = this.authService.getUserInfo();
-            console.log('User data loaded:', this.userData);
-            this.isSidebarOpen.set(!this.isSidebarOpen());
+            this.usersService.getCurrentUser().subscribe({
+                next: (data) => {
+                    this.userData = data;
+                    this.isSidebarOpen.set(!this.isSidebarOpen());
+                },
+                error: (error) => {
+                    console.error('Error fetching current user data:', error);
+                }
+            });
             return;
         }
         this.dialog

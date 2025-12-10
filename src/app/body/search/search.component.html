@@ -135,6 +135,10 @@
                         <div class="app-label">{{ 'search.otheroriginator' | translate }}:</div>
                         <div class="app-value">{{ item.otheroriginator }}</div>
                     </div>
+                    <div class="app-ie-field" *ngIf="item.originatorvalue">
+                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-value">{{ item.originatorvalue }}</div>
+                    </div>
 
                     <!-- PUBLICATION -->
                     <div class="app-ie-field" *ngIf="item.details && item.details?.intelectualEntity?.publication?.place">
