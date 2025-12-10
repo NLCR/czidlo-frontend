@@ -387,6 +387,8 @@
         "volumetitle": "název svazku",
         "issuetitle": "název čísla",
         "author": "autor",
+        "corporation": "autor (korporace)",
+        "event": "autor (akce)",
         "otheroriginator": "jiný původce",
         "sd": "Zdrojový dokument",
         "dd": "Digitální dokument",
@@ -445,6 +447,8 @@
         "no-query-text-2": "Lze vyhledávat konkrétní urn:nbn, zadat libovolný textový nebo použít pokročilé vyhledávací filtry.",
         "for-example": "Příklady vyhledávacích dotazů:",
         "all-registrars": "Všichni registrátoři",
-        "filter-by-registrar": "Filtrovat podle registrátora"
+        "filter-by-registrar": "Filtrovat podle registrátora",
+        "number": "č.",
+        "volume": "roč."
     }
 }

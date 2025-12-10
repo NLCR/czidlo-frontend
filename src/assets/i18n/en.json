@@ -387,6 +387,8 @@
         "volumetitle": "volume title",
         "issuetitle": "issue title",
         "author": "author",
+        "corporation": "author (corporation)",
+        "event": "author (event)",
         "otheroriginator": "other originator",
         "sd": "Source document",
         "dd": "Digital document",
@@ -432,6 +434,21 @@
         "sub_title": "subtitle",
         "UNKNOWN": "unknown",
         "UNLIMITED_ACCESS": "unlimited access",
-        "LIMITED_ACCESS": "limited access"
+        "LIMITED_ACCESS": "limited access",
+        "filter-by-type": "Filter by document type",
+        "filter-by-fields": "Filter by fields",
+        "authors": "Authors",
+        "titles": "Titles",
+        "show-advanced-search": "Show advanced search",
+        "hide-advanced-search": "Hide advanced search",
+        "search-placeholder": "Enter search query...",
+        "no-query-title": "Enter search query",
+        "no-query-text-1": "To start searching, enter a query in the search field above.",
+        "no-query-text-2": "You can search for a specific urn:nbn, enter any text, or use advanced search filters.",
+        "for-example": "Examples of search queries:",
+        "all-registrars": "All registrars",
+        "filter-by-registrar": "Filter by registrar",
+        "number": "no.",
+        "volume": "vol."
     }
 }

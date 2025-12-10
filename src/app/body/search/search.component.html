@@ -8,7 +8,7 @@
             </mat-select>
         </mat-form-field>
         <input
-        class="app-fields-input"
+            class="app-fields-input"
             #searchInput
             id="search-input"
             type="text"
@@ -65,16 +65,18 @@
     </div>
 
     <!-- SEARCH RESULTS -->
-    <div class="app-search-results" *ngIf="searchService.searchResults().length > 0 && !loadingResults()">
+    <div #resultsContainer class="app-search-results" *ngIf="searchService.searchResults().length > 0 && !loadingResults()">
         <div class="app-search-card" *ngFor="let item of searchService.searchResults()">
             <div class="app-card-header" [ngClass]="{ opened: item.opened }" (click)="onSelectItem(item)">
                 <div class="app-card-header-left">
                     <img *ngIf="!item.loading" [src]="item.opened ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                     <div *ngIf="item.loading" class="loader"><mat-spinner diameter="24"></mat-spinner></div>
                     <div class="app-card-title">
-                        <div class="app-title-part">{{ item.title }}</div>
+                        <div class="app-title-part">{{getLabel(item)}}</div>
+                        <!-- <div class="app-title-part">{{ item.title }}</div>
                         <div class="app-title-part" *ngIf="item.volumetitle">- {{ item.volumetitle }}</div>
                         <div class="app-title-part" *ngIf="item.sdtitle">({{ item.sdtitle }})</div>
+                        <div class="app-title-part" *ngIf="item.originatorvalue">({{ item.originatorvalue }})</div> -->
                     </div>
                 </div>
                 <div class="app-card-header-right" (click)="$event.stopPropagation()">
@@ -119,25 +121,27 @@
                     </div>
 
                     <!-- AUTHORS -->
+                    <div class="app-ie-field" *ngIf="item.originatorvalue">
+                        <div class="app-label" *ngIf="item.originatortype === 'AUTHOR'">{{ 'search.author' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.originatortype === 'EVENT'">{{ 'search.event' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.originatortype === 'CORPORATION'">{{ 'search.corporation' | translate }}:</div>
+                        <div class="app-value">{{ item.originatorvalue }}</div>
+                    </div>
                     <div class="app-ie-field" *ngIf="item.author?.length > 0">
                         <div class="app-label">{{ 'search.author' | translate }}:</div>
                         <div class="app-value">{{ item.author }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.corporation?.length > 0">
-                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-label">{{ 'search.corporation' | translate }}:</div>
                         <div class="app-value">{{ item.corporation }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.event?.length > 0">
-                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-label">{{ 'search.event' | translate }}:</div>
                         <div class="app-value">{{ item.event }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.otheroriginator">
                         <div class="app-label">{{ 'search.otheroriginator' | translate }}:</div>
                         <div class="app-value">{{ item.otheroriginator }}</div>
-                    </div>
-                    <div class="app-ie-field" *ngIf="item.originatorvalue">
-                        <div class="app-label">{{ 'search.author' | translate }}:</div>
-                        <div class="app-value">{{ item.originatorvalue }}</div>
                     </div>
 
                     <!-- PUBLICATION -->

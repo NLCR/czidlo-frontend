@@ -24,6 +24,8 @@ export class SearchComponent implements AfterViewInit {
     registrarsLoaded = signal(false);
 
     @ViewChild('searchInput') searchInput!: ElementRef;
+    @ViewChild('resultsContainer') resultsContainer!: ElementRef<HTMLDivElement>;
+
     searchQuery: string = '';
     advancedSearch = signal(false);
     entityTypesList: any[] = [];
@@ -176,6 +178,14 @@ export class SearchComponent implements AfterViewInit {
                 next: () => {
                     this.updatePagination();
                     this.tryFilterRegistrars();
+                    setTimeout(() => {
+                        if (this.resultsContainer) {
+                            this.resultsContainer.nativeElement.scrollTo({
+                                top: 0,
+                                behavior: 'instant',
+                            });
+                        }
+                    });
                 },
                 error: (error) => {
                     console.error('Error during search:', error);
@@ -186,66 +196,11 @@ export class SearchComponent implements AfterViewInit {
             });
         });
 
-        this.translate
-            .get([
-                'import.resolver',
-                'import.reservation',
-                'import.author',
-                'import.event',
-                'import.corporation',
-                'import.open',
-                'import.restricted',
-                'import.unknown',
-                'MONOGRAPH',
-                'MONOGRAPH_VOLUME',
-                'PERIODICAL',
-                'PERIODICAL_VOLUME',
-                'PERIODICAL_ISSUE',
-                'ANALYTICAL',
-                'THESIS',
-                'OTHER',
-                'SOUND_COLLECTION',
-                'all',
-                'search.authors',
-                'search.titles',
-                'search.all-registrars',
-            ])
-            .subscribe((translations) => {
-                this.registrationMode = [
-                    { value: 'resolver', label: translations['import.resolver'] },
-                    { value: 'reservation', label: translations['import.reservation'] },
-                ];
-                this.primaryOriginatorTypes = [
-                    { value: 'AUTHOR', label: translations['import.author'] },
-                    { value: 'EVENT', label: translations['import.event'] },
-                    { value: 'CORPORATION', label: translations['import.corporation'] },
-                ];
-                this.diAccessRestrictionsList = [
-                    { value: 'UNKNOWN', label: translations['import.unknown'] },
-                    { value: 'UNLIMITED_ACCESS', label: translations['import.open'] },
-                    { value: 'LIMITED_ACCESS', label: translations['import.restricted'] },
-                ];
-                this.entityTypesList = [
-                    { value: '', label: translations['all'] },
-                    { value: 'MONOGRAPH', label: translations['MONOGRAPH'] },
-                    { value: 'MONOGRAPH_VOLUME', label: translations['MONOGRAPH_VOLUME'] },
-                    { value: 'PERIODICAL', label: translations['PERIODICAL'] },
-                    { value: 'PERIODICAL_VOLUME', label: translations['PERIODICAL_VOLUME'] },
-                    { value: 'PERIODICAL_ISSUE', label: translations['PERIODICAL_ISSUE'] },
-                    { value: 'ANALYTICAL', label: translations['ANALYTICAL'] },
-                    { value: 'THESIS', label: translations['THESIS'] },
-                    { value: 'OTHER', label: translations['OTHER'] },
-                    { value: 'SOUND_COLLECTION', label: translations['SOUND_COLLECTION'] },
-                ];
-                this.filterFieldsList = [
-                    { value: '', label: translations['all'] },
-                    { value: 'author', label: translations['search.authors'] },
-                    { value: 'titles', label: translations['search.titles'] },
-                ];
+        this.loadTranslations();
 
-                this.selectedMode = this.registrationMode[0].value;
-                this.selectedDiAccessRestrictionId = this.diAccessRestrictionsList[0].value;
-            });
+        this.translate.onLangChange.subscribe(() => {
+            this.loadTranslations();
+        });
 
         this.apiService.getRecordCount().subscribe({
             next: (response) => {
@@ -322,6 +277,39 @@ export class SearchComponent implements AfterViewInit {
                 item.loading = false;
             },
         });
+    }
+    getLabel(item: any) {
+        let label = '';
+        if (item.originatorvalue || item.author || item.corporation || item.event) {
+            label = label + (item.originatorvalue || item.author || item.corporation || item.event) + ': ';
+        }
+        if (item.title) {
+            label = label + item.title;
+        }
+        if (item.volumetitle && item.entitytype === 'MONOGRAPH_VOLUME') {
+            label = label + ' - ' + item.volumetitle;
+        }
+        if (item.volumetitle && item.entitytype !== 'MONOGRAPH_VOLUME') {
+            label = label + ', ' + this.translate.instant('search.volume') + ' ' + item.volumetitle;
+        }
+        if (item.issuetitle) {
+            label = label + ', ' + this.translate.instant('search.number') + ' ' + item.issuetitle;
+        }
+        if (item.sdtitle) {
+            label = label + ' (' + item.sdtitle;
+            if (item.sdvolumetitle) {
+                label = label + ', ' + this.translate.instant('search.volume') + ' ' + item.sdvolumetitle;
+            }
+            if (item.sdissuetitle) {
+                label = label + ', ' + this.translate.instant('search.number') + ' ' + item.sdissuetitle + ')';
+            } else {
+                label = label + ')';
+            }
+        }
+        if (item.year) {
+            label = label + ' (' + item.year + ')';
+        }
+        return label;
     }
     renewDetails(item: any) {
         this.searchService.getRecordDetails(item.urnnbn).subscribe({
@@ -943,6 +931,67 @@ export class SearchComponent implements AfterViewInit {
             const regex = /^(97(8|9))?\d{9}(\d|X)$/; // ISBN-10 nebo ISBN-13
             return regex.test(value.replace(/[-\s]/g, '')) ? null : { invalidIsbn: true };
         };
+    }
+
+    // TRANSLATIONS
+    private loadTranslations() {
+        this.translate
+            .get([
+                'import.resolver',
+                'import.reservation',
+                'import.author',
+                'import.event',
+                'import.corporation',
+                'import.open',
+                'import.restricted',
+                'import.unknown',
+                'MONOGRAPH',
+                'MONOGRAPH_VOLUME',
+                'PERIODICAL',
+                'PERIODICAL_VOLUME',
+                'PERIODICAL_ISSUE',
+                'ANALYTICAL',
+                'THESIS',
+                'OTHER',
+                'SOUND_COLLECTION',
+                'all',
+                'search.authors',
+                'search.titles',
+                'search.all-registrars',
+            ])
+            .subscribe((t) => {
+                this.registrationMode = [
+                    { value: 'resolver', label: t['import.resolver'] },
+                    { value: 'reservation', label: t['import.reservation'] },
+                ];
+                this.primaryOriginatorTypes = [
+                    { value: 'AUTHOR', label: t['import.author'] },
+                    { value: 'EVENT', label: t['import.event'] },
+                    { value: 'CORPORATION', label: t['import.corporation'] },
+                ];
+                this.diAccessRestrictionsList = [
+                    { value: 'UNKNOWN', label: t['import.unknown'] },
+                    { value: 'UNLIMITED_ACCESS', label: t['import.open'] },
+                    { value: 'LIMITED_ACCESS', label: t['import.restricted'] },
+                ];
+                this.entityTypesList = [
+                    { value: '', label: t['all'] },
+                    { value: 'MONOGRAPH', label: t['MONOGRAPH'] },
+                    { value: 'MONOGRAPH_VOLUME', label: t['MONOGRAPH_VOLUME'] },
+                    { value: 'PERIODICAL', label: t['PERIODICAL'] },
+                    { value: 'PERIODICAL_VOLUME', label: t['PERIODICAL_VOLUME'] },
+                    { value: 'PERIODICAL_ISSUE', label: t['PERIODICAL_ISSUE'] },
+                    { value: 'ANALYTICAL', label: t['ANALYTICAL'] },
+                    { value: 'THESIS', label: t['THESIS'] },
+                    { value: 'OTHER', label: t['OTHER'] },
+                    { value: 'SOUND_COLLECTION', label: t['SOUND_COLLECTION'] },
+                ];
+                this.filterFieldsList = [
+                    { value: '', label: t['all'] },
+                    { value: 'author', label: t['search.authors'] },
+                    { value: 'titles', label: t['search.titles'] },
+                ];
+            });
     }
 
     // PAGINATOR

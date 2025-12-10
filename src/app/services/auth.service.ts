@@ -22,6 +22,9 @@ export class AuthService {
     isAdministrator(): Observable<boolean> {
         return of(this.isAdmin());
     }
+    getUserId(): string | null {
+        return this.userId();
+    }
 
     /** Přihlášení uživatele */
     login(username: string, password: string): Observable<boolean> {
@@ -68,7 +71,7 @@ export class AuthService {
         localStorage.removeItem('auth_username');
         localStorage.removeItem('auth_password');
         localStorage.removeItem('auth_is_admin');
-        localStorage.removeItem('auth_user');
+        localStorage.removeItem('auth_user_info');
         localStorage.removeItem('auth_expires_at');
         localStorage.removeItem('auth_user_id');
 
@@ -84,11 +87,11 @@ export class AuthService {
     }
 
     getUserInfo(): any | null {
-        return this.loggedIn() ? JSON.parse(localStorage.getItem('auth_user') || 'null') : null;
+        return this.loggedIn() ? JSON.parse(localStorage.getItem('auth_user_info') || 'null') : null;
     }
 
     hasRightToRegistrar(code: string): boolean {
-        return this.loggedIn() ? JSON.parse(localStorage.getItem('auth_user') || 'null')?.registrarRights?.includes(code) || this.isAdmin() : false;
+        return this.loggedIn() ? JSON.parse(localStorage.getItem('auth_user_info') || 'null')?.registrarRights?.includes(code) || this.isAdmin() : false;
     }
 
     public restoreSession(): void {

@@ -16,16 +16,15 @@ export class RegistrarsService {
             tap({
                 next: (data) => {
                     console.log('Archivers data received:', data);
-                    console.log(data.items);
                     let sortedItems = data.items.sort((a: any, b: any) => a.name.localeCompare(b.name));
                     this.archivers.set(sortedItems);
-                    console.log('Archivers loaded:', this.archivers());
+                    // console.log('Archivers loaded:', this.archivers());
                 },
                 error: (error) => {
                     console.error('Error loading archivers:', error);
                 },
                 complete: () => {
-                    console.log('Archivers loading complete');
+                    // console.log('Archivers loading complete');
                 },
             })
         );

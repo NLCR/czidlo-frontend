@@ -127,7 +127,7 @@ export class ImportRecordComponent {
                 console.error('Error fetching archiver IDs:', error);
             },
         });
-        this.usersService.getUserRights(this.authService.userInfo().id).subscribe({
+        this.usersService.getUserRights(this.authService.getUserId() || '').subscribe({
             next: (data) => {
                 this.assignedRegistars = data || [];
                 console.log('Assigned registrars:', this.assignedRegistars);
