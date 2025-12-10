@@ -1,12 +1,13 @@
 {
   "name": "czidlo-frontend",
-  "version": "0.0.0",
+  "version": "6.0",
   "scripts": {
     "ng": "ng",
     "prestart": "node scripts/bootstrap_file_environment-local-ts.js && node scripts/collect-build-info.js",
     "start": "ng serve",
     "prebuild": "node scripts/generate_file_env-json.js && node scripts/collect-build-info.js",
     "build": "ng build",
+    "build prod": "ng build --base-href /web/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

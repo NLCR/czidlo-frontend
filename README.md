@@ -48,12 +48,12 @@ docker build -t czidlo-frontend .
 
 possibly including version tag  
 ```
-docker build -t trinera/czidlo-frontend:0.0.0 .
+docker build -t trinera/czidlo-frontend:6.0 .
 ```
 
 or including version tag and tag `latest`
 ```
-docker build -t trinera/czidlo-frontend:latest -t trinera/czidlo-frontend:0.0.0 .
+docker build -t trinera/czidlo-frontend:latest -t trinera/czidlo-frontend:6.0 .
 ```
 
 ### Push to Dockerhub
@@ -62,7 +62,7 @@ Only if you have write access to Dockerhub repository trinera/czidlo-frontend.
 You don't need this to run localy built Docker image.
 
 ```
-docker push trinera/czidlo-frontend:0.0.0
+docker push trinera/czidlo-frontend:6.0
 docker push trinera/czidlo-frontend:latest
 ```
 
@@ -96,7 +96,7 @@ docker run -p 1234:80 \
   -e APP_DEV_MODE=false \
   -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/web-api/api \
   -e APP_CZIDLO_PUBLIC_API_URL=https://resolver.nkp.cz/api/v6 \  
-trinera/czidlo-frontend:0.0.0
+trinera/czidlo-frontend:6.0
 ```
 
 #### Image pulled from Docker Hub
