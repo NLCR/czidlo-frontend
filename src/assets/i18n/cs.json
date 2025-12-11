@@ -385,7 +385,10 @@
         "title": "název",
         "subtitle": "podnázev",
         "volumetitle": "název svazku",
+        "volume_title": "název svazku",
         "issuetitle": "název čísla",
+        "issue_title": "název čísla",
+        "other": "jiný identifikátor",
         "author": "autor",
         "corporation": "autor (korporace)",
         "event": "autor (akce)",
@@ -449,6 +452,7 @@
         "all-registrars": "Všichni registrátoři",
         "filter-by-registrar": "Filtrovat podle registrátora",
         "number": "č.",
-        "volume": "roč."
+        "volume": "roč.",
+        "ids": "Identifikátory"
     }
 }

@@ -449,6 +449,7 @@
         "all-registrars": "All registrars",
         "filter-by-registrar": "Filter by registrar",
         "number": "no.",
-        "volume": "vol."
+        "volume": "vol.",
+        "ids": "Identifiers"
     }
 }

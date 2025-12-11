@@ -55,7 +55,27 @@ export class SearchService {
             body.query.bool.must.push({
                 multi_match: {
                     query: term,
-                    fields: ['originatorvalue', 'otheroriginator', 'publisher'], 
+                    fields: ['originatorvalue', 'otheroriginator', 'publisher'],
+                    type: 'cross_fields',
+                    operator: 'and',
+                },
+            });
+        } else if (filter === 'titles') {
+            // 🔍 3) Hledání podle autora
+            body.query.bool.must.push({
+                multi_match: {
+                    query: term,
+                    fields: ['title', 'subtitle', 'volumetitle', 'issuetitle', 'sdtitle', 'sdvolumetitle', 'sdissuetitle'],
+                    type: 'cross_fields',
+                    operator: 'and',
+                },
+            });
+        } else if (filter === 'ids') {
+            // 🔍 3) Hledání podle autora
+            body.query.bool.must.push({
+                multi_match: {
+                    query: term,
+                    fields: ['issn', 'isbn', 'ccnb', 'otherid'],
                     type: 'cross_fields',
                     operator: 'and',
                 },
@@ -75,7 +95,11 @@ export class SearchService {
                         'sdvolumetitle',
                         'sdissuetitle',
                         'rsidvalues',
-                        'publisher'
+                        'publisher',
+                        'registrarcode',
+                        'issn',
+                        'isbn',
+                        'ccnb',
                     ],
                     type: 'cross_fields',
                     operator: 'and',

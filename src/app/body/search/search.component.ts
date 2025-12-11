@@ -138,6 +138,8 @@ export class SearchComponent implements AfterViewInit {
     selectedDiAccessRestrictionId = '';
     diAccessRestrictionsList: Array<{ value: string; label: string }> = [];
 
+    htmlHelpText: string = 'Aplikace umožňuje vyhledávat digitální dokumenty primárně podle názvových údajů (např. titul monografie, název periodika) nebo jejich částí, dále podle autora, registrátora a identifikátorů: čČNB - číslo české národní bibliografie (např. cnb000683872), ISSN, ISBN (např. 9788073210793), UUID, URN:NBN (např. urn:nbn:cz:nk-00027x)';
+
     constructor(
         public searchService: SearchService,
         private router: Router,
@@ -958,6 +960,7 @@ export class SearchComponent implements AfterViewInit {
                 'search.authors',
                 'search.titles',
                 'search.all-registrars',
+                'search.ids',
             ])
             .subscribe((t) => {
                 this.registrationMode = [
@@ -990,6 +993,7 @@ export class SearchComponent implements AfterViewInit {
                     { value: '', label: t['all'] },
                     { value: 'author', label: t['search.authors'] },
                     { value: 'titles', label: t['search.titles'] },
+                    { value: 'ids', label: t['search.ids'] },
                 ];
             });
     }
@@ -1088,4 +1092,5 @@ export class SearchComponent implements AfterViewInit {
     isDevMode() {
         return this.envService.get('devMode');
     }
+
 }
