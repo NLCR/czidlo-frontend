@@ -43,7 +43,7 @@ export class ProcessesService {
                                           1000
                                   ) + ' s'
                                 : '---',
-                        }))
+                        })).sort((a: any, b: any) => (a.id < b.id ? 1 : -1))
                     );
                     console.log('Processes loaded:', this.processes());
                 },

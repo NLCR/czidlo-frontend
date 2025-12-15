@@ -23,6 +23,7 @@ export class RegistrarsComponent {
     loadingArchivers = signal(false);
 
     loggedIn = computed(() => this.authService.loggedIn());
+    isAdmin = computed(() => this.authService.isAdmin());
 
     registrars = signal<Array<any>>([]);
     archivers = signal<Array<any>>([]);

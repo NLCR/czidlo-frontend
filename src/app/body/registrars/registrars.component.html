@@ -25,15 +25,17 @@
             </div>
             <div class="app-table app-table-registrars">
                 <!-- table header -->
-                <div class="app-row app-row-header">
+                <div class="app-row app-row-header app-row-registrars">
                     <div class="app-col app-col-name app-table-header-item">
                         {{ 'registrars.Name' | translate }}
                     </div>
-                    <div class="app-col app-col-code app-table-header-item">
-                        {{ 'registrars.Code' | translate }}
-                    </div>
-                    <div class="app-col app-col-actions app-col-reg-actions app-table-header-item">
-                        {{ 'registrars.Actions' | translate }}
+                    <div class="app-right">
+                        <div class="app-col app-col-code app-table-header-item">
+                            {{ 'registrars.Code' | translate }}
+                        </div>
+                        <div class="app-col app-col-actions app-col-reg-actions app-table-header-item" *ngIf="isAdmin()">
+                            {{ 'registrars.Actions' | translate }}
+                        </div>
                     </div>
                 </div>
                 <!-- no registrars -->
@@ -44,20 +46,22 @@
                 <div class="app-table-body">
                     <div
                         *ngFor="let registrar of registrars()"
-                        class="app-row app-table-row app-row-clicable"
+                        class="app-row app-table-row app-row-clicable app-row-registrars"
                         [ngClass]="{ 'app-row-active': activeRegistrar === registrar }"
                         (click)="openSidebar(registrar)"
                     >
                         <div class="app-col app-col-name">{{ registrar.name }}</div>
-                        <div class="app-col app-col-code">{{ registrar.code }}</div>
-                        <div class="app-col app-col-actions app-col-reg-actions">
-                            <app-button
-                                variant="tertiary"
-                                size="s"
-                                [icon]="true"
-                                iconLeft="trash-blue.svg"
-                                (click)="deleteRegistrar(registrar); $event.stopPropagation()"
-                            ></app-button>
+                        <div class="app-right">
+                            <div class="app-col app-col-code">{{ registrar.code }}</div>
+                            <div class="app-col app-col-actions app-col-reg-actions" *ngIf="isAdmin()">
+                                <app-button
+                                    variant="tertiary"
+                                    size="s"
+                                    [icon]="true"
+                                    iconLeft="trash-blue.svg"
+                                    (click)="deleteRegistrar(registrar); $event.stopPropagation()"
+                                ></app-button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -73,12 +77,12 @@
             </div>
             <div class="app-table app-table-archivers">
                 <!-- table header -->
-                <div class="app-row app-row-header">
+                <div class="app-row app-row-header app-row-archivers">
                     <div class="app-col app-col-name app-table-header-item">
                         {{ 'registrars.Name' | translate }}
                     </div>
-                    <div class="app-col app-col-actions app-table-header-item" *ngIf="loggedIn()">
-                        {{ 'registrars.actions' | translate }}
+                    <div class="app-col app-col-actions app-table-header-item" *ngIf="isAdmin()">
+                        {{ 'registrars.Actions' | translate }}
                     </div>
                 </div>
                 <!-- no archivers -->
@@ -89,16 +93,15 @@
                 <div class="app-table-body app-table-body-archivers">
                     <div
                         *ngFor="let archiver of archivers()"
-                        class="app-row app-table-row app-row-clicable"
+                        class="app-row app-table-row app-row-clicable app-row-archivers"
                         [ngClass]="{
-                            'app-row-hidden': archiver?.hidden === true && !loggedIn(),
+                            'app-row-hidden': archiver?.hidden === true && !isAdmin(),
                             'app-row-active': activeArchiver?.id?.toString() === archiver.id.toString(),
-                            'app-actions-invisible': !loggedIn()
+                            'app-actions-invisible': !isAdmin()
                         }"
                         (click)="openSidebar(archiver)"
                     >
                         <div class="app-col app-col-name">{{ archiver.name }}</div>
-                        <div class="app-col app-col-code">{{ archiver.code }}</div>
                         <div class="app-col app-col-actions" *ngIf="loggedIn()">
                             <app-button
                                 variant="tertiary"

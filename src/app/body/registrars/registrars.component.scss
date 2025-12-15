@@ -67,10 +67,16 @@
     align-items: center;
     height: 100%;
 }
-.app-table-row {
-    min-width: none;
-}
 .app-table-body {
     padding-bottom: 24px;
     width: 800px;
+}
+.app-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+}
+.app-row-registrars {
+    justify-content: space-between;
 }

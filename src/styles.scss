@@ -198,7 +198,8 @@ h4 {
         // align-self: stretch;
         overflow-x: hidden;
         overflow-y: auto; /* ⬅️ vertikální scroll */
-        &.app-table-body-users, &.app-table-body-definitions {
+        &.app-table-body-users,
+        &.app-table-body-definitions {
             width: 800px;
         }
     }
@@ -209,7 +210,6 @@ h4 {
         padding: 8px 24px;
         align-items: center;
         gap: 16px;
-        align-self: stretch;
         border-radius: 4px;
         border: 1px solid var(--Boarder-Primary-Default, #f6f7f9);
         background: var(--BG-Main-Light, #f6f7f9);
@@ -233,12 +233,14 @@ h4 {
             padding: 12px 24px;
             // width: fit-content;
             line-height: 16px;
-            align-self: stretch;
             background: var(--BG-Main-Contrast, #dfe5ec);
             border: none;
             app-button {
                 display: flex;
                 align-items: flex-start;
+            }
+            &:not(.app-row-processes) {
+                align-self: stretch;
             }
         }
         &.app-row-header-with-button {
@@ -298,8 +300,8 @@ h4 {
             }
         }
         &.app-col-actions {
-            width: 300px;
-            justify-content: flex-end;
+            width: 75px;
+            justify-content: flex-start;
         }
         &.app-col-actions-title {
             width: 290px;
@@ -314,15 +316,15 @@ h4 {
         }
         &.app-col-name {
             flex: 1 1 auto;
-            min-width: 250px;
-            max-width: 586px;
+            // min-width: 250px;
+            // max-width: 586px;
         }
         &.app-col-reg-actions {
             width: 32px;
             justify-content: flex-end;
         }
         &.app-col-code {
-            width: 100px;
+            width: 80px;
         }
         &.app-col-40px {
             width: 40px;
@@ -616,11 +618,13 @@ h4 {
             font-style: normal;
             font-weight: 500;
             line-height: 20px; /* 142.857% */
-            &.edit-completed, &.add-completed {
-                background-color: var(--States-available-BG-default, #DFF1C3);
+            &.edit-completed,
+            &.add-completed {
+                background-color: var(--States-available-BG-default, #dff1c3);
             }
-            &.edit-error, &.add-error {
-                background: var(--States-high-efford-BG-default, #FDE5E4);
+            &.edit-error,
+            &.add-error {
+                background: var(--States-high-efford-BG-default, #fde5e4);
             }
         }
     }
