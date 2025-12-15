@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 import { FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { switchMap, catchError, map } from 'rxjs/operators';
+import { switchMap, catchError, map, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
@@ -122,7 +122,7 @@ export class ProcessesComponent {
             // INSTANCES
             if (this.isActive === 'instances') {
                 if (this.processesService.processes().length === 0) {
-                    console.log('Loading processes...');
+                    console.log('Loading processes from server...');
                     this.loadProcesses();
                 } else {
                     this.processes.set(this.processesService.processes());
@@ -153,16 +153,19 @@ export class ProcessesComponent {
     }
 
     loadProcesses() {
+        this.loadingProcesses.set(true);
         this.processesService.getProcesses().subscribe({
             next: () => {
-                console.log('Processes loaded:', this.processesService.processes());
+                // console.log('Processes loaded:', this.processesService.processes());
                 this.processes.set(this.processesService.processes());
             },
             error: (error) => {
                 console.error('Error loading processes:', error);
+                this.loadingProcesses.set(false);
             },
             complete: () => {
-                console.log('Processes loading complete');
+                // console.log('Processes loading complete');
+                this.loadingProcesses.set(false);
             },
         });
     }
@@ -171,6 +174,24 @@ export class ProcessesComponent {
         this.processesService
             .getProcess(id)
             .pipe(
+                tap((data) => {
+                    console.log('Process data received for', id, ':', data);
+                    data.id = data.id;
+                    data.type = data.type;
+                    data.ownerLogin = data.ownerLogin;
+                    data.state = data.state;
+                    data.duration = data.finished
+                        ? (() => {
+                              const start = new Date(data.started.replace(/\[UTC\]$/, '')).getTime();
+                              const end = new Date(data.finished.replace(/\[UTC\]$/, '')).getTime();
+                              const diffSec = Math.round((end - start) / 1000);
+                              return diffSec;
+                          })()
+                        : '---';
+                    data.scheduled = data.scheduled ? new Date(data.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
+                    data.started = data.started ? new Date(data.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
+                    data.finished = data.finished ? new Date(data.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
+                }),
                 switchMap((data) =>
                     this.processesService.getLog(id).pipe(
                         map((logData) => ({ ...data, log: logData })),
@@ -182,7 +203,7 @@ export class ProcessesComponent {
                 next: (combinedData) => {
                     console.log('Process + log loaded:', combinedData);
                     this.activeProcess = combinedData;
-                    console.log('Current processes:', this.processes());
+                    // console.log('Current processes:', this.processes());
                     this.isSidebarOpen.set(true);
                 },
                 error: (error) => {
@@ -196,14 +217,14 @@ export class ProcessesComponent {
             next: (response) => {
                 // Název souboru z hlavičky
                 const contentDisposition = response.headers.get('content-disposition');
-                let filename = 'download';
+                console.log(contentDisposition);
+                let filename = '';
 
                 if (contentDisposition) {
                     const match = contentDisposition.match(/filename="?([^"]+)"?/);
-                    if (match) filename = match[1];
+                    if (match) filename = 'process_' + id + '_' + match[1];
                 }
 
-                // Blob a odkaz pro stažení
                 const blob = new Blob([response.body!], { type: response.body!.type || 'application/octet-stream' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -212,12 +233,13 @@ export class ProcessesComponent {
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
+                URL.revokeObjectURL(url);
 
                 console.log(`File downloaded: ${filename}`);
             },
             error: (err) => {
                 console.error('Error downloading file:', err);
+                this._snackBar.open(this.translate.instant('messages.error-downloading-file') + ': ' + err.error.message, 'OK');
             },
         });
     }
@@ -236,12 +258,23 @@ export class ProcessesComponent {
 
     downloadLog(process: any) {
         console.log('Downloading process log:', process);
-        const jsonStr = JSON.stringify(process, null, 2);
-        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const logText = process.log ?? process.logError ?? 'No log available';
+        const blob = new Blob([logText], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
 
-        // otevře v novém okně
-        window.open(url, '_blank');
+        // Jméno souboru – např. process_430_log.txt
+        const filename = `process_${process.id || 'id'}_log.txt`;
+
+        // Vytvoření <a> elementu
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+
+        // Klik pro stažení
+        a.click();
+
+        // Uvolnění URL
+        URL.revokeObjectURL(url);
     }
 
     copyLog(process: any) {
@@ -569,5 +602,21 @@ export class ProcessesComponent {
     }
     toggleIncludeCount() {
         this.selectedIncludeCount = !this.selectedIncludeCount;
+    }
+
+    formatDuration(seconds: number): string {
+        if (seconds < 60) {
+            return `${seconds} s`;
+        }
+
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+
+        if (h > 0) {
+            return `${h} h ${m} min ${s} s`;
+        } else {
+            return `${m} min ${s} s`;
+        }
     }
 }

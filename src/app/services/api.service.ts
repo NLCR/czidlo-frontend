@@ -1,7 +1,7 @@
 import { Injectable, signal, effect } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError, delay, tap } from 'rxjs/operators';
-import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { EnvironmentService } from './environment.service';
 import { LanguageService } from './language.service';
 
@@ -52,7 +52,37 @@ export class ApiService {
                 responseType: 'blob',
                 observe: 'response',
             })
-            .pipe(catchError(this.handleError));
+            .pipe(
+                catchError((error: HttpErrorResponse) => {
+                    // Pokud je chyba JSON uložený jako Blob, musíme ho přečíst
+                    if (error.error instanceof Blob && error.error.type === 'application/json') {
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                                try {
+                                    const errorJson = JSON.parse(reader.result as string);
+                                    console.error('Server error:', errorJson);
+
+                                    reject(
+                                        new HttpErrorResponse({
+                                            error: errorJson,
+                                            status: error.status,
+                                            statusText: error.statusText,
+                                            // url: error.url
+                                        })
+                                    );
+                                } catch (e) {
+                                    reject(error);
+                                }
+                            };
+                            reader.onerror = () => reject(error);
+                            reader.readAsText(error.error);
+                        });
+                    }
+
+                    return throwError(() => error);
+                })
+            ) as any;
     }
     downloadLogFile(url: string) {
         this.http.get(url, { responseType: 'blob' }).subscribe((blob) => {

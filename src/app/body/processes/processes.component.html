@@ -30,25 +30,25 @@
                         {{ 'ID' | translate }}
                     </div>
                     <div class="app-col app-table-header-item app-col-process-type">
-                        {{ 'processes.type' | translate }}
+                        {{ 'processes.Type' | translate }}
                     </div>
                     <div class="app-col app-col-180px app-table-header-item">
-                        {{ 'processes.ownerLogin' | translate }}
+                        {{ 'processes.OwnerLogin' | translate }}
                     </div>
                     <div class="app-col app-col-100px app-table-header-item">
-                        {{ 'processes.state' | translate }}
+                        {{ 'processes.State' | translate }}
                     </div>
                     <div class="app-col app-col-120px app-table-header-item">
-                        {{ 'processes.scheduled' | translate }}
+                        {{ 'processes.Scheduled' | translate }}
                     </div>
                     <div class="app-col app-col-120px app-table-header-item">
-                        {{ 'processes.started' | translate }}
+                        {{ 'processes.Started' | translate }}
                     </div>
                     <div class="app-col app-col-120px app-table-header-item">
-                        {{ 'processes.finished' | translate }}
+                        {{ 'processes.Finished' | translate }}
                     </div>
                     <div class="app-col app-col-120px app-table-header-item">
-                        {{ 'processes.duration' | translate }}
+                        {{ 'processes.Duration' | translate }}
                     </div>
                     <div class="app-col app-col-72px app-table-header-item">
                         {{ 'actions' | translate }}
@@ -57,7 +57,10 @@
                 <div class="no-processes" *ngIf="!loadingProcesses() && processes().length === 0">
                     {{ 'processes.no-processes' | translate }}
                 </div>
-                <div class="app-table-body">
+                <div class="app-loading" *ngIf="loadingProcesses()">
+                    <mat-spinner diameter="40"></mat-spinner>
+                </div>
+                <div class="app-table-body" *ngIf="!loadingProcesses()">
                     <div
                         *ngFor="let process of processes()"
                         class="app-row app-table-row app-row-clicable"
@@ -88,7 +91,7 @@
                             {{ process.finished }}
                         </div>
                         <div class="app-col app-col-120px app-table-item">
-                            {{ process.duration }}
+                            {{ formatDuration(process.duration) }}
                         </div>
                         <div class="app-col app-col-72px app-table-item">
                             <app-button
@@ -103,6 +106,7 @@
                                 size="s"
                                 [icon]="true"
                                 iconLeft="download-blue.svg"
+                                [matTooltip]="'buttons.download-output' | translate"
                                 (click)="downloadProcessOutput(process.id); $event.stopPropagation()"
                             ></app-button>
                             <app-button
@@ -117,6 +121,7 @@
                                 size="s"
                                 [icon]="true"
                                 iconLeft="trash-blue.svg"
+                                [matTooltip]="'buttons.delete-process' | translate"
                                 (click)="deleteProcess(process); $event.stopPropagation()"
                             ></app-button>
                             <app-button
@@ -146,7 +151,7 @@
             <div class="app-table app-table-definitions">
                 <div class="app-row app-row-header app-row-non-clicable app-row-definition">
                     <div class="app-col app-table-header-item">
-                        {{ 'processes.title' | translate }}
+                        {{ 'processes.Title' | translate }}
                     </div>
                     <div class="app-col app-table-header-item app-col-def-actions">
                         {{ 'actions' | translate }}
@@ -205,11 +210,45 @@
         </div>
 
         <div class="app-sidebar-content">
-            <pre class="app-sidebar-content-item" *ngIf="activeProcess">{{ activeProcess | json }}</pre>
-            <div class="app-sidebar-content-item" *ngIf="activeProcess?.log">{{ activeProcess.log | json }}</div>
+            <div class="app-sections">
+                <div class="app-section">
+                    <div class="app-items">
+                        <!-- <div class="app-item">
+                            <span class="app-item-label">{{ 'id' | translate }}:</span>
+                            <span class="app-item-value">{{ activeProcess?.id }}</span>
+                        </div> -->
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'processes.ownerLogin' | translate }}:</span>
+                            <span class="app-item-value">{{ activeProcess?.ownerLogin }}</span>
+                        </div>
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'processes.state' | translate }}:</span>
+                            <span class="app-item-value">{{ activeProcess?.state }}</span>
+                        </div>
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'processes.scheduled' | translate }}:</span>
+                            <span class="app-item-value">{{ activeProcess?.scheduled }}</span>
+                        </div>
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'processes.started' | translate }}:</span>
+                            <span class="app-item-value">{{ activeProcess?.started }}</span>
+                        </div>
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'processes.finished' | translate }}:</span>
+                            <span class="app-item-value">{{ activeProcess?.finished }}</span>
+                        </div>
+                        <div class="app-item">
+                            <span class="app-item-label">{{ 'processes.duration' | translate }}:</span>
+                            <span class="app-item-value">{{ formatDuration(activeProcess?.duration) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <pre class="app-sidebar-content-item" *ngIf="activeProcess">{{ activeProcess | json }}</pre> -->
+            <pre class="app-sidebar-content-item app-sidebar-log-content" *ngIf="activeProcess?.log">{{ activeProcess.log }}</pre>
             <div class="app-sidebar-content-item" *ngIf="activeProcess?.logError">
                 <div class="app-base-input-hint app-base-input-error">
-                    error: {{ activeProcess.logError | translate }} ({{ displayLogError(activeProcess) | translate }})
+                    {{ activeProcess.logError?.error | translate }} ({{ displayLogError(activeProcess) | translate }})
                 </div>
             </div>
         </div>
@@ -217,14 +256,17 @@
         <div class="app-sidebar-footer">
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
-                    <span>{{ 'buttons.cancel' | translate }}</span>
+                    <span>{{ 'buttons.close' | translate }}</span>
                 </app-button>
                 <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadLog(activeProcess)">
-                    <span>{{ 'buttons.download' | translate }}</span>
+                    <span>{{ 'buttons.download-log' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyLog(activeProcess)">
-                    <span>{{ 'buttons.copy' | translate }}</span>
+                <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadProcessOutput(activeProcess.id)">
+                    <span>{{ 'buttons.download-output' | translate }}</span>
                 </app-button>
+                <!-- <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyLog(activeProcess)">
+                    <span>{{ 'buttons.copy-log' | translate }}</span>
+                </app-button> -->
             </div>
         </div>
     </div>

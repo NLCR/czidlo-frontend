@@ -28,22 +28,25 @@ export class ProcessesService {
                 next: (data) => {
                     console.log('Processes data received:', data);
                     this.processes.set(
-                        data.items.map((item: any) => ({
-                            id: item.id,
-                            type: item.type,
-                            ownerLogin: item.ownerLogin,
-                            state: item.state,
-                            scheduled: item.scheduled ? new Date(item.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                            started: item.started ? new Date(item.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                            finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                            duration: item.finished
-                                ? Math.round(
-                                      (new Date(item.finished.replace(/\[UTC\]$/, '')).getTime() -
-                                          new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) /
-                                          1000
-                                  ) + ' s'
-                                : '---',
-                        })).sort((a: any, b: any) => (a.id < b.id ? 1 : -1))
+                        data.items
+                            .map((item: any) => ({
+                                id: item.id,
+                                type: item.type,
+                                ownerLogin: item.ownerLogin,
+                                state: item.state,
+                                scheduled: item.scheduled ? new Date(item.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                                started: item.started ? new Date(item.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                                finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                                duration: item.finished
+                                    ? (() => {
+                                          const start = new Date(item.started.replace(/\[UTC\]$/, '')).getTime();
+                                          const end = new Date(item.finished.replace(/\[UTC\]$/, '')).getTime();
+                                          const diffSec = Math.round((end - start) / 1000);
+                                          return diffSec;
+                                      })()
+                                    : '---',
+                            }))
+                            .sort((a: any, b: any) => (a.id < b.id ? 1 : -1))
                     );
                     console.log('Processes loaded:', this.processes());
                 },
