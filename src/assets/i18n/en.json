@@ -44,6 +44,7 @@
         "Password": "Password",
         "Email": "EEmail",
         "Admin": "Administrator",
+        "no-users": "No users",
         "hints": {
             "username": "Enter username.",
             "username-hint": "Length 5–15 characters. Allowed uppercase and lowercase letters, numbers, characters (underscore_ and hyphen -).",

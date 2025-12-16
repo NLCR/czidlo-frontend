@@ -19,9 +19,13 @@
                     {{ 'users.list-of-users' | translate }}
                     <app-button size="s" [icon]="true" iconLeft="add.png" (click)="openAddUserDialog()"></app-button>
                 </div>
-                <div class="app-col app-col-actions app-col-actions-title">
+                <div class="app-col app-col-actions-users app-col-actions-title">
                     <div>{{ 'actions' | translate }}</div>
                 </div>
+            </div>
+            <div class="app-no-users" *ngIf="users().length === 0 && !loadingUsers()">{{ 'users.no-users' | translate }}</div>
+            <div class="app-loading" *ngIf="loadingUsers()" >
+                <mat-spinner diameter="40"></mat-spinner>
             </div>
             <div class="app-table-body app-table-body-users">
                 <div
@@ -31,7 +35,7 @@
                     (click)="openSidebar(user)"
                 >
                     <div class="app-col app-col-user">{{ user?.login }}</div>
-                    <div class="app-col app-col-actions">
+                    <div class="app-col app-col-actions-users">
                         <app-button size="s" variant="tertiary" iconRight="setting.png" (click)="openRightsSidebar(user); $event.stopPropagation()">
                             {{ 'buttons.rights' | translate }}
                         </app-button>
@@ -136,11 +140,7 @@
                     <div class="app-items app-registrars-items" *ngIf="enrichedCurrentRegistrars().length > 0">
                         <div class="app-item app-registrar-item" *ngFor="let item of enrichedCurrentRegistrars()">
                             <span class="app-item-value">{{ item.code }} - {{ item.name }}</span>
-                            <app-button
-                                size="xs"
-                                variant="tertiary"
-                                (click)="removeCurrentRegistrar(item)"
-                            >
+                            <app-button size="xs" variant="tertiary" (click)="removeCurrentRegistrar(item)">
                                 {{ 'buttons.remove-rights' | translate }}
                             </app-button>
                         </div>
@@ -191,7 +191,12 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" (click)="addSelectedRegistrars()" [disabled]="!registrarsControl.value || registrarsControl.value.length === 0">
+                <app-button
+                    variant="primary"
+                    size="l"
+                    (click)="addSelectedRegistrars()"
+                    [disabled]="!registrarsControl.value || registrarsControl.value.length === 0"
+                >
                     {{ 'buttons.add' | translate }}
                 </app-button>
             </div>

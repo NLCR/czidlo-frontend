@@ -44,6 +44,7 @@
         "Password": "Heslo",
         "Email": "E-mail",
         "Admin": "Administrátor",
+        "no-users": "Žádní uživatelé",
         "hints": {
             "username": "Zadejte uživatelské jméno.",
             "username-hint": "Délka 5–15 znaků. Povolená velká a malá písmena, čísla, znaky (podtržení_ a pomlčka -).",

@@ -22,6 +22,7 @@ import { catchError } from 'rxjs/operators';
 export class UsersComponent {
     loggedIn = computed(() => this.authService.loggedIn());
     isAdmin = computed(() => this.authService.isAdmin());
+    loadingUsers = signal<boolean>(false);
 
     users = signal<Array<any>>([]);
     activeUser: any = null;
@@ -70,17 +71,21 @@ export class UsersComponent {
     }
 
     loadUsers() {
+        this.loadingUsers.set(true);
         console.log('Loading users...');
         if (!this.isAdmin()) {
             console.warn('User is not an administrator. Cannot load users.');
+            this.loadingUsers.set(false);
             return;
         }
         this.usersService.getUsers().subscribe({
             next: (response) => {
                 this.users.set(this.usersService.users());
+                this.loadingUsers.set(false);
             },
             error: (error) => {
                 console.error('Error loading users:', error);
+                this.loadingUsers.set(false);
             },
         });
     }
