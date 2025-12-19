@@ -392,7 +392,11 @@
         "assignments-title": "Souhrnné statistiky přiřazení URN:NBN",
         "resolvations-title": "Souhrnné statistiky resolvování URN:NBN",
         "all-years": "Všechny roky",
-        "all-registrars": "Všichni registrátoři"
+        "all-registrars": "Všichni registrátoři",
+        "registrar-name": "Název registrátora",
+        "registrar-code": "Kód",
+        "count": "Počet",
+        "all-types": "Všechny typy"
     },
     "search": {
         "true": "ano",

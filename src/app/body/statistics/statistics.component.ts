@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StatisticsService } from '../../services/statistics.service';
+import { RegistrarsService } from '../../services/registrars.service';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -12,6 +13,9 @@ import { map } from 'rxjs/operators';
 })
 export class StatisticsComponent {
     isActive = 'registered';
+
+    states = ['all', 'active', 'inactive'];
+    selectedState = signal<string>('all');
 
     chartDataByDate = signal<Array<{ name: string; value: number }>>([]);
     chartDataByRegistrar = signal<any[]>([]);
@@ -25,12 +29,19 @@ export class StatisticsComponent {
     selectedRegistrar = signal<string | null>(null);
 
     colorScheme: any = {
-        domain: ['#0080a8', '#00bcd4', '#4dd0e1'],
+        domain: ['#0080a8', '#00bcd4', '#4dd0e1', '#b2ebf2', '#e0f7fa'],
     };
 
-    constructor(private router: Router, private route: ActivatedRoute, private statisticsService: StatisticsService) {}
+    constructor(private router: Router, private route: ActivatedRoute, private statisticsService: StatisticsService, private registrarsService: RegistrarsService) {}
 
     ngOnInit() {
+        console.log('statistics init');
+        this.registrarsService.getRegistrars().subscribe(
+            () => {},
+            (error) => {
+                console.error('Error loading registrars in statistics component:', error);
+            }
+        );
         const url$ = this.route.url.pipe(
             map((url) => {
                 if (url.length > 1) {
@@ -46,6 +57,7 @@ export class StatisticsComponent {
             map((params) => ({
                 year: params['year'] || null,
                 registrar: params['registrar'] || null,
+                state: params['state'] || 'all',
             }))
         );
 
@@ -55,42 +67,50 @@ export class StatisticsComponent {
 
             this.selectedYear.set(filters.year);
             this.selectedRegistrar.set(filters.registrar);
+            this.selectedState.set(filters.state);
 
             this.reloadData(filters.year, filters.registrar);
         });
+
+        // FOR TESTING PURPOSES ONLY
+        this.statisticsService.getRecords().subscribe((data) => {
+            console.log('Records loaded:', data);
+        });
     }
 
-    private reloadData(year: string | null, registrar: string | null) {
+    private reloadData(year: string | null, registrar: string | null, state?: string) {
         const y = year || undefined;
         const r = registrar || undefined;
+        const s = state || this.selectedState();
 
         if (this.isActive === 'assignments') {
-            this.loadRegisteredData(r, y);
+            this.loadRegisteredData(r, y, s);
         } else if (this.isActive === 'resolvations') {
             this.loadResolvedData(r, y);
         }
     }
 
-    private loadRegisteredData(r?: string, y?: string) {
-        this.statisticsService.getCountByDate(r, y).subscribe((data) => {
+    private loadRegisteredData(r?: string, y?: string, s?: string) {
+        this.statisticsService.getCountByDate(r, y, s).subscribe((data) => {
             // console.table(data);
             this.chartDataByDate.set(data);
         });
 
-        this.statisticsService.getCountByRegistrar(y).subscribe((data) => {
+        this.statisticsService.getCountByRegistrar(y, s).subscribe((data) => {
             // console.table(data);
             this.chartDataByRegistrar.set(data);
         });
 
-        if (r) {
+        // if (r) {
             this.statisticsService.getCountByEntityTypes(r, y).subscribe((data) => {
                 // console.table(data);
                 this.chartDataByEntityTypes.set(data);
             });
-        } else {
-            this.chartDataByEntityTypes.set([]);
-        }
+        // } else {
+        //     this.chartDataByEntityTypes.set([]);
+        // }
     }
+
     private loadResolvedData(r?: string, y?: string) {
         this.statisticsService.getResolvedByDate(r, y).subscribe((data) => {
             // console.table(data);
@@ -146,6 +166,16 @@ export class StatisticsComponent {
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: { registrar: null },
+            queryParamsHandling: 'merge',
+        });
+    }
+
+    onStateChange(newState: string) {
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {
+                state: newState,
+            },
             queryParamsHandling: 'merge',
         });
     }

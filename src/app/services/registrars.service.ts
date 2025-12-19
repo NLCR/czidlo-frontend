@@ -3,6 +3,7 @@ import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
+
 @Injectable({ providedIn: 'root' })
 export class RegistrarsService {
     public registrars = signal<Array<any>>([]);

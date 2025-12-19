@@ -1,14 +1,22 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { tap, map, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
+import { RegistrarsService } from '../services/registrars.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { combineLatest } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class StatisticsService {
-    constructor(private apiService: ApiService) {}
+    registrars = computed(() => this.registrarsService.registrars());
+    registrars$: Observable<Array<any>>;
+
+    constructor(private apiService: ApiService, private registrarsService: RegistrarsService) {
+        this.registrars$ = toObservable(this.registrarsService.registrars);
+    }
 
     // REGISTRACE URNNBN PODLE ROKU
-    getCountByDate(registrar?: any, year?: any): Observable<any> {
+    getCountByDate(registrar?: any, year?: any, state?: string): Observable<any> {
         const filters: any[] = [];
 
         // pokud je filtr registrar
@@ -28,6 +36,16 @@ export class StatisticsService {
                         gte: `${year}-01-01`,
                         lt: `${year}-12-31`,
                     },
+                },
+            });
+        }
+
+        // pokud je filtrován stav
+        if (state && state !== 'all') {
+            const isActive = state === 'active';
+            filters.push({
+                term: {
+                    active: isActive,
                 },
             });
         }
@@ -73,7 +91,7 @@ export class StatisticsService {
     }
 
     // REGISTRACE URNNBN PODLE REGISTRÁTORŮ
-    getCountByRegistrar(year?: string): Observable<any> {
+    getCountByRegistrar(year?: string, state?: string): Observable<any> {
         const query: any = {
             bool: {
                 filter: [], // efektivnější než must
@@ -91,6 +109,15 @@ export class StatisticsService {
                 },
             });
         }
+        // pokud je filtrován stav
+        if (state && state !== 'all') {
+            const isActive = state === 'active';
+            query.bool.filter.push({
+                term: {
+                    active: isActive,
+                },
+            });
+        }
 
         const body: any = {
             size: 0,
@@ -105,33 +132,43 @@ export class StatisticsService {
         };
 
         // query přidáme jen pokud existuje filtr (rok)
-        if (year) {
+        if (year || (state && state !== 'all')) {
             body.query = query;
         }
 
-        return this.apiService.getStatisticsDataAssign(body).pipe(
-            map((res: any) =>
-                res.aggregations.registrar_codes.buckets.map((b: any) => ({
-                    name: b.key,
-                    value: b.doc_count,
-                }))
+
+        return combineLatest([this.registrars$, this.apiService.getStatisticsDataAssign(body)]).pipe(
+            map(([registrars, res]) =>
+                res.aggregations.registrar_codes.buckets.map((b: any) => {
+                    const r = registrars.find((reg) => reg.code === b.key);
+                    return {
+                        name: b.key,
+                        title: r ? r.name : b.key,
+                        value: b.doc_count,
+                    };
+                })
             )
         );
     }
 
     // REGISTRACE URNNBN PODLE TYPŮ V ZADANÉM ROCE A PRO ZADANÉHO REGISTRÁTORA
-    getCountByEntityTypes(registrar: string, year?: string): Observable<any> {
+    getCountByEntityTypes(registrar?: string, year?: string): Observable<any> {
+
         const query: any = {
             bool: {
                 must: [
-                    {
-                        term: {
-                            'registrarcode.keyword': registrar,
-                        },
-                    },
                 ],
             },
         };
+
+        // Pokud je zadaný registrátor → přidáme term filtr
+        if (registrar) {
+            query.bool.must.push({
+                term: {
+                    'registrarcode.keyword': registrar,
+                },
+            });
+        }
 
         // Pokud je zadaný rok → přidáme range filtr
         if (year) {
@@ -281,5 +318,16 @@ export class StatisticsService {
                 }));
             })
         );
+    }
+
+    // FOR TESTING PURPOSES ONLY
+    getRecords(): Observable<any> {
+        let body: any = {
+            size: 100,
+            query: {
+                match_all: {},
+            },
+        };
+        return this.apiService.getStatisticsDataAssign(body);
     }
 }

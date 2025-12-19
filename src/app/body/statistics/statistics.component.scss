@@ -69,6 +69,11 @@
                 flex-direction: column;
                 gap: 24px;
                 overflow: auto;
+                .app-chart-wrapper {
+                    display: flex;
+                    gap: 24px;
+                    overflow: auto;
+                }
                 .app-chart {
                     display: flex;
                     flex-direction: column;
@@ -82,6 +87,43 @@
                             align-items: center;
                             gap: 16px;
                             margin-bottom: 8px;
+                            .app-chart-header-title {
+                                /* Typesettings/M/Medium */
+                                font-family: 'IBM Plex Sans';
+                                font-size: 20px;
+                                font-style: normal;
+                                font-weight: 500;
+                                line-height: 24px; /* 150% */
+                            }
+                        }
+                    }
+                    .app-chart-table {
+                        width: 400px;
+                        font-size: 12px;
+                        margin-bottom: 40px;
+                        .app-chart-row {
+                            display: flex;
+                            justify-content: space-between;
+                            padding: 4px 16px;
+                            background-color: white;
+                            border-bottom: 1px solid var(--Border-Strong, #dfe3e6);
+                            &.app-header-row {
+                                font-weight: 600;
+                                border-bottom: 1px solid var(--Border-Strong, #dfe3e6);
+                            }
+                            .app-chart-col {
+                                display: flex;
+                                .app-col-registrar-code {
+                                    width: 65px;
+                                }
+                                .app-col-registrar-name {
+                                    flex: 1;
+                                }
+                                .app-col-count {
+                                    width: 100px;
+                                    text-align: right;
+                                }
+                            }
                         }
                     }
                 }
