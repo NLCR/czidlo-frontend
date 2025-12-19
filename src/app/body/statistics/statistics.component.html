@@ -17,7 +17,7 @@
             </div>
             <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedState" (valueChange)="onStateChange($event)">
                 @for (state of states; track state) {
-                <app-radio-button label="{{ 'processes.' + state | translate }}" value="{{ state }}"></app-radio-button>
+                <app-radio-button label="{{ 'statistics.' + state | translate }}" value="{{ state }}"></app-radio-button>
                 }
             </app-radio-group>
             <div class="app-content">

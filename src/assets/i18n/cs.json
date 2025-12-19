@@ -396,7 +396,10 @@
         "registrar-name": "Název registrátora",
         "registrar-code": "Kód",
         "count": "Počet",
-        "all-types": "Všechny typy"
+        "all-types": "Všechny typy",
+        "all": "Vše",
+        "active": "Aktivní",
+        "inactive": "Deaktivované"
     },
     "search": {
         "true": "ano",

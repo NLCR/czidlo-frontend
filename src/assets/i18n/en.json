@@ -391,7 +391,14 @@
         "assignments-title": "Summary statistics of URN:NBN assignments",
         "resolvations-title": "Summary statistics of URN:NBN resolvations",
         "all-years": "All years",
-        "all-registrars": "All registrars"
+        "all-registrars": "All registrars",
+        "registrar-name": "Registrar name",
+        "registrar-code": "Code",
+        "count": "Count",
+        "all-types": "All types",
+        "all": "All",
+        "active": "Active",
+        "inactive": "Deactivated"
     },
     "search": {
         "true": "yes",
