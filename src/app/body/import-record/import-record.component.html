@@ -564,9 +564,9 @@
         </div>
 
         <!-- FOOTER -->
-        <div class="app-sidebar-footer" [ngClass]="{ 'progress-bar-visible': importRecordSnackBarVisible() }">
-            <div class="app-progress-bar" *ngIf="importRecordSnackBarVisible()">
-                {{ 'messages.record-imported-successfully' | translate }}
+        <div class="app-sidebar-footer" [ngClass]="{ 'progress-bar-visible': progressBar().state }">
+            <div class="app-record-progress-bar" [ngClass]="progressBar().value" *ngIf="progressBar().state">
+                {{ 'messages.' + progressBar().value | translate }} {{ progressBar().error }}
             </div>
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">

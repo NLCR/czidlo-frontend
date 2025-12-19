@@ -26,6 +26,7 @@ export class ImportRecordComponent {
     selectedEntity: string = '';
 
     isSidebarOpen = signal(false);
+    progressBar = signal({ state: false, value: '', error: '' });
 
     // FORM CONTROLS
     // BASIC DETAILS
@@ -428,10 +429,16 @@ export class ImportRecordComponent {
     }
 
     importRecord() {
+        this.progressBar.set({ state: true, value: 'edit-running', error: '' });
         const record = this.buildRecordToImport();
         console.log(record.urnnbn);
         if (!record) {
             console.error('Record is invalid, cannot import.');
+            this.progressBar.set({ state: true, value: '', error: 'no-record' });
+            setTimeout(() => {
+                this.progressBar.set({ state: false, value: '', error: '' });
+                this.closeSidebar();
+            }, 1000);
             return;
         }
 
@@ -441,14 +448,19 @@ export class ImportRecordComponent {
                 //TODO: vyčistit formulář pro nové vkládání a nabídnout vytvořený přes odkaz v snackbaru
                 //přes přiřazené/potvrezené urnnbn v odpovědi
                 //(protože to nebude zaindexované úplně hned, tak proto ne hned router.navigate)
-                this.importRecordSnackBarVisible.set(true);
+                this.progressBar.set({ state: true, value: 'edit-completed', error: '' });
                 setTimeout(() => {
-                    this.importRecordSnackBarVisible.set(false);
-                }, 3000);
+                    this.progressBar.set({ state: false, value: '', error: '' });
+                    this.closeSidebar();
+                }, 1000);
             },
             error: (error) => {
                 //TODO: snackbar s chybou
                 console.error('Error importing record:', error);
+                this.progressBar.set({ state: true, value: 'edit-error', error: error.error.message });
+                setTimeout(() => {
+                    this.progressBar.set({ state: false, value: '', error: '' });
+                }, 10000);
             },
         });
     }
