@@ -38,11 +38,13 @@ export class AuthService {
                 },
             })
             .pipe(
-                tap((response) => {
+                tap((response: any) => {
                     console.log('login', response);
-                    let admin = response && (response as any).admin === true;
+                    let admin = response && response.admin === true;
                     this.loggedIn.set(true);
                     this.isAdmin.set(admin);
+                    this.userId.set(response.id);
+
 
                     // uložit credentialy
                     localStorage.setItem('auth_username', username);

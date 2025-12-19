@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, effect } from '@angular/core';
 import { FormControl, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { ImportRecordService } from '../../services/import-record.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -105,7 +105,17 @@ export class ImportRecordComponent {
         private authService: AuthService,
         private usersService: UsersService,
         private apiService: ApiService
-    ) {}
+    ) {
+        effect(() => {
+            const isLoggedIn = this.loggedIn();
+
+            if (isLoggedIn) {
+                this.loadRegistrarsAfterLogin();
+            } else {
+                this.resetRegistrars();
+            }
+        });
+    }
 
     ngOnInit(): void {
         this.translate
@@ -117,50 +127,6 @@ export class ImportRecordComponent {
                     { value: 'CORPORATION', label: translations['import.corporation'] },
                 ];
             });
-
-        this.registrarsService.getArchivers().subscribe({
-            next: (data) => {
-                this.archiverIdsList.set(this.registrarsService.archivers() || []);
-                console.log('Archiver IDs for selection:', this.archiverIdsList());
-            },
-            error: (error) => {
-                console.error('Error fetching archiver IDs:', error);
-            },
-        });
-        this.usersService.getUserRights(this.authService.getUserId() || '').subscribe({
-            next: (data) => {
-                this.assignedRegistars = data || [];
-                console.log('Assigned registrars:', this.assignedRegistars);
-                if (this.assignedRegistars.length > 0) {
-                    this.selectedRegistrar = this.assignedRegistars[0];
-                    this.registrarsService.getRegistrar(this.selectedRegistrar).subscribe({
-                        next: (registrarData) => {
-                            console.log('Selected registrar data:', registrarData);
-                            if (registrarData.allowedRegistrationModeByRegistrar) {
-                                this.registrationMode.push({ value: 'BY_REGISTRAR', label: this.translate.instant('import.by-registrar') });
-                            }
-                            if (registrarData.allowedRegistrationModeByReservation) {
-                                this.registrationMode.push({ value: 'BY_RESERVATION', label: this.translate.instant('import.by-reservation') });
-                            }
-                            if (registrarData.allowedRegistrationModeByResolver) {
-                                this.registrationMode.push({ value: 'BY_RESOLVER', label: this.translate.instant('import.by-resolver') });
-                            }
-                            if (this.registrationMode.length > 0) {
-                                this.selectedMode = this.registrationMode[0].value;
-                            } else {
-                                this.selectedMode = '';
-                            }
-                        },
-                        error: (error) => {
-                            console.error('Error fetching selected registrar data:', error);
-                        },
-                    });
-                }
-            },
-            error: (error) => {
-                console.error('Error fetching assigned registrars:', error);
-            },
-        });
 
         const controlsToWatch = [this.title, this.ccnb, this.isbn, this.issn];
         controlsToWatch.forEach((ctrl) => {
@@ -182,6 +148,75 @@ export class ImportRecordComponent {
         console.log('selected', this.selectedMode, this.selectedEntity, this.selectedMode);
     }
 
+    private loadRegistrarsAfterLogin() {
+        const userId = this.authService.getUserId();
+        if (!userId) {
+            console.error('User ID is null despite being logged in.');
+            return;
+        }
+
+        this.registrarsService.getArchivers().subscribe({
+            next: (data) => {
+                this.archiverIdsList.set(this.registrarsService.archivers() || []);
+            },
+            error: (error) => {
+                console.error('Error fetching archiver IDs:', error);
+            },
+        });
+
+        this.usersService.getUserRights(userId).subscribe({
+            next: (data) => {
+                this.assignedRegistars = data || [];
+                console.log('Assigned registrars:', this.assignedRegistars);
+
+                if (this.assignedRegistars.length > 0) {
+                    this.selectedRegistrar = this.assignedRegistars[0];
+                    this.loadRegistrarModes(this.selectedRegistrar);
+                }
+            },
+            error: (error) => {
+                console.error('Error fetching assigned registrars:', error);
+            },
+        });
+    }
+    private loadRegistrarModes(registrarCode: string) {
+        this.registrationMode = [];
+
+        this.registrarsService.getRegistrar(registrarCode).subscribe({
+            next: (registrarData) => {
+                if (registrarData.allowedRegistrationModeByRegistrar) {
+                    this.registrationMode.push({
+                        value: 'BY_REGISTRAR',
+                        label: this.translate.instant('import.by-registrar'),
+                    });
+                }
+                if (registrarData.allowedRegistrationModeByReservation) {
+                    this.registrationMode.push({
+                        value: 'BY_RESERVATION',
+                        label: this.translate.instant('import.by-reservation'),
+                    });
+                }
+                if (registrarData.allowedRegistrationModeByResolver) {
+                    this.registrationMode.push({
+                        value: 'BY_RESOLVER',
+                        label: this.translate.instant('import.by-resolver'),
+                    });
+                }
+
+                this.selectedMode = this.registrationMode[0]?.value ?? '';
+            },
+            error: (error) => {
+                console.error('Error fetching registrar data:', error);
+            },
+        });
+    }
+    private resetRegistrars() {
+        this.assignedRegistars = [];
+        this.selectedRegistrar = '';
+        this.registrationMode = [];
+        this.selectedMode = '';
+    }
+
     compareMode(a: string, b: string) {
         return a === b;
     }
@@ -197,7 +232,9 @@ export class ImportRecordComponent {
         // REGISTRAR AND MODE
         record.registrarCode = this.selectedRegistrar;
         record.registrationMode = this.selectedMode;
-        record.archiverId = this.selectedArchiverId;
+        if (this.selectedArchiverId) {
+            record.archiverId = this.selectedArchiverId;
+        }
 
         record.urnNbn = this.urnNbn.value;
 
@@ -355,10 +392,10 @@ export class ImportRecordComponent {
         }
         // RESOLUTION
         if (this.resolutionHorizontal.value) {
-            technicalMetadata.resolutionHorizontal = this.resolutionHorizontal.value;
+            technicalMetadata.resolutionHorizontal = Number(this.resolutionHorizontal.value);
         }
         if (this.resolutionVertical.value) {
-            technicalMetadata.resolutionVertical = this.resolutionVertical.value;
+            technicalMetadata.resolutionVertical = Number(this.resolutionVertical.value);
         }
         // COMPRESSION
         if (this.compression.value) {
