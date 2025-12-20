@@ -4,6 +4,17 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## Development
 
+### Prepare
+```shell
+#preferably use nvm to select proper version of node (and npm) from .nvmrc 
+#alternatively use another supported version of npm (see package.json engines)
+nvm use
+#use "npm clean install" or npm ci to update all dependences
+npm ci
+#or install libraries with "nvm install" (only if you're missing some dependencies)
+npm install
+```
+
 ### Run
 
 `npm run start`

@@ -1,6 +1,9 @@
 {
   "name": "czidlo-frontend",
   "version": "6.0",
+  "engines": {
+    "node": ">=20.11 <21"
+  },
   "scripts": {
     "ng": "ng",
     "prestart": "node scripts/bootstrap_file_environment-local-ts.js && node scripts/collect-build-info.js",
