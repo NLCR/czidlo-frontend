@@ -10,7 +10,7 @@ import { EnvironmentService } from './services/environment.service';
 export class AppComponent {
     title = 'czidlo-frontend';
 
-    constructor(private envService: EnvironmentService) {}
+    constructor(private envService: EnvironmentService) { }
 
     ngOnInit() {
         this.logDevInfo();
@@ -24,6 +24,7 @@ export class AppComponent {
             environmentName: this.envService.get('environmentName'),
 
             czidloApiServiceBaseUrl: this.envService.get('czidloApiServiceBaseUrl'),
+            czidloPublicApiBaseUrl: this.envService.get('czidloPublicApiBaseUrl'),
 
             pageInfoCzUrl: this.envService.get('pageInfoCzUrl'),
             pageRulesCzUrl: this.envService.get('pageRulesCzUrl'),
