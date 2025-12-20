@@ -69,16 +69,16 @@ export class ImportRecordComponent {
     formatValue = new FormControl<string>('image/jp2', [Validators.required]);
     formatVersion = new FormControl<string>('verze 1.0', [Validators.required]);
     extent = new FormControl<string>('');
-    resolutionHorizontal = new FormControl<number>(100, [this.positiveNumberValidator(), Validators.required]);
-    resolutionVertical = new FormControl<number>(100, [this.positiveNumberValidator(), Validators.required]);
+    resolutionHorizontal = new FormControl<number>(0, [this.positiveNumberValidator(), Validators.required]);
+    resolutionVertical = new FormControl<number>(0, [this.positiveNumberValidator(), Validators.required]);
     compression = new FormControl<string>('JPEG2000', Validators.required);
     // compressionRatio = new FormControl<string>('');
     // compressionValue = new FormControl<string>('');
     colorModel = new FormControl<string>('');
     colorDepth = new FormControl<string>('');
     iccProfile = new FormControl<string>('');
-    pictureSizeWidth = new FormControl<number>(100, [this.positiveNumberValidator(), Validators.required]);
-    pictureSizeHeight = new FormControl<number>(100, [this.positiveNumberValidator(), Validators.required]);
+    pictureSizeWidth = new FormControl<number>(0, [this.positiveNumberValidator(), Validators.required]);
+    pictureSizeHeight = new FormControl<number>(0, [this.positiveNumberValidator(), Validators.required]);
 
     // THESIS
     degreeAwardingInstitution = new FormControl<string>('');
@@ -326,7 +326,7 @@ export class ImportRecordComponent {
         let originator: any = {};
         // if (this.primaryOriginatorValue.valid && this.primaryOriginatorValue.value) {
         originator.type = this.selectedOriginatorType.toUpperCase() || 'AUTHOR';
-        originator.value = this.primaryOriginatorValue.value || '';
+        originator.value = this.primaryOriginatorValue.value || ' ';
         intelectualEntity.originator = originator;
         // }
         if (this.otherOriginator.value) {

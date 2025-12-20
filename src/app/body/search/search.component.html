@@ -410,6 +410,7 @@
                                     <div class="app-ie-field" *ngFor="let rsi of item.details?.registrarScopeIdentifiers">
                                         <div class="app-label">{{ rsi?.type }}:</div>
                                         <div class="app-value">{{ rsi?.value }}</div>
+                                        <div class="app-value-2">({{'search.created' | translate }} {{ rsi.created.split(['['])[0] | date }}, {{ 'search.modified' | translate }} {{ rsi.modified.split(['['])[0] | date }})</div>
                                     </div>
                                 </div>
                             </div>
