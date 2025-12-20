@@ -342,7 +342,7 @@ export class ImportRecordComponent {
             publication.publisher = this.publisher.value;
         }
         if (this.year.value) {
-            publication.year = this.year.value;
+            publication.year = Number(this.year.value);
         }
         if (Object.keys(publication).length > 0) {
             intelectualEntity.publication = publication;
