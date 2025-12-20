@@ -170,7 +170,10 @@
         "add-error": "Error adding record: ",
         "di-deactivated-successfully": "Digital instance was successfully deactivated.",
         "di-deactivate-error": "Error deactivating digital instance.",
-        "error-downloading-file": "Error downloading file"
+        "error-downloading-file": "Error downloading file",
+        "field-must-be-number": "Field must be a number",
+        "display-record": "Display record",
+        "import-completed": "Import completed."
     },
     "inputs": {
         "pick-start-date": "Pick from",
@@ -345,8 +348,8 @@
         "financed": "Financed",
         "contractNumber": "Contract number",
         "technicalMetadata": "Technical metadata",
-        "formatValue": "Format",
-        "formatVersion": "Format version",
+        "formatValue": "Format *",
+        "formatVersion": "Format version *",
         "extent": "Extent",
         "resolutionHorizontal": "Horizontal resolution",
         "resolutionVertical": "Vertical resolution",

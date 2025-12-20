@@ -15,8 +15,9 @@ import { ApiService } from '../../services/api.service';
     styleUrl: './import-record.component.scss',
 })
 export class ImportRecordComponent {
+    loadingRegistrars = signal(false);
     loggedIn = computed(() => this.authService.loggedIn());
-    assignedRegistars = [];
+    assignedRegistrars = [];
     selectedRegistrar: string = '';
     registrationMode: Array<{ value: string; label: string }> = [];
     selectedMode: string = '';
@@ -26,7 +27,7 @@ export class ImportRecordComponent {
     selectedEntity: string = '';
 
     isSidebarOpen = signal(false);
-    progressBar = signal({ state: false, value: '', error: '' });
+    progressBar = signal({ state: false, value: '', error: '', urnnbn: '' });
 
     // FORM CONTROLS
     // BASIC DETAILS
@@ -45,7 +46,7 @@ export class ImportRecordComponent {
     bornDigital: boolean = false;
 
     // ORIGINATORS
-    selectedOriginatorType: string = 'author';
+    selectedOriginatorType: string = 'AUTHOR';
     primaryOriginatorTypes: Array<{ value: string; label: string }> = [];
     primaryOriginatorValue = new FormControl<string>('', [Validators.required]);
     otherOriginator = new FormControl<string>('');
@@ -65,19 +66,19 @@ export class ImportRecordComponent {
     contractNumber = new FormControl<string>('');
 
     // TECHNICAL METADATA
-    formatValue = new FormControl<string>('');
-    formatVersion = new FormControl<string>('');
+    formatValue = new FormControl<string>('image/jp2', [Validators.required]);
+    formatVersion = new FormControl<string>('verze 1.0', [Validators.required]);
     extent = new FormControl<string>('');
-    resolutionHorizontal = new FormControl<string>('');
-    resolutionVertical = new FormControl<string>('');
-    compression = new FormControl<string>('');
+    resolutionHorizontal = new FormControl<number>(100, [this.positiveNumberValidator(), Validators.required]);
+    resolutionVertical = new FormControl<number>(100, [this.positiveNumberValidator(), Validators.required]);
+    compression = new FormControl<string>('JPEG2000', Validators.required);
     // compressionRatio = new FormControl<string>('');
     // compressionValue = new FormControl<string>('');
     colorModel = new FormControl<string>('');
     colorDepth = new FormControl<string>('');
     iccProfile = new FormControl<string>('');
-    pictureSizeWidth = new FormControl<string>('');
-    pictureSizeHeight = new FormControl<string>('');
+    pictureSizeWidth = new FormControl<number>(100, [this.positiveNumberValidator(), Validators.required]);
+    pictureSizeHeight = new FormControl<number>(100, [this.positiveNumberValidator(), Validators.required]);
 
     // THESIS
     degreeAwardingInstitution = new FormControl<string>('');
@@ -94,7 +95,6 @@ export class ImportRecordComponent {
     sourceDocumentPublisher = new FormControl<string>('');
     sourceDocumentYear = new FormControl<string>('');
 
-    importRecordSnackBarVisible = signal(false);
     isButtonDisabled = signal(true);
 
     constructor(
@@ -129,30 +129,43 @@ export class ImportRecordComponent {
                 ];
             });
 
-        const controlsToWatch = [this.title, this.ccnb, this.isbn, this.issn];
+        const controlsToWatch: FormControl[] = [
+            this.title,
+            this.ccnb,
+            this.isbn,
+            this.issn,
+            this.formatValue,
+            this.formatVersion,
+            this.resolutionHorizontal,
+            this.resolutionVertical,
+            this.pictureSizeWidth,
+            this.pictureSizeHeight
+        ];
         controlsToWatch.forEach((ctrl) => {
             ctrl.statusChanges.subscribe(() => {
-                this.updateButtonState();
+                this.importButtonState();
             });
             ctrl.valueChanges.subscribe(() => {
-                this.updateButtonState();
+                this.importButtonState();
             });
         });
 
         // inicializace při startu
-        this.updateButtonState();
+        this.importButtonState();
 
         this.intellectualEntitiesList.set(this.importRecordService.intellectualEntities() || []);
-        this.selectedRegistrar = this.assignedRegistars[0];
+        this.selectedRegistrar = this.assignedRegistrars[0];
         this.selectedEntity = this.intellectualEntitiesList()[0];
 
         console.log('selected', this.selectedMode, this.selectedEntity, this.selectedMode);
     }
 
     private loadRegistrarsAfterLogin() {
+        this.loadingRegistrars.set(true);
         const userId = this.authService.getUserId();
         if (!userId) {
             console.error('User ID is null despite being logged in.');
+            this.loadingRegistrars.set(false);
             return;
         }
 
@@ -167,16 +180,18 @@ export class ImportRecordComponent {
 
         this.usersService.getUserRights(userId).subscribe({
             next: (data) => {
-                this.assignedRegistars = data || [];
-                console.log('Assigned registrars:', this.assignedRegistars);
+                this.assignedRegistrars = data || [];
+                console.log('Assigned registrars:', this.assignedRegistrars);
 
-                if (this.assignedRegistars.length > 0) {
-                    this.selectedRegistrar = this.assignedRegistars[0];
+                if (this.assignedRegistrars.length > 0) {
+                    this.selectedRegistrar = this.assignedRegistrars[0];
                     this.loadRegistrarModes(this.selectedRegistrar);
                 }
+                this.loadingRegistrars.set(false);
             },
             error: (error) => {
                 console.error('Error fetching assigned registrars:', error);
+                this.loadingRegistrars.set(false);
             },
         });
     }
@@ -212,7 +227,7 @@ export class ImportRecordComponent {
         });
     }
     private resetRegistrars() {
-        this.assignedRegistars = [];
+        this.assignedRegistrars = [];
         this.selectedRegistrar = '';
         this.registrationMode = [];
         this.selectedMode = '';
@@ -236,11 +251,15 @@ export class ImportRecordComponent {
         if (this.selectedArchiverId) {
             record.archiverId = this.selectedArchiverId;
         }
-
-        record.urnNbn = this.urnNbn.value;
+        if (record.urnNbn) {
+            record.urnNbn = this.urnNbn.value;
+        }
 
         // INTELECTUAL ENTITY
         let intelectualEntity: any = {};
+
+        intelectualEntity.id = 0; // nová IE
+        intelectualEntity.entityType = this.selectedEntity;
 
         if (this.documentType.value) {
             intelectualEntity.documentType = this.documentType.value;
@@ -305,11 +324,11 @@ export class ImportRecordComponent {
 
         // ORIGINATORS
         let originator: any = {};
-        if (this.primaryOriginatorValue.valid && this.primaryOriginatorValue.value) {
-            originator.type = this.selectedOriginatorType;
-            originator.value = this.primaryOriginatorValue.value;
-            intelectualEntity.originator = originator;
-        }
+        // if (this.primaryOriginatorValue.valid && this.primaryOriginatorValue.value) {
+        originator.type = this.selectedOriginatorType.toUpperCase() || 'AUTHOR';
+        originator.value = this.primaryOriginatorValue.value || '';
+        intelectualEntity.originator = originator;
+        // }
         if (this.otherOriginator.value) {
             intelectualEntity.otherOriginator = this.otherOriginator.value;
         }
@@ -414,10 +433,10 @@ export class ImportRecordComponent {
         }
         // PICTURE SIZE
         if (this.pictureSizeWidth.value) {
-            technicalMetadata.pictureSizeWidth = this.pictureSizeWidth.value;
+            technicalMetadata.pictureWidth = Number(this.pictureSizeWidth.value);
         }
         if (this.pictureSizeHeight.value) {
-            technicalMetadata.pictureSizeHeight = this.pictureSizeHeight.value;
+            technicalMetadata.pictureHeight = Number(this.pictureSizeHeight.value);
         }
         if (Object.keys(technicalMetadata).length > 0) {
             record.digitalDocument = technicalMetadata;
@@ -429,14 +448,14 @@ export class ImportRecordComponent {
     }
 
     importRecord() {
-        this.progressBar.set({ state: true, value: 'edit-running', error: '' });
+        this.progressBar.set({ state: true, value: 'edit-running', error: '', urnnbn: '' });
         const record = this.buildRecordToImport();
-        console.log(record.urnnbn);
+        console.log('urnnbn', record.urnnbn);
         if (!record) {
             console.error('Record is invalid, cannot import.');
-            this.progressBar.set({ state: true, value: '', error: 'no-record' });
+            this.progressBar.set({ state: true, value: '', error: 'no-record', urnnbn: '' });
             setTimeout(() => {
-                this.progressBar.set({ state: false, value: '', error: '' });
+                this.progressBar.set({ state: false, value: '', error: '', urnnbn: '' });
                 this.closeSidebar();
             }, 1000);
             return;
@@ -448,18 +467,19 @@ export class ImportRecordComponent {
                 //TODO: vyčistit formulář pro nové vkládání a nabídnout vytvořený přes odkaz v snackbaru
                 //přes přiřazené/potvrezené urnnbn v odpovědi
                 //(protože to nebude zaindexované úplně hned, tak proto ne hned router.navigate)
-                this.progressBar.set({ state: true, value: 'edit-completed', error: '' });
+                let urnnbn = 'urn:nbn:cz:' + data.urnNbn.registrarCode + '-' + data.urnNbn.documentCode ;
+                this.progressBar.set({ state: true, value: 'import-completed', error: '', urnnbn: urnnbn });
                 setTimeout(() => {
-                    this.progressBar.set({ state: false, value: '', error: '' });
+                    this.progressBar.set({ state: false, value: '', error: '', urnnbn: '' });
                     this.closeSidebar();
-                }, 1000);
+                }, 100000);
             },
             error: (error) => {
                 //TODO: snackbar s chybou
                 console.error('Error importing record:', error);
-                this.progressBar.set({ state: true, value: 'edit-error', error: error.error.message });
+                this.progressBar.set({ state: true, value: 'edit-error', error: error.error.message, urnnbn: '' });
                 setTimeout(() => {
-                    this.progressBar.set({ state: false, value: '', error: '' });
+                    this.progressBar.set({ state: false, value: '', error: '', urnnbn: '' });
                 }, 10000);
             },
         });
@@ -493,7 +513,7 @@ export class ImportRecordComponent {
     }
 
     // VALIDACNI FUNKCE
-    updateButtonState() {
+    importButtonState() {
         // tlačítko se aktivuje jen když:
         // - title je validní (required)
         // - ccnb, isbn a issn jsou validní (nebo prázdné)
@@ -501,8 +521,24 @@ export class ImportRecordComponent {
         const ccnbValid = this.ccnb.valid;
         const isbnValid = this.isbn.valid;
         const issnValid = this.issn.valid;
+        const formatValueValid = this.formatValue.valid;
+        const formatVersionValid = this.formatVersion.valid;
+        const resolutionHorizontalValid = this.resolutionHorizontal.valid;
+        const resolutionVerticalValid = this.resolutionVertical.valid;
+        const pictureSizeWidthValid = this.pictureSizeWidth.valid;
+        const pictureSizeHeightValid = this.pictureSizeHeight.valid;
 
-        const isDisabled = !titleValid || !ccnbValid || !isbnValid || !issnValid;
+        const isDisabled =
+            !titleValid ||
+            !ccnbValid ||
+            !isbnValid ||
+            !issnValid ||
+            !formatValueValid ||
+            !formatVersionValid ||
+            !resolutionHorizontalValid ||
+            !resolutionVerticalValid ||
+            !pictureSizeWidthValid ||
+            !pictureSizeHeightValid;
         this.isButtonDisabled.set(isDisabled);
     }
     /** Validátor CCNB: musí začínat "cnb" a mít přesně 9 číslic */
@@ -532,6 +568,20 @@ export class ImportRecordComponent {
             if (!value) return null;
             const regex = /^(97(8|9))?\d{9}(\d|X)$/; // ISBN-10 nebo ISBN-13
             return regex.test(value.replace(/[-\s]/g, '')) ? null : { invalidIsbn: true };
+        };
+    }
+
+    positiveNumberValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+            if (value === null || value === undefined || value === '') {
+                return null; // prázdné pole je OK
+            }
+            const num = Number(value);
+            if (isNaN(num) || num <= 0) {
+                return { invalidPositiveNumber: true };
+            }
+            return null;
         };
     }
 }

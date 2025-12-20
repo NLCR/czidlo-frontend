@@ -632,6 +632,9 @@ h4 {
             &.add-error {
                 background: var(--States-high-efford-BG-default, #fde5e4);
             }
+            &.import-completed {
+                background-color: var(--States-available-BG-default, #dff1c3);
+            }
         }
     }
 }

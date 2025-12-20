@@ -5,7 +5,7 @@
         </div>
     </div>
 </div>
-<div class="app-import-record-container" *ngIf="assignedRegistars.length > 0 && loggedIn()">
+<div class="app-import-record-container" *ngIf="!loadingRegistrars() && assignedRegistrars.length > 0 && loggedIn()">
     <div class="app-import-record-header">
         {{ 'import.import-record-title' | translate }}
     </div>
@@ -36,7 +36,7 @@
                         </div>
                         <mat-form-field appearance="outline">
                             <mat-select class="app-singleselect" [(value)]="selectedRegistrar" (valueChange)="onRegistrarChange()">
-                                @for (registrar of assignedRegistars; track registrar) {
+                                @for (registrar of assignedRegistrars; track registrar) {
                                 <mat-option [value]="registrar">{{ registrar }}</mat-option>
                                 }
                             </mat-select>
@@ -76,9 +76,12 @@
         </div>
     </div>
 </div>
+<div class="app-loading" *ngIf="loadingRegistrars()">
+    <mat-spinner diameter="40"></mat-spinner>
+</div>
 
 <!-- No Registrars -->
-<div class="app-no-registrars" *ngIf="assignedRegistars.length === 0 && loggedIn()">
+<div class="app-no-registrars" *ngIf="!loadingRegistrars() && assignedRegistrars.length === 0 && loggedIn()">
     <div class="app-no-registrars-header">
         <div class="app-no-registrars-header-title">{{ 'import.no-registrar-title' | translate }}</div>
         <div class="app-no-registrars-header-subtitle">{{ 'import.no-registrar-subtitle' | translate }}</div>
@@ -495,12 +498,41 @@
                                 {{ 'import.resolutionHorizontal' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="resolutionHorizontal" />
+                            <mat-error
+                                class="app-error-message"
+                                *ngIf="resolutionHorizontal.invalid && (resolutionHorizontal.dirty || resolutionHorizontal.touched)"
+                            >
+                                {{ 'messages.required-field' | translate }}
+                            </mat-error>
+                            <mat-error
+                                class="app-error-message"
+                                *ngIf="
+                                    resolutionHorizontal.hasError('invalidPositiveNumber') &&
+                                    (resolutionHorizontal.dirty || resolutionHorizontal.touched)
+                                "
+                            >
+                                {{ 'messages.field-must-be-number' | translate }}
+                            </mat-error>
                         </div>
                         <div class="app-base-input app-half-width app-resolutionVertical">
                             <div class="app-base-input-label">
                                 {{ 'import.resolutionVertical' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="resolutionVertical" />
+                            <mat-error
+                                class="app-error-message"
+                                *ngIf="resolutionVertical.invalid && (resolutionVertical.dirty || resolutionVertical.touched)"
+                            >
+                                {{ 'messages.required-field' | translate }}
+                            </mat-error>
+                            <mat-error
+                                class="app-error-message"
+                                *ngIf="
+                                    resolutionVertical.hasError('invalidPositiveNumber') && (resolutionVertical.dirty || resolutionVertical.touched)
+                                "
+                            >
+                                {{ 'messages.field-must-be-number' | translate }}
+                            </mat-error>
                         </div>
                     </div>
                     <div class="app-base-input-container">
@@ -567,6 +599,10 @@
         <div class="app-sidebar-footer" [ngClass]="{ 'progress-bar-visible': progressBar().state }">
             <div class="app-record-progress-bar" [ngClass]="progressBar().value" *ngIf="progressBar().state">
                 {{ 'messages.' + progressBar().value | translate }} {{ progressBar().error }}
+                <a class="app-link" *ngIf="progressBar().urnnbn" [routerLink]="['/search']" [queryParams]="{ q: progressBar().urnnbn }">
+                    {{ 'messages.display-record' | translate }}: {{ progressBar().urnnbn }}
+                </a>
+                <div *ngIf="progressBar().urnnbn" class="app-link app-close-sidebar" (click)="closeSidebar()">{{ 'buttons.close' | translate }}</div>
             </div>
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">

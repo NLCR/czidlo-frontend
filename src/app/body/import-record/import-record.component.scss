@@ -152,6 +152,7 @@
         }
         input {
             padding: 11px 12px;
+            flex: 0;
             border-radius: var(--Spacing-x1, 4px);
             border: 1px solid var(--Boarder-Contrast, #bfccd9);
             background: var(--BG-Main-Base, #fff);
@@ -189,4 +190,17 @@
         width: 588px;
     }
 
+}
+.app-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+.app-link {
+    color: var(--Text-Link, #0080a8);
+    text-decoration-line: underline;
+    margin-left: 16px;
+    cursor: pointer;
 }
