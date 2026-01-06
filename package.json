@@ -10,7 +10,7 @@
     "start": "ng serve",
     "prebuild": "node scripts/generate_file_env-json.js && node scripts/collect-build-info.js",
     "build": "ng build",
-    "build prod": "ng build --base-href /web/",
+    "build-prod": "ng build --base-href /web/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
