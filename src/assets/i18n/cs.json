@@ -318,8 +318,11 @@
         "contact-admin": "Kontaktujte svého administrátora nebo napište na",
         "registration-mode": "Mód registrace URN:NBN",
         "by-resolver": "resolverem",
+        "by_resolver": "resolverem",
         "by-reservation": "rezervací",
+        "by_reservation": "rezervací",
         "by-registrar": "registrátorem",
+        "by_registrar": "registrátorem",
         "continue": "Pokračovat",
         "mandatory": "Povinné pole *",
         "title_part": "Základní údaje",
@@ -402,7 +405,8 @@
         "all-types": "Všechny typy",
         "all": "Vše",
         "active": "Aktivní",
-        "inactive": "Deaktivované"
+        "inactive": "Deaktivované",
+        "type": "Typ entity"
     },
     "search": {
         "true": "ano",

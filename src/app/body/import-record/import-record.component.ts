@@ -139,7 +139,7 @@ export class ImportRecordComponent {
             this.resolutionHorizontal,
             this.resolutionVertical,
             this.pictureSizeWidth,
-            this.pictureSizeHeight
+            this.pictureSizeHeight,
         ];
         controlsToWatch.forEach((ctrl) => {
             ctrl.statusChanges.subscribe(() => {
@@ -325,9 +325,9 @@ export class ImportRecordComponent {
         // ORIGINATORS
         let originator: any = {};
         if (this.primaryOriginatorValue.valid && this.primaryOriginatorValue.value) {
-        originator.type = this.selectedOriginatorType.toUpperCase() || 'AUTHOR';
-        originator.value = this.primaryOriginatorValue.value || ' ';
-        intelectualEntity.originator = originator;
+            originator.type = this.selectedOriginatorType.toUpperCase() || 'AUTHOR';
+            originator.value = this.primaryOriginatorValue.value || ' ';
+            intelectualEntity.originator = originator;
         }
         if (this.otherOriginator.value) {
             intelectualEntity.otherOriginator = this.otherOriginator.value;
@@ -467,7 +467,7 @@ export class ImportRecordComponent {
                 //TODO: vyčistit formulář pro nové vkládání a nabídnout vytvořený přes odkaz v snackbaru
                 //přes přiřazené/potvrezené urnnbn v odpovědi
                 //(protože to nebude zaindexované úplně hned, tak proto ne hned router.navigate)
-                let urnnbn = 'urn:nbn:cz:' + data.urnNbn.registrarCode + '-' + data.urnNbn.documentCode ;
+                let urnnbn = 'urn:nbn:cz:' + data.urnNbn.registrarCode + '-' + data.urnNbn.documentCode;
                 this.progressBar.set({ state: true, value: 'import-completed', error: '', urnnbn: urnnbn });
                 setTimeout(() => {
                     this.progressBar.set({ state: false, value: '', error: '', urnnbn: '' });

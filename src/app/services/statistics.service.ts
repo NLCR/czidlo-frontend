@@ -91,12 +91,22 @@ export class StatisticsService {
     }
 
     // REGISTRACE URNNBN PODLE REGISTRÁTORŮ
-    getCountByRegistrar(year?: string, state?: string): Observable<any> {
+    getCountByRegistrar(registrar?: string, year?: string, state?: string): Observable<any> {
+        console.log(registrar, year, state);
         const query: any = {
             bool: {
                 filter: [], // efektivnější než must
             },
         };
+
+        // pokud je filtr registrar
+        if (registrar) {
+            query.bool.filter.push({
+                term: {
+                    'registrarcode.keyword': registrar,
+                },
+            });
+        }
 
         // pokud mám rok → přidám range
         if (year) {
@@ -132,7 +142,7 @@ export class StatisticsService {
         };
 
         // query přidáme jen pokud existuje filtr (rok)
-        if (year || (state && state !== 'all')) {
+        if (registrar || year || (state && state !== 'all')) {
             body.query = query;
         }
 
@@ -152,7 +162,7 @@ export class StatisticsService {
     }
 
     // REGISTRACE URNNBN PODLE TYPŮ V ZADANÉM ROCE A PRO ZADANÉHO REGISTRÁTORA
-    getCountByEntityTypes(registrar?: string, year?: string): Observable<any> {
+    getCountByEntityTypes(registrar?: string, year?: string, state?: string): Observable<any> {
 
         const query: any = {
             bool: {
@@ -178,6 +188,16 @@ export class StatisticsService {
                         gte: `${year}-01-01`,
                         lt: `${year}-12-31`,
                     },
+                },
+            });
+        }
+
+        // pokud je filtrován stav
+        if (state && state !== 'all') {
+            const isActive = state === 'active';
+            query.bool.must.push({
+                term: {
+                    active: isActive,
                 },
             });
         }

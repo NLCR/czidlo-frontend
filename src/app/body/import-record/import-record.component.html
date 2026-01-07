@@ -126,7 +126,7 @@
         <!-- HEADER -->
         <div class="app-sidebar-header">
             <div class="app-sidebar-title">
-                {{ 'import.' + selectedEntity | translate }}
+                {{ 'import.' + selectedEntity | translate }} - {{ selectedRegistrar}} - {{ 'import.' + selectedMode.toLowerCase() | translate }}
             </div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />

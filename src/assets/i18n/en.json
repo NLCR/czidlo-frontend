@@ -401,7 +401,8 @@
         "all-types": "All types",
         "all": "All",
         "active": "Active",
-        "inactive": "Deactivated"
+        "inactive": "Deactivated",
+        "type": "Entity Type"
     },
     "search": {
         "true": "yes",

@@ -27,6 +27,7 @@ export class StatisticsComponent {
     records = signal<Array<any>>([]);
     selectedYear = signal<string | null>(null);
     selectedRegistrar = signal<string | null>(null);
+    selectedType = signal<string | null>(null);
 
     colorScheme: any = {
         domain: ['#0080a8', '#00bcd4', '#4dd0e1', '#b2ebf2', '#e0f7fa'],
@@ -69,7 +70,7 @@ export class StatisticsComponent {
             this.selectedRegistrar.set(filters.registrar);
             this.selectedState.set(filters.state);
 
-            this.reloadData(filters.year, filters.registrar);
+            this.reloadData(filters.year, filters.registrar, filters.state);
         });
 
         // FOR TESTING PURPOSES ONLY
@@ -91,18 +92,19 @@ export class StatisticsComponent {
     }
 
     private loadRegisteredData(r?: string, y?: string, s?: string) {
+        console.log(r, y, s);
         this.statisticsService.getCountByDate(r, y, s).subscribe((data) => {
             // console.table(data);
             this.chartDataByDate.set(data);
         });
 
-        this.statisticsService.getCountByRegistrar(y, s).subscribe((data) => {
-            // console.table(data);
+        this.statisticsService.getCountByRegistrar(r, y, s).subscribe((data) => {
+            console.table(data);
             this.chartDataByRegistrar.set(data);
         });
 
         // if (r) {
-            this.statisticsService.getCountByEntityTypes(r, y).subscribe((data) => {
+            this.statisticsService.getCountByEntityTypes(r, y, s).subscribe((data) => {
                 // console.table(data);
                 this.chartDataByEntityTypes.set(data);
             });
@@ -153,6 +155,17 @@ export class StatisticsComponent {
             queryParamsHandling: 'merge',
         });
     }
+    onTypeClick(event: any) {
+        const type = event.name;
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {
+                type,
+            },
+            queryParamsHandling: 'merge',
+        });
+    }
 
     onYearCancel() {
         this.router.navigate([], {
@@ -166,6 +179,14 @@ export class StatisticsComponent {
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: { registrar: null },
+            queryParamsHandling: 'merge',
+        });
+    }
+
+    onTypeCancel() {
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { type: null },
             queryParamsHandling: 'merge',
         });
     }
