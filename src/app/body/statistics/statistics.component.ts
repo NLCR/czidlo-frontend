@@ -126,7 +126,8 @@ export class StatisticsComponent {
 
             this.translate.get(keys).subscribe((translations: any) => {
                 const translatedData = data.map((i: any) => ({
-                    name: translations[i.name] || i.name,
+                    label: translations[i.name] || i.name,
+                    name: i.name,
                     value: i.value,
                 }));
             this.chartDataByEntityTypes.set(translatedData);
@@ -182,6 +183,7 @@ export class StatisticsComponent {
 
     onTypeClick(event: any) {
         const type = event.name;
+        console.log(event);
 
         this.router.navigate([], {
             relativeTo: this.route,
