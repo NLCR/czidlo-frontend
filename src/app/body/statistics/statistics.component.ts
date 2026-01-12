@@ -4,6 +4,7 @@ import { StatisticsService } from '../../services/statistics.service';
 import { RegistrarsService } from '../../services/registrars.service';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-statistics',
@@ -19,6 +20,7 @@ export class StatisticsComponent {
 
     chartDataByDate = signal<Array<{ name: string; value: number }>>([]);
     chartDataByRegistrar = signal<any[]>([]);
+    chartDataByRegistrarTable = signal<any[]>([]);
     chartDataByEntityTypes = signal<any[]>([]);
 
     resolvedDataByDate = signal<Array<{ name: string; value: number }>>([]);
@@ -33,7 +35,13 @@ export class StatisticsComponent {
         domain: ['#0080a8', '#00bcd4', '#4dd0e1', '#b2ebf2', '#e0f7fa'],
     };
 
-    constructor(private router: Router, private route: ActivatedRoute, private statisticsService: StatisticsService, private registrarsService: RegistrarsService) {}
+    constructor(
+        private router: Router,
+        private route: ActivatedRoute,
+        private statisticsService: StatisticsService,
+        private registrarsService: RegistrarsService,
+        private translate: TranslateService
+    ) {}
 
     ngOnInit() {
         console.log('statistics init');
@@ -59,6 +67,7 @@ export class StatisticsComponent {
                 year: params['year'] || null,
                 registrar: params['registrar'] || null,
                 state: params['state'] || 'all',
+                type: params['type'] || null,
             }))
         );
 
@@ -69,8 +78,9 @@ export class StatisticsComponent {
             this.selectedYear.set(filters.year);
             this.selectedRegistrar.set(filters.registrar);
             this.selectedState.set(filters.state);
+            this.selectedType.set(filters.type);
 
-            this.reloadData(filters.year, filters.registrar, filters.state);
+            this.reloadData(filters.year, filters.registrar, filters.state, filters.type);
         });
 
         // FOR TESTING PURPOSES ONLY
@@ -79,38 +89,49 @@ export class StatisticsComponent {
         });
     }
 
-    private reloadData(year: string | null, registrar: string | null, state?: string) {
+    private reloadData(year: string | null, registrar: string | null, state?: string, type?: any) {
         const y = year || undefined;
         const r = registrar || undefined;
         const s = state || this.selectedState();
+        const t = type || this.selectedType();
+
+        console.log('type', t);
 
         if (this.isActive === 'assignments') {
-            this.loadRegisteredData(r, y, s);
+            this.loadRegisteredData(r, y, s, t);
         } else if (this.isActive === 'resolvations') {
             this.loadResolvedData(r, y);
         }
     }
 
-    private loadRegisteredData(r?: string, y?: string, s?: string) {
-        console.log(r, y, s);
-        this.statisticsService.getCountByDate(r, y, s).subscribe((data) => {
+    private loadRegisteredData(r?: string, y?: string, s?: string, t?: string) {
+        console.log(r, y, s, t);
+        // DATE
+        this.statisticsService.getCountByDate(r, y, s, t).subscribe((data) => {
             // console.table(data);
             this.chartDataByDate.set(data);
         });
-
-        this.statisticsService.getCountByRegistrar(r, y, s).subscribe((data) => {
-            console.table(data);
-            this.chartDataByRegistrar.set(data);
+        // REGISTRAR
+        this.statisticsService.getCountByRegistrar(r, y, s, t).subscribe((data) => {
+            // console.table(data);
+            // TABULKA – beze změny
+            this.chartDataByRegistrarTable.set(data);
+            // GRAF – malé hodnoty sloučené do "Other"
+            const chartData = this.prepareChartDataWithOther(data, 1);
+            this.chartDataByRegistrar.set(chartData);
         });
+        // ENTITY TYPES
+        this.statisticsService.getCountByEntityTypes(r, y, s, t).subscribe((data) => {
+            const keys = data.map((i: any) => `${i.name}`);
 
-        // if (r) {
-            this.statisticsService.getCountByEntityTypes(r, y, s).subscribe((data) => {
-                // console.table(data);
-                this.chartDataByEntityTypes.set(data);
+            this.translate.get(keys).subscribe((translations: any) => {
+                const translatedData = data.map((i: any) => ({
+                    name: translations[i.name] || i.name,
+                    value: i.value,
+                }));
+            this.chartDataByEntityTypes.set(translatedData);
             });
-        // } else {
-        //     this.chartDataByEntityTypes.set([]);
-        // }
+        });
     }
 
     private loadResolvedData(r?: string, y?: string) {
@@ -144,6 +165,9 @@ export class StatisticsComponent {
 
     onRegistrarClick(event: any) {
         const registrar = event.name;
+        if (registrar === 'další') {
+            return;
+        }
         const year = this.selectedYear();
 
         this.router.navigate([], {
@@ -155,6 +179,7 @@ export class StatisticsComponent {
             queryParamsHandling: 'merge',
         });
     }
+
     onTypeClick(event: any) {
         const type = event.name;
 
@@ -199,5 +224,34 @@ export class StatisticsComponent {
             },
             queryParamsHandling: 'merge',
         });
+    }
+
+    private prepareChartDataWithOther(items: any[], thresholdPercent = 4, otherName = 'další', otherTitle = 'Other'): any[] {
+        if (!items?.length) return [];
+        const total = items.reduce((sum, i) => sum + i.value, 0);
+        if (total === 0) return items;
+
+        const thresholdValue = (thresholdPercent / 100) * total;
+        const result: any[] = [];
+        let otherSum = 0;
+        for (const item of items) {
+            if (item.value < thresholdValue) {
+                otherSum += item.value;
+            } else {
+                result.push({ ...item });
+            }
+        }
+        if (otherSum > 0) {
+            result.push({
+                name: otherName,
+                title: otherTitle,
+                value: otherSum,
+            });
+        }
+
+        // graf je přehlednější, když je seřazený
+        // result.sort((a, b) => b.value - a.value);
+
+        return result;
     }
 }

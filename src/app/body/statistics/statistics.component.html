@@ -17,12 +17,31 @@
             <div class="app-title">
                 {{ 'statistics.assignments-title' | translate }}
             </div>
-            <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedState" (valueChange)="onStateChange($event)">
-                @for (state of states; track state) {
-                <app-radio-button label="{{ 'statistics.' + state | translate }}" value="{{ state }}"></app-radio-button>
-                }
-            </app-radio-group>
+            <div class="app-filter-tags">
+                <div class="app-filter-tag" *ngIf="selectedState() !== 'all'" (click)="selectedState.set('all')">
+                    <div class="app-tag-label">{{ 'statistics.' + selectedState() | translate }} URN:NBN</div>
+                    <div class="app-tag-remove-icon" (click)="selectedState.set('all')">&#10005;</div>
+                </div>
+                <div class="app-filter-tag" *ngIf="selectedYear()" (click)="onYearCancel()">
+                    <div class="app-tag-label">{{'statistics.year' | translate}}: {{ selectedYear() }}</div>
+                    <div class="app-tag-remove-icon" (click)="onYearCancel()">&#10005;</div>
+                </div>
+                <div class="app-filter-tag" *ngIf="selectedRegistrar()" (click)="onRegistrarCancel()">
+                    <div class="app-tag-label">{{'statistics.registrar' | translate}}: {{ selectedRegistrar() }}</div>
+                    <div class="app-tag-remove-icon" (click)="onRegistrarCancel()">&#10005;</div>
+                </div>
+                <div class="app-filter-tag" *ngIf="selectedType()" (click)="onTypeCancel()">
+                    <div class="app-tag-label">{{ selectedType() | translate}}</div>
+                    <div class="app-tag-remove-icon" (click)="onTypeCancel()">&#10005;</div>
+                </div>
+            </div>
+
             <div class="app-content">
+                <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedState" (valueChange)="onStateChange($event)">
+                    @for (state of states; track state) {
+                    <app-radio-button label="{{ 'statistics.' + state | translate }}" value="{{ state }}"></app-radio-button>
+                    }
+                </app-radio-group>
                 <div class="app-chart app-chart-years">
                     <div class="app-chart-header">
                         <div class="app-chart-header-item" *ngIf="!selectedYear()">
@@ -44,7 +63,6 @@
                         [gradient]="false"
                         [xAxis]="true"
                         [yAxis]="true"
-                        [legend]="false"
                         [showDataLabel]="false"
                         (select)="onYearClick($event)"
                     ></ngx-charts-bar-vertical>
@@ -89,7 +107,7 @@
                                 </div>
                                 <div class="app-chart-col app-col-count">{{ 'statistics.count' | translate }}</div>
                             </div>
-                            <div class="app-chart-row" *ngFor="let item of chartDataByRegistrar()">
+                            <div class="app-chart-row" *ngFor="let item of chartDataByRegistrarTable()" (click)="onRegistrarClick(item)">
                                 <div class="app-chart-col">
                                     <div class="app-col-registrar-code">{{ item.name }}</div>
                                     <div class="app-col-registrar-name">{{ item.title }}</div>
@@ -106,14 +124,8 @@
                                 <div class="app-chart-header-title">{{ 'statistics.all-types' | translate }}</div>
                             </div>
                             <div class="app-chart-header-item" *ngIf="selectedType()">
-                                <app-button
-                                    variant="tertiary"
-                                    size="s"
-                                    [icon]="true"
-                                    iconLeft="arrow-left.svg"
-                                    (click)="onTypeCancel()"
-                                ></app-button>
-                                <div class="app-chart-header-title">{{ selectedType() }}</div>
+                                <app-button variant="tertiary" size="s" [icon]="true" iconLeft="arrow-left.svg" (click)="onTypeCancel()"></app-button>
+                                <div class="app-chart-header-title">{{ selectedType() | translate }}</div>
                             </div>
                         </div>
                         <ngx-charts-pie-chart
@@ -137,7 +149,7 @@
                                 </div>
                                 <div class="app-chart-col app-col-count">{{ 'statistics.count' | translate }}</div>
                             </div>
-                            <div class="app-chart-row" *ngFor="let item of chartDataByEntityTypes()">
+                            <div class="app-chart-row" *ngFor="let item of chartDataByEntityTypes()" (click)="onTypeClick(item)">
                                 <div class="app-chart-col">{{ item.name | translate }}</div>
                                 <div class="app-chart-col app-col-count">{{ item.value }}</div>
                             </div>
