@@ -71,10 +71,16 @@
     }
     .app-advanced-search {
         display: flex;
+        flex-direction: column;
         gap: 16px;
         width: 800px;
         padding: 0px 0px 16px 16px;
         box-sizing: border-box;
+        .app-advanced-search-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
         .app-search-entity-type {
             width: 190px;
         }

@@ -14,7 +14,16 @@ export class SearchService {
 
     constructor(private apiService: ApiService) {}
 
-    search(term: string, docType?: string, filter?: string, registrar?: string, page: number = 1): Observable<any> {
+    search(
+        term: string,
+        docType?: string,
+        filter?: string,
+        registrar?: string,
+        dateFrom?: string,
+        dateTo?: string,
+        state?: string,
+        page: number = 1
+    ): Observable<any> {
         this.query.set(term);
 
         const body: any = {
@@ -28,7 +37,7 @@ export class SearchService {
             },
         };
 
-        // 🔍 1) Hledání URNNBN – speciální režim
+        // 🔍 1) Hledání URNNBN
         if (term.toLowerCase().startsWith('urn:nbn')) {
             let parts = term.split(':');
             let code = parts[parts.length - 1].split('-')[1];
@@ -45,7 +54,8 @@ export class SearchService {
             });
         } else if (term.startsWith('cnb')) {
             // 🔍 2) Hledání CNB – speciální režim
-            body.query.bool.must.push({ //TODO: opravit. Nefunguje, viz urn:nbn:cz:ope301-00038f s cnb000358651
+            body.query.bool.must.push({
+                //TODO: opravit. Nefunguje, viz urn:nbn:cz:ope301-00038f s cnb000358651
                 match_phrase: {
                     ccnb: term,
                 },
@@ -61,6 +71,7 @@ export class SearchService {
                 },
             });
         } else if (filter === 'titles') {
+            // 🔍 4) Hledání podle názvových údajů
             body.query.bool.must.push({
                 multi_match: {
                     query: term,
@@ -70,6 +81,7 @@ export class SearchService {
                 },
             });
         } else if (filter === 'ids') {
+            // 🔍 5) Hledání podle identifikátorů
             body.query.bool.must.push({
                 multi_match: {
                     query: term,
@@ -79,6 +91,7 @@ export class SearchService {
                 },
             });
         } else {
+            // 🔍 6) Obecné hledání ve všech relevantních polích
             body.query.bool.must.push({
                 multi_match: {
                     query: term,
@@ -119,6 +132,34 @@ export class SearchService {
             body.query.bool.filter.push({
                 term: {
                     'registrarcode.keyword': registrar,
+                },
+            });
+        }
+        // 🎯 Filtr podle data registrace od
+        if (dateFrom) {
+            body.query.bool.filter.push({
+                range: {
+                    registrationdate: {
+                        gte: dateFrom,
+                    },
+                },
+            });
+        }
+        // 🎯 Filtr podle data registrace do
+        if (dateTo) {
+            body.query.bool.filter.push({
+                range: {
+                    registrationdate: {
+                        lte: dateTo,
+                    },
+                },
+            });
+        }
+        // 🎯 Filtr podle stavu
+        if (state && state !== 'all') {
+            body.query.bool.filter.push({
+                term: {
+                    active: state === 'active' ? true : false,
                 },
             });
         }

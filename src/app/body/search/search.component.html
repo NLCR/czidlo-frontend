@@ -12,11 +12,11 @@
             #searchInput
             id="search-input"
             type="text"
-            placeholder="Hledat..."
+            placeholder="{{ 'search.search-placeholder' | translate }}"
             [(ngModel)]="searchQuery"
             (keyup.enter)="onFilterSelected()"
         />
-        <div class="app-help-icon" [matTooltip]="htmlHelpText">
+        <div class="app-help-icon" [matTooltip]="helpText">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path
                     fill-rule="evenodd"
@@ -59,6 +59,10 @@
             <div class="app-tag-label">{{ 'search.to' | translate }}: {{ dateTo | date }}</div>
             <div class="app-tag-remove-icon" *ngIf="dateTo" (click)="removeFilter('dateTo')">&#10005;</div>
         </div>
+        <div class="app-search-tag" *ngIf="selectedState && selectedState !== 'all'">
+            <div class="app-tag-label">{{ 'statistics.' + selectedState | translate }}</div>
+            <div class="app-tag-remove-icon" *ngIf="selectedState" (click)="removeFilter('selectedState')">&#10005;</div>
+        </div>
     </div>
 
     <!-- ACTION ROW -->
@@ -77,78 +81,89 @@
 
     <!-- ADVANCED SEARCH -->
     <div class="app-advanced-search" *ngIf="advancedSearch()">
-        <!-- ENTITY TYPE -->
-        <div class="app-base-input-container">
-            <div class="app-base-input app-search-entity-type">
-                <div class="app-base-input-label">
-                    {{ 'search.filter-by-type' | translate }}
-                </div>
-                <mat-form-field appearance="outline">
-                    <mat-select [(ngModel)]="selectedType" (selectionChange)="onFilterSelected()">
-                        @for (entity of entityTypesList; track entity) {
-                        <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-            </div>
+        <!-- STATE -->
+        <div class="app-base-input-label">
+            {{ 'search.filter-by-state' | translate }}
         </div>
+        <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedState" (valueChange)="onStateChange($event)">
+            @for (state of states; track state) {
+            <app-radio-button label="{{ 'statistics.' + state | translate }}" value="{{ state }}"></app-radio-button>
+            }
+        </app-radio-group>
+        <div class="app-advanced-search-row">
+            <!-- ENTITY TYPE -->
+            <div class="app-base-input-container">
+                <div class="app-base-input app-search-entity-type">
+                    <div class="app-base-input-label">
+                        {{ 'search.filter-by-type' | translate }}
+                    </div>
+                    <mat-form-field appearance="outline">
+                        <mat-select [(ngModel)]="selectedType" (selectionChange)="onFilterSelected()">
+                            @for (entity of entityTypesList; track entity) {
+                            <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
 
-        <!-- REGISTRAR -->
-        <div class="app-base-input-container">
-            <div class="app-base-input app-search-registrar">
-                <div class="app-base-input-label">
-                    {{ 'search.filter-by-registrar' | translate }}
+            <!-- REGISTRAR -->
+            <div class="app-base-input-container">
+                <div class="app-base-input app-search-registrar">
+                    <div class="app-base-input-label">
+                        {{ 'search.filter-by-registrar' | translate }}
+                    </div>
+                    <mat-form-field appearance="outline">
+                        <mat-select [(ngModel)]="selectedRegistrar" (selectionChange)="onFilterSelected()">
+                            <mat-option [value]="''">{{ 'search.all-registrars' | translate }}</mat-option>
+                            @for (entity of registrarCodeList; track entity) {
+                            <mat-option [value]="entity.code">{{ entity.code }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
                 </div>
-                <mat-form-field appearance="outline">
-                    <mat-select [(ngModel)]="selectedRegistrar" (selectionChange)="onFilterSelected()">
-                        <mat-option [value]="''">{{ 'search.all-registrars' | translate }}</mat-option>
-                        @for (entity of registrarCodeList; track entity) {
-                        <mat-option [value]="entity.code">{{ entity.code }}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
             </div>
-        </div>
 
-        <!-- DATES -->
-        <div class="app-base-input-container">
-            <div class="app-base-input app-search-date">
-                <div class="app-base-input-label">
-                    {{ 'search.filter-by-date-from' | translate }}
+            <!-- DATES -->
+            <div class="app-base-input-container">
+                <div class="app-base-input app-search-date">
+                    <div class="app-base-input-label">
+                        {{ 'search.filter-by-date-from' | translate }}
+                    </div>
+                    <mat-form-field appearance="outline">
+                        <input
+                            matInput
+                            [matDatepicker]="pickerFrom"
+                            placeholder="{{ 'search.from' | translate }}"
+                            [(ngModel)]="dateFrom"
+                            [min]="minDate"
+                            [max]="maxDate"
+                            (dateChange)="onFilterSelected()"
+                        />
+                        <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerFrom></mat-datepicker>
+                    </mat-form-field>
                 </div>
-                <mat-form-field appearance="outline">
-                    <input
-                        matInput
-                        [matDatepicker]="pickerFrom"
-                        placeholder="{{ 'search.from' | translate }}"
-                        [(ngModel)]="dateFrom"
-                        [min]="minDate"
-                        [max]="maxDate"
-                        (dateChange)="onFilterSelected()"
-                    />
-                    <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
-                    <mat-datepicker #pickerFrom></mat-datepicker>
-                </mat-form-field>
             </div>
-        </div>
-        <div class="app-base-input-container">
-            <div class="app-base-input app-search-date">
-                <div class="app-base-input-label">
-                    {{ 'search.filter-by-date-to' | translate }}
+            <div class="app-base-input-container">
+                <div class="app-base-input app-search-date">
+                    <div class="app-base-input-label">
+                        {{ 'search.filter-by-date-to' | translate }}
+                    </div>
+                    <mat-form-field appearance="outline">
+                        <input
+                            matInput
+                            [matDatepicker]="pickerTo"
+                            placeholder="{{ 'search.to' | translate }}"
+                            [(ngModel)]="dateTo"
+                            [min]="minDate"
+                            [max]="maxDate"
+                            (dateChange)="onFilterSelected()"
+                        />
+                        <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerTo></mat-datepicker>
+                    </mat-form-field>
                 </div>
-                <mat-form-field appearance="outline">
-                    <input
-                        matInput
-                        [matDatepicker]="pickerTo"
-                        placeholder="{{ 'search.to' | translate }}"
-                        [(ngModel)]="dateTo"
-                        [min]="minDate"
-                        [max]="maxDate"
-                        (dateChange)="onFilterSelected()"
-                    />
-                    <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
-                    <mat-datepicker #pickerTo></mat-datepicker>
-                </mat-form-field>
             </div>
         </div>
     </div>

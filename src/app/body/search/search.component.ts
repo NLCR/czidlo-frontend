@@ -41,6 +41,8 @@ export class SearchComponent implements AfterViewInit {
     dateTo: string = '';
     minDate: Date = new Date(2010, 0, 1);
     maxDate: Date = new Date();
+    states = ['all', 'active', 'inactive'];
+    selectedState: string = 'all';
 
     isLoggedIn = computed(() => this.authService.loggedIn());
     isAdmin = computed(() => this.authService.isAdmin());
@@ -142,8 +144,7 @@ export class SearchComponent implements AfterViewInit {
     selectedDiAccessRestrictionId = '';
     diAccessRestrictionsList: Array<{ value: string; label: string }> = [];
 
-    htmlHelpText: string =
-        'Aplikace umožňuje vyhledávat digitální dokumenty primárně podle názvových údajů (např. titul monografie, název periodika) nebo jejich částí, dále podle autora, registrátora a identifikátorů: čČNB - číslo české národní bibliografie (např. cnb000683872), ISSN, ISBN (např. 9788073210793), UUID, URN:NBN (např. urn:nbn:cz:nk-00027x)';
+    helpText: string = '';
 
     constructor(
         public searchService: SearchService,
@@ -176,14 +177,15 @@ export class SearchComponent implements AfterViewInit {
             this.selectedRegistrar = registrar || '';
             this.dateFrom = params['dateFrom'] || '';
             this.dateTo = params['dateTo'] || '';
+            this.selectedState = params['state'] || 'all';
 
-            if (this.selectedType || this.selectedRegistrar || this.dateFrom || this.dateTo) {
+            if (this.selectedType || this.selectedRegistrar || this.dateFrom || this.dateTo || this.selectedState !== 'all') {
                 this.advancedSearch.set(true);
             } else {
                 this.advancedSearch.set(false);
             }
 
-            this.searchService.search(q, type, filter, registrar, page).subscribe({
+            this.searchService.search(q, type, filter, registrar, this.dateFrom, this.dateTo, this.selectedState, page).subscribe({
                 next: () => {
                     this.updatePagination();
                     this.tryFilterRegistrars();
@@ -223,15 +225,30 @@ export class SearchComponent implements AfterViewInit {
     }
 
     onFilterSelected() {
-        console.log(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar, this.dateFrom, this.dateTo);
+        console.log(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar, this.dateFrom, this.dateTo, this.selectedState);
         this.currentPage = 1;
-        this.onSearch(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar, this.dateFrom, this.dateTo);
+        this.onSearch(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar, this.dateFrom, this.dateTo, this.selectedState);
+    }
+    onStateChange(newState: string) {
+        console.log('State changed to:', newState);
+        this.selectedState = newState;
+        this.currentPage = 1;
+        this.onSearch(
+            this.searchQuery,
+            this.selectedType,
+            this.selectedField,
+            this.selectedRegistrar,
+            this.dateFrom,
+            this.dateTo,
+            this.selectedState
+        );
     }
 
-    onSearch(query: string, type?: string, fields?: string, registrar?: string, dateFrom?: any, dateTo?: any) {
+    onSearch(query: string, type?: string, fields?: string, registrar?: string, dateFrom?: any, dateTo?: any, state?: string) {
         this.currentPage = 1;
         let formattedDateFrom = this.formatDate(dateFrom);
         let formattedDateTo = this.formatDate(dateTo);
+        let stateParam = state && state !== 'all' ? state : null;
         this.router.navigate([], {
             queryParams: {
                 q: query || null,
@@ -240,6 +257,7 @@ export class SearchComponent implements AfterViewInit {
                 registrar: registrar ? this.selectedRegistrar || undefined : undefined,
                 dateFrom: formattedDateFrom,
                 dateTo: formattedDateTo,
+                state: stateParam,
                 page: 1,
             },
             queryParamsHandling: 'merge',
@@ -261,6 +279,9 @@ export class SearchComponent implements AfterViewInit {
         }
         if (value === 'dateTo') {
             this.dateTo = '';
+        }
+        if (value === 'selectedState') {
+            this.selectedState = 'all';
         }
         this.updateUrlParams();
     }
@@ -303,6 +324,11 @@ export class SearchComponent implements AfterViewInit {
             queryParams['dateTo'] = this.dateTo;
         } else {
             queryParams['dateTo'] = undefined; // odstraní parametr z URL
+        }
+        if (this.selectedState && this.selectedState !== 'all') {
+            queryParams['state'] = this.selectedState;
+        } else {
+            queryParams['state'] = undefined; // odstraní parametr z URL
         }
         if (this.currentPage) {
             queryParams['page'] = this.currentPage;
@@ -1020,6 +1046,7 @@ export class SearchComponent implements AfterViewInit {
                 'search.titles',
                 'search.all-registrars',
                 'search.ids',
+                'search.help-text',
             ])
             .subscribe((t) => {
                 this.registrationMode = [
@@ -1054,6 +1081,7 @@ export class SearchComponent implements AfterViewInit {
                     { value: 'titles', label: t['search.titles'] },
                     { value: 'ids', label: t['search.ids'] },
                 ];
+                this.helpText = t['search.help-text'];
             });
     }
 

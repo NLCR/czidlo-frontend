@@ -492,9 +492,11 @@
         "issn-search": "ISSN se spojovníkem",
         "too-many-records": "Výsledků je příliš mnoho, zkuste upřesnit vyhledávací dotaz.",
         "filter-by-date": "Filtrovat podle data",
-        "filter-by-date-from": "Datum od",
-        "filter-by-date-to": "Datum do",
+        "filter-by-date-from": "Datum registrace od",
+        "filter-by-date-to": "Datum registrace do",
+        "filter-by-state": "Filtrovat podle stavu URN:NBN",
         "from": "Od",
-        "to": "Do"
+        "to": "Do",
+        "help-text": "Primárně lze vyhledávat podle názvových údajů (např. titul monografie, název periodika) nebo jejich částí, podle autora a identifikátorů (čČNB, ISSN, ISBN, UUID, URN:NBN)."
     }
 }
