@@ -14,7 +14,7 @@
             type="text"
             placeholder="Hledat..."
             [(ngModel)]="searchQuery"
-            (keyup.enter)="onSearch(searchInput.value)"
+            (keyup.enter)="onFilterSelected()"
         />
         <div class="app-help-icon" [matTooltip]="htmlHelpText">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -32,24 +32,54 @@
                 />
             </svg>
         </div>
-        <app-button variant="primary" size="l" iconLeft="" iconRight="" (click)="onSearch(searchInput.value)">
+        <app-button variant="primary" size="l" iconLeft="" iconRight="" (click)="onFilterSelected()">
             <span>{{ 'buttons.search' | translate }}</span>
         </app-button>
     </div>
+
+    <!-- SEARCH TAGS -->
+    <div class="app-search-tags">
+        <div class="app-search-tag" *ngIf="searchQuery && searchQuery.length > 0">
+            <div class="app-tag-label">{{ searchQuery }}</div>
+            <div class="app-tag-remove-icon" (click)="removeFilter('searchQuery')">&#10005;</div>
+        </div>
+        <div class="app-search-tag" *ngIf="selectedType">
+            <div class="app-tag-label">{{ selectedTypeLabel() }}</div>
+            <div class="app-tag-remove-icon" *ngIf="selectedType" (click)="removeFilter('selectedType')">&#10005;</div>
+        </div>
+        <div class="app-search-tag" *ngIf="selectedRegistrar">
+            <div class="app-tag-label">{{ selectedRegistrar }}</div>
+            <div class="app-tag-remove-icon" *ngIf="selectedRegistrar" (click)="removeFilter('selectedRegistrar')">&#10005;</div>
+        </div>
+        <div class="app-search-tag" *ngIf="dateFrom">
+            <div class="app-tag-label">{{ 'search.from' | translate }}: {{ dateFrom | date }}</div>
+            <div class="app-tag-remove-icon" *ngIf="dateFrom" (click)="removeFilter('dateFrom')">&#10005;</div>
+        </div>
+        <div class="app-search-tag" *ngIf="dateTo">
+            <div class="app-tag-label">{{ 'search.to' | translate }}: {{ dateTo | date }}</div>
+            <div class="app-tag-remove-icon" *ngIf="dateTo" (click)="removeFilter('dateTo')">&#10005;</div>
+        </div>
+    </div>
+
+    <!-- ACTION ROW -->
     <div class="app-action">
         <div class="app-advanced-search-text" (click)="advancedSearch.set(!advancedSearch())">
             {{ advancedSearch() ? ('search.hide-advanced-search' | translate) : ('search.show-advanced-search' | translate) }}
         </div>
         <div class="app-records-count" *ngIf="searchService.recordsCount() > 0">
-            {{ 'search.records-found' | translate }}: {{ searchService.recordsCount() }}
-            <span *ngIf="searchService.recordsCount() === 10000">+</span>
+            <div class="app-records-found">
+                {{ 'search.records-found' | translate }}: {{ searchService.recordsCount() }}
+                <span *ngIf="searchService.recordsCount() === 10000">+</span>
+            </div>
+            <div class="app-too-many-records-info" *ngIf="searchService.recordsCount() === 10000">{{ 'search.too-many-records' | translate }}</div>
         </div>
     </div>
 
-    <!-- ENTITY TYPE -->
+    <!-- ADVANCED SEARCH -->
     <div class="app-advanced-search" *ngIf="advancedSearch()">
+        <!-- ENTITY TYPE -->
         <div class="app-base-input-container">
-            <div class="app-base-input">
+            <div class="app-base-input app-search-entity-type">
                 <div class="app-base-input-label">
                     {{ 'search.filter-by-type' | translate }}
                 </div>
@@ -65,7 +95,7 @@
 
         <!-- REGISTRAR -->
         <div class="app-base-input-container">
-            <div class="app-base-input">
+            <div class="app-base-input app-search-registrar">
                 <div class="app-base-input-label">
                     {{ 'search.filter-by-registrar' | translate }}
                 </div>
@@ -76,6 +106,48 @@
                         <mat-option [value]="entity.code">{{ entity.code }}</mat-option>
                         }
                     </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <!-- DATES -->
+        <div class="app-base-input-container">
+            <div class="app-base-input app-search-date">
+                <div class="app-base-input-label">
+                    {{ 'search.filter-by-date-from' | translate }}
+                </div>
+                <mat-form-field appearance="outline">
+                    <input
+                        matInput
+                        [matDatepicker]="pickerFrom"
+                        placeholder="{{ 'search.from' | translate }}"
+                        [(ngModel)]="dateFrom"
+                        [min]="minDate"
+                        [max]="maxDate"
+                        (dateChange)="onFilterSelected()"
+                    />
+                    <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerFrom></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="app-base-input-container">
+            <div class="app-base-input app-search-date">
+                <div class="app-base-input-label">
+                    {{ 'search.filter-by-date-to' | translate }}
+                </div>
+                <mat-form-field appearance="outline">
+                    <input
+                        matInput
+                        [matDatepicker]="pickerTo"
+                        placeholder="{{ 'search.to' | translate }}"
+                        [(ngModel)]="dateTo"
+                        [min]="minDate"
+                        [max]="maxDate"
+                        (dateChange)="onFilterSelected()"
+                    />
+                    <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerTo></mat-datepicker>
                 </mat-form-field>
             </div>
         </div>
@@ -206,8 +278,10 @@
                     </div>
                     <div class="app-ie-fields" *ngIf="item.details.intelectualEntity?.ieIdentifiers?.length > 0">
                         <div class="app-ie-field" *ngFor="let id of item.details.intelectualEntity?.ieIdentifiers">
-                            <div class="app-label">{{ 'search.' + id.type.toLowerCase() | translate }}:</div>
-                            <div class="app-value">{{ id.value }}</div>
+                            <div class="app-label" *ngIf="id.type !== 'TITLE' && id.type !== 'SUB_TITLE'">
+                                {{ 'search.' + id.type.toLowerCase() | translate }}:
+                            </div>
+                            <div class="app-value" *ngIf="id.type !== 'TITLE' && id.type !== 'SUB_TITLE'">{{ id.value }}</div>
                         </div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.details.intelectualEntity?.created">
@@ -509,14 +583,41 @@
 
     <!-- NO QUERY -->
     <div class="app-no-results app-no-query" *ngIf="!searchedQuery() && !loadingResults()">
-        <h1 class="app-no-query-title">{{ 'search.no-query-title' | translate }}</h1>
+        <h3 class="app-no-query-title">{{ 'search.no-query-title' | translate }}</h3>
         <div class="app-no-query-text">{{ 'search.no-query-text-1' | translate }}</div>
-        <div class="app-no-query-text">{{ 'search.no-query-text-2' | translate }}</div>
+        <!-- <div class="app-no-query-text">{{ 'search.no-query-text-2' | translate }}</div> -->
         <div class="app-no-query-text app-example">
             <div class="app-example-label">{{ 'search.for-example' | translate }}</div>
-            <div class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'urn:nbn:cz:aba001-000ovg' }">urn:nbn:cz:aba001-000ovg</div>
-            <div class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'babička' }">babička</div>
-            <div class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'babička', type: 'MONOGRAPH' }">babička + MONOGRAPH</div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'babička' }">babička</span>
+                <span>({{ 'search.title' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'babička', type: 'MONOGRAPH' }">babička + MONOGRAPH</span>
+                <span>({{ 'search.title-type' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'urn:nbn:cz:aba001-000ovg' }">urn:nbn:cz:aba001-000ovg</span>
+                <span>({{ 'search.urn' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: '2f58bcf0-f6ae-11dd-8224-000d606f5dc6' }">
+                    2f58bcf0-f6ae-11dd-8224-000d606f5dc6
+                </span>
+                <span>({{ 'search.uuid' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'cnb001642268' }">cnb001642268</span>
+                <span>({{ 'search.ccnb-search' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: '8085190389' }">8085190389</span>
+                <span>({{ 'search.isbn-search' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: '1851-1866' }">1851-1866</span>
+                <span>({{ 'search.issn-search' | translate }})</span>
+            </div>
         </div>
     </div>
 

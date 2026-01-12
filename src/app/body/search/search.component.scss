@@ -28,6 +28,33 @@
             margin: 0px 10px 0 -40px;
         }
     }
+    .app-search-tags {
+        display: flex;
+        width: 800px;
+        padding: 0px 16px 16px 16px;
+        gap: 8px;
+        box-sizing: border-box;
+        .app-search-tag {
+            display: flex;
+            align-items: center;
+            background: var(--BG-Main-Light, #f6f7f9);
+            border-radius: 16px;
+            padding: 4px 12px;
+            gap: 8px;
+            .app-tag-label {
+                font-size: 14px;
+                color: var(--Text-Secondary, #263340);
+            }
+            .app-tag-remove-icon {
+                font-size: 14px;
+                color: var(--Text-Light, #4c6580);
+                cursor: pointer;
+                &:hover {
+                    color: var(--Text-Secondary, #263340);
+                }
+            }
+        }
+    }
     .app-action {
         display: flex;
         width: 800px;
@@ -45,9 +72,18 @@
     .app-advanced-search {
         display: flex;
         gap: 16px;
-        // width: 800px;
+        width: 800px;
         padding: 0px 0px 16px 16px;
         box-sizing: border-box;
+        .app-search-entity-type {
+            width: 190px;
+        }
+        .app-search-registrar {
+            width: 200px;
+        }
+        .app-search-date {
+            width: 170px;
+        }
     }
     .app-search-results {
         display: flex;
@@ -277,7 +313,7 @@
     align-items: flex-start;
     align-self: stretch;
     padding: 20px 0 0 16px;
-    gap: 8px;
+    gap: 16px;
 
     .app-no-results-text {
         color: var(--Text-Secondary, #263340);
@@ -478,13 +514,34 @@
         .app-no-query-label {
             font-weight: 500;
         }
+        .app-example-value-wrapper {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
         .app-example-value {
             color: #0080a8;
-            font-weight: 400;
+            font-weight: 500;
             cursor: pointer;
             &:hover {
                 text-decoration: underline;
             }
         }
+    }
+}
+.app-records-count {
+    font-size: 14px;
+    color: var(--Text-Secondary, #263340);
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    .app-records-found {
+        display: flex;
+        justify-content: flex-end;
+    }
+    .app-too-many-records-info {
+        font-size: 12px;
+        color: var(--Text-Light, #4c6580);
     }
 }

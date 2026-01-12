@@ -61,7 +61,6 @@ export class SearchService {
                 },
             });
         } else if (filter === 'titles') {
-            // 🔍 3) Hledání podle autora
             body.query.bool.must.push({
                 multi_match: {
                     query: term,
@@ -71,11 +70,10 @@ export class SearchService {
                 },
             });
         } else if (filter === 'ids') {
-            // 🔍 3) Hledání podle autora
             body.query.bool.must.push({
                 multi_match: {
                     query: term,
-                    fields: ['issn', 'isbn', 'ccnb', 'otherid'],
+                    fields: ['issn', 'isbn', 'ccnb', 'otherid', 'rsidvalues', 'rsidkeyvalues'],
                     type: 'cross_fields',
                     operator: 'and',
                 },
@@ -100,6 +98,7 @@ export class SearchService {
                         'issn',
                         'isbn',
                         'ccnb',
+                        'otherid',
                     ],
                     type: 'cross_fields',
                     operator: 'and',

@@ -37,6 +37,10 @@ export class SearchComponent implements AfterViewInit {
     allRegistrars: Array<{ code: string; name: string }> = [];
     registrarCodeList: any[] = [];
     selectedRegistrar: string = '';
+    dateFrom: string = '';
+    dateTo: string = '';
+    minDate: Date = new Date(2010, 0, 1);
+    maxDate: Date = new Date();
 
     isLoggedIn = computed(() => this.authService.loggedIn());
     isAdmin = computed(() => this.authService.isAdmin());
@@ -138,7 +142,8 @@ export class SearchComponent implements AfterViewInit {
     selectedDiAccessRestrictionId = '';
     diAccessRestrictionsList: Array<{ value: string; label: string }> = [];
 
-    htmlHelpText: string = 'Aplikace umožňuje vyhledávat digitální dokumenty primárně podle názvových údajů (např. titul monografie, název periodika) nebo jejich částí, dále podle autora, registrátora a identifikátorů: čČNB - číslo české národní bibliografie (např. cnb000683872), ISSN, ISBN (např. 9788073210793), UUID, URN:NBN (např. urn:nbn:cz:nk-00027x)';
+    htmlHelpText: string =
+        'Aplikace umožňuje vyhledávat digitální dokumenty primárně podle názvových údajů (např. titul monografie, název periodika) nebo jejich částí, dále podle autora, registrátora a identifikátorů: čČNB - číslo české národní bibliografie (např. cnb000683872), ISSN, ISBN (např. 9788073210793), UUID, URN:NBN (např. urn:nbn:cz:nk-00027x)';
 
     constructor(
         public searchService: SearchService,
@@ -169,8 +174,10 @@ export class SearchComponent implements AfterViewInit {
             this.currentPage = page;
             this.selectedField = filter;
             this.selectedRegistrar = registrar || '';
+            this.dateFrom = params['dateFrom'] || '';
+            this.dateTo = params['dateTo'] || '';
 
-            if (this.selectedType || this.selectedRegistrar) {
+            if (this.selectedType || this.selectedRegistrar || this.dateFrom || this.dateTo) {
                 this.advancedSearch.set(true);
             } else {
                 this.advancedSearch.set(false);
@@ -215,18 +222,54 @@ export class SearchComponent implements AfterViewInit {
         this.searchInput.nativeElement.focus();
     }
 
-    onSearch(query: string, type?: string, fields?: string, registrar?: string) {
+    onFilterSelected() {
+        console.log(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar, this.dateFrom, this.dateTo);
         this.currentPage = 1;
+        this.onSearch(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar, this.dateFrom, this.dateTo);
+    }
+
+    onSearch(query: string, type?: string, fields?: string, registrar?: string, dateFrom?: any, dateTo?: any) {
+        this.currentPage = 1;
+        let formattedDateFrom = this.formatDate(dateFrom);
+        let formattedDateTo = this.formatDate(dateTo);
         this.router.navigate([], {
             queryParams: {
                 q: query || null,
-                type: type ?? (this.selectedType || null),
-                filter: fields ?? (this.selectedField || null),
-                registrar: registrar ?? (this.selectedRegistrar || null),
+                type: type ? this.selectedType || undefined : undefined,
+                filter: fields ? this.selectedField || undefined : undefined,
+                registrar: registrar ? this.selectedRegistrar || undefined : undefined,
+                dateFrom: formattedDateFrom,
+                dateTo: formattedDateTo,
                 page: 1,
             },
             queryParamsHandling: 'merge',
         });
+    }
+    removeFilter(value: string) {
+        if (value === 'searchQuery') {
+            console.log(this.searchQuery);
+            this.searchQuery = '';
+        }
+        if (value === 'selectedType') {
+            this.selectedType = '';
+        }
+        if (value === 'selectedRegistrar') {
+            this.selectedRegistrar = '';
+        }
+        if (value === 'dateFrom') {
+            this.dateFrom = '';
+        }
+        if (value === 'dateTo') {
+            this.dateTo = '';
+        }
+        this.updateUrlParams();
+    }
+    selectedTypeLabel(): string {
+        if (!this.selectedType) {
+            return this.translate.instant('search.all-types');
+        }
+
+        return this.entityTypesList.find((e) => e.value === this.selectedType)?.label ?? this.translate.instant('search.all-types');
     }
 
     updateUrlParams() {
@@ -246,11 +289,20 @@ export class SearchComponent implements AfterViewInit {
         } else {
             queryParams['filter'] = null;
         }
-
         if (this.selectedRegistrar !== '') {
             queryParams['registrar'] = this.selectedRegistrar;
         } else {
             queryParams['registrar'] = undefined; // odstraní parametr z URL
+        }
+        if (this.dateFrom !== '') {
+            queryParams['dateFrom'] = this.dateFrom;
+        } else {
+            queryParams['dateFrom'] = undefined; // odstraní parametr z URL
+        }
+        if (this.dateTo !== '') {
+            queryParams['dateTo'] = this.dateTo;
+        } else {
+            queryParams['dateTo'] = undefined; // odstraní parametr z URL
         }
         if (this.currentPage) {
             queryParams['page'] = this.currentPage;
@@ -375,11 +427,6 @@ export class SearchComponent implements AfterViewInit {
 
         // filtruj seznam registrátorů
         this.registrarCodeList = this.allRegistrars.filter((reg) => resultRegistrars.has(reg.code));
-    }
-
-    onFilterSelected() {
-        this.currentPage = 1;
-        this.onSearch(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar);
     }
 
     onSelectItem(item: any) {
@@ -892,6 +939,18 @@ export class SearchComponent implements AfterViewInit {
         return this.authService.hasRightToRegistrar(code);
     }
 
+    private formatDate(date: any): string | null {
+        console.log('format date', date);
+        if (!date) return null;
+        if (!date._d || !(date._d instanceof Date)) return date;
+
+        const y = date._d.getFullYear();
+        const m = String(date._d.getMonth() + 1).padStart(2, '0');
+        const d = String(date._d.getDate()).padStart(2, '0');
+
+        return `${y}-${m}-${d}`;
+    }
+
     // VALIDACNI FUNKCE
     updateButtonState() {
         // tlačítko se aktivuje jen když:
@@ -986,8 +1045,8 @@ export class SearchComponent implements AfterViewInit {
                     { value: 'PERIODICAL_ISSUE', label: t['PERIODICAL_ISSUE'] },
                     { value: 'ANALYTICAL', label: t['ANALYTICAL'] },
                     { value: 'THESIS', label: t['THESIS'] },
-                    { value: 'OTHER', label: t['OTHER'] },
                     { value: 'SOUND_COLLECTION', label: t['SOUND_COLLECTION'] },
+                    { value: 'OTHER', label: t['OTHER'] },
                 ];
                 this.filterFieldsList = [
                     { value: '', label: t['all'] },
@@ -1092,5 +1151,4 @@ export class SearchComponent implements AfterViewInit {
     isDevMode() {
         return this.envService.get('devMode');
     }
-
 }
