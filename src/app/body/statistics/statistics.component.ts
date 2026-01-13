@@ -1,10 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ViewChild, ElementRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StatisticsService } from '../../services/statistics.service';
 import { RegistrarsService } from '../../services/registrars.service';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { id } from '@swimlane/ngx-charts';
 
 @Component({
     selector: 'app-statistics',
@@ -16,7 +17,7 @@ export class StatisticsComponent {
     isActive = 'registered';
 
     states = ['all', 'active', 'inactive'];
-    selectedState = signal<string>('all');
+    selectedState: string = '';
 
     chartDataByDate = signal<Array<{ name: string; value: number }>>([]);
     chartDataByRegistrar = signal<any[]>([]);
@@ -31,6 +32,7 @@ export class StatisticsComponent {
     selectedRegistrar = signal<string | null>(null);
     selectedType = signal<string | null>(null);
 
+    @ViewChild('sourceDiv') sourceDiv!: ElementRef<HTMLElement>;
     colorScheme: any = {
         domain: ['#0080a8', '#00bcd4', '#4dd0e1', '#b2ebf2', '#e0f7fa'],
     };
@@ -75,9 +77,11 @@ export class StatisticsComponent {
         combineLatest([url$, filters$]).subscribe(([active, filters]) => {
             this.isActive = active;
 
+            console.log(filters.state);
+
             this.selectedYear.set(filters.year);
             this.selectedRegistrar.set(filters.registrar);
-            this.selectedState.set(filters.state);
+            this.selectedState = filters.state;
             this.selectedType.set(filters.type);
 
             this.reloadData(filters.year, filters.registrar, filters.state, filters.type);
@@ -88,11 +92,21 @@ export class StatisticsComponent {
             console.log('Records loaded:', data);
         });
     }
+    ngAfterViewInit(): void {
+        console.log(this.getCalculatedWidth());
+    }
+
+    getCalculatedWidth(): number {
+        return this.sourceDiv?.nativeElement.clientWidth ?? 0;
+    }
+    getCalculatedWidthHalf(): number {
+        return (this.sourceDiv?.nativeElement.clientWidth ?? 0) / 2;
+    }
 
     private reloadData(year: string | null, registrar: string | null, state?: string, type?: any) {
         const y = year || undefined;
         const r = registrar || undefined;
-        const s = state || this.selectedState();
+        const s = state || this.selectedState;
         const t = type || this.selectedType();
 
         console.log('type', t);
@@ -122,15 +136,18 @@ export class StatisticsComponent {
         });
         // ENTITY TYPES
         this.statisticsService.getCountByEntityTypes(r, y, s, t).subscribe((data) => {
+            console.log('getCountByTypes', data);
             const keys = data.map((i: any) => `${i.name}`);
 
             this.translate.get(keys).subscribe((translations: any) => {
                 const translatedData = data.map((i: any) => ({
-                    label: translations[i.name] || i.name,
-                    name: i.name,
+                    name: translations[i.name] || i.name,
+                    // name: i.name,
                     value: i.value,
+                    extra: { id: i.name },
                 }));
-            this.chartDataByEntityTypes.set(translatedData);
+                console.log(translatedData);
+                this.chartDataByEntityTypes.set(translatedData);
             });
         });
     }
@@ -182,7 +199,7 @@ export class StatisticsComponent {
     }
 
     onTypeClick(event: any) {
-        const type = event.name;
+        const type = event.extra.id;
         console.log(event);
 
         this.router.navigate([], {
@@ -219,6 +236,7 @@ export class StatisticsComponent {
     }
 
     onStateChange(newState: string) {
+        console.log('onstateChange', newState);
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: {

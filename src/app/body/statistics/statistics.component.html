@@ -18,29 +18,27 @@
                 {{ 'statistics.assignments-title' | translate }}
             </div>
             <div class="app-filter-tags">
-                <div class="app-filter-tag" *ngIf="selectedState() !== 'all'" (click)="selectedState.set('all')">
-                    <div class="app-tag-label">{{ 'statistics.' + selectedState() | translate }} URN:NBN</div>
-                    <div class="app-tag-remove-icon" (click)="selectedState.set('all')">&#10005;</div>
+                <div class="app-filter-tag" *ngIf="selectedState !== 'all'" (click)="onStateChange('all')">
+                    <div class="app-tag-label">{{ 'statistics.' + selectedState | translate }} URN:NBN</div>
+                    <div class="app-tag-remove-icon" (click)="onStateChange('all')">&#10005;</div>
                 </div>
                 <div class="app-filter-tag" *ngIf="selectedYear()" (click)="onYearCancel()">
-                    <div class="app-tag-label">{{'statistics.year' | translate}}: {{ selectedYear() }}</div>
+                    <div class="app-tag-label">{{ 'statistics.year' | translate }}: {{ selectedYear() }}</div>
                     <div class="app-tag-remove-icon" (click)="onYearCancel()">&#10005;</div>
                 </div>
                 <div class="app-filter-tag" *ngIf="selectedRegistrar()" (click)="onRegistrarCancel()">
-                    <div class="app-tag-label">{{'statistics.registrar' | translate}}: {{ selectedRegistrar() }}</div>
+                    <div class="app-tag-label">{{ 'statistics.registrar' | translate }}: {{ selectedRegistrar() }}</div>
                     <div class="app-tag-remove-icon" (click)="onRegistrarCancel()">&#10005;</div>
                 </div>
                 <div class="app-filter-tag" *ngIf="selectedType()" (click)="onTypeCancel()">
-                    <div class="app-tag-label">{{ selectedType() | translate}}</div>
+                    <div class="app-tag-label">{{ selectedType() | translate }}</div>
                     <div class="app-tag-remove-icon" (click)="onTypeCancel()">&#10005;</div>
                 </div>
             </div>
 
             <div class="app-content">
                 <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedState" (valueChange)="onStateChange($event)">
-                    @for (state of states; track state) {
-                    <app-radio-button label="{{ 'statistics.' + state | translate }}" value="{{ state }}"></app-radio-button>
-                    }
+                    <app-radio-button *ngFor="let state of states" [label]="'statistics.' + state | translate" [value]="state"></app-radio-button>
                 </app-radio-group>
                 <div class="app-chart app-chart-years">
                     <div class="app-chart-header">
@@ -53,19 +51,21 @@
                         </div>
                     </div>
                     <!-- DATA BY YEARS -->
-                    <ngx-charts-bar-vertical
-                        *ngIf="chartDataByDate()"
-                        [scheme]="colorScheme"
-                        [view]="[1000, 300]"
-                        [animations]="true"
-                        [barPadding]="2"
-                        [results]="chartDataByDate()"
-                        [gradient]="false"
-                        [xAxis]="true"
-                        [yAxis]="true"
-                        [showDataLabel]="false"
-                        (select)="onYearClick($event)"
-                    ></ngx-charts-bar-vertical>
+                    <div class="app-chart-item" #sourceDiv>
+                        <ngx-charts-bar-vertical
+                            *ngIf="chartDataByDate()"
+                            [scheme]="colorScheme"
+                            [view]="[getCalculatedWidth(), 300]"
+                            [animations]="true"
+                            [barPadding]="2"
+                            [results]="chartDataByDate()"
+                            [gradient]="false"
+                            [xAxis]="true"
+                            [yAxis]="true"
+                            [showDataLabel]="false"
+                            (select)="onYearClick($event)"
+                        ></ngx-charts-bar-vertical>
+                    </div>
                 </div>
 
                 <div class="app-chart-wrapper">
@@ -86,19 +86,22 @@
                                 <div class="app-chart-header-title">{{ selectedRegistrar() }}</div>
                             </div>
                         </div>
-                        <ngx-charts-pie-chart
-                            *ngIf="chartDataByRegistrar()"
-                            [results]="chartDataByRegistrar()"
-                            [view]="[500, 300]"
-                            [animations]="false"
-                            [legend]="false"
-                            [labels]="true"
-                            [doughnut]="false"
-                            [explodeSlices]="false"
-                            [gradient]="false"
-                            [scheme]="colorScheme"
-                            (select)="onRegistrarClick($event)"
-                        ></ngx-charts-pie-chart>
+                        <div class="app-chart-item" #sourceDiv>
+                            <ngx-charts-pie-chart
+                                #chart
+                                *ngIf="chartDataByRegistrar()"
+                                [view]="[getCalculatedWidthHalf(), 400]"
+                                [results]="chartDataByRegistrar()"
+                                [animations]="false"
+                                [legend]="false"
+                                [labels]="true"
+                                [doughnut]="false"
+                                [explodeSlices]="false"
+                                [gradient]="false"
+                                [scheme]="colorScheme"
+                                (select)="onRegistrarClick($event)"
+                            ></ngx-charts-pie-chart>
+                        </div>
                         <div class="app-chart-table">
                             <div class="app-header-row app-chart-row">
                                 <div class="app-chart-col">
@@ -128,20 +131,23 @@
                                 <div class="app-chart-header-title">{{ selectedType() | translate }}</div>
                             </div>
                         </div>
-                        <ngx-charts-pie-chart
-                            *ngIf="chartDataByEntityTypes()"
-                            [results]="chartDataByEntityTypes()"
-                            [view]="[500, 300]"
-                            [animations]="false"
-                            [legend]="true"
-                            [labels]="true"
-                            [doughnut]="false"
-                            [explodeSlices]="false"
-                            [gradient]="false"
-                            [legend]="false"
-                            [scheme]="colorScheme"
-                            (select)="onTypeClick($event)"
-                        ></ngx-charts-pie-chart>
+                        <div class="app-chart-item" #sourceDiv>
+                            <ngx-charts-pie-chart
+                                #chart
+                                [view]="[getCalculatedWidthHalf(), 400]"
+                                *ngIf="chartDataByEntityTypes()"
+                                [results]="chartDataByEntityTypes()"
+                                [animations]="false"
+                                [legend]="true"
+                                [labels]="true"
+                                [doughnut]="false"
+                                [explodeSlices]="false"
+                                [gradient]="false"
+                                [legend]="false"
+                                [scheme]="colorScheme"
+                                (select)="onTypeClick($event)"
+                            ></ngx-charts-pie-chart>
+                        </div>
                         <div class="app-chart-table">
                             <div class="app-header-row app-chart-row">
                                 <div class="app-chart-col">

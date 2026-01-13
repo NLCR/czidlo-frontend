@@ -72,16 +72,21 @@
                 .app-chart-wrapper {
                     display: flex;
                     gap: 24px;
+                    max-width: 1200px;
+                    height: 100%;
                     // overflow: auto;
                 }
                 .app-chart {
                     display: flex;
                     flex-direction: column;
-                    width: 100%;
+                    width: 50%;
+                    // height: 400px;
                     // height: 300px;
+                    &.app-chart-years {
+                        width: 100%;
+                    }
                     .app-chart-header {
                         display: flex;
-
                         .app-chart-header-item {
                             display: flex;
                             align-items: center;
@@ -98,7 +103,7 @@
                         }
                     }
                     .app-chart-table {
-                        width: 400px;
+                        width: 100%;
                         font-size: 12px;
                         margin-bottom: 40px;
                         .app-chart-row {
@@ -135,30 +140,30 @@
         }
     }
 }
-    .app-filter-tags {
+.app-filter-tags {
+    display: flex;
+    width: 800px;
+    padding: 0px 16px 16px 16px;
+    gap: 8px;
+    box-sizing: border-box;
+    .app-filter-tag {
         display: flex;
-        width: 800px;
-        padding: 0px 16px 16px 16px;
+        align-items: center;
+        background: var(--BG-Main-Light, #f6f7f9);
+        border-radius: 16px;
+        padding: 4px 12px;
         gap: 8px;
-        box-sizing: border-box;
-        .app-filter-tag {
-            display: flex;
-            align-items: center;
-            background: var(--BG-Main-Light, #f6f7f9);
-            border-radius: 16px;
-            padding: 4px 12px;
-            gap: 8px;
-            .app-tag-label {
-                font-size: 14px;
+        .app-tag-label {
+            font-size: 14px;
+            color: var(--Text-Secondary, #263340);
+        }
+        .app-tag-remove-icon {
+            font-size: 14px;
+            color: var(--Text-Light, #4c6580);
+            cursor: pointer;
+            &:hover {
                 color: var(--Text-Secondary, #263340);
-            }
-            .app-tag-remove-icon {
-                font-size: 14px;
-                color: var(--Text-Light, #4c6580);
-                cursor: pointer;
-                &:hover {
-                    color: var(--Text-Secondary, #263340);
-                }
             }
         }
     }
+}

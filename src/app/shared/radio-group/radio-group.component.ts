@@ -1,58 +1,68 @@
 import {
-  Component,
-  ContentChildren,
-  QueryList,
-  AfterContentInit,
-  Input,
-  Output,
-  EventEmitter,
-  ChangeDetectorRef,
-  AfterViewInit,
+    Component,
+    ContentChildren,
+    QueryList,
+    AfterContentInit,
+    Input,
+    Output,
+    EventEmitter,
+    ChangeDetectorRef,
+    AfterViewInit,
+    SimpleChanges,
 } from '@angular/core';
 import { RadioButtonComponent } from '../radio-button/radio-button.component';
 
 @Component({
-  selector: 'app-radio-group',
-  standalone: false,
-  templateUrl: './radio-group.component.html',
-  styleUrls: ['./radio-group.component.scss'],
+    selector: 'app-radio-group',
+    standalone: false,
+    templateUrl: './radio-group.component.html',
+    styleUrls: ['./radio-group.component.scss'],
 })
 export class RadioGroupComponent implements AfterContentInit, AfterViewInit {
-  @Input() value: any;
-  @Output() valueChange = new EventEmitter<any>();
-  @Input() orientation: 'horizontal' | 'vertical' = 'vertical';
-  @Input() gap = 12; // px
+    @Input() value: any;
+    @Output() valueChange = new EventEmitter<any>();
+    @Input() orientation: 'horizontal' | 'vertical' = 'vertical';
+    @Input() gap = 12; // px
 
-  @ContentChildren(RadioButtonComponent) radios!: QueryList<RadioButtonComponent>;
+    @ContentChildren(RadioButtonComponent) radios!: QueryList<RadioButtonComponent>;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+    constructor(private cdr: ChangeDetectorRef) {}
 
-  ngAfterContentInit(): void {
-    this.bindRadios();
-  }
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['value']) {
+            // když rodič změní selectedState, přepni radios
+            this.updateCheckedStates();
+            // někdy pomůže dotlačit změnu do UI
+            this.cdr.detectChanges();
+        }
+    }
 
-  ngAfterViewInit(): void {
-    // aktualizace proběhne AŽ po prvním renderu
-    Promise.resolve().then(() => {
-      this.updateCheckedStates();
-      this.cdr.detectChanges();
-    });
-  }
+    ngAfterContentInit(): void {
+        this.bindRadios();
+    }
 
-  private bindRadios(): void {
-    this.radios.forEach((radio) => {
-      radio.changed.subscribe((val) => {
-        this.value = val;
-        this.updateCheckedStates();
-        this.valueChange.emit(val);
-      });
-    });
-  }
+    ngAfterViewInit(): void {
+        // aktualizace proběhne AŽ po prvním renderu
+        Promise.resolve().then(() => {
+            this.updateCheckedStates();
+            this.cdr.detectChanges();
+        });
+    }
 
-  private updateCheckedStates(): void {
-    if (!this.radios) return;
-    this.radios.forEach((radio) => {
-      radio.checked = radio.value === this.value;
-    });
-  }
+    private bindRadios(): void {
+        this.radios.forEach((radio) => {
+            radio.changed.subscribe((val) => {
+                this.value = val;
+                this.updateCheckedStates();
+                this.valueChange.emit(val);
+            });
+        });
+    }
+
+    private updateCheckedStates(): void {
+        if (!this.radios) return;
+        this.radios.forEach((radio) => {
+            radio.checked = radio.value === this.value;
+        });
+    }
 }
