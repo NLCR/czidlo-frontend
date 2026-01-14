@@ -408,7 +408,13 @@
         "all": "Vše",
         "active": "Aktivní",
         "inactive": "Deaktivované",
-        "type": "Typ entity"
+        "type": "Typ entity",
+        "download-csv": "Stáhnout CSV",
+        "no-active-filters": "Žádné aktivní filtry",
+        "active-filters": "Aktivní filtry",
+        "filter-by-born-digital": "Filtrovat podle digital born",
+        "digital": "Digital born",
+        "analog": "Analog born"
     },
     "search": {
         "true": "ano",

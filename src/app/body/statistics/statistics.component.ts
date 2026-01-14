@@ -17,7 +17,9 @@ export class StatisticsComponent {
     isActive = 'registered';
 
     states = ['all', 'active', 'inactive'];
-    selectedState: string = '';
+    selectedState: string = 'all';
+    bornDigitalStates = ['all', 'digital', 'analog'];
+    selectedBornDigitalState: string = 'all';
 
     chartDataByDate = signal<Array<{ name: string; value: number }>>([]);
     chartDataByRegistrar = signal<any[]>([]);
@@ -34,7 +36,20 @@ export class StatisticsComponent {
 
     @ViewChild('sourceDiv') sourceDiv!: ElementRef<HTMLElement>;
     colorScheme: any = {
-        domain: ['#0080a8', '#00bcd4', '#4dd0e1', '#b2ebf2', '#e0f7fa'],
+        // domain: ['#0080a8', '#00bcd4', '#0097a7', '#4dd0e1', '#b2ebf2'],
+        domain: [
+            '#4FA3C4', // zesvětlená tyrkysová (hlavní)
+
+            '#B06B6B', // zesvětlená červenohnědá
+            '#C4925D', // zesvětlená oranžová
+            '#B3B86A', // zesvětlená olivová
+            '#82A883', // zesvětlená zelená
+            '#7FB2AA', // zesvětlená zelenomodrá
+            '#8796C4', // zesvětlená modrá
+            '#A48AC4', // zesvětlená fialová
+            '#A0A0A0', // zesvětlená šedá
+            '#7D919B', // zesvětlená šedomodrá
+        ],
     };
 
     constructor(
@@ -70,6 +85,7 @@ export class StatisticsComponent {
                 registrar: params['registrar'] || null,
                 state: params['state'] || 'all',
                 type: params['type'] || null,
+                born: params['born'] || 'all',
             }))
         );
 
@@ -82,9 +98,10 @@ export class StatisticsComponent {
             this.selectedYear.set(filters.year);
             this.selectedRegistrar.set(filters.registrar);
             this.selectedState = filters.state;
+            this.selectedBornDigitalState = filters.born;
             this.selectedType.set(filters.type);
 
-            this.reloadData(filters.year, filters.registrar, filters.state, filters.type);
+            this.reloadData(filters.year, filters.registrar, filters.state, filters.type, filters.born);
         });
 
         // FOR TESTING PURPOSES ONLY
@@ -103,30 +120,28 @@ export class StatisticsComponent {
         return (this.sourceDiv?.nativeElement.clientWidth ?? 0) / 2;
     }
 
-    private reloadData(year: string | null, registrar: string | null, state?: string, type?: any) {
+    private reloadData(year: string | null, registrar: string | null, state?: string, type?: any, born?: string) {
         const y = year || undefined;
         const r = registrar || undefined;
         const s = state || this.selectedState;
         const t = type || this.selectedType();
-
-        console.log('type', t);
+        const b = born || this.selectedBornDigitalState;
 
         if (this.isActive === 'assignments') {
-            this.loadRegisteredData(r, y, s, t);
+            this.loadRegisteredData(r, y, s, t, b);
         } else if (this.isActive === 'resolvations') {
             this.loadResolvedData(r, y);
         }
     }
 
-    private loadRegisteredData(r?: string, y?: string, s?: string, t?: string) {
-        console.log(r, y, s, t);
+    private loadRegisteredData(r?: string, y?: string, s?: string, t?: string, b?: string) {
+        console.log(r, y, s, t, b);
         // DATE
-        this.statisticsService.getCountByDate(r, y, s, t).subscribe((data) => {
-            // console.table(data);
+        this.statisticsService.getCountByDate(r, y, s, t, b).subscribe((data) => {
             this.chartDataByDate.set(data);
         });
         // REGISTRAR
-        this.statisticsService.getCountByRegistrar(r, y, s, t).subscribe((data) => {
+        this.statisticsService.getCountByRegistrar(r, y, s, t, b).subscribe((data) => {
             // console.table(data);
             // TABULKA – beze změny
             this.chartDataByRegistrarTable.set(data);
@@ -135,9 +150,12 @@ export class StatisticsComponent {
             this.chartDataByRegistrar.set(chartData);
         });
         // ENTITY TYPES
-        this.statisticsService.getCountByEntityTypes(r, y, s, t).subscribe((data) => {
-            console.log('getCountByTypes', data);
-            const keys = data.map((i: any) => `${i.name}`);
+        this.statisticsService.getCountByEntityTypes(r, y, s, t, b).subscribe((data) => {
+            if (!Array.isArray(data) || data.length === 0) {
+                this.chartDataByEntityTypes.set([]);
+                return;
+            }
+            const keys = data?.map((i: any) => `${i.name}`) || [];
 
             this.translate.get(keys).subscribe((translations: any) => {
                 const translatedData = data.map((i: any) => ({
@@ -154,12 +172,10 @@ export class StatisticsComponent {
 
     private loadResolvedData(r?: string, y?: string) {
         this.statisticsService.getResolvedByDate(r, y).subscribe((data) => {
-            // console.table(data);
             this.resolvedDataByDate.set(data);
         });
 
         this.statisticsService.getResolvedByRegistrar(y).subscribe((data) => {
-            console.table(data);
             this.resolvedDataByRegistrar.set(data);
         });
     }
@@ -245,6 +261,16 @@ export class StatisticsComponent {
             queryParamsHandling: 'merge',
         });
     }
+    onBornDigitalChange(newValue: string) {
+        console.log('onBornDigitalChange', newValue);
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {
+                born: newValue,
+            },
+            queryParamsHandling: 'merge',
+        });
+    }
 
     private prepareChartDataWithOther(items: any[], thresholdPercent = 4, otherName = 'další', otherTitle = 'Other'): any[] {
         if (!items?.length) return [];
@@ -273,5 +299,111 @@ export class StatisticsComponent {
         // result.sort((a, b) => b.value - a.value);
 
         return result;
+    }
+
+    downloadCSV(table: string) {
+        // 1) filename podle filtrů
+        let filename = `assignments-${table}`;
+        if (this.selectedYear()) filename += `-${this.selectedYear()}`;
+        if (this.selectedRegistrar()) filename += `-${this.selectedRegistrar()}`;
+        if (this.selectedState && this.selectedState !== 'all') filename += `-${this.selectedState}`;
+        if (this.selectedType()) filename += `-${this.selectedType()}`;
+        if (this.selectedBornDigitalState && this.selectedBornDigitalState !== 'all') filename += `-born-${this.selectedBornDigitalState}`;
+        filename += `.csv`;
+
+        // 2) vyber zdroj dat
+        let data: any[] = [];
+        if (table === 'by-registrars') data = this.chartDataByRegistrarTable();
+        if (table === 'by-years') data = this.chartDataByDate();
+        if (table === 'by-entity-types') data = this.chartDataByEntityTypes();
+
+        // 3) ochrana pro prázdná data
+        if (!Array.isArray(data) || data.length === 0) {
+            // klidně si místo toho dej snackbar/toast
+            console.warn('No data to export.');
+            return;
+        }
+
+        // 4) vytvoř CSV a stáhni
+        const csv = this.toCSV(data);
+        this.downloadTextFile(csv, filename, 'text/csv;charset=utf-8;');
+    }
+
+    /** Převede array objektů na CSV (včetně flatten extra.*) */
+    private toCSV(rows: any[]): string {
+        const flattened = rows.map((r) => this.flattenObject(r));
+
+        // sjednocení všech klíčů (aby nic nechybělo, i když některé řádky mají extra klíče)
+        const headerSet = new Set<string>();
+        flattened.forEach((obj) => Object.keys(obj).forEach((k) => headerSet.add(k)));
+
+        // “nejhezčí” pořadí, když existuje:
+        const preferredOrder = ['name', 'title', 'value', 'count', 'year', 'registrar', 'state', 'type'];
+        const headers = [...preferredOrder.filter((h) => headerSet.has(h)), ...Array.from(headerSet).filter((h) => !preferredOrder.includes(h))];
+
+        const escape = (val: any) => {
+            if (val === null || val === undefined) return '';
+            const s = String(val);
+            // CSV escaping: když obsahuje uvozovku/čárku/newline, obal do "..." a " zdvoj
+            const mustQuote = /[",\n\r;]/.test(s); // ; kvůli excelu (někdy)
+            const escaped = s.replace(/"/g, '""');
+            return mustQuote ? `"${escaped}"` : escaped;
+        };
+
+        const lines: string[] = [];
+        lines.push(headers.map(escape).join(',')); // hlavička
+
+        for (const row of flattened) {
+            lines.push(headers.map((h) => escape(row[h])).join(','));
+        }
+
+        // BOM pomůže Excelu s UTF-8 (čj)
+        return '\uFEFF' + lines.join('\n');
+    }
+
+    /** Zploští objekt: {a:{b:1}} => {"a.b":1}. Hodí se pro extra.id apod. */
+    private flattenObject(obj: any, prefix = '', out: Record<string, any> = {}): Record<string, any> {
+        if (obj === null || obj === undefined) return out;
+
+        // pokud je to primitivum, uložíme pod prefix (většinou se nepoužije)
+        if (typeof obj !== 'object' || obj instanceof Date) {
+            if (prefix) out[prefix] = obj instanceof Date ? obj.toISOString() : obj;
+            return out;
+        }
+
+        // array -> dáme jako JSON string (CSV-friendly)
+        if (Array.isArray(obj)) {
+            if (prefix) out[prefix] = JSON.stringify(obj);
+            return out;
+        }
+
+        for (const key of Object.keys(obj)) {
+            const value = obj[key];
+            const path = prefix ? `${prefix}.${key}` : key;
+
+            if (value && typeof value === 'object' && !(value instanceof Date) && !Array.isArray(value)) {
+                this.flattenObject(value, path, out);
+            } else if (Array.isArray(value)) {
+                out[path] = JSON.stringify(value);
+            } else {
+                out[path] = value instanceof Date ? value.toISOString() : value;
+            }
+        }
+        return out;
+    }
+
+    private downloadTextFile(content: string, filename: string, mime: string) {
+        const blob = new Blob([content], { type: mime });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 }

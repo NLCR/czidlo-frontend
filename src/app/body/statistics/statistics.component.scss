@@ -69,10 +69,12 @@
                 flex-direction: column;
                 gap: 24px;
                 overflow: auto;
+                width: 100%;
+                padding: 0 24px 0 0;
+                box-sizing: border-box;
                 .app-chart-wrapper {
                     display: flex;
                     gap: 24px;
-                    max-width: 1200px;
                     height: 100%;
                     // overflow: auto;
                 }
@@ -87,11 +89,12 @@
                     }
                     .app-chart-header {
                         display: flex;
+                        align-items: center;
+                        gap: 16px;
                         .app-chart-header-item {
                             display: flex;
                             align-items: center;
                             gap: 16px;
-                            margin-bottom: 8px;
                             .app-chart-header-title {
                                 /* Typesettings/M/Medium */
                                 font-family: 'IBM Plex Sans';
@@ -106,6 +109,8 @@
                         width: 100%;
                         font-size: 12px;
                         margin-bottom: 40px;
+                        padding: 0 24px 0 0;
+                        box-sizing: border-box;
                         .app-chart-row {
                             display: flex;
                             justify-content: space-between;
@@ -140,12 +145,35 @@
         }
     }
 }
+.app-statistic-filters {
+    display: flex;
+    gap: 48px;
+    .app-statistics-filter {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+.app-filter-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .app-download-statistics {
+        display: flex;
+        width: 120px;
+    }
+}
 .app-filter-tags {
     display: flex;
+    align-items: center;
     width: 800px;
-    padding: 0px 16px 16px 16px;
     gap: 8px;
     box-sizing: border-box;
+    .app-filter-title {
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--Text-Light, #4c6580);
+    }
     .app-filter-tag {
         display: flex;
         align-items: center;

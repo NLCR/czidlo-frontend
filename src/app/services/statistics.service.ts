@@ -16,7 +16,7 @@ export class StatisticsService {
     }
 
     // REGISTRACE URNNBN PODLE ROKU
-    getCountByDate(registrar?: any, year?: any, state?: string, type?: string): Observable<any> {
+    getCountByDate(registrar?: any, year?: any, state?: string, type?: string, born?: string): Observable<any> {
         const filters: any[] = [];
 
         // pokud je filtr registrar
@@ -48,6 +48,23 @@ export class StatisticsService {
                     active: isActive,
                 },
             });
+        }
+
+        // pokud je filtrován born digital
+        if (born && born !== 'all') {
+            if (born === 'digital') {
+                filters.push({
+                    term: {
+                        borndigital: true,
+                    },
+                });
+            } else if (born === 'analog') {
+                filters.push({
+                    term: {
+                        borndigital: false,
+                    },
+                });
+            }
         }
 
         // pokud je filtrován typ entity
@@ -100,7 +117,7 @@ export class StatisticsService {
     }
 
     // REGISTRACE URNNBN PODLE REGISTRÁTORŮ
-    getCountByRegistrar(registrar?: string, year?: string, state?: string, type?: string): Observable<any> {
+    getCountByRegistrar(registrar?: string, year?: string, state?: string, type?: string, born?: string): Observable<any> {
         console.log('getCountByRegistrar', registrar, year, state, type);
         const query: any = {
             bool: {
@@ -146,6 +163,22 @@ export class StatisticsService {
                 },
             });
         }
+        // pokud je filtrován born digital
+        if (born && born !== 'all') {
+            if (born === 'digital') {
+                query.bool.filter.push({
+                    term: {
+                        borndigital: true,
+                    },
+                });
+            } else if (born === 'analog') {
+                query.bool.filter.push({
+                    term: {
+                        borndigital: false,
+                    },
+                });
+            }
+        }
 
         const body: any = {
             size: 0,
@@ -160,10 +193,9 @@ export class StatisticsService {
         };
 
         // query přidáme jen pokud existuje filtr (rok)
-        if (registrar || year || (state && state !== 'all') || type) {
+        if (registrar || year || (state && state !== 'all') || type || (born && born !== 'all')) {
             body.query = query;
         }
-
 
         return combineLatest([this.registrars$, this.apiService.getStatisticsDataAssign(body)]).pipe(
             map(([registrars, res]) =>
@@ -179,13 +211,11 @@ export class StatisticsService {
         );
     }
 
-    // REGISTRACE URNNBN PODLE TYPŮ V ZADANÉM ROCE A PRO ZADANÉHO REGISTRÁTORA
-    getCountByEntityTypes(registrar?: string, year?: string, state?: string, type?: string): Observable<any> {
-
+    // REGISTRACE URNNBN PODLE TYPŮ
+    getCountByEntityTypes(registrar?: string, year?: string, state?: string, type?: string, born?: string): Observable<any> {
         const query: any = {
             bool: {
-                must: [
-                ],
+                must: [],
             },
         };
 
@@ -220,6 +250,22 @@ export class StatisticsService {
             });
         }
 
+        // pokud je filtrován born digital
+        if (born && born !== 'all') {
+            if (born === 'digital') {
+                query.bool.must.push({
+                    term: {
+                        borndigital: true,
+                    },
+                });
+            } else if (born === 'analog') {
+                query.bool.must.push({
+                    term: {
+                        borndigital: false,
+                    },
+                });
+            }
+        }
 
         // pokud je filtrován typ entity
         if (type) {
@@ -246,7 +292,7 @@ export class StatisticsService {
         return this.apiService.getStatisticsDataAssign(body).pipe(
             map((result: any) =>
                 result.aggregations.entity_types.buckets.map((bucket: any) => ({
-                    name:  bucket.key,
+                    name: bucket.key,
                     value: bucket.doc_count,
                 }))
             ),
@@ -378,4 +424,6 @@ export class StatisticsService {
         };
         return this.apiService.getStatisticsDataAssign(body);
     }
+
+
 }
