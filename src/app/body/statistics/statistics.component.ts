@@ -37,19 +37,32 @@ export class StatisticsComponent {
     @ViewChild('sourceDiv') sourceDiv!: ElementRef<HTMLElement>;
     colorScheme: any = {
         // domain: ['#0080a8', '#00bcd4', '#0097a7', '#4dd0e1', '#b2ebf2'],
-        domain: [
-            '#4FA3C4', // zesvětlená tyrkysová (hlavní)
+        // domain: [
+        //     '#4FA3C4', // zesvětlená tyrkysová (hlavní)
 
-            '#B06B6B', // zesvětlená červenohnědá
-            '#C4925D', // zesvětlená oranžová
-            '#B3B86A', // zesvětlená olivová
-            '#82A883', // zesvětlená zelená
-            '#7FB2AA', // zesvětlená zelenomodrá
-            '#8796C4', // zesvětlená modrá
-            '#A48AC4', // zesvětlená fialová
-            '#A0A0A0', // zesvětlená šedá
-            '#7D919B', // zesvětlená šedomodrá
-        ],
+        //     '#B06B6B', // zesvětlená červenohnědá
+        //     '#C4925D', // zesvětlená oranžová
+        //     '#B3B86A', // zesvětlená olivová
+        //     '#82A883', // zesvětlená zelená
+        //     '#77b2b8ff', // zesvětlená zelenomodrá
+        //     '#8796C4', // zesvětlená modrá
+        //     '#A48AC4', // zesvětlená fialová
+        //     '#A0A0A0', // zesvětlená šedá
+        //     '#7D919B', // zesvětlená šedomodrá
+        // ],
+        domain: [
+  '#2F93B8', // živější tyrkysová (hlavní)
+
+  '#C04A4A', // živější tlumená červená
+  '#D08A3C', // živější oranžová
+  '#dde032ff', // žluto-olivová
+  '#5FAF6A', // zelená
+  '#3FA6A0', // zelenomodrá
+  '#4F6FB8', // modrá
+  '#8C63B8', // fialová
+  '#8C8C8C', // neutrální šedá
+  '#4F6E7A'  // šedomodrá
+]
     };
 
     constructor(
