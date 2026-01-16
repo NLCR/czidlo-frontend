@@ -61,7 +61,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="app-content">
                 <div class="app-statistic-filters">
                     <!-- STATE -->
@@ -244,49 +243,125 @@
             <div class="app-title">
                 {{ 'statistics.resolvations-title' | translate }}
             </div>
-            <!-- <div class="app-actions">
-                <div class="app-left-part">select</div>
-                <div class="app-right-part">
-                    <div class="app-tags">
-                        <div class="app-tag">tag1</div>
-                        <div class="app-tag">tag2</div>
+            <div class="app-filter-actions">
+                <div class="app-filter-tags">
+                    <div
+                        class="app-filter-title"
+                        *ngIf="
+                            selectedState !== 'all' || selectedYear() || selectedRegistrar() || selectedType() || selectedBornDigitalState !== 'all'
+                        "
+                    >
+                        {{ 'statistics.active-filters' | translate }}:
+                    </div>
+                    <div
+                        class="app-filter-title"
+                        *ngIf="
+                            selectedState === 'all' &&
+                            !selectedYear() &&
+                            !selectedRegistrar() &&
+                            !selectedType() &&
+                            selectedBornDigitalState === 'all'
+                        "
+                    >
+                        {{ 'statistics.no-active-filters' | translate }}
+                    </div>
+                    <div class="app-filter-tag" *ngIf="selectedState !== 'all'" (click)="onStateChange('all')">
+                        <div class="app-tag-label">{{ 'statistics.' + selectedState | translate }} URN:NBN</div>
+                        <div class="app-tag-remove-icon" (click)="onStateChange('all')">&#10005;</div>
+                    </div>
+                    <div class="app-filter-tag" *ngIf="selectedBornDigitalState !== 'all'" (click)="onBornDigitalChange('all')">
+                        <div class="app-tag-label">{{ 'statistics.' + selectedBornDigitalState | translate }}</div>
+                        <div class="app-tag-remove-icon" (click)="onBornDigitalChange('all')">&#10005;</div>
+                    </div>
+                    <div class="app-filter-tag" *ngIf="selectedYear()" (click)="onYearCancel()">
+                        <div class="app-tag-label">{{ 'statistics.year' | translate }}: {{ selectedYear() }}</div>
+                        <div class="app-tag-remove-icon" (click)="onYearCancel()">&#10005;</div>
+                    </div>
+                    <div class="app-filter-tag" *ngIf="selectedRegistrar()" (click)="onRegistrarCancel()">
+                        <div class="app-tag-label">{{ 'statistics.registrar' | translate }}: {{ selectedRegistrar() }}</div>
+                        <div class="app-tag-remove-icon" (click)="onRegistrarCancel()">&#10005;</div>
+                    </div>
+                    <div class="app-filter-tag" *ngIf="selectedType()" (click)="onTypeCancel()">
+                        <div class="app-tag-label">{{ selectedType() | translate }}</div>
+                        <div class="app-tag-remove-icon" (click)="onTypeCancel()">&#10005;</div>
                     </div>
                 </div>
-            </div> -->
+            </div>
             <div class="app-content">
+                <div class="app-statistic-filters">
+                    <!-- STATE -->
+                    <div class="app-statistics-filter">
+                        <div class="app-base-input-label">
+                            {{ 'search.filter-by-state' | translate }}
+                        </div>
+                        <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedState" (valueChange)="onStateChange($event)">
+                            <app-radio-button
+                                *ngFor="let state of states"
+                                [label]="'statistics.' + state | translate"
+                                [value]="state"
+                            ></app-radio-button>
+                        </app-radio-group>
+                    </div>
+                    <!-- BORN DIGITAL FILTER -->
+                    <div class="app-statistics-filter">
+                        <div class="app-base-input-label">
+                            {{ 'statistics.filter-by-born-digital' | translate }}
+                        </div>
+                        <app-radio-group
+                            orientation="horizontal"
+                            [gap]="16"
+                            [(value)]="selectedBornDigitalState"
+                            (valueChange)="onBornDigitalChange($event)"
+                        >
+                            <app-radio-button
+                                *ngFor="let state of bornDigitalStates"
+                                [label]="'statistics.' + state | translate"
+                                [value]="state"
+                            ></app-radio-button>
+                        </app-radio-group>
+                    </div>
+                </div>
                 <div class="app-chart app-chart-years">
                     <div class="app-chart-header">
-                        <div class="app-chart-header-item" *ngIf="!selectedYear()">{{ 'statistics.all-years' | translate }}</div>
+                        <div class="app-chart-header-item" *ngIf="!selectedYear()">
+                            <div class="app-chart-header-title">{{ 'statistics.all-years' | translate }}</div>
+                        </div>
                         <div class="app-chart-header-item" *ngIf="selectedYear()">
                             <app-button variant="tertiary" size="s" [icon]="true" iconLeft="arrow-left.svg" (click)="onYearCancel()"></app-button>
                             <div class="app-chart-header-title">{{ selectedYear() }}</div>
                         </div>
+                        <div class="app-download-statistics">
+                            <app-button variant="tertiary" size="s" (click)="downloadCSV('by-years')">
+                                {{ 'statistics.download-csv' | translate }}
+                            </app-button>
+                        </div>
                     </div>
                     <!-- DATA BY YEARS -->
-                    <ngx-charts-bar-vertical
-                        *ngIf="resolvedDataByDate()"
-                        [scheme]="colorScheme"
-                        [view]="[1000, 300]"
-                        [animations]="true"
-                        [barPadding]="2"
-                        [results]="resolvedDataByDate()"
-                        [gradient]="false"
-                        [xAxis]="true"
-                        [yAxis]="true"
-                        [legend]="false"
-                        [showDataLabel]="false"
-                        (select)="onYearClick($event)"
-                    ></ngx-charts-bar-vertical>
-
+                    <div class="app-chart-item" #sourceDiv>
+                        <ngx-charts-bar-vertical
+                            *ngIf="resolvedDataByDate()"
+                            [scheme]="colorScheme"
+                            [view]="[getCalculatedWidth(), 300]"
+                            [animations]="true"
+                            [barPadding]="2"
+                            [results]="resolvedDataByDate()"
+                            [gradient]="false"
+                            [xAxis]="true"
+                            [yAxis]="true"
+                            [legend]="false"
+                            [showDataLabel]="false"
+                            (select)="onYearClick($event)"
+                        ></ngx-charts-bar-vertical>
+                    </div>
+                </div>
+                <div class="app-chart-wrapper">
                     <!-- DATA BY REGISTRARS -->
                     <div class="app-chart app-chart-pie">
-                        <div class="app-chart-header" *ngIf="!selectedRegistrar()">
-                            <div class="app-chart-header-item">
+                        <div class="app-chart-header">
+                            <div class="app-chart-header-item" *ngIf="!selectedRegistrar()">
                                 <div class="app-chart-header-title">{{ 'statistics.all-registrars' | translate }}</div>
                             </div>
-                        </div>
-                        <div class="app-chart-header" *ngIf="selectedRegistrar()">
-                            <div class="app-chart-header-item">
+                            <div class="app-chart-header-item" *ngIf="selectedRegistrar()">
                                 <app-button
                                     variant="tertiary"
                                     size="s"
@@ -296,21 +371,92 @@
                                 ></app-button>
                                 <div class="app-chart-header-title">{{ selectedRegistrar() }}</div>
                             </div>
+                            <div class="app-download-statistics">
+                                <app-button variant="tertiary" size="s" (click)="downloadCSV('by-registrars')">
+                                    {{ 'statistics.download-csv' | translate }}
+                                </app-button>
+                            </div>
                         </div>
-                        <ngx-charts-pie-chart
-                            *ngIf="resolvedDataByRegistrar()"
-                            [results]="resolvedDataByRegistrar()"
-                            [view]="[1000, 300]"
-                            [animations]="false"
-                            [legend]="true"
-                            [labels]="true"
-                            [doughnut]="false"
-                            [explodeSlices]="false"
-                            [gradient]="false"
-                            [scheme]="colorScheme"
-                            [trimLabels]="false"
-                            (select)="onRegistrarClick($event)"
-                        ></ngx-charts-pie-chart>
+                        <div class="app-chart-item" #sourceDiv>
+                            <ngx-charts-pie-chart
+                                *ngIf="resolvedDataByRegistrar()"
+                                [results]="resolvedDataByRegistrar()"
+                                [view]="[getCalculatedWidthHalf(), 400]"
+                                [animations]="false"
+                                [legend]="false"
+                                [labels]="true"
+                                [doughnut]="false"
+                                [explodeSlices]="false"
+                                [gradient]="false"
+                                [scheme]="colorScheme"
+                                [trimLabels]="false"
+                                (select)="onRegistrarClick($event)"
+                            ></ngx-charts-pie-chart>
+                        </div>
+                        <div class="app-chart-table">
+                            <div class="app-header-row app-chart-row">
+                                <div class="app-chart-col">
+                                    <div class="app-col-registrar-code">{{ 'statistics.registrar-code' | translate }}</div>
+                                    <div class="app-col-registrar-name">{{ 'statistics.registrar-name' | translate }}</div>
+                                </div>
+                                <div class="app-chart-col app-col-count">{{ 'statistics.count' | translate }}</div>
+                            </div>
+                            <div class="app-chart-row" *ngFor="let item of resolvedDataByRegistrarTable()" (click)="onRegistrarClick(item)">
+                                <div class="app-chart-col">
+                                    <div class="app-col-registrar-code">{{ item.name }}</div>
+                                    <div class="app-col-registrar-name">{{ item.title }}</div>
+                                </div>
+                                <div class="app-chart-col app-col-count">{{ item.value }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DATA BY ENTITY TYPES -->
+                    <div class="app-chart app-chart-pie">
+                        <div class="app-chart-header">
+                            <div class="app-chart-header-item" *ngIf="!selectedType()">
+                                <div class="app-chart-header-title">{{ 'statistics.all-types' | translate }}</div>
+                            </div>
+                            <div class="app-chart-header-item" *ngIf="selectedType()">
+                                <app-button variant="tertiary" size="s" [icon]="true" iconLeft="arrow-left.svg" (click)="onTypeCancel()"></app-button>
+                                <div class="app-chart-header-title">{{ selectedType() | translate }}</div>
+                            </div>
+                            <div class="app-download-statistics">
+                                <app-button variant="tertiary" size="s" (click)="downloadCSV('by-entity-types')">
+                                    {{ 'statistics.download-csv' | translate }}
+                                </app-button>
+                            </div>
+                        </div>
+                        <div class="app-chart-item" #sourceDiv>
+                            <ngx-charts-pie-chart
+                                #chart
+                                [view]="[getCalculatedWidthHalf(), 400]"
+                                *ngIf="resolvedDataByEntityTypes()"
+                                [results]="resolvedDataByEntityTypes()"
+                                [animations]="false"
+                                [legend]="true"
+                                [labels]="true"
+                                [doughnut]="false"
+                                [explodeSlices]="false"
+                                [gradient]="false"
+                                [legend]="false"
+                                [trimLabels]="false"
+                                [scheme]="colorScheme"
+                                (select)="onTypeClick($event)"
+                            ></ngx-charts-pie-chart>
+                        </div>
+                        <div class="app-chart-table">
+                            <div class="app-header-row app-chart-row">
+                                <div class="app-chart-col">
+                                    <div class="app-col-registrar-code">{{ 'statistics.type' | translate }}</div>
+                                </div>
+                                <div class="app-chart-col app-col-count">{{ 'statistics.count' | translate }}</div>
+                            </div>
+                            <div class="app-chart-row" *ngFor="let item of resolvedDataByEntityTypes()" (click)="onTypeClick(item)">
+                                <div class="app-chart-col">{{ item.name | translate }}</div>
+                                <div class="app-chart-col app-col-count">{{ item.value }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

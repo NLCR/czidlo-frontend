@@ -5,7 +5,7 @@ import { RegistrarsService } from '../../services/registrars.service';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { id } from '@swimlane/ngx-charts';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
     selector: 'app-statistics',
@@ -21,13 +21,17 @@ export class StatisticsComponent {
     bornDigitalStates = ['all', 'digital', 'analog'];
     selectedBornDigitalState: string = 'all';
 
+    // ASSIGNMENTS
     chartDataByDate = signal<Array<{ name: string; value: number }>>([]);
     chartDataByRegistrar = signal<any[]>([]);
     chartDataByRegistrarTable = signal<any[]>([]);
     chartDataByEntityTypes = signal<any[]>([]);
 
+    // RESOLVATIONS
     resolvedDataByDate = signal<Array<{ name: string; value: number }>>([]);
     resolvedDataByRegistrar = signal<any[]>([]);
+    resolvedDataByRegistrarTable = signal<any[]>([]);
+    resolvedDataByEntityTypes = signal<any[]>([]);
 
     records = signal<Array<any>>([]);
     selectedYear = signal<string | null>(null);
@@ -51,18 +55,18 @@ export class StatisticsComponent {
         //     '#7D919B', // zesvětlená šedomodrá
         // ],
         domain: [
-  '#2F93B8', // živější tyrkysová (hlavní)
+            '#2F93B8', // živější tyrkysová (hlavní)
 
-  '#C04A4A', // živější tlumená červená
-  '#D08A3C', // živější oranžová
-  '#dde032ff', // žluto-olivová
-  '#5FAF6A', // zelená
-  '#3FA6A0', // zelenomodrá
-  '#4F6FB8', // modrá
-  '#8C63B8', // fialová
-  '#8C8C8C', // neutrální šedá
-  '#4F6E7A'  // šedomodrá
-]
+            '#C04A4A', // živější tlumená červená
+            '#D08A3C', // živější oranžová
+            '#dde032ff', // žluto-olivová
+            '#5FAF6A', // zelená
+            '#3FA6A0', // zelenomodrá
+            '#4F6FB8', // modrá
+            '#8C63B8', // fialová
+            '#8C8C8C', // neutrální šedá
+            '#4F6E7A', // šedomodrá
+        ],
     };
 
     constructor(
@@ -70,7 +74,8 @@ export class StatisticsComponent {
         private route: ActivatedRoute,
         private statisticsService: StatisticsService,
         private registrarsService: RegistrarsService,
-        private translate: TranslateService
+        private translate: TranslateService,
+        private snackbar: MatSnackBar
     ) {}
 
     ngOnInit() {
@@ -183,13 +188,35 @@ export class StatisticsComponent {
         });
     }
 
-    private loadResolvedData(r?: string, y?: string) {
-        this.statisticsService.getResolvedByDate(r, y).subscribe((data) => {
+    private loadResolvedData(r?: string, y?: string, s?: string, t?: string, b?: string) {
+        // DATE
+        this.statisticsService.getResolvedByDate(r, y, s, t, b).subscribe((data) => {
             this.resolvedDataByDate.set(data);
         });
+        // REGISTRAR
+        this.statisticsService.getResolvedByRegistrar(r, y, s, t, b).subscribe((data) => {
+            this.resolvedDataByRegistrarTable.set(data);
+            const chartData = this.prepareChartDataWithOther(data, 1);
+            this.resolvedDataByRegistrar.set(chartData);
+        });
+        // ENTITY TYPES
+        this.statisticsService.getResolvedByEntityTypes(r, y, s, t, b).subscribe((data) => {
+            if (!Array.isArray(data) || data.length === 0) {
+                this.resolvedDataByEntityTypes.set([]);
+                return;
+            }
+            const keys = data?.map((i: any) => `${i.name}`) || [];
 
-        this.statisticsService.getResolvedByRegistrar(y).subscribe((data) => {
-            this.resolvedDataByRegistrar.set(data);
+            this.translate.get(keys).subscribe((translations: any) => {
+                const translatedData = data.map((i: any) => ({
+                    name: translations[i.name] || i.name,
+                    // name: i.name,
+                    value: i.value,
+                    extra: { id: i.name },
+                }));
+                console.log(translatedData);
+                this.resolvedDataByEntityTypes.set(translatedData);
+            });
         });
     }
 
@@ -316,7 +343,12 @@ export class StatisticsComponent {
 
     downloadCSV(table: string) {
         // 1) filename podle filtrů
-        let filename = `assignments-${table}`;
+        let filename = '';
+        if (this.isActive === 'assignments') {
+            filename = `assignments-${table}`;
+        } else {
+            filename = `resolvations-${table}`;
+        }
         if (this.selectedYear()) filename += `-${this.selectedYear()}`;
         if (this.selectedRegistrar()) filename += `-${this.selectedRegistrar()}`;
         if (this.selectedState && this.selectedState !== 'all') filename += `-${this.selectedState}`;
@@ -326,14 +358,20 @@ export class StatisticsComponent {
 
         // 2) vyber zdroj dat
         let data: any[] = [];
-        if (table === 'by-registrars') data = this.chartDataByRegistrarTable();
-        if (table === 'by-years') data = this.chartDataByDate();
-        if (table === 'by-entity-types') data = this.chartDataByEntityTypes();
+        if (this.isActive === 'resolvations') {
+            if (table === 'by-registrars') data = this.resolvedDataByRegistrar();
+            if (table === 'by-years') data = this.resolvedDataByDate();
+        } else {
+            if (table === 'by-registrars') data = this.chartDataByRegistrarTable();
+            if (table === 'by-years') data = this.chartDataByDate();
+            if (table === 'by-entity-types') data = this.chartDataByEntityTypes();
+        }
 
         // 3) ochrana pro prázdná data
         if (!Array.isArray(data) || data.length === 0) {
             // klidně si místo toho dej snackbar/toast
             console.warn('No data to export.');
+            this.snackbar.open(this.translate.instant('statistics.no-data-to-export'), undefined, { duration: 3000 });
             return;
         }
 

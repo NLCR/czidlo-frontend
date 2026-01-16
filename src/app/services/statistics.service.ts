@@ -304,7 +304,7 @@ export class StatisticsService {
     }
 
     // RESOLVOVANI PODLE ROKU
-    getResolvedByDate(registrar?: string, year?: string): Observable<any> {
+    getResolvedByDate(registrar?: string, year?: string, state?: string, type?: string, born?: string): Observable<any> {
         console.log('getResolvedByDATE', registrar, year);
         const filters: any[] = [];
 
@@ -313,6 +313,42 @@ export class StatisticsService {
             filters.push({
                 term: {
                     'registrarcode.keyword': registrar,
+                },
+            });
+        }
+
+        // pokud je filtrován stav
+        if (state && state !== 'all') {
+            const isActive = state === 'active';
+            filters.push({
+                term: {
+                    active: isActive,
+                },
+            });
+        }
+
+        // pokud je filtrován born digital
+        if (born && born !== 'all') {
+            if (born === 'digital') {
+                filters.push({
+                    term: {
+                        borndigital: true,
+                    },
+                });
+            } else if (born === 'analog') {
+                filters.push({
+                    term: {
+                        borndigital: false,
+                    },
+                });
+            }
+        }
+
+        // pokud je filtrován typ entity
+        if (type) {
+            filters.push({
+                term: {
+                    'entitytype.keyword': type,
                 },
             });
         }
@@ -367,12 +403,57 @@ export class StatisticsService {
     }
 
     // RESOLVOVANI PODLE REGISTRÁTORŮ
-    getResolvedByRegistrar(year?: string): Observable<any> {
+    getResolvedByRegistrar(registrar?: string, year?: string, state?: string, type?: string, born?: string): Observable<any> {
         const query: any = {
             bool: {
                 filter: [], // efektivnější než must
             },
         };
+
+        // pokud je filtr registrar
+        if (registrar) {
+            query.bool.filter.push({
+                term: {
+                    'registrarcode.keyword': registrar,
+                },
+            });
+        }
+
+        // pokud je filtrován stav
+        if (state && state !== 'all') {
+            const isActive = state === 'active';
+            query.bool.filter.push({
+                term: {
+                    active: isActive,
+                },
+            });
+        }
+
+        // pokud je filtrován born digital
+        if (born && born !== 'all') {
+            if (born === 'digital') {
+                query.bool.filter.push({
+                    term: {
+                        borndigital: true,
+                    },
+                });
+            } else if (born === 'analog') {
+                query.bool.filter.push({
+                    term: {
+                        borndigital: false,
+                    },
+                });
+            }
+        }
+
+        // pokud je filtrován typ entity
+        if (type) {
+            query.bool.filter.push({
+                term: {
+                    'entitytype.keyword': type,
+                },
+            });
+        }
 
         // pokud mám rok → přidám range
         if (year) {
@@ -399,7 +480,7 @@ export class StatisticsService {
         };
 
         // query přidáme jen pokud existuje filtr (rok)
-        if (year) {
+        if (year || registrar || (state && state !== 'all') || type || (born && born !== 'all')) {
             body.query = query;
         }
 
@@ -410,6 +491,98 @@ export class StatisticsService {
                     name: b.key,
                     value: b.doc_count,
                 }));
+            })
+        );
+    }
+
+    // RESOLVOVANI PODLE TYPŮ ENTIT
+    getResolvedByEntityTypes(registrar?: string, year?: string, state?: string, type?: string, born?: string): Observable<any> {
+        const query: any = {
+            bool: {
+                must: [],
+            },
+        };
+
+        // Pokud je zadaný registrátor → přidáme term filtr
+        if (registrar) {
+            query.bool.must.push({
+                term: {
+                    'registrarcode.keyword': registrar,
+                },
+            });
+        }
+
+        // Pokud je zadaný rok → přidáme range filtr
+        if (year) {
+            query.bool.must.push({
+                range: {
+                    resolved: {
+                        gte: `${year}-01-01`,
+                        lt: `${year}-12-31`,
+                    },
+                },
+            });
+        }
+
+        // pokud je filtrován stav
+        if (state && state !== 'all') {
+            const isActive = state === 'active';
+            query.bool.must.push({
+                term: {
+                    active: isActive,
+                },
+            });
+        }
+
+        // pokud je filtrován born digital
+        if (born && born !== 'all') {
+            if (born === 'digital') {
+                query.bool.must.push({
+                    term: {
+                        borndigital: true,
+                    },
+                });
+            } else if (born === 'analog') {
+                query.bool.must.push({
+                    term: {
+                        borndigital: false,
+                    },
+                });
+            }
+        }
+
+        // pokud je filtrován typ entity
+        if (type) {
+            query.bool.must.push({
+                term: {
+                    'entitytype.keyword': type,
+                },
+            });
+        }
+
+        const body = {
+            size: 0,
+            query,
+            aggs: {
+                entity_types: {
+                    terms: {
+                        field: 'entitytype.keyword',
+                        size: 100,
+                    },
+                },
+            },
+        };
+
+        return this.apiService.getStatisticsDataResolve(body).pipe(
+            map((result: any) =>
+                result.aggregations.entity_types.buckets.map((bucket: any) => ({
+                    name: bucket.key,
+                    value: bucket.doc_count,
+                }))
+            ),
+            catchError((err) => {
+                console.error('Error loading entity type counts:', err);
+                return throwError(() => err);
             })
         );
     }

@@ -414,7 +414,8 @@
         "active-filters": "Aktivní filtry",
         "filter-by-born-digital": "Filtrovat podle digital born",
         "digital": "Digital born",
-        "analog": "Analog born"
+        "analog": "Analog born",
+        "no-data-to-export": "Žádná data k exportu"
     },
     "search": {
         "true": "ano",
