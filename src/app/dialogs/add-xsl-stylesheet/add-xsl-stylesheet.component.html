@@ -1,0 +1,73 @@
+<div class="app-dialog app-add-xsl-dialog">
+    <div class="app-dialog-header">
+        <div class="app-dialog-title">
+            {{ 'processes.add-xsl-stylesheet-title' | translate }}
+        </div>
+        <div class="app-close" (click)="onCancel()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M0.46967 0.46967C0.762563 0.176777 1.23744 0.176777 1.53033 0.46967L7 5.93934L12.4697 0.46967C12.7626 0.176777 13.2374 0.176777 13.5303 0.46967C13.8232 0.762563 13.8232 1.23744 13.5303 1.53033L8.06066 7L13.5303 12.4697C13.8232 12.7626 13.8232 13.2374 13.5303 13.5303C13.2374 13.8232 12.7626 13.8232 12.4697 13.5303L7 8.06066L1.53033 13.5303C1.23744 13.8232 0.762563 13.8232 0.46967 13.5303C0.176777 13.2374 0.176777 12.7626 0.46967 12.4697L5.93934 7L0.46967 1.53033C0.176777 1.23744 0.176777 0.762563 0.46967 0.46967Z"
+                    fill="#4C6580"
+                />
+                <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M0.46967 0.46967C0.762563 0.176777 1.23744 0.176777 1.53033 0.46967L7 5.93934L12.4697 0.46967C12.7626 0.176777 13.2374 0.176777 13.5303 0.46967C13.8232 0.762563 13.8232 1.23744 13.5303 1.53033L8.06066 7L13.5303 12.4697C13.8232 12.7626 13.8232 13.2374 13.5303 13.5303C13.2374 13.8232 12.7626 13.8232 12.4697 13.5303L7 8.06066L1.53033 13.5303C1.23744 13.8232 0.762563 13.8232 0.46967 13.5303C0.176777 13.2374 0.176777 12.7626 0.46967 12.4697L5.93934 7L0.46967 1.53033C0.176777 1.23744 0.176777 0.762563 0.46967 0.46967Z"
+                    fill="#4C6580"
+                />
+            </svg>
+        </div>
+    </div>
+    <div class="app-dialog-body">
+        <!-- TITLE -->
+        <div class="app-part-content app-part-title">
+            <div class="app-base-input-label">{{ 'processes.Title' | translate }}</div>
+            <div class="app-base-input">
+                <mat-form-field appearance="outline" class="app-base-input-field">
+                    <input matInput [(ngModel)]="data.title" />
+                </mat-form-field>
+            </div>
+        </div>
+        <!-- DESCRIPTION -->
+        <div class="app-part-content app-part-description">
+            <div class="app-base-input-label">{{ 'processes.Description' | translate }}</div>
+            <div class="app-base-input app-base-textarea">
+                <textarea
+                    class="app-base-textarea-input"
+                    matInput
+                    cdkTextareaAutosize
+                    #autosize="cdkTextareaAutosize"
+                    cdkAutosizeMinRows="2"
+                    cdkAutosizeMaxRows="5"
+                    [(ngModel)]="data.description"
+                ></textarea>
+            </div>
+        </div>
+        <!-- XSLT FILE UPLOAD -->
+        <div class="app-part-content app-part-xslt-file">
+            <div class="app-base-input-label">{{ 'processes.xslt-file' | translate }}</div>
+                <input class="app-hidden-input" type="file" #fileInput (change)="onFileSelected($event)" />
+                <input class="app-visible-input" matInput [value]="fileName" readonly (click)="fileInput.click()" />
+                <app-button class="app-upload-button" size="xs" variant="tertiary" (click)="fileInput.click()">{{ 'buttons.choose-file' | translate }}</app-button>
+                <!-- @if(!fileUploadForm.get('file')?.valid) {
+                <mat-error class="ms-0">
+                    File is
+                    <strong>required</strong>
+                </mat-error>
+                } -->
+        </div>
+    </div>
+    <!-- DIALOG FOOTER -->
+    <div class="app-dialog-footer">
+        <div class="app-dialog-footer-part app-dialog-footer-buttons">
+            <app-button size="l" variant="tertiary" (click)="onCancel()">
+                {{ 'buttons.cancel' | translate }}
+            </app-button>
+            <app-button size="l" variant="primary" (click)="onConfirm()" [disabled]="!data.title || fileName === ''">
+                {{ 'buttons.upload' | translate }}
+            </app-button>
+        </div>
+    </div>
+</div>

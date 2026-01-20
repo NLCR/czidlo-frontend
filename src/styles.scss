@@ -202,6 +202,9 @@ h4 {
         &.app-table-body-definitions {
             width: 800px;
         }
+        &.app-rdd-table-body {
+            width: 100%;
+        }
     }
     .app-row {
         display: flex;
@@ -347,6 +350,18 @@ h4 {
         &.app-col-300px {
             width: 300px;
         }
+        &.app-rdd-title {
+            width: 230px;
+        }
+        &.app-rdd-description {
+            flex: 1;
+        }
+        &.app-rdd-created {
+            width: 120px;
+        }
+        &.app-rdd-action {
+            width: 72px;
+        }
     }
 }
 
@@ -464,6 +479,8 @@ h4 {
             // border-bottom: 1px solid var(--Boarder-Bright, #dfe5ec);
         }
         .app-part-title {
+            display: flex;
+            gap: 4px;
             color: var(--Text-Link, #0080a8);
 
             /* Typesettings/L/Medium */
@@ -475,9 +492,9 @@ h4 {
             align-self: stretch;
         }
         &.app-set-oai-adapter {
-            border: 1px solid var(--Boarder-Bright, #dfe5ec);
+            // border: 1px solid var(--Boarder-Bright, #dfe5ec);
             display: flex;
-            padding: 16px;
+            // padding: 16px;
             flex-direction: column;
             align-items: flex-start;
             gap: 16px;

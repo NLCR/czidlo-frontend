@@ -63,7 +63,7 @@
                 <div class="app-table-body" *ngIf="!loadingProcesses()">
                     <div
                         *ngFor="let process of processes()"
-                        class="app-row app-table-row app-row-clicable"
+                        class="app-row  "
                         [ngClass]="{ 'app-row-active': activeProcess?.id.toString() === process.id.toString() }"
                         (click)="openSidebar(process)"
                     >
@@ -286,15 +286,68 @@
         <!-- SETTINGS OAI ADAPTER -->
         <div class="app-sidebar-content" *ngIf="activeAction === 'set' && activeDefinition() === 'OAI_ADAPTER'">
             <div class="app-part app-set-oai-adapter">
-                <div class="app-part-title">{{ 'processes.transform-rdd' | translate }}</div>
+                <div class="app-part-title">
+                    <div>{{ 'processes.transform-prefix' | translate }}</div>
+                    <div><b>{{ 'processes.transform-rdd' | translate }}</b></div>
+                </div>
                 <div class="app-part-buttons">
-                    <app-button variant="primary" size="s" iconLeft="add-white.svg">
+                    <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openAddXslStylesheetDialog()">
                         <div>{{ 'buttons.add' | translate }}</div>
                     </app-button>
                 </div>
+                <div class="app-part-content">
+                    <div class="app-table app-rdd-table">
+                        <div class="app-row app-row-header app-row-rdd">
+                            <div class="app-col app-table-header-item app-rdd-title">
+                                {{ 'processes.Title' | translate }}
+                            </div>
+                            <div class="app-col app-table-header-item app-rdd-description">
+                                {{ 'processes.Description' | translate }}
+                            </div>
+                            <div class="app-col app-table-header-item app-rdd-created">
+                                {{ 'processes.Created' | translate }}
+                            </div>
+                            <div class="app-col app-table-header-item app-col-actions app-rdd-action">
+                                {{ 'processes.Action' | translate }}
+                            </div>
+                        </div>
+                        <div class="app-table-body app-rdd-table-body">
+                            <div
+                                class="app-row app-table-row app-row-clicable"
+                                *ngFor="let tr of rddTransformations()"
+                                [ngClass]="{ 'app-row-active': activeRddTransformation?.id.toString() === tr.id.toString() }"
+                                (click)="openRddTransformation(tr)"
+                            >
+                                <div class="app-col app-rdd-title">{{ tr.name }}</div>
+                                <div class="app-col app-rdd-description">{{ tr.description }}</div>
+                                <div class="app-col app-rdd-created">{{ tr.created | date }}</div>
+                                <div class="app-col app-col-actions app-rdd-action">
+                                    <app-button
+                                        variant="tertiary"
+                                        [icon]="true"
+                                        iconLeft="download-blue.svg"
+                                        size="s"
+                                        (click)="$event.stopPropagation(); downloadTransformation(tr)"
+                                    ></app-button>
+                                    <app-button
+                                        variant="tertiary"
+                                        [icon]="true"
+                                        iconLeft="trash-blue.svg"
+                                        size="s"
+                                        (click)="$event.stopPropagation(); removeTransformation(tr)"
+                                    ></app-button>
+                                    <!-- Actions for each transformation can be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="app-part app-set-oai-adapter">
-                <div class="app-part-title">{{ 'processes.transform-ids' | translate }}</div>
+                <div class="app-part-title">
+                    <div>{{ 'processes.transform-prefix' | translate }}</div>
+                    <div><b>{{ 'processes.transform-ids' | translate }}</b></div>
+                </div>
                 <div class="app-part-buttons">
                     <app-button variant="primary" size="s" iconLeft="add-white.svg">
                         <div>{{ 'buttons.add' | translate }}</div>

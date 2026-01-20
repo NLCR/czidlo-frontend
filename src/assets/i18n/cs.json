@@ -123,7 +123,9 @@
         "confirm-reactivate": "Ano, reaktivovat",
         "confirm-deactivate": "Ano, deaktivovat",
         "save-record": "Uložit záznam",
-        "edit-instance": "Upravit instanci"
+        "edit-instance": "Upravit instanci",
+        "upload": "Nahrát",
+        "choose-file": "Vybrat soubor"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
@@ -173,7 +175,9 @@
         "error-downloading-file": "Chyba při stahování souboru",
         "field-must-be-number": "Pole musí být číslo",
         "display-record": "Zobrazit záznam",
-        "import-completed": "Import dokončen."
+        "import-completed": "Import dokončen.",
+        "confirm-delete-transformation-title": "Smazat transformaci",
+        "confirm-delete-transformation-message": "Opravdu chcete smazat tuto transformaci?"
     },
     "inputs": {
         "pick-start-date": "Vyberte od",
@@ -202,10 +206,14 @@
         "finished": "ukončen",
         "Duration": "Trvání",
         "duration": "trvání",
+        "Created": "Vloženo",
+        "Action": "Akce",
         "log": "log",
         "no-processes": "Žádné procesy",
         "Title": "Název",
         "title": "název",
+        "Description": "Popis",
+        "description": "popis",
         "plan-process": "Plánovat proces",
         "settings": "Nastavit proces",
         "action-plan": "Plánování nového procesu",
@@ -213,8 +221,9 @@
         "basic-settings": "Základní nastavení",
         "registration-rules": "Pravidla registrace",
         "diff-tolerance": "Tolerance rozdílů",
-        "transform-rdd": "Transformace pro operaci Registrace digitálního dokumentu",
-        "transform-ids": "Transformace pro operaci Import digitální instance",
+        "transform-prefix": "Transformace pro operaci ",
+        "transform-rdd": "Registrace digitálního dokumentu",
+        "transform-ids": "Import digitální instance",
         "filter-by": "Filtrovat podle:",
         "filter-by-date": "Datum registrace",
         "filter-by-registrar": "Registrátora",
@@ -241,7 +250,9 @@
         "log-scheduled": "Naplánované procesy neobsahují logy.",
         "cnb": "CNB",
         "issn": "ISSN",
-        "isbn": "ISBN"
+        "isbn": "ISBN",
+        "add-xsl-stylesheet-title": "Nahrejte XSL šablonu (import digitální instance)",
+        "xslt-file": "XSLT soubor"
     },
     "definitions": {
         "OAI_ADAPTER": "OAI adapter",
@@ -412,9 +423,9 @@
         "download-csv": "Stáhnout CSV",
         "no-active-filters": "Žádné aktivní filtry",
         "active-filters": "Aktivní filtry",
-        "filter-by-born-digital": "Filtrovat podle digital born",
+        "filter-by-born-digital": "Filtrovat podle původní předlohy",
         "digital": "Digital born",
-        "analog": "Analog born",
+        "analog": "Fyzická předloha",
         "no-data-to-export": "Žádná data k exportu"
     },
     "search": {

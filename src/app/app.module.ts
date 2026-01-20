@@ -66,6 +66,8 @@ import { EditRegistrarDialogComponent } from './dialogs/edit-registrar-dialog/ed
 import { DetailDialogComponent } from './dialogs/detail-dialog/detail-dialog.component';
 import { EditDlCatalogDialogComponent } from './dialogs/edit-dl-catalog-dialog/edit-dl-catalog-dialog.component';
 import { BasicAuthInterceptor } from './services/basic-auth.interceptor';
+import { AddXslStylesheetComponent } from './dialogs/add-xsl-stylesheet/add-xsl-stylesheet.component';
+import { TransformationDetailDialogComponent } from './dialogs/transformation-detail-dialog/transformation-detail-dialog.component';
 
 // Překladač
 export function HttpLoaderFactory() {
@@ -121,6 +123,8 @@ export const MY_DATE_FORMATS = {
         EditRegistrarDialogComponent,
         DetailDialogComponent,
         EditDlCatalogDialogComponent,
+        AddXslStylesheetComponent,
+        TransformationDetailDialogComponent,
     ],
     imports: [
         BrowserModule,

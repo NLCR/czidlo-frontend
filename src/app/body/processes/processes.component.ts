@@ -10,6 +10,7 @@ import { switchMap, catchError, map, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+import { AddXslStylesheetComponent } from '../../dialogs/add-xsl-stylesheet/add-xsl-stylesheet.component';
 
 @Component({
     selector: 'app-processes',
@@ -34,6 +35,9 @@ export class ProcessesComponent {
     activeProcess: any = null;
     activeDefinition = signal<string | null>(null);
     activeAction: string | null = null;
+
+    rddTransformations = signal<Array<any>>([]);
+    activeRddTransformation: any = null;
 
     startDateControl = new FormControl<Date | null>(null, [Validators.required, this.dateValidator]);
     endDateControl = new FormControl<Date | null>(null, [Validators.required, this.dateValidator]);
@@ -150,6 +154,11 @@ export class ProcessesComponent {
                 }
             }
         });
+        // RDD TRANSFORMATIONS
+        this.rddTransformations.set([
+            { name: 'Transformation 1', id: 'rdd_transf_1', description: 'Description of Transformation 1', created: '2023-10-01 10:00:00' },
+            { name: 'Transformation 2', id: 'rdd_transf_2', description: '', created: '2023-11-15 14:30:00' },
+        ]);
     }
 
     loadProcesses() {
@@ -618,5 +627,68 @@ export class ProcessesComponent {
         } else {
             return `${m} min ${s} s`;
         }
+    }
+    openAddXslStylesheetDialog() {
+        const dialogRef = this.dialog.open(AddXslStylesheetComponent, {
+            width: '800px',
+            maxWidth: '800px',
+            data: {
+                // předání dat do dialogu, pokud je potřeba
+            },
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                console.log('Dialog result:', result);
+                // Zpracování výsledku z dialogu
+            } else {
+                console.log('Dialog was closed without action');
+            }
+        });
+    }
+    downloadTransformation(transformation: any) {
+        console.log('Downloading transformation:', transformation);
+        // Implement the download logic here
+    }
+    openRddTransformation(transformation: any) {
+        console.log('Opening RDD transformation:', transformation);
+        this.activeRddTransformation = transformation;
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: {
+                title: transformation.name,
+                message: `
+                    <p><strong>${this.translate.instant('Description')}:</strong> ${transformation.description || '---'}</p>
+                    <p><strong>${this.translate.instant('Created')}:</strong> ${transformation.created || '---'}</p>
+                `,
+                warning: null,
+                confirmButtonText: this.translate.instant('buttons.close'),
+                showCancelButton: false,
+            },
+            maxWidth: '800px',
+        });
+
+        dialogRef.afterClosed().subscribe(() => {
+            this.activeRddTransformation = null;
+        });
+
+    }
+    removeTransformation(transformation: any) {
+        console.log('Removing transformation:', transformation);
+        // Implement the removal logic here
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: {
+                data: transformation,
+                title: this.translate.instant('messages.confirm-delete-transformation-title'),
+                message: this.translate.instant('messages.confirm-delete-transformation-message', { name: transformation.name }),
+                warning: 'buttons.confirm-delete',
+            },
+            maxWidth: '800px',
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.rddTransformations.set(this.rddTransformations().filter(t => t.id !== transformation.id));
+            }
+        });
     }
 }
