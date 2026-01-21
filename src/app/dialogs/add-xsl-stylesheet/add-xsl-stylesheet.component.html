@@ -26,7 +26,7 @@
             <div class="app-base-input-label">{{ 'processes.Title' | translate }}</div>
             <div class="app-base-input">
                 <mat-form-field appearance="outline" class="app-base-input-field">
-                    <input matInput [(ngModel)]="data.title" />
+                    <input matInput [(ngModel)]="data.name" />
                 </mat-form-field>
             </div>
         </div>
@@ -65,7 +65,7 @@
             <app-button size="l" variant="tertiary" (click)="onCancel()">
                 {{ 'buttons.cancel' | translate }}
             </app-button>
-            <app-button size="l" variant="primary" (click)="onConfirm()" [disabled]="!data.title || fileName === ''">
+            <app-button size="l" variant="primary" (click)="onConfirm()" [disabled]="!data.name || fileName === ''">
                 {{ 'buttons.upload' | translate }}
             </app-button>
         </div>

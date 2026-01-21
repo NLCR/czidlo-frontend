@@ -5,7 +5,7 @@
         </div>
     </div>
 </div>
-<div class="app-import-record-container" *ngIf="!loadingRegistrars() && assignedRegistrars.length > 0 && loggedIn()">
+<div class="app-import-record-container" *ngIf="!loadingRegistrars() && assignedRegistrars().length > 0 && loggedIn()">
     <div class="app-import-record-header">
         {{ 'import.import-record-title' | translate }}
     </div>
@@ -36,7 +36,7 @@
                         </div>
                         <mat-form-field appearance="outline">
                             <mat-select class="app-singleselect" [(value)]="selectedRegistrar" (valueChange)="onRegistrarChange()">
-                                @for (registrar of assignedRegistrars; track registrar) {
+                                @for (registrar of assignedRegistrars(); track registrar) {
                                 <mat-option [value]="registrar">{{ registrar }}</mat-option>
                                 }
                             </mat-select>
@@ -81,7 +81,7 @@
 </div>
 
 <!-- No Registrars -->
-<div class="app-no-registrars" *ngIf="!loadingRegistrars() && assignedRegistrars.length === 0 && loggedIn()">
+<div class="app-no-registrars" *ngIf="!loadingRegistrars() && assignedRegistrars().length === 0 && loggedIn()">
     <div class="app-no-registrars-header">
         <div class="app-no-registrars-header-title">{{ 'import.no-registrar-title' | translate }}</div>
         <div class="app-no-registrars-header-subtitle">{{ 'import.no-registrar-subtitle' | translate }}</div>

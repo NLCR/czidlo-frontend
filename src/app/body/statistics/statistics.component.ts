@@ -80,12 +80,6 @@ export class StatisticsComponent {
 
     ngOnInit() {
         console.log('statistics init');
-        this.registrarsService.getRegistrars().subscribe(
-            () => {},
-            (error) => {
-                console.error('Error loading registrars in statistics component:', error);
-            }
-        );
         const url$ = this.route.url.pipe(
             map((url) => {
                 if (url.length > 1) {

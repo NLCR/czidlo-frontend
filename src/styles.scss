@@ -448,7 +448,7 @@ h4 {
     padding: 0 24px 24px 24px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 32px;
+    gap: 24px;
     flex: 1 0 0;
     align-self: stretch;
     color: var(--Text-Base, #0a0d10);
@@ -477,6 +477,9 @@ h4 {
         &:not(:last-child) {
             padding-bottom: 32px;
             // border-bottom: 1px solid var(--Boarder-Bright, #dfe5ec);
+        }
+        &.app-oai-part {
+            padding-bottom: 0;
         }
         .app-part-title {
             display: flex;
@@ -509,6 +512,9 @@ h4 {
             gap: 32px;
             &.app-part-import-record {
                 width: 460px;
+            }
+            &.app-oai-part-content {
+                gap: 20px;
             }
             .app-datepicker-container {
                 display: flex;
@@ -887,6 +893,10 @@ app-information {
     .app-checkbox-container {
         display: flex;
         gap: 16px;
+        &.app-checkbox-oai {
+            flex-direction: column;
+            margin-left: 32px;
+        }
     }
 }
 .app-base-input {

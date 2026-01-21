@@ -1,5 +1,7 @@
-import { Component, signal, inject, computed, Inject } from '@angular/core';
+import { Component, signal, inject, computed, Inject, effect } from '@angular/core';
 import { ProcessesService } from '../../services/processes.service';
+import { RegistrarsService } from '../../services/registrars.service';
+import { UsersService } from '../../services/users.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
@@ -11,6 +13,7 @@ import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { AddXslStylesheetComponent } from '../../dialogs/add-xsl-stylesheet/add-xsl-stylesheet.component';
+import { TransformationDetailDialogComponent } from '../../dialogs/transformation-detail-dialog/transformation-detail-dialog.component';
 
 @Component({
     selector: 'app-processes',
@@ -36,8 +39,18 @@ export class ProcessesComponent {
     activeDefinition = signal<string | null>(null);
     activeAction: string | null = null;
 
+    // TRANSFORMATIONS
     rddTransformations = signal<Array<any>>([]);
     activeRddTransformation: any = null;
+    selectedRddTransformationId: string = '';
+    idsTransformations = signal<Array<any>>([]);
+    activeIdsTransformation: any = null;
+    selectedIdsTransformationId: string = '';
+    transformWithUrnNbn = true;
+    transformWithoutUrnNbn = false;
+    mergeDigitalInstances = true;
+    ignoreDiffInAccess = true;
+    ignoreDiffInFormat = true;
 
     startDateControl = new FormControl<Date | null>(null, [Validators.required, this.dateValidator]);
     endDateControl = new FormControl<Date | null>(null, [Validators.required, this.dateValidator]);
@@ -57,7 +70,11 @@ export class ProcessesComponent {
     showMyProcesses = false;
 
     registrars = new FormControl();
-    registrarList = signal(<Array<string>>[]);
+    registrarList = signal(<Array<any>>[]);
+    assignedRegistrars = signal(<Array<any>>[]);
+    loadingRegistrars = signal(false);
+    selectedRegistrar: any = null;
+
     intellectualEntities = new FormControl();
     intellectualEntitiesList = signal(<Array<string>>[]);
     missingCNB = false;
@@ -68,6 +85,11 @@ export class ProcessesComponent {
     selectedState = 'ALL';
     states = ['ALL', 'ACTIVE', 'DEACTIVATED'];
     selectedIncludeCount = false;
+
+    oaiBaseUrlControl = new FormControl('', [Validators.required]);
+    oaiMetadataPrefixControl = new FormControl('', [Validators.required]);
+    oaiSetControl = new FormControl('', [Validators.required]);
+    selectedRegistrarForOaiImportId = '';
 
     isPlanButtonDisabled = computed(() => {
         const def = this.activeDefinition();
@@ -89,19 +111,31 @@ export class ProcessesComponent {
 
     constructor(
         private processesService: ProcessesService,
+        private registrarsService: RegistrarsService,
+        private usersService: UsersService,
         private route: ActivatedRoute,
         private router: Router,
         private translate: TranslateService,
         private dialog: MatDialog,
         private authService: AuthService,
         private dateAdapter: DateAdapter<Date>,
-        @Inject(MAT_DATE_FORMATS) private dateFormats: any
+        @Inject(MAT_DATE_FORMATS) private dateFormats: any,
     ) {
         // 🧩 Propojení valueChanges → signal
         this.startDateControl.valueChanges.subscribe((value) => this.startDateValue.set(value));
         this.endDateControl.valueChanges.subscribe((value) => this.endDateValue.set(value));
         this.deactivationStartControl.valueChanges.subscribe((value) => this.deactivationStartValue.set(value));
         this.deactivationEndControl.valueChanges.subscribe((value) => this.deactivationEndValue.set(value));
+
+        effect(() => {
+            const isLoggedIn = this.loggedIn();
+
+            if (isLoggedIn) {
+                this.loadAssignedRegistrars();
+            } else {
+                this.resetRegistrars();
+            }
+        });
     }
 
     ngOnInit() {
@@ -114,8 +148,8 @@ export class ProcessesComponent {
         this.deactivationStartControl.disable();
         this.deactivationEndControl.disable();
 
-        this.registrarList.set(this.processesService.registrars() || []);
         this.intellectualEntitiesList.set(this.processesService.intellectualEntities() || []);
+        this.loadRegistrarCodes();
 
         this.route.url.subscribe((url) => {
             this.isActive = url[1]?.path || 'instances';
@@ -154,11 +188,64 @@ export class ProcessesComponent {
                 }
             }
         });
+        // ======== TODO API FETCH =======
         // RDD TRANSFORMATIONS
         this.rddTransformations.set([
             { name: 'Transformation 1', id: 'rdd_transf_1', description: 'Description of Transformation 1', created: '2023-10-01 10:00:00' },
             { name: 'Transformation 2', id: 'rdd_transf_2', description: '', created: '2023-11-15 14:30:00' },
         ]);
+        // IDS TRANSFORMATIONS
+        this.idsTransformations.set([
+            { name: 'IDS Transformation A', id: 'ids_transf_a', description: 'Description of IDS Transformation A', created: '2024-01-20 09:15:00' },
+            { name: 'IDS Transformation B', id: 'ids_transf_b', description: '', created: '2024-02-10 16:45:00' },
+        ]);
+        this.selectedRddTransformationId = this.rddTransformations()[0]?.id || '';
+        this.selectedIdsTransformationId = this.idsTransformations()[0]?.id || '';
+    }
+
+    loadRegistrarCodes() {
+        this.registrarsService.getRegistrars().subscribe({
+            next: (response) => {
+                this.registrarList.set(
+                    response.items.map((r: any) => ({
+                        code: r.code,
+                        name: r.name,
+                    })),
+                );
+            },
+        });
+    }
+    loadAssignedRegistrars() {
+        this.loadingRegistrars.set(true);
+        const userId = this.authService.getUserId();
+        if (!userId) {
+            console.error('User ID is null despite being logged in.');
+            this.loadingRegistrars.set(false);
+            return;
+        }
+
+        this.usersService.getUserRights(userId).subscribe({
+            next: (data) => {
+                this.assignedRegistrars.set(data || []);
+                console.log('Assigned registrars:', this.assignedRegistrars());
+
+                if (this.assignedRegistrars().length > 0) {
+                    if (this.assignedRegistrars().includes('nk')) {
+                        this.selectedRegistrar = 'nk';
+                    } else {
+                        this.selectedRegistrar = this.assignedRegistrars()[0];
+                    }
+                }
+                this.loadingRegistrars.set(false);
+            },
+            error: (error) => {
+                console.error('Error fetching assigned registrars:', error);
+                this.loadingRegistrars.set(false);
+            },
+        });
+    }
+    resetRegistrars() {
+        this.assignedRegistrars.set([]);
     }
 
     loadProcesses() {
@@ -204,9 +291,9 @@ export class ProcessesComponent {
                 switchMap((data) =>
                     this.processesService.getLog(id).pipe(
                         map((logData) => ({ ...data, log: logData })),
-                        catchError((error) => of({ ...data, logError: error || 'Error loading log' }))
-                    )
-                )
+                        catchError((error) => of({ ...data, logError: error || 'Error loading log' })),
+                    ),
+                ),
             )
             .subscribe({
                 next: (combinedData) => {
@@ -628,7 +715,7 @@ export class ProcessesComponent {
             return `${m} min ${s} s`;
         }
     }
-    openAddXslStylesheetDialog() {
+    openAddXslStylesheetDialog(context: string) {
         const dialogRef = this.dialog.open(AddXslStylesheetComponent, {
             width: '800px',
             maxWidth: '800px',
@@ -641,6 +728,12 @@ export class ProcessesComponent {
             if (result) {
                 console.log('Dialog result:', result);
                 // Zpracování výsledku z dialogu
+                if (context === 'rdd') {
+                    this.rddTransformations.set([...this.rddTransformations(), result]);
+                }
+                if (context === 'ids') {
+                    this.idsTransformations.set([...this.idsTransformations(), result]);
+                }
             } else {
                 console.log('Dialog was closed without action');
             }
@@ -653,16 +746,11 @@ export class ProcessesComponent {
     openRddTransformation(transformation: any) {
         console.log('Opening RDD transformation:', transformation);
         this.activeRddTransformation = transformation;
-        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        const dialogRef = this.dialog.open(TransformationDetailDialogComponent, {
             data: {
+                data: transformation,
                 title: transformation.name,
-                message: `
-                    <p><strong>${this.translate.instant('Description')}:</strong> ${transformation.description || '---'}</p>
-                    <p><strong>${this.translate.instant('Created')}:</strong> ${transformation.created || '---'}</p>
-                `,
-                warning: null,
                 confirmButtonText: this.translate.instant('buttons.close'),
-                showCancelButton: false,
             },
             maxWidth: '800px',
         });
@@ -670,9 +758,8 @@ export class ProcessesComponent {
         dialogRef.afterClosed().subscribe(() => {
             this.activeRddTransformation = null;
         });
-
     }
-    removeTransformation(transformation: any) {
+    removeTransformation(context: string, transformation: any) {
         console.log('Removing transformation:', transformation);
         // Implement the removal logic here
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -687,7 +774,12 @@ export class ProcessesComponent {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.rddTransformations.set(this.rddTransformations().filter(t => t.id !== transformation.id));
+                if (context === 'rdd') {
+                    this.rddTransformations.set(this.rddTransformations().filter((t) => t.id !== transformation.id));
+                }
+                if (context === 'ids') {
+                    this.idsTransformations.set(this.idsTransformations().filter((t) => t.id !== transformation.id));
+                }
             }
         });
     }

@@ -17,7 +17,7 @@ import { ApiService } from '../../services/api.service';
 export class ImportRecordComponent {
     loadingRegistrars = signal(false);
     loggedIn = computed(() => this.authService.loggedIn());
-    assignedRegistrars = [];
+    assignedRegistrars = signal<any>([]);
     selectedRegistrar: string = '';
     registrationMode: Array<{ value: string; label: string }> = [];
     selectedMode: string = '';
@@ -154,7 +154,7 @@ export class ImportRecordComponent {
         this.importButtonState();
 
         this.intellectualEntitiesList.set(this.importRecordService.intellectualEntities() || []);
-        this.selectedRegistrar = this.assignedRegistrars[0];
+        this.selectedRegistrar = this.assignedRegistrars()[0];
         this.selectedEntity = this.intellectualEntitiesList()[0];
 
         console.log('selected', this.selectedMode, this.selectedEntity, this.selectedMode);
@@ -180,11 +180,15 @@ export class ImportRecordComponent {
 
         this.usersService.getUserRights(userId).subscribe({
             next: (data) => {
-                this.assignedRegistrars = data || [];
-                console.log('Assigned registrars:', this.assignedRegistrars);
+                this.assignedRegistrars.set(data || []);
+                console.log('Assigned registrars:', this.assignedRegistrars());
 
-                if (this.assignedRegistrars.length > 0) {
-                    this.selectedRegistrar = this.assignedRegistrars[0];
+                if (this.assignedRegistrars().length > 0) {
+                    if (this.assignedRegistrars().includes('nk')) {
+                        this.selectedRegistrar = 'nk';
+                    } else {
+                        this.selectedRegistrar = this.assignedRegistrars()[0];
+                    }
                     this.loadRegistrarModes(this.selectedRegistrar);
                 }
                 this.loadingRegistrars.set(false);
@@ -227,7 +231,7 @@ export class ImportRecordComponent {
         });
     }
     private resetRegistrars() {
-        this.assignedRegistrars = [];
+        this.assignedRegistrars.set([]);
         this.selectedRegistrar = '';
         this.registrationMode = [];
         this.selectedMode = '';

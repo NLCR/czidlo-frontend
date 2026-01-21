@@ -63,7 +63,7 @@
                 <div class="app-table-body" *ngIf="!loadingProcesses()">
                     <div
                         *ngFor="let process of processes()"
-                        class="app-row  "
+                        class="app-row"
                         [ngClass]="{ 'app-row-active': activeProcess?.id.toString() === process.id.toString() }"
                         (click)="openSidebar(process)"
                     >
@@ -288,10 +288,12 @@
             <div class="app-part app-set-oai-adapter">
                 <div class="app-part-title">
                     <div>{{ 'processes.transform-prefix' | translate }}</div>
-                    <div><b>{{ 'processes.transform-rdd' | translate }}</b></div>
+                    <div>
+                        <b>{{ 'processes.transform-rdd' | translate }}</b>
+                    </div>
                 </div>
                 <div class="app-part-buttons">
-                    <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openAddXslStylesheetDialog()">
+                    <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openAddXslStylesheetDialog('rdd')">
                         <div>{{ 'buttons.add' | translate }}</div>
                     </app-button>
                 </div>
@@ -334,7 +336,7 @@
                                         [icon]="true"
                                         iconLeft="trash-blue.svg"
                                         size="s"
-                                        (click)="$event.stopPropagation(); removeTransformation(tr)"
+                                        (click)="$event.stopPropagation(); removeTransformation('rdd', tr)"
                                     ></app-button>
                                     <!-- Actions for each transformation can be added here -->
                                 </div>
@@ -343,30 +345,203 @@
                     </div>
                 </div>
             </div>
+
             <div class="app-part app-set-oai-adapter">
                 <div class="app-part-title">
                     <div>{{ 'processes.transform-prefix' | translate }}</div>
-                    <div><b>{{ 'processes.transform-ids' | translate }}</b></div>
+                    <div>
+                        <b>{{ 'processes.transform-ids' | translate }}</b>
+                    </div>
                 </div>
                 <div class="app-part-buttons">
-                    <app-button variant="primary" size="s" iconLeft="add-white.svg">
+                    <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="openAddXslStylesheetDialog('ids')">
                         <div>{{ 'buttons.add' | translate }}</div>
                     </app-button>
+                </div>
+                <div class="app-part-content">
+                    <div class="app-table app-rdd-table">
+                        <div class="app-row app-row-header app-row-rdd">
+                            <div class="app-col app-table-header-item app-rdd-title">
+                                {{ 'processes.Title' | translate }}
+                            </div>
+                            <div class="app-col app-table-header-item app-rdd-description">
+                                {{ 'processes.Description' | translate }}
+                            </div>
+                            <div class="app-col app-table-header-item app-rdd-created">
+                                {{ 'processes.Created' | translate }}
+                            </div>
+                            <div class="app-col app-table-header-item app-col-actions app-rdd-action">
+                                {{ 'processes.Action' | translate }}
+                            </div>
+                        </div>
+                        <div class="app-table-body app-rdd-table-body">
+                            <div
+                                class="app-row app-table-row app-row-clicable"
+                                *ngFor="let tr of idsTransformations()"
+                                [ngClass]="{ 'app-row-active': activeIdsTransformation?.id.toString() === tr.id.toString() }"
+                                (click)="openRddTransformation(tr)"
+                            >
+                                <div class="app-col app-rdd-title">{{ tr.name }}</div>
+                                <div class="app-col app-rdd-description">{{ tr.description }}</div>
+                                <div class="app-col app-rdd-created">{{ tr.created | date }}</div>
+                                <div class="app-col app-col-actions app-rdd-action">
+                                    <app-button
+                                        variant="tertiary"
+                                        [icon]="true"
+                                        iconLeft="download-blue.svg"
+                                        size="s"
+                                        (click)="$event.stopPropagation(); downloadTransformation(tr)"
+                                    ></app-button>
+                                    <app-button
+                                        variant="tertiary"
+                                        [icon]="true"
+                                        iconLeft="trash-blue.svg"
+                                        size="s"
+                                        (click)="$event.stopPropagation(); removeTransformation('ids', tr)"
+                                    ></app-button>
+                                    <!-- Actions for each transformation can be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- PLAN OAI ADAPTER -->
         <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition() === 'OAI_ADAPTER'">
-            <div class="app-part">
+            <div class="app-part app-oai-part">
                 <div class="app-part-title">{{ 'processes.basic-settings' | translate }} OAI</div>
+                <div class="app-part-content app-oai-part-content">
+                    <!-- REGISTRAR -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width">
+                            <div class="app-base-input-label">
+                                {{ 'processes.registrar' | translate }}
+                            </div>
+                            <mat-form-field appearance="outline">
+                                <mat-select class="app-singleselect" [(value)]="selectedRegistrar">
+                                    @for (registrar of assignedRegistrars(); track registrar) {
+                                        <mat-option [value]="registrar">{{ registrar }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width">
+                            <div class="app-base-input-label">{{ 'processes.set-base-url' | translate }}</div>
+                            <mat-form-field appearance="outline">
+                                <input matInput [formControl]="oaiBaseUrlControl" />
+                                <mat-error *ngIf="oaiBaseUrlControl.hasError('required')">
+                                    {{ 'messages.field-required' | translate }}
+                                </mat-error>
+                                <mat-error *ngIf="oaiBaseUrlControl.hasError('invalidUrl')">
+                                    {{ 'messages.invalid-url' | translate }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width">
+                            <div class="app-base-input-label">{{ 'processes.oai-metadata-prefix' | translate }}</div>
+                            <mat-form-field appearance="outline">
+                                <input matInput [formControl]="oaiMetadataPrefixControl" />
+                                <mat-error *ngIf="oaiMetadataPrefixControl.hasError('required')">
+                                    {{ 'messages.field-required' | translate }}
+                                </mat-error>
+                                <mat-error *ngIf="oaiMetadataPrefixControl.hasError('invalidUrl')">
+                                    {{ 'messages.invalid-url' | translate }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-full-width">
+                            <div class="app-base-input-label">{{ 'processes.oai-set' | translate }}</div>
+                            <mat-form-field appearance="outline">
+                                <input matInput [formControl]="oaiSetControl" />
+                                <mat-error *ngIf="oaiSetControl.hasError('required')">
+                                    {{ 'messages.field-required' | translate }}
+                                </mat-error>
+                                <mat-error *ngIf="oaiSetControl.hasError('invalidUrl')">
+                                    {{ 'messages.invalid-url' | translate }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <!-- RDD TRANSFORMATION -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width">
+                            <div class="app-base-input-label">
+                                {{ 'processes.transform-rdd-select' | translate }}
+                            </div>
+                            <mat-form-field appearance="outline">
+                                <mat-select class="app-singleselect" [(value)]="selectedRddTransformationId">
+                                    @for (tr of rddTransformations(); track tr) {
+                                        <mat-option [value]="tr.id">{{ tr.name }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <!-- RDI TRANSFORMATION -->
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-half-width">
+                            <div class="app-base-input-label">
+                                {{ 'processes.transform-rdi-select' | translate }}
+                            </div>
+                            <mat-form-field appearance="outline">
+                                <mat-select class="app-singleselect" [(value)]="selectedIdsTransformationId">
+                                    @for (tr of idsTransformations(); track tr) {
+                                        <mat-option [value]="tr.id">{{ tr.name }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="app-part">
+            <div class="app-part app-oai-part">
                 <div class="app-part-title">{{ 'processes.registration-rules' | translate }}</div>
+                <div class="app-part-content app-oai-part-content">
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-radio-toggle-checkboxes">
+                            <div class="app-base-input-label">{{ 'processes.register-dd' | translate }}</div>
+                            <div class="app-checkbox-container app-checkbox-oai">
+                                <app-checkbox [(checked)]="transformWithUrnNbn" label="{{ 'processes.with-urnNbn' | translate }}"></app-checkbox>
+                                <app-checkbox
+                                    [(checked)]="transformWithoutUrnNbn"
+                                    label="{{ 'processes.without-urnNbn' | translate }}"
+                                ></app-checkbox>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-radio-toggle-checkboxes">
+                            <!-- <div class="app-base-input-label">{{ 'processes.register-dd' | translate }}</div> -->
+                            <app-checkbox [(checked)]="mergeDigitalInstances" label="{{ 'processes.merge-digital-instances' | translate }}"></app-checkbox>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="app-part">
+            <div class="app-part app-oai-part">
                 <div class="app-part-title">{{ 'processes.diff-tolerance' | translate }}</div>
+                <div class="app-part-content app-oai-part-content">
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-radio-toggle-checkboxes">
+                            <!-- <div class="app-base-input-label">{{ 'processes.register-dd' | translate }}</div> -->
+                            <app-checkbox [(checked)]="ignoreDiffInAccess" label="{{ 'processes.ignore-diff-in-access' | translate }}"></app-checkbox>
+                        </div>
+                    </div>
+                    <div class="app-base-input-container">
+                        <div class="app-base-input app-radio-toggle-checkboxes">
+                            <!-- <div class="app-base-input-label">{{ 'processes.register-dd' | translate }}</div> -->
+                            <app-checkbox [(checked)]="ignoreDiffInFormat" label="{{ 'processes.ignore-diff-in-format' | translate }}"></app-checkbox>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -443,12 +618,12 @@
                                 <mat-select [formControl]="registrars" multiple [placeholder]="'inputs.select-registrar' | translate">
                                     <mat-select-trigger>
                                         @if ((registrars.value?.length || 0) > 0) {
-                                        {{ 'inputs.selected-items' | translate }}:
-                                        <span>{{ registrars.value?.length }}</span>
+                                            {{ 'inputs.selected-items' | translate }}:
+                                            <span>{{ registrars.value?.length }}</span>
                                         }
                                     </mat-select-trigger>
                                     @for (reg of registrarList(); track reg) {
-                                    <mat-option [value]="reg">{{ reg }}</mat-option>
+                                        <mat-option [value]="reg">{{ reg.code }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
@@ -470,12 +645,12 @@
                                 <mat-select [formControl]="intellectualEntities" multiple [placeholder]="'inputs.select-entity' | translate">
                                     <mat-select-trigger>
                                         @if ((intellectualEntities.value?.length || 0) > 0) {
-                                        {{ 'inputs.selected-items' | translate }}:
-                                        <span>{{ intellectualEntities.value?.length }}</span>
+                                            {{ 'inputs.selected-items' | translate }}:
+                                            <span>{{ intellectualEntities.value?.length }}</span>
                                         }
                                     </mat-select-trigger>
                                     @for (entity of intellectualEntitiesList(); track entity) {
-                                    <mat-option [value]="entity">{{ entity }}</mat-option>
+                                        <mat-option [value]="entity">{{ entity }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
@@ -507,7 +682,7 @@
 
                             <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedState" (valueChange)="onStateChange($event)">
                                 @for (state of states; track state) {
-                                <app-radio-button label="{{ 'processes.' + state | translate }}" value="{{ state }}"></app-radio-button>
+                                    <app-radio-button label="{{ 'processes.' + state | translate }}" value="{{ state }}"></app-radio-button>
                                 }
                             </app-radio-group>
                         </div>
@@ -601,12 +776,12 @@
                                 <mat-select [formControl]="registrars" multiple [placeholder]="'inputs.select-registrar' | translate">
                                     <mat-select-trigger>
                                         @if ((registrars.value?.length || 0) > 0) {
-                                        {{ 'inputs.selected-items' | translate }}:
-                                        <span>{{ registrars.value?.length }}</span>
+                                            {{ 'inputs.selected-items' | translate }}:
+                                            <span>{{ registrars.value?.length }}</span>
                                         }
                                     </mat-select-trigger>
                                     @for (reg of registrarList(); track reg) {
-                                    <mat-option [value]="reg">{{ reg }}</mat-option>
+                                        <mat-option [value]="reg">{{ reg }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
@@ -628,12 +803,12 @@
                                 <mat-select [formControl]="intellectualEntities" multiple [placeholder]="'inputs.select-entity' | translate">
                                     <mat-select-trigger>
                                         @if ((intellectualEntities.value?.length || 0) > 0) {
-                                        {{ 'inputs.selected-items' | translate }}:
-                                        <span>{{ intellectualEntities.value?.length }}</span>
+                                            {{ 'inputs.selected-items' | translate }}:
+                                            <span>{{ intellectualEntities.value?.length }}</span>
                                         }
                                     </mat-select-trigger>
                                     @for (entity of intellectualEntitiesList(); track entity) {
-                                    <mat-option [value]="entity">{{ entity }}</mat-option>
+                                        <mat-option [value]="entity">{{ entity }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
@@ -659,7 +834,7 @@
                                     (valueChange)="onStateChange($event)"
                                 >
                                     @for (state of states; track state) {
-                                    <app-radio-button label="{{ 'processes.' + state | translate }}" value="{{ state }}"></app-radio-button>
+                                        <app-radio-button label="{{ 'processes.' + state | translate }}" value="{{ state }}"></app-radio-button>
                                     }
                                 </app-radio-group>
                             </div>
@@ -671,7 +846,6 @@
             <div class="app-part">
                 <div class="app-part-title">{{ 'processes.digital-instance' | translate }}</div>
                 <div class="app-part-content">
-                    .....
                     <div class="app-base-input-label">{{ 'processes.created-deactivated' | translate }}</div>
                     <div class="app-datepicker-container">
                         <div class="app-datepicker-item">
@@ -732,7 +906,7 @@
                     <div class="app-base-input">
                         <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedDIState" (valueChange)="onStateChange($event)">
                             @for (state of states; track state) {
-                            <app-radio-button [value]="state" label="{{ 'processes.' + state | translate }}"></app-radio-button>
+                                <app-radio-button [value]="state" label="{{ 'processes.' + state | translate }}"></app-radio-button>
                             }
                         </app-radio-group>
                     </div>
@@ -744,58 +918,60 @@
         <div class="app-sidebar-content" *ngIf="activeAction === 'plan' && activeDefinition() === 'INDEXATION'">
             <div class="app-part">
                 <div class="app-part-content">
-                    <div class="app-base-input-label">{{ 'processes.filter-by-date' | translate }} *</div>
-                    <div class="app-datepicker-container">
-                        <div class="app-datepicker-item">
-                            <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
-                                <input
-                                    matInput
-                                    [matDatepicker]="startDatePicker"
-                                    [formControl]="startDateControl"
-                                    [placeholder]="'inputs.pick-start-date' | translate"
-                                />
-                                <mat-datepicker-toggle matSuffix [for]="startDatePicker">
-                                    <mat-icon matDatepickerToggleIcon>
-                                        <img src="assets/icons/calendar.svg" alt="calendar" />
-                                    </mat-icon>
-                                </mat-datepicker-toggle>
-                                <mat-datepicker #startDatePicker></mat-datepicker>
-                                <mat-error
-                                    *ngIf="
-                                        startDateControl.hasError('matDatepickerParse') ||
-                                        startDateControl.hasError('invalidDate') ||
-                                        startDateControl.hasError('required')
-                                    "
-                                >
-                                    {{ 'messages.invalid-date' | translate }}
-                                </mat-error>
-                            </mat-form-field>
-                        </div>
-                        <div class="app-datepicker-spacer">-</div>
-                        <div class="app-datepicker-item">
-                            <mat-form-field appearance="outline" class="app-datepicker">
-                                <input
-                                    matInput
-                                    [matDatepicker]="endDatePicker"
-                                    [formControl]="endDateControl"
-                                    [placeholder]="'inputs.pick-end-date' | translate"
-                                />
-                                <mat-datepicker-toggle matSuffix [for]="endDatePicker">
-                                    <mat-icon matDatepickerToggleIcon>
-                                        <img src="assets/icons/calendar.svg" alt="calendar" />
-                                    </mat-icon>
-                                </mat-datepicker-toggle>
-                                <mat-datepicker #endDatePicker></mat-datepicker>
-                                <mat-error
-                                    *ngIf="
-                                        endDateControl.hasError('matDatepickerParse') ||
-                                        endDateControl.hasError('invalidDate') ||
-                                        endDateControl.hasError('required')
-                                    "
-                                >
-                                    {{ 'messages.invalid-date' | translate }}
-                                </mat-error>
-                            </mat-form-field>
+                    <div class="app-base-input">
+                        <div class="app-base-input-label">{{ 'processes.filter-by-date' | translate }} *</div>
+                        <div class="app-datepicker-container">
+                            <div class="app-datepicker-item">
+                                <mat-form-field appearance="outline" class="app-datepicker app-base-input-field">
+                                    <input
+                                        matInput
+                                        [matDatepicker]="startDatePicker"
+                                        [formControl]="startDateControl"
+                                        [placeholder]="'inputs.pick-start-date' | translate"
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+                                        <mat-icon matDatepickerToggleIcon>
+                                            <img src="assets/icons/calendar.svg" alt="calendar" />
+                                        </mat-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #startDatePicker></mat-datepicker>
+                                    <mat-error
+                                        *ngIf="
+                                            startDateControl.hasError('matDatepickerParse') ||
+                                            startDateControl.hasError('invalidDate') ||
+                                            startDateControl.hasError('required')
+                                        "
+                                    >
+                                        {{ 'messages.invalid-date' | translate }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="app-datepicker-spacer">-</div>
+                            <div class="app-datepicker-item">
+                                <mat-form-field appearance="outline" class="app-datepicker">
+                                    <input
+                                        matInput
+                                        [matDatepicker]="endDatePicker"
+                                        [formControl]="endDateControl"
+                                        [placeholder]="'inputs.pick-end-date' | translate"
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+                                        <mat-icon matDatepickerToggleIcon>
+                                            <img src="assets/icons/calendar.svg" alt="calendar" />
+                                        </mat-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #endDatePicker></mat-datepicker>
+                                    <mat-error
+                                        *ngIf="
+                                            endDateControl.hasError('matDatepickerParse') ||
+                                            endDateControl.hasError('invalidDate') ||
+                                            endDateControl.hasError('required')
+                                        "
+                                    >
+                                        {{ 'messages.invalid-date' | translate }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -808,8 +984,11 @@
                 {{ 'messages.process-planned-successfully' | translate }}
             </div>
             <div class="app-button-container">
-                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()" *ngIf="activeAction === 'plan'">
                     <span>{{ 'buttons.cancel' | translate }}</span>
+                </app-button>
+                <app-button variant="tertiary" size="l" (click)="closeSidebar()" *ngIf="activeAction === 'set'">
+                    <span>{{ 'buttons.close' | translate }}</span>
                 </app-button>
                 <app-button
                     *ngIf="activeAction === 'plan'"
@@ -820,9 +999,9 @@
                 >
                     <span>{{ 'buttons.plan-process' | translate }}</span>
                 </app-button>
-                <app-button *ngIf="activeAction === 'set'" variant="primary" size="l" (click)="setProcess(activeDefinition())">
+                <!-- <app-button *ngIf="activeAction === 'set'" variant="primary" size="l" (click)="setProcess(activeDefinition())">
                     <span>{{ 'buttons.set-process' | translate }}</span>
-                </app-button>
+                </app-button> -->
             </div>
         </div>
     </div>

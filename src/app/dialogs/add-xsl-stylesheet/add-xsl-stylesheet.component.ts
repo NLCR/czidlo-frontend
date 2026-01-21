@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
+import { id } from '@swimlane/ngx-charts';
 
 @Component({
     selector: 'app-add-xsl-stylesheet',
@@ -18,6 +19,15 @@ export class AddXslStylesheetComponent {
 
     onConfirm() {
         console.log('Přidat XSL stylesheet:', this.data);
+        let newTransformation = {
+            id: this.data.id || id(),
+            name: this.data.name,
+            description: this.data.description,
+            file: this.data.selectedFile,
+            filename: this.fileName,
+            created: new Date()
+        };
+        this.data = newTransformation;
         this.dialogRef.close(this.data);
     }
 
