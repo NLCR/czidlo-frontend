@@ -1,7 +1,5 @@
 ## Kontakty
 
-Kontakty
-
 Kurátori:
 
 Mgr. Filip Pavčík, PhD.
