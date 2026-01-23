@@ -507,7 +507,7 @@ export class ProcessesComponent {
             console.log('Planning REGISTRARS_URN_NBN_CSV_EXPORT process...');
             const registrationStart = this.startDateControl.value;
             const registrationEnd = this.endDateControl.value;
-            const registrars = this.registrars.value?.join(',');
+            const registrarCodes = this.registrars.value?.join(',');
             const entityTypes = this.intellectualEntities.value?.join(',');
             const withMissingCnbOnly = this.missingCNB;
             const withMissingIssnOnly = this.missingISSN;
@@ -524,7 +524,7 @@ export class ProcessesComponent {
                 params: {
                     registrationDateFrom: registrationStart?.toISOString(),
                     registrationDateTo: registrationEnd?.toISOString(),
-                    registrars: registrars,
+                    registrarCodes: registrarCodes,
                     intEntTypes: entityTypes,
                     withMissingCnbOnly: withMissingCnbOnly,
                     withMissingIssnOnly: withMissingIssnOnly,
