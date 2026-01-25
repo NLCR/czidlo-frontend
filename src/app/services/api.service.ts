@@ -133,6 +133,10 @@ export class ApiService {
         const url = `${this.apiUrl}/processes/${id}/cancel`;
         return this.http.post(url, {}).pipe(catchError(this.handleError));
     }
+    killProcess(id: string): Observable<any> {
+        const url = `${this.apiUrl}/processes/${id}/kill`;
+        return this.http.post(url, {}).pipe(catchError(this.handleError));
+    }
 
     // INFO PAGES
     getInfo(): Observable<any> {

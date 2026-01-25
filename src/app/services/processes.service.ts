@@ -20,7 +20,7 @@ export class ProcessesService {
     ]);
     public identifiers = signal<Array<string>>(['CNB', 'ISSN', 'ISBN']);
 
-    constructor(private apiService: ApiService) {}
+    constructor(private apiService: ApiService) { }
 
     getProcesses(): Observable<any> {
         return this.apiService.getProcesses().pipe(
@@ -39,11 +39,11 @@ export class ProcessesService {
                                 finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
                                 duration: item.finished
                                     ? (() => {
-                                          const start = new Date(item.started.replace(/\[UTC\]$/, '')).getTime();
-                                          const end = new Date(item.finished.replace(/\[UTC\]$/, '')).getTime();
-                                          const diffSec = Math.round((end - start) / 1000);
-                                          return diffSec;
-                                      })()
+                                        const start = new Date(item.started.replace(/\[UTC\]$/, '')).getTime();
+                                        const end = new Date(item.finished.replace(/\[UTC\]$/, '')).getTime();
+                                        const diffSec = Math.round((end - start) / 1000);
+                                        return diffSec;
+                                    })()
                                     : '---',
                             }))
                             .sort((a: any, b: any) => (a.id < b.id ? 1 : -1))
@@ -93,10 +93,10 @@ export class ProcessesService {
                             finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
                             duration: item.finished
                                 ? Math.round(
-                                      (new Date(item.finished.replace(/\[UTC\]$/, '')).getTime() -
-                                          new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) /
-                                          1000
-                                  ) + ' s'
+                                    (new Date(item.finished.replace(/\[UTC\]$/, '')).getTime() -
+                                        new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) /
+                                    1000
+                                ) + ' s'
                                 : Math.round((Date.now() - new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) / 1000) + ' s',
                         }))
                     );
@@ -129,7 +129,7 @@ export class ProcessesService {
         );
     }
     killProcess(id: string): Observable<any> {
-        return this.apiService.cancelProcess(id).pipe(
+        return this.apiService.killProcess(id).pipe(
             tap({
                 next: () => {
                     console.log(`Process ${id} kill requested`);
