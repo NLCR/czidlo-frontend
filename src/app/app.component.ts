@@ -32,6 +32,7 @@ export class AppComponent {
             //es
             esBaseUrl: this.envService.get('esBaseUrl'),
             esLogin: this.envService.get('esLogin'),
+            //esPassword: this.envService.get('esPassword'),
             esIndexSearch: this.envService.get('esIndexSearch'),
             esIndexAssign: this.envService.get('esIndexAssign'),
             esIndexResolve: this.envService.get('esIndexResolve'),
