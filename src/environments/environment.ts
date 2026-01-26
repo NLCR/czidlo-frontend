@@ -14,17 +14,23 @@ export const environment = {
     pageInfoCzUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Informace.md',
     pageRulesCzUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Pravidla.md',
     pageContactsCzUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Kontakty.md',
-    
+
     pageInfoEnUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Information.md',
     pageRulesEnUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Rules.md',
     pageContactsEnUrl: 'https://raw.githubusercontent.com/NLCR/czidlo-frontend/refs/heads/main/docs/Contacts.md',
-    
+
     pageEditInfoCzUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Informace.md',
     pageEditRulesCzUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Pravidla.md',
     pageEditContactsCzUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Kontakty.md',
-    
+
     pageEditInfoEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Information.md',
     pageEditRulesEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Rules.md',
     pageEditContactsEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Contacts.md',
 
+    esBaseUrl: '', // pro produkci ziskej z promenne APP_ES_BASE_URL (přes env.json)
+    esLogin: '', // pro produkci ziskej z promenne APP_ES_LOGIN (přes env.json)
+    esPassword: '', // pro produkci ziskej z promenne APP_ES_PASSWORD (přes env.json)
+    esIndexSearch: '', // pro produkci ziskej z promenne APP_ES_INDEX_SEARCH (přes env.json)
+    esIndexAssign: '', // pro produkci ziskej z promenne APP_ES_INDEX_ASSIGN (přes env.json)
+    esIndexResolve: '', // pro produkci ziskej z promenne APP_ES_INDEX_RESOLVE (přes env.json)
 }
