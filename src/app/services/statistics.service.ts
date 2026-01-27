@@ -595,8 +595,8 @@ export class StatisticsService {
                 match_all: {},
             },
         };
-        // return this.apiService.getStatisticsDataAssign(body);
-        return this.apiService.getStatisticsDataResolve(body);
+        return this.apiService.getStatisticsDataAssign(body);
+        // return this.apiService.getStatisticsDataResolve(body);
     }
 
 
