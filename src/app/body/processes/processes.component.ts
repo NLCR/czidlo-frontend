@@ -507,7 +507,7 @@ export class ProcessesComponent {
             console.log('Planning REGISTRARS_URN_NBN_CSV_EXPORT process...');
             const registrationStart = this.startDateControl.value;
             const registrationEnd = this.endDateControl.value;
-            const registrars = this.registrars.value?.join(',');
+            const registrarCodes = this.registrars.value?.join(',');
             const entityTypes = this.intellectualEntities.value?.join(',');
             const withMissingCnbOnly = this.missingCNB;
             const withMissingIssnOnly = this.missingISSN;
@@ -515,16 +515,16 @@ export class ProcessesComponent {
             const returnActive = this.selectedState === 'ALL' || this.selectedState === 'ACTIVE';
             const returnDeactivated = this.selectedState === 'ALL' || this.selectedState === 'DEACTIVATED';
             let enabledDeactivationDates = this.selectedState === 'DEACTIVATED';
-            const deactivationStart = enabledDeactivationDates ? this.deactivationStartControl.value?.toISOString() || null : null;
-            const deactivationEnd = enabledDeactivationDates ? this.deactivationEndControl.value?.toISOString() || null : null;
+            const deactivationStart = enabledDeactivationDates ? this.deactivationStartControl.value?.toISOString().split('T')[0] || null : null;
+            const deactivationEnd = enabledDeactivationDates ? this.deactivationEndControl.value?.toISOString().split('T')[0] || null : null;
             const exportNumOfDigInstances = this.selectedIncludeCount || false;
 
             let body = {
                 type: 'REGISTRARS_URN_NBN_CSV_EXPORT',
                 params: {
-                    registrationDateFrom: registrationStart?.toISOString(),
-                    registrationDateTo: registrationEnd?.toISOString(),
-                    registrars: registrars,
+                    registrationDateFrom: registrationStart?.toISOString().split('T')[0], // jen datum YYYY-MM-DD
+                    registrationDateTo: registrationEnd?.toISOString().split('T')[0], // jen datum YYYY-MM-DD
+                    registrarCodes: registrarCodes,
                     intEntTypes: entityTypes,
                     withMissingCnbOnly: withMissingCnbOnly,
                     withMissingIssnOnly: withMissingIssnOnly,
@@ -599,8 +599,8 @@ export class ProcessesComponent {
                 body = {
                     type: 'INDEXATION',
                     params: {
-                        mod_date_from: startDate.toISOString(),
-                        mod_date_to: endDate.toISOString(),
+                        mod_date_from: startDate?.toISOString().split('T')[0], // jen datum YYYY-MM-DD
+                        mod_date_to: endDate?.toISOString().split('T')[0], // jen datum YYYY-MM-DD
                     },
                 };
             }

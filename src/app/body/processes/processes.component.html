@@ -781,7 +781,7 @@
                                         }
                                     </mat-select-trigger>
                                     @for (reg of registrarList(); track reg.code) {
-                                        <mat-option [value]="reg.code">{{ reg.code }}</mat-option>
+                                        <mat-option [value]="reg.code">{{ reg.code.code }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>

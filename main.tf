@@ -29,6 +29,30 @@ variable "APP_CZIDLO_PUBLIC_API_URL" {
   type = string
 }
 
+variable "APP_ES_BASE_URL" {
+  type = string
+}
+
+variable "APP_ES_LOGIN" {
+  type = string
+}
+
+variable "APP_ES_PASSWORD" {
+  type = string
+}
+
+variable "APP_ES_INDEX_SEARCH" {
+  type = string
+}
+
+variable "APP_ES_INDEX_ASSIGN" {
+  type = string
+}
+
+variable "APP_ES_INDEX_RESOLVE" {
+  type = string
+}
+
 variable "docker_host_uri" {
   type = string
 }
@@ -87,7 +111,13 @@ resource "docker_container" "czidlo_frontend" {
     "APP_ENV_NAME=${var.APP_ENV_NAME}",
     "APP_ENV_CODE=${var.APP_ENV_CODE}",
     "APP_CZIDLO_API_SERVICE_URL=${var.APP_CZIDLO_API_SERVICE_URL}",
-    "APP_CZIDLO_PUBLIC_API_URL=${var.APP_CZIDLO_PUBLIC_API_URL}"
+    "APP_CZIDLO_PUBLIC_API_URL=${var.APP_CZIDLO_PUBLIC_API_URL}",
+    "APP_ES_BASE_URL=${var.APP_ES_BASE_URL}",
+    "APP_ES_LOGIN=${var.APP_ES_LOGIN}",
+    "APP_ES_PASSWORD=${var.APP_ES_PASSWORD}",
+    "APP_ES_INDEX_SEARCH=${var.APP_ES_INDEX_SEARCH}",
+    "APP_ES_INDEX_ASSIGN=${var.APP_ES_INDEX_ASSIGN}",
+    "APP_ES_INDEX_RESOLVE=${var.APP_ES_INDEX_RESOLVE}"
   ]
 
   labels {

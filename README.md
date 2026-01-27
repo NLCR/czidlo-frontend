@@ -32,6 +32,12 @@ First define configuration in environment variables
 export APP_DEV_MODE=false
 export APP_CZIDLO_API_SERVICE_URL="https://czidlo-web-api.trinera.cloud/web-api/api"
 export APP_CZIDLO_PUBLIC_API_URL="https://resolver.nkp.cz/api/v6"
+export APP_ES_BASE_URL="https//es8.somehwere.com"
+export APP_ES_LOGIN="login"
+export APP_ES_PASSWORD="password"
+export APP_ES_INDEX_SEARCH="czidlo_search_1"
+export APP_ES_INDEX_ASSIGN="czidlo_assign_1"
+export APP_ES_INDEX_RESOLVE="czidlo_resolve_1"
 ```
 
 Now run `npm run build` to build the project. 
@@ -89,6 +95,26 @@ docker run -p 1234:80 \
   -e APP_DEV_MODE=false \
   -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/web-api/api \
   -e APP_CZIDLO_PUBLIC_API_URL=https://resolver.nkp.cz/api/v6 \
+  -e APP_ES_BASE_URL=https//es8.somehwere.com \
+  -e APP_ES_LOGIN=login \
+  -e APP_ES_PASSWORD=password \
+  -e APP_ES_INDEX_SEARCH=czidlo_search_1 \
+  -e APP_ES_INDEX_ASSIGN=czidlo_assign_1 \
+  -e APP_ES_INDEX_RESOLVE=czidlo_resolve_1 \
+trinera/czidlo-frontend
+```
+
+```
+docker run -p 1234:80 \
+  -e APP_DEV_MODE=false \
+  -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/web-api/api \
+  -e APP_CZIDLO_PUBLIC_API_URL=https://resolver.nkp.cz/api/v6 \
+  -e APP_ES_BASE_URL=https://es8.dev-service.trinera.cloud \
+  -e APP_ES_LOGIN=czidlo_reader \
+  -e APP_ES_PASSWORD=dq7o8rDrXZzhiS20qm \
+  -e APP_ES_INDEX_SEARCH=czidlo_search_1 \
+  -e APP_ES_INDEX_ASSIGN=czidlo_assign_1 \
+  -e APP_ES_INDEX_RESOLVE=czidlo_resolve_1 \
 trinera/czidlo-frontend
 ```
 
