@@ -170,7 +170,7 @@
                                     </mat-select>
                                 </mat-form-field>
                             </div>
-                            <div class="app-selected-items" *ngIf="registrarsControl.value?.length > 0">
+                            <div class="app-selected-items app-selected-users" *ngIf="registrarsControl.value?.length > 0">
                                 <div class="app-selected-item" *ngFor="let item of registrarsControl.value">
                                     {{ item.code }}
                                     <div class="app-selected-item-remove" (click)="removeSelectedRegistrar(item)">

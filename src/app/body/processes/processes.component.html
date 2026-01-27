@@ -622,8 +622,8 @@
                                             <span>{{ registrars.value?.length }}</span>
                                         }
                                     </mat-select-trigger>
-                                    @for (reg of registrarList(); track reg) {
-                                        <mat-option [value]="reg">{{ reg.code }}</mat-option>
+                                    @for (reg of registrarList(); track reg.code) {
+                                        <mat-option [value]="reg.code">{{ reg.code }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
@@ -780,8 +780,8 @@
                                             <span>{{ registrars.value?.length }}</span>
                                         }
                                     </mat-select-trigger>
-                                    @for (reg of registrarList(); track reg) {
-                                        <mat-option [value]="reg">{{ reg }}</mat-option>
+                                    @for (reg of registrarList(); track reg.code) {
+                                        <mat-option [value]="reg.code">{{ reg.code }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>

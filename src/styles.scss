@@ -850,7 +850,7 @@ app-information {
     .app-selected-items {
         display: flex;
         padding: 8px;
-        margin: 0 0 24px 0;
+        margin: 24px 0 0 0;
         align-items: center;
         align-content: center;
         gap: 8px;
@@ -859,6 +859,9 @@ app-information {
         flex-wrap: wrap;
         border-radius: 4px;
         background: var(--BG-Main-Light, #f6f7f9);
+        &.app-selected-users {
+            margin: 0;
+        }
         .app-selected-item {
             display: flex;
             padding: var(--Spacing-x1, 4px) var(--Spacing-x3, 12px);
