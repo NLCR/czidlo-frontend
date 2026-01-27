@@ -597,7 +597,7 @@
     </div>
 
     <!-- NO QUERY -->
-    <div class="app-no-results app-no-query" *ngIf="!searchedQuery() && !loadingResults()">
+    <div class="app-no-results app-no-query" *ngIf="!loadingResults() && !searchedQuery() && !selectedType && !selectedRegistrar && !selectedState && !dateFrom && !dateTo">
         <h3 class="app-no-query-title">{{ 'search.no-query-title' | translate }}</h3>
         <div class="app-no-query-text">{{ 'search.no-query-text-1' | translate }}</div>
         <!-- <div class="app-no-query-text">{{ 'search.no-query-text-2' | translate }}</div> -->

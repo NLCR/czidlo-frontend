@@ -251,7 +251,7 @@ export class SearchComponent implements AfterViewInit {
         let stateParam = state && state !== 'all' ? state : null;
         this.router.navigate([], {
             queryParams: {
-                q: query || null,
+                q: query,
                 type: type ? this.selectedType || undefined : undefined,
                 filter: fields ? this.selectedField || undefined : undefined,
                 registrar: registrar ? this.selectedRegistrar || undefined : undefined,

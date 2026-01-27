@@ -22,7 +22,7 @@ export class SearchService {
         dateFrom?: string,
         dateTo?: string,
         state?: string,
-        page: number = 1
+        page: number = 1,
     ): Observable<any> {
         this.query.set(term);
 
@@ -37,8 +37,11 @@ export class SearchService {
             },
         };
 
-        // 🔍 1) Hledání URNNBN
-        if (term.toLowerCase().startsWith('urn:nbn')) {
+        if (term.length === 0) {
+            body.query = { match_all: {} };
+
+            // 🔍 1) Hledání URNNBN
+        } else if (term.toLowerCase().startsWith('urn:nbn')) {
             let parts = term.split(':');
             let code = parts[parts.length - 1].split('-')[1];
             let registratorCode = parts[parts.length - 1].split('-')[0];
@@ -119,9 +122,15 @@ export class SearchService {
             });
         }
 
+        // 🎯 Filtry (musí fungovat i pro match_all)
+        const addFilter = (f: any) => {
+            if (body.query?.bool?.filter) body.query.bool.filter.push(f);
+            else body.query = { bool: { must: [{ match_all: {} }], filter: [f] } };
+        };
+
         // 🎯 Filtr typu dokumentu
         if (docType) {
-            body.query.bool.filter.push({
+            addFilter({
                 term: {
                     'entitytype.keyword': docType,
                 },
@@ -129,7 +138,7 @@ export class SearchService {
         }
         // 🎯 Filtr registrátora
         if (registrar) {
-            body.query.bool.filter.push({
+            addFilter({
                 term: {
                     'registrarcode.keyword': registrar,
                 },
@@ -137,9 +146,9 @@ export class SearchService {
         }
         // 🎯 Filtr podle data registrace od
         if (dateFrom) {
-            body.query.bool.filter.push({
+            addFilter({
                 range: {
-                    registrationdate: {
+                    registered: {
                         gte: dateFrom,
                     },
                 },
@@ -147,9 +156,9 @@ export class SearchService {
         }
         // 🎯 Filtr podle data registrace do
         if (dateTo) {
-            body.query.bool.filter.push({
+            addFilter({
                 range: {
-                    registrationdate: {
+                    registered: {
                         lte: dateTo,
                     },
                 },
@@ -157,7 +166,7 @@ export class SearchService {
         }
         // 🎯 Filtr podle stavu
         if (state && state !== 'all') {
-            body.query.bool.filter.push({
+            addFilter({
                 term: {
                     active: state === 'active' ? true : false,
                 },
@@ -187,7 +196,7 @@ export class SearchService {
                     console.error('Error during search:', error);
                     this.isLoading.set(false);
                 },
-            })
+            }),
         );
     }
     getRecordDetails(urnnbn: string): Observable<any> {
@@ -199,7 +208,7 @@ export class SearchService {
                 error: (error) => {
                     console.error('Error fetching record details for', urnnbn, ':', error);
                 },
-            })
+            }),
         );
         return this.apiService.getRecordByUrnnbn(urnnbn);
     }
@@ -212,7 +221,7 @@ export class SearchService {
                 error: (error) => {
                     console.error('Error adding new instance to', urnnbn, ':', error);
                 },
-            })
+            }),
         );
     }
     editInstance(instanceId: string, updatedInstance: any): Observable<any> {
