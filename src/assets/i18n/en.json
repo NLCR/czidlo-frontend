@@ -425,7 +425,8 @@
         "filter-by-born-digital": "Filter by digital born",
         "digital": "Digital born",
         "analog": "Analog born",
-        "no-data-to-export": "No data to export"
+        "no-data-to-export": "No data to export",
+        "no-data": "No statistics available for the selected filters"
     },
     "search": {
         "true": "yes",

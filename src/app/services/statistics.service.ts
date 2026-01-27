@@ -55,13 +55,13 @@ export class StatisticsService {
             if (born === 'digital') {
                 filters.push({
                     term: {
-                        borndigital: true,
+                        digitalborn: true,
                     },
                 });
             } else if (born === 'analog') {
                 filters.push({
                     term: {
-                        borndigital: false,
+                        digitalborn: false,
                     },
                 });
             }
@@ -168,13 +168,13 @@ export class StatisticsService {
             if (born === 'digital') {
                 query.bool.filter.push({
                     term: {
-                        borndigital: true,
+                        digitalborn: true,
                     },
                 });
             } else if (born === 'analog') {
                 query.bool.filter.push({
                     term: {
-                        borndigital: false,
+                        digitalborn: false,
                     },
                 });
             }
@@ -255,13 +255,13 @@ export class StatisticsService {
             if (born === 'digital') {
                 query.bool.must.push({
                     term: {
-                        borndigital: true,
+                        digitalborn: true,
                     },
                 });
             } else if (born === 'analog') {
                 query.bool.must.push({
                     term: {
-                        borndigital: false,
+                        digitalborn: false,
                     },
                 });
             }
@@ -332,13 +332,13 @@ export class StatisticsService {
             if (born === 'digital') {
                 filters.push({
                     term: {
-                        borndigital: true,
+                        digitalborn: true,
                     },
                 });
             } else if (born === 'analog') {
                 filters.push({
                     term: {
-                        borndigital: false,
+                        digitalborn: false,
                     },
                 });
             }
@@ -434,13 +434,13 @@ export class StatisticsService {
             if (born === 'digital') {
                 query.bool.filter.push({
                     term: {
-                        borndigital: true,
+                        digitalborn: true,
                     },
                 });
             } else if (born === 'analog') {
                 query.bool.filter.push({
                     term: {
-                        borndigital: false,
+                        digitalborn: false,
                     },
                 });
             }
@@ -539,13 +539,13 @@ export class StatisticsService {
             if (born === 'digital') {
                 query.bool.must.push({
                     term: {
-                        borndigital: true,
+                        digitalborn: true,
                     },
                 });
             } else if (born === 'analog') {
                 query.bool.must.push({
                     term: {
-                        borndigital: false,
+                        digitalborn: false,
                     },
                 });
             }
@@ -595,7 +595,8 @@ export class StatisticsService {
                 match_all: {},
             },
         };
-        return this.apiService.getStatisticsDataAssign(body);
+        // return this.apiService.getStatisticsDataAssign(body);
+        return this.apiService.getStatisticsDataResolve(body);
     }
 
 

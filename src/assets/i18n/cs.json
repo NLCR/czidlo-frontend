@@ -440,7 +440,8 @@
         "filter-by-born-digital": "Filtrovat podle původní předlohy",
         "digital": "Digital born",
         "analog": "Fyzická předloha",
-        "no-data-to-export": "Žádná data k exportu"
+        "no-data-to-export": "Žádná data k exportu",
+        "no-data": "Pro zadané filtry nejsou k dispozici žádné statistiky"
     },
     "search": {
         "true": "ano",

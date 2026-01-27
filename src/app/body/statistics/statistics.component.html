@@ -114,7 +114,7 @@
                     <!-- DATA BY YEARS -->
                     <div class="app-chart-item" #sourceDiv>
                         <ngx-charts-bar-vertical
-                            *ngIf="chartDataByDate()"
+                            *ngIf="chartDataByDate() && chartDataByDate().length > 0"
                             [scheme]="colorScheme"
                             [view]="[getCalculatedWidth(), 300]"
                             [animations]="true"
@@ -127,6 +127,7 @@
                             (select)="onYearClick($event)"
                         ></ngx-charts-bar-vertical>
                     </div>
+                    <div class="app-no-data" *ngIf="!chartDataByDate() || chartDataByDate().length === 0">{{ 'statistics.no-data' | translate }}</div>
                 </div>
 
                 <div class="app-chart-wrapper">
@@ -155,7 +156,7 @@
                         <div class="app-chart-item" #sourceDiv>
                             <ngx-charts-pie-chart
                                 #chart
-                                *ngIf="chartDataByRegistrar()"
+                                *ngIf="chartDataByRegistrar() && chartDataByRegistrar().length > 0"
                                 [view]="[getCalculatedWidthHalf(), 400]"
                                 [results]="chartDataByRegistrar()"
                                 [animations]="false"
@@ -169,7 +170,8 @@
                                 (select)="onRegistrarClick($event)"
                             ></ngx-charts-pie-chart>
                         </div>
-                        <div class="app-chart-table">
+                        <div class="app-no-data" *ngIf="!chartDataByRegistrar() || chartDataByRegistrar().length === 0">{{ 'statistics.no-data' | translate }}</div>
+                        <div class="app-chart-table" *ngIf="chartDataByRegistrarTable().length > 0">
                             <div class="app-header-row app-chart-row">
                                 <div class="app-chart-col">
                                     <div class="app-col-registrar-code">{{ 'statistics.registrar-code' | translate }}</div>
@@ -207,7 +209,7 @@
                             <ngx-charts-pie-chart
                                 #chart
                                 [view]="[getCalculatedWidthHalf(), 400]"
-                                *ngIf="chartDataByEntityTypes()"
+                                *ngIf="chartDataByEntityTypes() && chartDataByEntityTypes().length > 0"
                                 [results]="chartDataByEntityTypes()"
                                 [animations]="false"
                                 [legend]="true"
@@ -221,7 +223,8 @@
                                 (select)="onTypeClick($event)"
                             ></ngx-charts-pie-chart>
                         </div>
-                        <div class="app-chart-table">
+                        <div class="app-no-data" *ngIf="!chartDataByEntityTypes() || chartDataByEntityTypes().length === 0">{{ 'statistics.no-data' | translate }}</div>
+                        <div class="app-chart-table" *ngIf="chartDataByEntityTypes().length > 0">
                             <div class="app-header-row app-chart-row">
                                 <div class="app-chart-col">
                                     <div class="app-col-registrar-code">{{ 'statistics.type' | translate }}</div>

@@ -80,6 +80,8 @@ export class StatisticsComponent {
 
     ngOnInit() {
         console.log('statistics init');
+        this.registrarsService.getRegistrars().subscribe();
+
         const url$ = this.route.url.pipe(
             map((url) => {
                 if (url.length > 1) {
@@ -142,7 +144,7 @@ export class StatisticsComponent {
         if (this.isActive === 'assignments') {
             this.loadRegisteredData(r, y, s, t, b);
         } else if (this.isActive === 'resolvations') {
-            this.loadResolvedData(r, y);
+            this.loadResolvedData(r, y, s, t, b);
         }
     }
 
@@ -154,7 +156,7 @@ export class StatisticsComponent {
         });
         // REGISTRAR
         this.statisticsService.getCountByRegistrar(r, y, s, t, b).subscribe((data) => {
-            // console.table(data);
+            console.table(data);
             // TABULKA – beze změny
             this.chartDataByRegistrarTable.set(data);
             // GRAF – malé hodnoty sloučené do "Other"
