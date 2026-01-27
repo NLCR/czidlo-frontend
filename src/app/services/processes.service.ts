@@ -37,14 +37,22 @@ export class ProcessesService {
                                 scheduled: item.scheduled ? new Date(item.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
                                 started: item.started ? new Date(item.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
                                 finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                                duration: item.finished
+                                duration: item.state === 'FINISHED'
                                     ? (() => {
                                         const start = new Date(item.started.replace(/\[UTC\]$/, '')).getTime();
                                         const end = new Date(item.finished.replace(/\[UTC\]$/, '')).getTime();
                                         const diffSec = Math.round((end - start) / 1000);
                                         return diffSec;
                                     })()
-                                    : '---',
+                                    : (() => {
+                                        const start = item.started ? new Date(item.started.replace(/\[UTC\]$/, '')).getTime() : 0;
+                                        const end = new Date().getTime();
+                                        const diffSec = Math.round((end - start) / 1000);
+                                        if (!item.started) {
+                                            return '---';
+                                        }
+                                        return diffSec;
+                                    })(),
                             }))
                             .sort((a: any, b: any) => (a.id < b.id ? 1 : -1))
                     );

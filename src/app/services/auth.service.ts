@@ -97,7 +97,7 @@ export class AuthService {
     }
 
     public restoreSession(): void {
-        console.log('restoring session with userinfo', localStorage.getItem('auth_user_info'));
+        // console.log('restoring session with userinfo', localStorage.getItem('auth_user_info'));
         const username = localStorage.getItem('auth_username');
         const password = localStorage.getItem('auth_password');
         const isAdmin = localStorage.getItem('auth_is_admin') === 'true';
@@ -111,7 +111,7 @@ export class AuthService {
                 this.isAdmin.set(isAdmin);
                 this.userId.set(id);
                 // this.userInfo.set(JSON.parse(user || 'null'));
-                console.log('Session restored for user:', user);
+                // console.log('Session restored for user:', user);
             } else {
                 this.logout();
             }

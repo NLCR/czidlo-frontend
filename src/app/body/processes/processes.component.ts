@@ -276,14 +276,22 @@ export class ProcessesComponent {
                     data.type = data.type;
                     data.ownerLogin = data.ownerLogin;
                     data.state = data.state;
-                    data.duration = data.finished
+                    data.duration = data.state === 'FINISHED'
                         ? (() => {
                               const start = new Date(data.started.replace(/\[UTC\]$/, '')).getTime();
                               const end = new Date(data.finished.replace(/\[UTC\]$/, '')).getTime();
                               const diffSec = Math.round((end - start) / 1000);
                               return diffSec;
                           })()
-                        : '---';
+                        : (() => {
+                              const start = data.started ? new Date(data.started.replace(/\[UTC\]$/, '')).getTime() : 0;
+                              const end = new Date().getTime();
+                              const diffSec = Math.round((end - start) / 1000);
+                                if (!data.started) {
+                                    return '---';
+                                }
+                              return diffSec;
+                          })();
                     data.scheduled = data.scheduled ? new Date(data.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
                     data.started = data.started ? new Date(data.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
                     data.finished = data.finished ? new Date(data.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
@@ -701,6 +709,9 @@ export class ProcessesComponent {
     }
 
     formatDuration(seconds: number): string {
+        if (seconds === null || seconds === undefined || isNaN(seconds)) {
+            return '---';
+        }
         if (seconds < 60) {
             return `${seconds} s`;
         }
