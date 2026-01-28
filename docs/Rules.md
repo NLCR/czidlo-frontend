@@ -1,6 +1,4 @@
-## Rules
-
-### Scope
+## Scope
 
 Czidlo is a system for the permanent identification of digital documents of Czech cultural heritage. The system is operated by the **National Library of the Czech Republic**, which administers and cooperates with other institutions. This cooperation is an essential condition for the successful functioning of the entire system.
 
