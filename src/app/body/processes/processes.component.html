@@ -246,11 +246,11 @@
             </div>
             <!-- <pre class="app-sidebar-content-item" *ngIf="activeProcess">{{ activeProcess | json }}</pre> -->
             <pre class="app-sidebar-content-item app-sidebar-log-content" *ngIf="activeProcess?.log">{{ activeProcess.log }}</pre>
-            <div class="app-sidebar-content-item" *ngIf="activeProcess?.logError">
+            <!-- <div class="app-sidebar-content-item" *ngIf="activeProcess?.logError">
                 <div class="app-base-input-hint app-base-input-error">
                     {{ activeProcess.logError?.error | translate }} ({{ displayLogError(activeProcess) | translate }})
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <div class="app-sidebar-footer">
@@ -258,10 +258,10 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.close' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadLog(activeProcess)">
+                <app-button *ngIf="activeProcess.state !== 'CANCELED' && activeProcess.state !== 'SCHEDULED'" variant="primary" size="l" iconRight="download.svg" (click)="downloadLog(activeProcess)">
                     <span>{{ 'buttons.download-log' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" iconRight="download.svg" (click)="downloadProcessOutput(activeProcess.id)">
+                <app-button *ngIf="activeProcess.state !== 'CANCELED' && activeProcess.state !== 'SCHEDULED'" variant="primary" size="l" iconRight="download.svg" (click)="downloadProcessOutput(activeProcess.id)">
                     <span>{{ 'buttons.download-output' | translate }}</span>
                 </app-button>
                 <!-- <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyLog(activeProcess)">

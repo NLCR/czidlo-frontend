@@ -109,6 +109,7 @@ export class SearchService {
                         'sdvolumetitle',
                         'sdissuetitle',
                         'rsidvalues',
+                        'rsidkeyvalues',
                         'publisher',
                         'registrarcode',
                         'issn',
