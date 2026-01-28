@@ -246,11 +246,11 @@
             </div>
             <!-- <pre class="app-sidebar-content-item" *ngIf="activeProcess">{{ activeProcess | json }}</pre> -->
             <pre class="app-sidebar-content-item app-sidebar-log-content" *ngIf="activeProcess?.log">{{ activeProcess.log }}</pre>
-            <!-- <div class="app-sidebar-content-item" *ngIf="activeProcess?.logError">
+            <div class="app-sidebar-content-item" *ngIf="activeProcess?.logError && activeProcess?.state !== 'CANCELED' && activeProcess?.state !== 'SCHEDULED'">
                 <div class="app-base-input-hint app-base-input-error">
                     {{ activeProcess.logError?.error | translate }} ({{ displayLogError(activeProcess) | translate }})
                 </div>
-            </div> -->
+            </div>
         </div>
 
         <div class="app-sidebar-footer">

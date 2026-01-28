@@ -70,7 +70,7 @@
         <div class="app-advanced-search-text" (click)="advancedSearch.set(!advancedSearch())">
             {{ advancedSearch() ? ('search.hide-advanced-search' | translate) : ('search.show-advanced-search' | translate) }}
         </div>
-        <div class="app-records-count" *ngIf="searchService.recordsCount() > 0">
+        <div class="app-records-count" *ngIf="searchService.recordsCount() > 0 && (searchedQuery() || selectedType || selectedRegistrar || dateFrom || dateTo || (selectedState && selectedState !== 'all'))">
             <div class="app-records-found">
                 {{ 'search.records-found' | translate }}: {{ searchService.recordsCount() }}
                 <span *ngIf="searchService.recordsCount() === 10000">+</span>
