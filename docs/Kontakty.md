@@ -1,6 +1,7 @@
 ## Kontakty
+📧 urnnbn@nkp.cz
 
-Kurátori:
+**Kurátoři:**
 
 Mgr. Filip Pavčík, PhD.
 
@@ -10,7 +11,7 @@ Mgr. Veronika Ježková
 
 📧 veronika.jezkova@nkp.cz
 
-Technická správa a podpora
+**Technická správa a podpora:**
 
 📧 resolver-podpora@nkp.cz
 
