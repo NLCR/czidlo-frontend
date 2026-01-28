@@ -52,6 +52,7 @@
                     >
                         <div class="app-col app-col-name">{{ registrar.name }}</div>
                         <div class="app-right">
+                            <div class="app-invisible-button" *ngIf="!isAdmin()"></div>
                             <div class="app-col app-col-code">{{ registrar.code }}</div>
                             <div class="app-col app-col-actions app-col-reg-actions" *ngIf="isAdmin()">
                                 <app-button
@@ -97,7 +98,7 @@
                         [ngClass]="{
                             'app-row-hidden': archiver?.hidden === true && !isAdmin(),
                             'app-row-active': activeArchiver?.id?.toString() === archiver.id.toString(),
-                            'app-actions-invisible': !isAdmin()
+                            'app-actions-invisible': !isAdmin(),
                         }"
                         (click)="openSidebar(archiver)"
                     >
@@ -199,7 +200,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="app-section-part">
+                        <div class="app-section-part" *ngIf="isAdmin()">
                             <app-button variant="primary" size="s" (click)="openEditRegistrarDialog(activeRegistrar)">
                                 {{ 'buttons.edit' | translate }}
                             </app-button>
@@ -221,6 +222,7 @@
                                     {{ 'buttons.details' | translate }}
                                 </app-button>
                                 <app-button
+                                    *ngIf="isAdmin()"
                                     variant="tertiary"
                                     size="xs"
                                     [icon]="true"
@@ -229,6 +231,7 @@
                                     (click)="editDigitalLibrary(activeRegistrar.code, library); $event.stopPropagation()"
                                 ></app-button>
                                 <app-button
+                                    *ngIf="isAdmin()"
                                     variant="tertiary"
                                     size="xs"
                                     [icon]="true"
@@ -239,7 +242,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="app-section-part">
+                    <div class="app-section-part" *ngIf="!isAdmin() && (!activeRegistrar?.digitalLibraries || activeRegistrar?.digitalLibraries.length === 0)">
+                        <div class="no-catalogues-or-libraries">{{ 'registrars.no-libraries' | translate }}</div>
+                    </div>
+                    <div class="app-section-part" *ngIf="isAdmin()">
                         <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="addNewDigitalLibrary(activeRegistrar.code)">
                             {{ 'buttons.add' | translate }}
                         </app-button>
@@ -260,6 +266,7 @@
                                     {{ 'buttons.details' | translate }}
                                 </app-button>
                                 <app-button
+                                    *ngIf="isAdmin()"
                                     variant="tertiary"
                                     size="xs"
                                     [icon]="true"
@@ -268,6 +275,7 @@
                                     (click)="editCatalogue(activeRegistrar.code, catalog); $event.stopPropagation()"
                                 ></app-button>
                                 <app-button
+                                    *ngIf="isAdmin()"
                                     variant="tertiary"
                                     size="xs"
                                     [icon]="true"
@@ -278,7 +286,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="app-section-part">
+                    <div class="app-section-part" *ngIf="!isAdmin() && (!activeRegistrar?.catalogues || activeRegistrar?.catalogues.length === 0)">
+                        <div class="no-catalogues-or-libraries">{{ 'registrars.no-catalogues' | translate }}</div>
+                    </div>
+                    <div class="app-section-part" *ngIf="isAdmin()">
                         <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="addNewCatalogue(activeRegistrar.code)">
                             {{ 'buttons.add' | translate }}
                         </app-button>
