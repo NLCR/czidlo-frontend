@@ -174,7 +174,11 @@
         "error-downloading-file": "Error downloading file",
         "field-must-be-number": "Field must be a number",
         "display-record": "Display record",
-        "import-completed": "Import completed."
+        "import-completed": "Import completed.",
+        "confirm-delete-transformation-title": "Delete transformation",
+        "confirm-delete-transformation-message": "Are you sure you want to delete this transformation?",
+        "confirm-delete-digital-library-title": "Delete digital library",
+        "confirm-delete-catalogue-title": "Delete catalogue"
     },
     "inputs": {
         "pick-start-date": "Pick from",
@@ -306,7 +310,9 @@
         "url": "url",
         "URL": "URL",
         "URL-prefix": "URL prefix",
-        "url-prefix": "url prefix"
+        "url-prefix": "url prefix",
+        "edit-digital-library-title": "Digital library – edit record",
+        "edit-catalogue-title": "Catalogue – edit record"
     },
     "logs": {
         "title": "List of the last 30 logs"

@@ -177,7 +177,9 @@
         "display-record": "Zobrazit záznam",
         "import-completed": "Import dokončen.",
         "confirm-delete-transformation-title": "Smazat transformaci",
-        "confirm-delete-transformation-message": "Opravdu chcete smazat tuto transformaci?"
+        "confirm-delete-transformation-message": "Opravdu chcete smazat tuto transformaci?",
+        "confirm-delete-digital-library-title": "Smazat digitální knihovnu",
+        "confirm-delete-catalogue-title": "Smazat katalog"
     },
     "inputs": {
         "pick-start-date": "Vyberte od",
@@ -321,7 +323,9 @@
         "url": "url",
         "URL": "URL",
         "URL-prefix": "URL prefix",
-        "url-prefix": "url prefix"
+        "url-prefix": "url prefix",
+        "edit-digital-library-title": "Digitální knihovna – úprava záznamu",
+        "edit-catalogue-title": "Katalog – úprava záznamu"
     },
     "logs": {
         "title": "Seznam posledních 30 logů"
