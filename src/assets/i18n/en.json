@@ -408,7 +408,9 @@
         "restricted": "certain restrictions",
         "unknown": "unknown",
         "format": "Format",
-        "access": "Access"
+        "access": "Access",
+        "periodicalVolumeTitle": "Periodical volume *",
+        "periodicalIssueTitle": "Periodical issue *"
     },
     "statistics": {
         "assignments": "Assignments",
