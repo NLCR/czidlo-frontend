@@ -11,7 +11,7 @@ export class ImportRecordService {
         'PERIODICAL_ISSUE',
         'ANALYTICAL',
         'THESIS',
-        'OTHER',
-        'SOUND_COLLECTION'
+        'SOUND_COLLECTION',
+        'OTHER'
     ]);
 }

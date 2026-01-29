@@ -21,7 +21,7 @@
                         <mat-form-field appearance="outline">
                             <mat-select class="app-singleselect" [(value)]="selectedEntity">
                                 @for (entity of intellectualEntitiesList(); track entity) {
-                                <mat-option [value]="entity">{{ entity }}</mat-option>
+                                    <mat-option [value]="entity">{{ entity }}</mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
@@ -37,7 +37,7 @@
                         <mat-form-field appearance="outline">
                             <mat-select class="app-singleselect" [(value)]="selectedRegistrar" (valueChange)="onRegistrarChange()">
                                 @for (registrar of assignedRegistrars(); track registrar) {
-                                <mat-option [value]="registrar">{{ registrar }}</mat-option>
+                                    <mat-option [value]="registrar">{{ registrar }}</mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
@@ -53,7 +53,7 @@
                         <mat-form-field appearance="outline">
                             <mat-select class="app-singleselect" [(value)]="selectedMode" [compareWith]="compareMode">
                                 @for (mode of registrationMode; track mode) {
-                                <mat-option [value]="mode.value">{{ mode.label | translate }}</mat-option>
+                                    <mat-option [value]="mode.value">{{ mode.label | translate }}</mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
@@ -126,7 +126,7 @@
         <!-- HEADER -->
         <div class="app-sidebar-header">
             <div class="app-sidebar-title">
-                {{ 'import.' + selectedEntity | translate }} - {{ selectedRegistrar}} - {{ 'import.' + selectedMode.toLowerCase() | translate }}
+                {{ 'import.' + selectedEntity | translate }} - {{ selectedRegistrar }} - {{ 'import.' + selectedMode.toLowerCase() | translate }}
             </div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
@@ -274,8 +274,16 @@
                             <div class="app-base-input-label">
                                 {{ 'import.documentType' | translate }}
                             </div>
-                            <input matInput type="text" [formControl]="documentType" />
+
+                            <mat-form-field appearance="outline" class="w-100">
+                                <mat-select [formControl]="documentType">
+                                    <mat-option *ngFor="let option of documentTypeOptions" [value]="option">
+                                        {{ option }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
                         </div>
+
                         <div class="app-base-input app-toggle-container app-bornDigital" *ngIf="selectedEntity !== 'ANALYTICAL'">
                             <app-toggle size="s" [checked]="bornDigital" (click)="bornDigital = !bornDigital"></app-toggle>
                             <div class="app-toggle-label">{{ 'import.bornDigital' | translate }}</div>
@@ -291,7 +299,7 @@
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect app-primaryOriginatorType" [(value)]="selectedOriginatorType">
                                     @for (entity of primaryOriginatorTypes; track entity) {
-                                    <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                                        <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
@@ -437,7 +445,7 @@
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedArchiverId">
                                     @for (entity of archiverIdsList(); track entity) {
-                                    <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
+                                        <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>

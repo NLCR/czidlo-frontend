@@ -42,7 +42,15 @@ export class ImportRecordComponent {
     issn = new FormControl<string>('', [this.issnValidator()]);
     otherId = new FormControl<string>('');
 
-    documentType = new FormControl<string>('', [Validators.required]);
+    documentType = new FormControl<string>('');
+    documentTypeOptions: string[] = [];
+
+    documentTypeMap: Record<string, string[]> = {
+        MONOGRAPH: ['', 'cartographic', 'graphic', 'sheetmusic'],
+        MONOGRAPH_VOLUME: ['', 'cartographic', 'graphic', 'sheetmusic'],
+        SOUND_COLLECTION: ['', 'sound recording', 'audio cylinder', 'audio disc', 'digital audio'],
+        OTHER: ['', 'data_disc', 'Clipping', 'Clipping index', 'Card index'],
+    };
     bornDigital: boolean = false;
 
     // ORIGINATORS
@@ -105,7 +113,7 @@ export class ImportRecordComponent {
         private registrarsService: RegistrarsService,
         private authService: AuthService,
         private usersService: UsersService,
-        private apiService: ApiService
+        private apiService: ApiService,
     ) {
         effect(() => {
             const isLoggedIn = this.loggedIn();
@@ -204,10 +212,10 @@ export class ImportRecordComponent {
 
         this.registrarsService.getRegistrar(registrarCode).subscribe({
             next: (registrarData) => {
-                if (registrarData.allowedRegistrationModeByRegistrar) {
+                if (registrarData.allowedRegistrationModeByResolver) {
                     this.registrationMode.push({
-                        value: 'BY_REGISTRAR',
-                        label: this.translate.instant('import.by-registrar'),
+                        value: 'BY_RESOLVER',
+                        label: this.translate.instant('import.by-resolver'),
                     });
                 }
                 if (registrarData.allowedRegistrationModeByReservation) {
@@ -216,10 +224,10 @@ export class ImportRecordComponent {
                         label: this.translate.instant('import.by-reservation'),
                     });
                 }
-                if (registrarData.allowedRegistrationModeByResolver) {
+                if (registrarData.allowedRegistrationModeByRegistrar) {
                     this.registrationMode.push({
-                        value: 'BY_RESOLVER',
-                        label: this.translate.instant('import.by-resolver'),
+                        value: 'BY_REGISTRAR',
+                        label: this.translate.instant('import.by-registrar'),
                     });
                 }
 
@@ -241,10 +249,15 @@ export class ImportRecordComponent {
         return a === b;
     }
     openSidebar() {
+        this.loadDocumentTypeOptions();
         this.isSidebarOpen.set(true);
     }
     closeSidebar() {
         this.isSidebarOpen.set(false);
+    }
+    loadDocumentTypeOptions() {
+        this.documentType.setValue('');
+        this.documentTypeOptions = this.documentTypeMap[this.selectedEntity] || [];
     }
     buildRecordToImport() {
         let record: any = {};
@@ -495,14 +508,14 @@ export class ImportRecordComponent {
         this.registrarsService.getRegistrar(this.selectedRegistrar).subscribe({
             next: (registrarData) => {
                 console.log('Selected registrar data:', registrarData);
+                if (registrarData.allowedRegistrationModeByResolver) {
+                    this.registrationMode.push({ value: 'BY_RESOLVER', label: this.translate.instant('import.by-resolver') });
+                }
                 if (registrarData.allowedRegistrationModeByRegistrar) {
                     this.registrationMode.push({ value: 'BY_REGISTRAR', label: this.translate.instant('import.by-registrar') });
                 }
                 if (registrarData.allowedRegistrationModeByReservation) {
                     this.registrationMode.push({ value: 'BY_RESERVATION', label: this.translate.instant('import.by-reservation') });
-                }
-                if (registrarData.allowedRegistrationModeByResolver) {
-                    this.registrationMode.push({ value: 'BY_RESOLVER', label: this.translate.instant('import.by-resolver') });
                 }
                 if (this.registrationMode.length > 0) {
                     this.selectedMode = this.registrationMode[0].value;
