@@ -183,6 +183,8 @@ export class SearchService {
                     let recordsCount = data.hits.total.value;
                     let results = data.hits.hits.map((hit: any) => ({
                         ...hit._source,
+                        id: hit._id,
+                        // opened: recordsCount === 1,
                         urnnbn:
                             hit._source.registrarcode && hit._source.documentcode
                                 ? `urn:nbn:cz:${hit._source.registrarcode}-${hit._source.documentcode}`

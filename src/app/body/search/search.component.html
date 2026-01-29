@@ -313,13 +313,13 @@
                             <div class="app-value" *ngIf="id.type !== 'TITLE' && id.type !== 'SUB_TITLE'">{{ id.value }}</div>
                         </div>
                     </div> -->
-                    <div class="app-ie-field" *ngIf="item.details.intelectualEntity?.created">
+                    <div class="app-ie-field" *ngIf="item.details?.intelectualEntity?.created">
                         <div class="app-label">{{ 'search.created' | translate }}:</div>
-                        <div class="app-value">{{ item.details.intelectualEntity?.created.split('[')[0] | date }}</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.created.split('[')[0] | date }}</div>
                     </div>
-                    <div class="app-ie-field" *ngIf="item.details.intelectualEntity?.modified">
+                    <div class="app-ie-field" *ngIf="item.details?.intelectualEntity?.modified">
                         <div class="app-label">{{ 'search.modified' | translate }}:</div>
-                        <div class="app-value">{{ item.details.intelectualEntity?.modified.split('[')[0] | date }}</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.modified.split('[')[0] | date }}</div>
                     </div>
 
                     <div class="app-button-part" *ngIf="hasRightToRegistrar(item.registrarcode)">

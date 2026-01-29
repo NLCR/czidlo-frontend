@@ -202,6 +202,10 @@ export class SearchComponent implements AfterViewInit {
                     console.error('Error during search:', error);
                 },
                 complete: () => {
+                    if (this.searchQuery && this.searchService.searchResults().length === 1) {
+                        this.getDetails(this.searchService.searchResults()[0]);
+                        this.searchService.searchResults()[0].opened = true;
+                    }
                     this.loadingResults.set(false);
                 },
             });
