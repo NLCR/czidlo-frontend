@@ -179,7 +179,9 @@
         "confirm-delete-transformation-title": "Smazat transformaci",
         "confirm-delete-transformation-message": "Opravdu chcete smazat tuto transformaci?",
         "confirm-delete-digital-library-title": "Smazat digitální knihovnu",
-        "confirm-delete-catalogue-title": "Smazat katalog"
+        "confirm-delete-catalogue-title": "Smazat katalog",
+        "digital-library-deleted-successfully": "Digitální knihovna byla úspěšně smazána",
+        "catalogue-deleted-successfully": "Katalog byl úspěšně smazán"
     },
     "inputs": {
         "pick-start-date": "Vyberte od",

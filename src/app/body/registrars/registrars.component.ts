@@ -39,7 +39,7 @@ export class RegistrarsComponent {
         private authService: AuthService,
         private dialog: MatDialog,
         private translate: TranslateService,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
     ) {}
 
     ngOnInit(): void {
@@ -249,7 +249,7 @@ export class RegistrarsComponent {
                                 this.translate.instant('buttons.close'),
                                 {
                                     duration: 3000,
-                                }
+                                },
                             );
                             this.loadRegistrarDetails(registrar.code);
                             this.loadRegistrars();
@@ -346,11 +346,11 @@ export class RegistrarsComponent {
                             this.translate.instant('buttons.close'),
                             {
                                 duration: 3000,
-                            }
+                            },
                         );
                     },
                 });
-           }
+            }
         });
     }
     editDigitalLibrary(registrarCode: string, library: any): void {
@@ -380,7 +380,7 @@ export class RegistrarsComponent {
                             this.translate.instant('buttons.close'),
                             {
                                 duration: 3000,
-                            }
+                            },
                         );
                     },
                 });
@@ -404,19 +404,19 @@ export class RegistrarsComponent {
                     this.registrarsService.deleteDigitalLibrary(registrarCode, library.id).subscribe({
                         next: () => {
                             console.log('Digital library deleted successfully');
+                            this.snackBar.open(
+                                this.translate.instant('messages.digital-library-deleted-successfully'),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 3000,
+                                },
+                            );
                             this.loadRegistrarDetails(registrarCode);
                         },
                         error: (error) => {
                             console.error('Error deleting digital library:', error);
                         },
                     });
-                    this.snackBar.open(
-                        this.translate.instant('messages.digital-library-deleted-successfully'),
-                        this.translate.instant('buttons.close'),
-                        {
-                            duration: 3000,
-                        }
-                    );
                 }
             });
     }
@@ -446,8 +446,8 @@ export class RegistrarsComponent {
                             this.translate.instant('messages.' + error?.error?.message || 'catalogue-creation-failed'),
                             this.translate.instant('buttons.close'),
                             {
-                                duration: 3000,
-                            }
+                                duration: 20000,
+                            },
                         );
                     },
                 });
@@ -469,7 +469,7 @@ export class RegistrarsComponent {
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 console.log('Edited catalogue data:', result);
-                let body = {name: result.name, description: result.description, urlPrefix: result.urlPrefix};
+                let body = { name: result.name, description: result.description, urlPrefix: result.urlPrefix };
                 this.registrarsService.editCatalogue(registrarCode, catalog.id, body).subscribe({
                     next: () => {
                         console.log('Catalogue edited successfully');
@@ -482,7 +482,7 @@ export class RegistrarsComponent {
                             this.translate.instant('buttons.close'),
                             {
                                 duration: 3000,
-                            }
+                            },
                         );
                     },
                 });
@@ -506,19 +506,19 @@ export class RegistrarsComponent {
                     this.registrarsService.deleteCatalogue(registrarCode, catalog.id).subscribe({
                         next: () => {
                             console.log('Catalogue deleted successfully');
+                            this.snackBar.open(
+                                this.translate.instant('messages.catalogue-deleted-successfully'),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 3000,
+                                },
+                            );
                             this.loadRegistrarDetails(registrarCode);
                         },
                         error: (error) => {
                             console.error('Error deleting catalogue:', error);
                         },
                     });
-                    this.snackBar.open(
-                        this.translate.instant('messages.catalogue-deleted-successfully'),
-                        this.translate.instant('buttons.close'),
-                        {
-                            duration: 3000,
-                        }
-                    );
                 }
             });
     }

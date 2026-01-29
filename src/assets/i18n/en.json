@@ -178,7 +178,9 @@
         "confirm-delete-transformation-title": "Delete transformation",
         "confirm-delete-transformation-message": "Are you sure you want to delete this transformation?",
         "confirm-delete-digital-library-title": "Delete digital library",
-        "confirm-delete-catalogue-title": "Delete catalogue"
+        "confirm-delete-catalogue-title": "Delete catalogue",
+        "digital-library-deleted-successfully": "Digital library was deleted successfully",
+        "catalogue-deleted-successfully": "Catalogue was deleted successfully"
     },
     "inputs": {
         "pick-start-date": "Pick from",
