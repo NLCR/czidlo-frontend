@@ -7,6 +7,8 @@ import { RegistrarsService } from '../../services/registrars.service';
 import { AuthService } from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
 import { ApiService } from '../../services/api.service';
+import { Observable, of } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
     selector: 'app-import-record',
@@ -42,8 +44,9 @@ export class ImportRecordComponent {
     issn = new FormControl<string>('', [this.issnValidator()]);
     otherId = new FormControl<string>('');
 
-    documentType = new FormControl<string>('');
+    documentType = new FormControl<string>('', { nonNullable: true });
     documentTypeOptions: string[] = [];
+    filteredDocumentTypeOptions$: Observable<string[]> = of([]);
 
     documentTypeMap: Record<string, string[]> = {
         MONOGRAPH: ['', 'cartographic', 'graphic', 'sheetmusic'],
@@ -258,7 +261,24 @@ export class ImportRecordComponent {
     loadDocumentTypeOptions() {
         this.documentType.setValue('');
         this.documentTypeOptions = this.documentTypeMap[this.selectedEntity] || [];
+        this.setupDocumentTypeFiltering();
     }
+    private setupDocumentTypeFiltering() {
+        this.filteredDocumentTypeOptions$ = this.documentType.valueChanges.pipe(
+            startWith(this.documentType.value ?? ''),
+            map((value) => this.filterDocTypes(value ?? '')),
+        );
+    }
+    private filterDocTypes(value: string): string[] {
+        const v = (value || '').toLowerCase().trim();
+        if (!v) return this.documentTypeOptions.slice();
+        return this.documentTypeOptions.filter((opt) => opt.toLowerCase().includes(v));
+    }
+    normalizeDocTypeValue() {
+        const v = (this.documentType.value || '').trim();
+        this.documentType.setValue(v, { emitEvent: false });
+    }
+
     buildRecordToImport() {
         let record: any = {};
 
@@ -332,6 +352,16 @@ export class ImportRecordComponent {
             ieIdentifiers.push(identifier);
         }
         if (this.otherId.value) {
+            // let otherIdValues = this.otherId.value
+            //     .split(',')
+            //     .map((id) => id.trim())
+            //     .filter((id) => id.length > 0);
+            // for (let oid of otherIdValues) {
+            //     let identifier: any = {};
+            //     identifier.type = 'OTHER';
+            //     identifier.value = oid;
+            //     ieIdentifiers.push(identifier);
+            // }
             let identifier: any = {};
             identifier.type = 'OTHER';
             identifier.value = this.otherId.value;
@@ -500,6 +530,65 @@ export class ImportRecordComponent {
                 }, 10000);
             },
         });
+    }
+    cancelImport() {
+        this.resetForm();
+        this.closeSidebar();
+    }
+    private resetForm() {
+        // BASIC DETAILS
+        this.title.reset('');
+        this.subTitle.reset('');
+        this.volumeTitle.reset('');
+        this.issueTitle.reset('');
+
+        // IDENTIFIERS
+        this.ccnb.reset('');
+        this.isbn.reset('');
+        this.issn.reset('');
+        this.otherId.reset('');
+
+        this.documentType.reset('');
+
+        // ORIGINATORS
+        this.selectedOriginatorType = 'AUTHOR';
+        this.primaryOriginatorValue.reset('');
+        this.otherOriginator.reset('');
+
+        // PUBLICATION DETAILS
+        this.place.reset('');
+        this.publisher.reset('');
+        this.year.reset('');
+
+        // TECHNICAL METADATA
+        this.formatValue.reset('image/jp2');
+        this.formatVersion.reset('verze 1.0');
+        this.extent.reset('');
+        this.resolutionHorizontal.reset(1000);
+        this.resolutionVertical.reset(1000);
+        this.compression.reset('JPEG2000');
+        this.colorModel.reset('');
+        this.colorDepth.reset('');
+        this.iccProfile.reset('');
+        this.pictureSizeWidth.reset(1000);
+        this.pictureSizeHeight.reset(1000);
+
+        // THESIS
+        this.degreeAwardingInstitution.reset('');
+
+        // ANALYTICAL
+        this.sourceDocumentTitle.reset('');
+        this.sourceDocumentVolumeTitle.reset('');
+        this.sourceDocumentIssueTitle.reset('');
+        this.sourceDocumentCcnb.reset('');
+        this.sourceDocumentIsbn.reset('');
+        this.sourceDocumentIssn.reset('');
+        this.sourceDocumentOtherId.reset('');
+        this.sourceDocumentPlace.reset('');
+        this.sourceDocumentPublisher.reset('');
+        this.sourceDocumentYear.reset('');
+
+        this.importButtonState();
     }
 
     onRegistrarChange() {

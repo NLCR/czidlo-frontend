@@ -204,3 +204,13 @@
     margin-left: 16px;
     cursor: pointer;
 }
+.app-prefix-icon {
+    font-size: 20px;
+    color: var(--Text-Light, #4c6580);
+    cursor: pointer;
+    margin: 0;
+    padding: 4px 0 0 12px;
+    &:hover {
+        color: var(--Text-Secondary, #263340);
+    }
+}

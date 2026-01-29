@@ -269,18 +269,28 @@
                 </div>
                 <div class="app-part-content">
                     <!-- DOCUMENT TYPE & BORN DIGITAL -->
+                    <!-- DOCUMENT TYPE -->
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width app-documentType">
                             <div class="app-base-input-label">
                                 {{ 'import.documentType' | translate }}
                             </div>
 
-                            <mat-form-field appearance="outline" class="w-100">
-                                <mat-select [formControl]="documentType">
-                                    <mat-option *ngFor="let option of documentTypeOptions" [value]="option">
+                            <mat-form-field appearance="outline">
+                                <input
+                                    matInput
+                                    type="text"
+                                    class="app-input-autocomplete"
+                                    [formControl]="documentType"
+                                    [matAutocomplete]="docTypeAuto"
+                                    (blur)="normalizeDocTypeValue()"
+                                />
+
+                                <mat-autocomplete #docTypeAuto="matAutocomplete" autoActiveFirstOption>
+                                    <mat-option *ngFor="let option of filteredDocumentTypeOptions$ | async" [value]="option">
                                         {{ option }}
                                     </mat-option>
-                                </mat-select>
+                                </mat-autocomplete>
                             </mat-form-field>
                         </div>
 
@@ -438,7 +448,7 @@
                 <div class="app-part-content">
                     <!-- ARCHIVER ID -->
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-half-width app-primaryArchiverId">
+                        <div class="app-base-input app-full-width app-primaryArchiverId">
                             <div class="app-base-input-label">
                                 {{ 'import.archiverId' | translate }}
                             </div>
@@ -448,15 +458,21 @@
                                         <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
                                     }
                                 </mat-select>
+                                <!-- CLEAR BUTTON -->
+                                <mat-icon class="app-prefix-icon" matPrefix *ngIf="selectedArchiverId" (click)="selectedArchiverId = ''; $event.stopPropagation()">
+                                    close
+                                </mat-icon>
                             </mat-form-field>
                         </div>
                     </div>
+                    <!-- URNNBN -->
                     <div class="app-base-input-container" *ngIf="selectedMode === 'BY_RESERVATION' || selectedMode === 'BY_REGISTRAR'">
                         <div class="app-base-input app-half-width app-urnNbn">
                             <div class="app-base-input-label">{{ 'import.urnNbn' | translate }}{{ selectedRegistrar }}-</div>
                             <input matInput type="text" [formControl]="urnNbn" />
                         </div>
                     </div>
+                    <!-- FINANCED -->
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width app-financed">
                             <div class="app-base-input-label">
@@ -610,10 +626,10 @@
                 <a class="app-link" *ngIf="progressBar().urnnbn" [routerLink]="['/search']" [queryParams]="{ q: progressBar().urnnbn }">
                     {{ 'messages.display-record' | translate }}: {{ progressBar().urnnbn }}
                 </a>
-                <div *ngIf="progressBar().urnnbn" class="app-link app-close-sidebar" (click)="closeSidebar()">{{ 'buttons.close' | translate }}</div>
+                <div *ngIf="progressBar().urnnbn" class="app-link app-close-sidebar" (click)="cancelImport()">{{ 'buttons.close' | translate }}</div>
             </div>
             <div class="app-button-container">
-                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                <app-button variant="tertiary" size="l" (click)="cancelImport()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
                 <app-button variant="primary" size="l" (click)="importRecord()" [disabled]="isButtonDisabled()">

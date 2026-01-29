@@ -39,6 +39,8 @@ import { MatRadioModule } from '@angular/material/radio';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import {MatIconModule} from '@angular/material/icon';
 
 //  CHARTS
 import { NgxChartsModule } from '@swimlane/ngx-charts';
@@ -146,6 +148,8 @@ export const MY_DATE_FORMATS = {
         FormsModule,
         MatRadioModule,
         MatTooltipModule,
+        MatAutocompleteModule,
+        MatIconModule,
         NgxChartsModule,
         BrowserAnimationsModule,
         MatProgressSpinnerModule

@@ -99,6 +99,9 @@ input {
     &::placeholder {
         color: var(--Text-Disable, #9fb2c6);
     }
+    &.app-input-autocomplete {
+        padding: 0;
+    }
 }
 
 textarea {
@@ -1095,7 +1098,7 @@ app-information {
     font-family: 'IBM Plex Sans' !important;
     color: var(--Text-Secondary, #263340);
 }
-.mat-mdc-select-panel {
+.mat-mdc-select-panel, .mat-mdc-autocomplete-panel {
     background-color: #fff !important;
 }
 .mat-mdc-option {
