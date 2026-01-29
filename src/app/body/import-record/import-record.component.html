@@ -188,8 +188,11 @@
                         "
                     >
                         <div class="app-base-input app-full-width app-volumeTitle">
-                            <div class="app-base-input-label">
+                            <div class="app-base-input-label" *ngIf="selectedEntity === 'MONOGRAPH_VOLUME'">
                                 {{ 'import.volumeTitle' | translate }}
+                            </div>
+                            <div class="app-base-input-label" *ngIf="selectedEntity === 'PERIODICAL_VOLUME' || selectedEntity === 'PERIODICAL_ISSUE'">
+                                {{ 'import.periodicalVolumeTitle' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="volumeTitle" />
                         </div>
@@ -198,7 +201,7 @@
                     <div class="app-base-input-container" *ngIf="selectedEntity === 'PERIODICAL_ISSUE'">
                         <div class="app-base-input app-full-width app-issueTitle">
                             <div class="app-base-input-label">
-                                {{ 'import.issueTitle' | translate }}
+                                {{ 'import.periodicalIssueTitle' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="issueTitle" />
                         </div>

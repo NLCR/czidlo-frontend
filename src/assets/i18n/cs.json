@@ -423,7 +423,9 @@
         "restricted": "určitá omezení",
         "unknown": "neznámá",
         "format": "Formát",
-        "access": "Přístup"
+        "access": "Přístup",
+        "periodicalVolumeTitle": "Ročník periodika *",
+        "periodicalIssueTitle": "Číslo periodika *"
     },
     "statistics": {
         "assignments": "Přiřazení",
