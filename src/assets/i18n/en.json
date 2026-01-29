@@ -525,6 +525,10 @@
         "filter-by-state": "Filter by URN:NBN state",
         "from": "From",
         "to": "To",
-        "help-text": "Primarily, you can search by title data (e.g., monograph title, periodical title) or parts thereof, by author, and by identifiers (ČČNB, ISSN, ISBN, UUID, URN:NBN)."
+        "help-text": "Primarily, you can search by title data (e.g., monograph title, periodical title) or parts thereof, by author, and by identifiers (ČČNB, ISSN, ISBN, UUID, URN:NBN).",
+        "successors": "successors",
+        "predecessors": "predecessors",
+        "successor": "successor",
+        "predecessor": "predecessor"
     }
 }

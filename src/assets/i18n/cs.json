@@ -540,6 +540,10 @@
         "filter-by-state": "Filtrovat podle stavu URN:NBN",
         "from": "Od",
         "to": "Do",
-        "help-text": "Primárně lze vyhledávat podle názvových údajů (např. titul monografie, název periodika) nebo jejich částí, podle autora a identifikátorů (čČNB, ISSN, ISBN, UUID, URN:NBN)."
+        "help-text": "Primárně lze vyhledávat podle názvových údajů (např. titul monografie, název periodika) nebo jejich částí, podle autora a identifikátorů (čČNB, ISSN, ISBN, UUID, URN:NBN).",
+        "successors": "následníci",
+        "predecessors": "předchůdci",
+        "successor": "následník",
+        "predecessor": "předchůdce"
     }
 }
