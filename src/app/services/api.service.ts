@@ -138,6 +138,33 @@ export class ApiService {
         return this.http.post(url, {}).pipe(catchError(this.handleError));
     }
 
+    // OAI TRANSFORMATIONS
+    getTransformations(): Observable<any> {
+        const url = `${this.apiUrl}/process_oai_adapter/transformations/`;
+        return this.doGet(url);
+    }
+    getTransformation(id: string): Observable<any> {
+        const url = `${this.apiUrl}/process_oai_adapter/transformations`;
+        const body = { id: id };
+        return this.doGet(url, { params: body });
+    }
+    createTransformation(body: any): Observable<any> {
+        const url = `${this.apiUrl}/process_oai_adapter/transformations`;
+        return this.http.post(url, body).pipe(catchError(this.handleError));
+    }
+    deleteTransformation(id: string): Observable<any> {
+        const url = `${this.apiUrl}/process_oai_adapter/transformations/${id}`;
+        return this.http.delete(url).pipe(catchError(this.handleError));
+    }
+    uploadTransformationFile(transformationId: string, file: File): Observable<any> {
+        const url = `${this.apiUrl}/process_oai_adapter/transformations/${transformationId}/xslt`;
+        return this.http.put(url, file).pipe(catchError(this.handleError));
+    }
+    downloadTransformationFile(transformationId: string): Observable<any> {
+        const url = `${this.apiUrl}/process_oai_adapter/transformations/${transformationId}/xslt`;
+        return this.http.get(url, { responseType: 'text' });
+    }
+
     // INFO PAGES
     getInfo(): Observable<any> {
         const lang = this.languageService.currentLang();

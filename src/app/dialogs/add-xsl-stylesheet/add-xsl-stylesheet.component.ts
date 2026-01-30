@@ -15,7 +15,9 @@ export class AddXslStylesheetComponent {
     data = inject(MAT_DIALOG_DATA);
     _snackBar = inject(MatSnackBar);
     translate = inject(TranslateService);
-    fileName: string = '';
+    // fileName: string = '';
+    xsltFileName: string = '';
+    xsltContent: string = '';
 
     onConfirm() {
         console.log('Přidat XSL stylesheet:', this.data);
@@ -23,9 +25,9 @@ export class AddXslStylesheetComponent {
             id: this.data.id || id(),
             name: this.data.name,
             description: this.data.description,
-            file: this.data.selectedFile,
-            filename: this.fileName,
-            created: new Date()
+            file: this.xsltContent,
+            filename: this.xsltFileName,
+            created: new Date(),
         };
         this.data = newTransformation;
         this.dialogRef.close(this.data);
@@ -35,11 +37,30 @@ export class AddXslStylesheetComponent {
         this.dialogRef.close(null);
     }
 
-    onFileSelected(event: any) {
-        const file: File = event.target.files[0];
-        this.fileName = file ? file.name : '';
-        if (file) {
-            this.data.selectedFile = file;
+    // onFileSelected(event: any) {
+    //     const file: File = event.target.files[0];
+    //     this.fileName = file ? file.name : '';
+    //     if (file) {
+    //         this.data.selectedFile = file;
+    //     }
+    // }
+
+    async onXsltSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+        if (!file) return;
+
+        this.xsltFileName = file.name;
+
+        // nejjednodušší: přečti obsah souboru jako text
+        this.xsltContent = await file.text();
+
+        // pokud chceš: validace že to vypadá jako XSLT
+        if (!this.xsltContent.includes('<xsl:stylesheet') && !this.xsltContent.includes('<xsl:transform')) {
+            console.warn('Soubor nevypadá jako XSLT.');
         }
+
+        // důležité: když vybereš stejný soubor znovu, change se někdy nespustí
+        input.value = '';
     }
 }

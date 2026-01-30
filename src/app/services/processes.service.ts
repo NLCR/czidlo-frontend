@@ -170,15 +170,35 @@ export class ProcessesService {
         return this.apiService.createProcess(body).pipe(
             tap({
                 next: (data) => {
-                    console.log(`Indexation process planned:`, data);
+                    console.log(`process planned:`, data);
                 },
                 error: (error) => {
-                    console.error(`Error planning indexation process:`, error);
+                    console.error(`Error planning process:`, error);
                 },
                 complete: () => {
-                    console.log(`Indexation process planning complete`);
+                    console.log(`Process planning complete`);
                 },
             })
         );
+    }
+
+    // OAI TRANSFORMATIONS
+    getTransformations(): Observable<any> {
+        return this.apiService.getTransformations();
+    }
+    getTransformation(id: string): Observable<any> {
+        return this.apiService.getTransformation(id);
+    }
+    deleteTransformation(id: string): Observable<any> {
+        return this.apiService.deleteTransformation(id);
+    }
+    createTransformation(body: any): Observable<any> {
+        return this.apiService.createTransformation(body);
+    }
+    uploadTransformationFile(id: string, file: File): Observable<any> {
+        return this.apiService.uploadTransformationFile(id, file);
+    }
+    downloadTransformationFile(id: string): Observable<any> {
+        return this.apiService.downloadTransformationFile(id);
     }
 }

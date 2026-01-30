@@ -48,8 +48,8 @@
         <!-- XSLT FILE UPLOAD -->
         <div class="app-part-content app-part-xslt-file">
             <div class="app-base-input-label">{{ 'processes.xslt-file' | translate }}</div>
-                <input class="app-hidden-input" type="file" #fileInput (change)="onFileSelected($event)" />
-                <input class="app-visible-input" matInput [value]="fileName" readonly (click)="fileInput.click()" />
+                <input class="app-hidden-input" type="file" #fileInput (change)="onXsltSelected($event)" />
+                <input class="app-visible-input" matInput [value]="xsltFileName" readonly (click)="fileInput.click()" />
                 <app-button class="app-upload-button" size="xs" variant="tertiary" (click)="fileInput.click()">{{ 'buttons.choose-file' | translate }}</app-button>
                 <!-- @if(!fileUploadForm.get('file')?.valid) {
                 <mat-error class="ms-0">
@@ -65,7 +65,7 @@
             <app-button size="l" variant="tertiary" (click)="onCancel()">
                 {{ 'buttons.cancel' | translate }}
             </app-button>
-            <app-button size="l" variant="primary" (click)="onConfirm()" [disabled]="!data.name || fileName === ''">
+            <app-button size="l" variant="primary" (click)="onConfirm()" [disabled]="!data.name || xsltFileName === ''">
                 {{ 'buttons.upload' | translate }}
             </app-button>
         </div>

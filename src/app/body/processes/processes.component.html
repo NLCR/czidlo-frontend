@@ -322,14 +322,14 @@
                             >
                                 <div class="app-col app-rdd-title">{{ tr.name }}</div>
                                 <div class="app-col app-rdd-description">{{ tr.description }}</div>
-                                <div class="app-col app-rdd-created">{{ tr.created | date }}</div>
+                                <div class="app-col app-rdd-created" *ngIf="tr?.created">{{ tr?.created?.split('[')?.[0] | date }}</div>
                                 <div class="app-col app-col-actions app-rdd-action">
                                     <app-button
                                         variant="tertiary"
                                         [icon]="true"
                                         iconLeft="download-blue.svg"
                                         size="s"
-                                        (click)="$event.stopPropagation(); downloadTransformation(tr)"
+                                        (click)="$event.stopPropagation(); downloadTransformationFile(tr)"
                                     ></app-button>
                                     <app-button
                                         variant="tertiary"
@@ -383,14 +383,14 @@
                             >
                                 <div class="app-col app-rdd-title">{{ tr.name }}</div>
                                 <div class="app-col app-rdd-description">{{ tr.description }}</div>
-                                <div class="app-col app-rdd-created">{{ tr.created | date }}</div>
+                                <div class="app-col app-rdd-created" *ngIf="tr?.created">{{ tr?.created?.split('[')?.[0] | date }}</div>
                                 <div class="app-col app-col-actions app-rdd-action">
                                     <app-button
                                         variant="tertiary"
                                         [icon]="true"
                                         iconLeft="download-blue.svg"
                                         size="s"
-                                        (click)="$event.stopPropagation(); downloadTransformation(tr)"
+                                        (click)="$event.stopPropagation(); downloadTransformationFile(tr)"
                                     ></app-button>
                                     <app-button
                                         variant="tertiary"

@@ -40,6 +40,7 @@ export class ProcessesComponent {
     activeAction: string | null = null;
 
     // TRANSFORMATIONS
+    loadingTransformations = signal(false);
     rddTransformations = signal<Array<any>>([]);
     activeRddTransformation: any = null;
     selectedRddTransformationId: string = '';
@@ -189,18 +190,19 @@ export class ProcessesComponent {
             }
         });
         // ======== TODO API FETCH =======
+        this.getTransformations();
         // RDD TRANSFORMATIONS
-        this.rddTransformations.set([
-            { name: 'Transformation 1', id: 'rdd_transf_1', description: 'Description of Transformation 1', created: '2023-10-01 10:00:00' },
-            { name: 'Transformation 2', id: 'rdd_transf_2', description: '', created: '2023-11-15 14:30:00' },
-        ]);
-        // IDS TRANSFORMATIONS
-        this.idsTransformations.set([
-            { name: 'IDS Transformation A', id: 'ids_transf_a', description: 'Description of IDS Transformation A', created: '2024-01-20 09:15:00' },
-            { name: 'IDS Transformation B', id: 'ids_transf_b', description: '', created: '2024-02-10 16:45:00' },
-        ]);
-        this.selectedRddTransformationId = this.rddTransformations()[0]?.id || '';
-        this.selectedIdsTransformationId = this.idsTransformations()[0]?.id || '';
+        // this.rddTransformations.set([
+        //     { name: 'Transformation 1', id: 'rdd_transf_1', description: 'Description of Transformation 1', created: '2023-10-01 10:00:00' },
+        //     { name: 'Transformation 2', id: 'rdd_transf_2', description: '', created: '2023-11-15 14:30:00' },
+        // ]);
+        // // IDS TRANSFORMATIONS
+        // this.idsTransformations.set([
+        //     { name: 'IDS Transformation A', id: 'ids_transf_a', description: 'Description of IDS Transformation A', created: '2024-01-20 09:15:00' },
+        //     { name: 'IDS Transformation B', id: 'ids_transf_b', description: '', created: '2024-02-10 16:45:00' },
+        // ]);
+        // this.selectedRddTransformationId = this.rddTransformations()[0]?.id || '';
+        // this.selectedIdsTransformationId = this.idsTransformations()[0]?.id || '';
     }
 
     loadRegistrarCodes() {
@@ -276,22 +278,23 @@ export class ProcessesComponent {
                     data.type = data.type;
                     data.ownerLogin = data.ownerLogin;
                     data.state = data.state;
-                    data.duration = data.state === 'FINISHED'
-                        ? (() => {
-                              const start = new Date(data.started.replace(/\[UTC\]$/, '')).getTime();
-                              const end = new Date(data.finished.replace(/\[UTC\]$/, '')).getTime();
-                              const diffSec = Math.round((end - start) / 1000);
-                              return diffSec;
-                          })()
-                        : (() => {
-                              const start = data.started ? new Date(data.started.replace(/\[UTC\]$/, '')).getTime() : 0;
-                              const end = new Date().getTime();
-                              const diffSec = Math.round((end - start) / 1000);
-                                if (!data.started) {
-                                    return '---';
-                                }
-                              return diffSec;
-                          })();
+                    data.duration =
+                        data.state === 'FINISHED'
+                            ? (() => {
+                                  const start = new Date(data.started.replace(/\[UTC\]$/, '')).getTime();
+                                  const end = new Date(data.finished.replace(/\[UTC\]$/, '')).getTime();
+                                  const diffSec = Math.round((end - start) / 1000);
+                                  return diffSec;
+                              })()
+                            : (() => {
+                                  const start = data.started ? new Date(data.started.replace(/\[UTC\]$/, '')).getTime() : 0;
+                                  const end = new Date().getTime();
+                                  const diffSec = Math.round((end - start) / 1000);
+                                  if (!data.started) {
+                                      return '---';
+                                  }
+                                  return diffSec;
+                              })();
                     data.scheduled = data.scheduled ? new Date(data.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
                     data.started = data.started ? new Date(data.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
                     data.finished = data.finished ? new Date(data.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
@@ -508,7 +511,33 @@ export class ProcessesComponent {
         console.log('Planning process:', activeProcess);
         if (activeProcess === 'OAI_ADAPTER') {
             console.log('Planning OAI_ADAPTER process...');
-            this.processPlannedSnackBarVisible.set(true);
+            const registrarCode = this.selectedRegistrarForOaiImportId;
+            const oaiBaseUrl = this.oaiBaseUrlControl.value;
+            const oaiMetadataPrefix = this.oaiMetadataPrefixControl.value;
+            const oaiSet = this.oaiSetControl.value;
+
+            let body = {
+                type: 'OAI_ADAPTER',
+                params: {
+                    registrarCode: registrarCode,
+                    oaiBaseUrl: oaiBaseUrl,
+                    oaiMetadataPrefix: oaiMetadataPrefix,
+                    oaiSet: oaiSet
+                },
+            };
+            console.log('OAI_ADAPTER', body);
+            this.processesService.planProcess(body).subscribe({
+                next: (data) => {
+                    console.log('OAI Adapter process planned successfully:', data);
+                    this.openSnackBar(this.translate.instant('messages.process-planned-successfully'), 'OK');
+                    this.closeSidebar();
+                    this.loadProcesses();
+                },
+                error: (error) => {
+                    console.error('Error planning OAI Adapter process:', error);
+                    this.openSnackBar(this.translate.instant('messages.error-planning-process'), 'OK');
+                },
+            });
         }
         // PLAN REGISTRARS URN NBN CSV EXPORT
         if (activeProcess === 'REGISTRARS_URN_NBN_CSV_EXPORT') {
@@ -726,6 +755,7 @@ export class ProcessesComponent {
             return `${m} min ${s} s`;
         }
     }
+    // NEW TRANSFORMATION DIALOG
     openAddXslStylesheetDialog(context: string) {
         const dialogRef = this.dialog.open(AddXslStylesheetComponent, {
             width: '800px',
@@ -739,20 +769,66 @@ export class ProcessesComponent {
             if (result) {
                 console.log('Dialog result:', result);
                 // Zpracování výsledku z dialogu
+                let body = {};
                 if (context === 'rdd') {
-                    this.rddTransformations.set([...this.rddTransformations(), result]);
+                    body = {
+                        type: 'DIGITAL_DOCUMENT_REGISTRATION',
+                        name: result.name,
+                        description: result.description,
+                    };
                 }
                 if (context === 'ids') {
-                    this.idsTransformations.set([...this.idsTransformations(), result]);
+                    body = {
+                        type: 'DIGITAL_INSTANCE_IMPORT',
+                        name: result.name,
+                        description: result.description,
+                    };
                 }
-            } else {
-                console.log('Dialog was closed without action');
+                let xsltContent = result.file;
+                this.processesService.createTransformation(body).subscribe({
+                    next: (data) => {
+                        console.log('Transformation created successfully:', data);
+                        result.id = data.id;
+                        this.processesService.uploadTransformationFile(data.id, xsltContent).subscribe({
+                            next: (uploadData) => {
+                                console.log('Transformation file uploaded successfully:', uploadData);
+                            },
+                            error: (uploadError) => {
+                                console.error('Error uploading transformation file:', uploadError);
+                            },
+                        });
+                    },
+                    error: (error) => {
+                        console.error('Error creating transformation:', error);
+                    },
+                    complete: () => {
+                        if (context === 'ids') {
+                            this.idsTransformations.set([...this.idsTransformations(), result]);
+                        }
+                        if (context === 'rdd') {
+                            this.rddTransformations.set([...this.rddTransformations(), result]);
+                        }
+                    },
+                });
             }
         });
     }
-    downloadTransformation(transformation: any) {
+    downloadTransformationFile(transformation: any) {
         console.log('Downloading transformation:', transformation);
-        // Implement the download logic here
+        this.processesService.downloadTransformationFile(transformation.id).subscribe({
+            next: (xsltText: string) => {
+                const blob = new Blob([xsltText], { type: 'application/xml;charset=utf-8' });
+                const url = window.URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `transformation-${transformation.id}.xslt`; // nebo .xsl
+                a.click();
+
+                window.URL.revokeObjectURL(url);
+            },
+            error: (err) => console.error(err),
+        });
     }
     openRddTransformation(transformation: any) {
         console.log('Opening RDD transformation:', transformation);
@@ -770,6 +846,40 @@ export class ProcessesComponent {
             this.activeRddTransformation = null;
         });
     }
+    getTransformations() {
+        this.loadingTransformations.set(true);
+        let userId = String(this.authService.getUserId() || '');
+        // let userId = 'pavla-admin';
+        this.processesService.getTransformations().subscribe({
+            next: (data) => {
+                console.log('Transformations loaded for user:', data);
+                this.rddTransformations.set(data.transformations.filter((tr: any) => tr.type === 'DIGITAL_DOCUMENT_REGISTRATION') || []);
+                this.idsTransformations.set(data.transformations.filter((tr: any) => tr.type === 'DIGITAL_INSTANCE_IMPORT') || []);
+                // Zpracování načtených transformací
+            },
+            error: (error) => {
+                console.error('Error loading transformations for user:', error);
+                this.rddTransformations.set([]);
+                this.idsTransformations.set([]);
+            },
+            complete: () => {
+                this.loadingTransformations.set(false);
+            },
+        });
+        console.log('Fetching transformations for user ID:', userId);
+        // Implement the logic to fetch transformations by user
+    }
+    getTransformationDescription(transformation: any) {
+        this.processesService.getTransformation(transformation.id).subscribe({
+            next: (data) => {
+                console.log('Transformation details loaded:', data);
+                transformation.description = data.description || '';
+            },
+            error: (error) => {
+                console.error('Error loading transformation details:', error);
+            },
+        });
+    }
     removeTransformation(context: string, transformation: any) {
         console.log('Removing transformation:', transformation);
         // Implement the removal logic here
@@ -785,12 +895,20 @@ export class ProcessesComponent {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                if (context === 'rdd') {
-                    this.rddTransformations.set(this.rddTransformations().filter((t) => t.id !== transformation.id));
-                }
-                if (context === 'ids') {
-                    this.idsTransformations.set(this.idsTransformations().filter((t) => t.id !== transformation.id));
-                }
+                this.processesService.deleteTransformation(transformation.id).subscribe({
+                    next: () => {
+                        console.log('Transformation deleted successfully');
+                        if (context === 'rdd') {
+                            this.rddTransformations.set(this.rddTransformations().filter((tr) => tr.id !== transformation.id));
+                        }
+                        if (context === 'ids') {
+                            this.idsTransformations.set(this.idsTransformations().filter((tr) => tr.id !== transformation.id));
+                        }
+                    },
+                    error: (error) => {
+                        console.error('Error deleting transformation:', error);
+                    },
+                });
             }
         });
     }
