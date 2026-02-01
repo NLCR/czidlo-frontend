@@ -417,7 +417,7 @@
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width">
                             <div class="app-base-input-label">
-                                {{ 'processes.registrar' | translate }}
+                                {{ 'processes.registrar' | translate }} *
                             </div>
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedRegistrar">
@@ -430,7 +430,7 @@
                     </div>
                     <div class="app-base-input-container">
                         <div class="app-base-input app-full-width">
-                            <div class="app-base-input-label">{{ 'processes.set-base-url' | translate }}</div>
+                            <div class="app-base-input-label">{{ 'processes.set-base-url' | translate }} *</div>
                             <mat-form-field appearance="outline">
                                 <input matInput [formControl]="oaiBaseUrlControl" />
                                 <mat-error *ngIf="oaiBaseUrlControl.hasError('required')">
@@ -444,7 +444,7 @@
                     </div>
                     <div class="app-base-input-container">
                         <div class="app-base-input app-full-width">
-                            <div class="app-base-input-label">{{ 'processes.oai-metadata-prefix' | translate }}</div>
+                            <div class="app-base-input-label">{{ 'processes.oai-metadata-prefix' | translate }} *</div>
                             <mat-form-field appearance="outline">
                                 <input matInput [formControl]="oaiMetadataPrefixControl" />
                                 <mat-error *ngIf="oaiMetadataPrefixControl.hasError('required')">
@@ -474,7 +474,7 @@
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width">
                             <div class="app-base-input-label">
-                                {{ 'processes.transform-rdd-select' | translate }}
+                                {{ 'processes.transform-rdd-select' | translate }} *
                             </div>
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedRddTransformationId">
@@ -489,7 +489,7 @@
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width">
                             <div class="app-base-input-label">
-                                {{ 'processes.transform-rdi-select' | translate }}
+                                {{ 'processes.transform-rdi-select' | translate }} *
                             </div>
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedIdsTransformationId">

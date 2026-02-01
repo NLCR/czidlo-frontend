@@ -64,6 +64,9 @@ export class ProcessesComponent {
     endDateValue = signal<Date | null>(null);
     deactivationStartValue = signal<Date | null>(null);
     deactivationEndValue = signal<Date | null>(null);
+    oaiBaseUrlValue = signal<string>('');
+    oaiMetadataPrefixValue = signal<string>('');
+    oaiSetValue = signal<string>('');
 
     private _snackBar = inject(MatSnackBar);
     // private _dialog = inject(MatDialog);
@@ -87,10 +90,9 @@ export class ProcessesComponent {
     states = ['ALL', 'ACTIVE', 'DEACTIVATED'];
     selectedIncludeCount = false;
 
-    oaiBaseUrlControl = new FormControl('', [Validators.required]);
+    oaiBaseUrlControl = new FormControl('http://', [Validators.required]);
     oaiMetadataPrefixControl = new FormControl('', [Validators.required]);
     oaiSetControl = new FormControl('', [Validators.required]);
-    selectedRegistrarForOaiImportId = '';
 
     isPlanButtonDisabled = computed(() => {
         const def = this.activeDefinition();
@@ -100,7 +102,14 @@ export class ProcessesComponent {
         const startInvalid = this.startDateControl.invalid || !start;
         const endInvalid = this.endDateControl.invalid || !end;
 
+        const selectedRegistrarInvalid = !this.selectedRegistrar;
+        const oaiBaseUrlInvalid = this.oaiBaseUrlControl.invalid || !this.oaiBaseUrlValue();
+        const oaiMetadataPrefixInvalid = this.oaiMetadataPrefixControl.invalid || !this.oaiMetadataPrefixValue();
+        const rddTransformationInvalid = !this.selectedRddTransformationId;
+        const idsTransformationInvalid = !this.selectedIdsTransformationId;
+
         if (def === 'OAI_ADAPTER') return false;
+
         if (def === 'REGISTRARS_URN_NBN_CSV_EXPORT' || def === 'DI_URL_AVAILABILITY_CHECK') {
             return startInvalid || endInvalid;
         }
@@ -201,8 +210,6 @@ export class ProcessesComponent {
         //     { name: 'IDS Transformation A', id: 'ids_transf_a', description: 'Description of IDS Transformation A', created: '2024-01-20 09:15:00' },
         //     { name: 'IDS Transformation B', id: 'ids_transf_b', description: '', created: '2024-02-10 16:45:00' },
         // ]);
-        // this.selectedRddTransformationId = this.rddTransformations()[0]?.id || '';
-        // this.selectedIdsTransformationId = this.idsTransformations()[0]?.id || '';
     }
 
     loadRegistrarCodes() {
@@ -511,10 +518,17 @@ export class ProcessesComponent {
         console.log('Planning process:', activeProcess);
         if (activeProcess === 'OAI_ADAPTER') {
             console.log('Planning OAI_ADAPTER process...');
-            const registrarCode = this.selectedRegistrarForOaiImportId;
+            const registrarCode = this.selectedRegistrar;
             const oaiBaseUrl = this.oaiBaseUrlControl.value;
             const oaiMetadataPrefix = this.oaiMetadataPrefixControl.value;
             const oaiSet = this.oaiSetControl.value;
+            const ddRegTransId = this.selectedRddTransformationId || null;
+            const diImportTransId = this.selectedIdsTransformationId || null;
+            const registerDDsWithUrn = this.transformWithUrnNbn;
+            const registerDDsWithoutUrn = this.transformWithoutUrnNbn;
+            const diImportMergeDis = this.mergeDigitalInstances;
+            const ignoreDifferenceInAccessibility = this.ignoreDiffInAccess;
+            const ignoreDifferenceInFormat = this.ignoreDiffInFormat;
 
             let body = {
                 type: 'OAI_ADAPTER',
@@ -522,7 +536,14 @@ export class ProcessesComponent {
                     registrarCode: registrarCode,
                     oaiBaseUrl: oaiBaseUrl,
                     oaiMetadataPrefix: oaiMetadataPrefix,
-                    oaiSet: oaiSet
+                    oaiSet: oaiSet,
+                    ddRegTransId: ddRegTransId,
+                    diImportTransId: diImportTransId,
+                    registerDDsWithUrn: registerDDsWithUrn,
+                    registerDDsWithoutUrn: registerDDsWithoutUrn,
+                    diImportMergeDis: diImportMergeDis,
+                    ignoreDifferenceInAccessibility: ignoreDifferenceInAccessibility,
+                    ignoreDifferenceInFormat: ignoreDifferenceInFormat,
                 },
             };
             console.log('OAI_ADAPTER', body);
@@ -855,6 +876,8 @@ export class ProcessesComponent {
                 console.log('Transformations loaded for user:', data);
                 this.rddTransformations.set(data.transformations.filter((tr: any) => tr.type === 'DIGITAL_DOCUMENT_REGISTRATION') || []);
                 this.idsTransformations.set(data.transformations.filter((tr: any) => tr.type === 'DIGITAL_INSTANCE_IMPORT') || []);
+                this.selectedRddTransformationId = this.rddTransformations()[0]?.id || '';
+                this.selectedIdsTransformationId = this.idsTransformations()[0]?.id || '';
                 // Zpracování načtených transformací
             },
             error: (error) => {
