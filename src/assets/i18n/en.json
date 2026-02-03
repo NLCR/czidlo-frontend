@@ -180,7 +180,19 @@
         "confirm-delete-digital-library-title": "Delete digital library",
         "confirm-delete-catalogue-title": "Delete catalogue",
         "digital-library-deleted-successfully": "Digital library was deleted successfully",
-        "catalogue-deleted-successfully": "Catalogue was deleted successfully"
+        "catalogue-deleted-successfully": "Catalogue was deleted successfully",
+        "registrar-edited-successfully": "Registrar was edited successfully",
+        "registrar-edit-failed": "Error editing registrar",
+        "registrar-created-successfully": "Registrar was created successfully",
+        "registrar-creation-failed": "Error creating registrar",
+        "code-length-error": "Code length must be between 2 and 6 characters",
+        "code-length-hint": "Code length must be between 2 and 6 characters",
+        "registrar-deleted-successfully": "Registrar was deleted successfully",
+        "registrar-deletion-failed": "Error deleting registrar: {{error}}",
+        "archiver-edited-successfully": "Archiver was edited successfully",
+        "archiver-editing-failed": "Error editing archiver: {{error}}",
+        "archiver-created-successfully": "Archiver was created successfully",
+        "archiver-creation-failed": "Error creating archiver: {{error}}"
     },
     "inputs": {
         "pick-start-date": "Pick from",

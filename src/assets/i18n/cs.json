@@ -181,7 +181,20 @@
         "confirm-delete-digital-library-title": "Smazat digitální knihovnu",
         "confirm-delete-catalogue-title": "Smazat katalog",
         "digital-library-deleted-successfully": "Digitální knihovna byla úspěšně smazána",
-        "catalogue-deleted-successfully": "Katalog byl úspěšně smazán"
+        "catalogue-deleted-successfully": "Katalog byl úspěšně smazán",
+        "registrar-edited-successfully": "Registrátor byl úspěšně upraven",
+        "registrar-edit-failed": "Chyba při úpravě registrátora",
+        "registrar-created-successfully": "Registrátor byl úspěšně vytvořen",
+        "registrar-creation-failed": "Chyba při vytváření registrátora",
+        "code-length-error": "Délka kódu musí být mezi 2 a 6 znaky",
+        "code-length-hint": "Délka kódu musí být mezi 2 a 6 znaky",
+        "registrar-deleted-successfully": "Registrátor byl úspěšně smazán",
+        "registrar-deletion-failed": "Chyba při mazání registrátora: {{error}}",
+        "archiver-edited-successfully": "Archivátor byl úspěšně upraven",
+        "archiver-editing-failed": "Chyba při úpravě archivátora",
+        "archiver-created-successfully": "Archivátor byl úspěšně vytvořen",
+        "archiver-creation-failed": "Chyba při vytváření archivátora"
+
     },
     "inputs": {
         "pick-start-date": "Vyberte od",

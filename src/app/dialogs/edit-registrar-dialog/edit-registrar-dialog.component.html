@@ -33,10 +33,12 @@
         </div>
         <div class="app-part-content app-part-code">
             <div class="app-base-input-label">{{ 'registrars.Code' | translate }}</div>
-            <div class="app-base-input app-login-input">
+
+            <div class="app-basic-input app-code-input">
                 <mat-form-field appearance="outline" class="app-base-input-field">
-                    <input matInput [(ngModel)]="code" />
+                    <input matInput [formControl]="codeControl" [maxlength]="6" />
                 </mat-form-field>
+                <mat-hint class="app-base-input-hint">{{ 'messages.code-length-hint' | translate }}</mat-hint>
             </div>
         </div>
         <div class="app-part-content app-part-description">
@@ -93,7 +95,7 @@
             <app-button size="l" variant="tertiary" (click)="onCancel()">
                 {{ 'buttons.cancel' | translate }}
             </app-button>
-            <app-button size="l" variant="primary" [disabled]="!name" (click)="onConfirm()">
+            <app-button size="l" variant="primary" [disabled]="!name || !codeControl.valid" (click)="onConfirm()">
                 {{ 'buttons.save' | translate }}
             </app-button>
         </div>

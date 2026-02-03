@@ -33,7 +33,6 @@ export class RegistrarsComponent {
     activeRegistrar: any = null;
     activeArchiver: any = null;
 
-
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -209,14 +208,25 @@ export class RegistrarsComponent {
                     this.registrarsService.deleteRegistrar(registrar.code).subscribe({
                         next: () => {
                             console.log('Registrar deleted successfully');
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-deleted-successfully'),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 3000,
+                                },
+                            );
                             this.loadRegistrars();
                         },
                         error: (error) => {
                             console.error('Error deleting registrar:', error);
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-deletion-failed', error),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 10000,
+                                },
+                            );
                         },
-                    });
-                    this.snackBar.open(this.translate.instant('messages.registrar-deleted-successfully'), this.translate.instant('buttons.close'), {
-                        duration: 3000,
                     });
                 }
             });
@@ -236,6 +246,7 @@ export class RegistrarsComponent {
                 resolverMode: registrar?.allowedRegistrationModeByResolver || false,
                 reserveMode: registrar?.allowedRegistrationModeByReservation || false,
                 registrarMode: registrar?.allowedRegistrationModeByRegistrar || false,
+                hidden: registrar?.hidden || false,
             },
         });
 
@@ -259,6 +270,13 @@ export class RegistrarsComponent {
                         },
                         error: (error) => {
                             console.error('Error editing registrar:', error);
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-edit-failed', error),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 10000,
+                                },
+                            );
                         },
                     });
                 } else {
@@ -266,10 +284,27 @@ export class RegistrarsComponent {
                     this.registrarsService.createRegistrar(result).subscribe({
                         next: () => {
                             console.log('Registrar created successfully');
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-created-successfully'),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 3000,
+                                },
+                            );
                             this.loadRegistrars();
                         },
                         error: (error) => {
                             console.error('Error creating registrar:', error);
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-creation-failed', error),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 10000,
+                                },
+                            );
+                        },
+                        complete: () => {
+                            this.loadRegistrars();
                         },
                     });
                 }
@@ -297,14 +332,27 @@ export class RegistrarsComponent {
                     console.log('Archiver edited/added:', result);
                     if (archiver) {
                         // Edit existing archiver
-                        // result.hidden = archiver.hidden; // preserve history
                         this.registrarsService.editArchiver(archiver.id, result).subscribe({
                             next: () => {
                                 console.log('Archiver edited successfully');
+                                this.snackBar.open(
+                                    this.translate.instant('messages.archiver-edited-successfully'),
+                                    this.translate.instant('buttons.close'),
+                                    {
+                                        duration: 3000,
+                                    },
+                                );
                                 this.loadArchivers();
                             },
                             error: (error) => {
                                 console.error('Error editing archiver:', error);
+                                this.snackBar.open(
+                                    this.translate.instant('messages.archiver-editing-failed', error),
+                                    this.translate.instant('buttons.close'),
+                                    {
+                                        duration: 10000,
+                                    },
+                                );
                             },
                         });
                     } else {
@@ -312,10 +360,24 @@ export class RegistrarsComponent {
                         this.registrarsService.createArchiver(result).subscribe({
                             next: () => {
                                 console.log('Archiver created successfully');
+                                this.snackBar.open(
+                                    this.translate.instant('messages.archiver-created-successfully'),
+                                    this.translate.instant('buttons.close'),
+                                    {
+                                        duration: 3000,
+                                    },
+                                );
                                 this.loadArchivers();
                             },
                             error: (error) => {
                                 console.error('Error creating archiver:', error);
+                                this.snackBar.open(
+                                    this.translate.instant('messages.archiver-creation-failed', error),
+                                    this.translate.instant('buttons.close'),
+                                    {
+                                        duration: 10000,
+                                    },
+                                );
                             },
                         });
                     }
