@@ -47,7 +47,11 @@
                     <div
                         *ngFor="let registrar of registrars()"
                         class="app-row app-table-row app-row-clicable app-row-registrars"
-                        [ngClass]="{ 'app-row-active': activeRegistrar === registrar }"
+                        [ngClass]="{
+                            'app-row-hidden': registrar?.hidden === true && !isAdmin(),
+                            'app-row-active': activeRegistrar === registrar,
+                            'app-actions-invisible': !isAdmin(),
+                        }"
                         (click)="openSidebar(registrar)"
                     >
                         <div class="app-col app-col-name">{{ registrar.name }}</div>
@@ -103,6 +107,7 @@
                         (click)="openSidebar(archiver)"
                     >
                         <div class="app-col app-col-name">{{ archiver.name }}</div>
+                        <div class="app-invisible-button" *ngIf="!isAdmin()"></div>
                         <div class="app-col app-col-actions" *ngIf="loggedIn()">
                             <app-button
                                 variant="tertiary"

@@ -26,11 +26,13 @@ export class RegistrarsComponent {
     isAdmin = computed(() => this.authService.isAdmin());
 
     registrars = signal<Array<any>>([]);
+    filteredRegistrars: Array<any> = [];
     archivers = signal<Array<any>>([]);
 
     isSidebarOpen = signal(false);
     activeRegistrar: any = null;
     activeArchiver: any = null;
+
 
     constructor(
         private router: Router,
@@ -118,6 +120,7 @@ export class RegistrarsComponent {
         this.registrarsService.getRegistrars().subscribe({
             next: (data) => {
                 this.registrars.set(this.registrarsService.registrars());
+                this.filteredRegistrars = this.registrars().filter((reg) => !reg.hidden);
             },
             error: (error) => {
                 console.error('Error loading registrars in component:', error);
