@@ -80,16 +80,14 @@ export class ImportRecordComponent {
     formatValue = new FormControl<string>('image/jp2', [Validators.required]);
     formatVersion = new FormControl<string>('verze 1.0', [Validators.required]);
     extent = new FormControl<string>('');
-    resolutionHorizontal = new FormControl<number>(1000, [this.positiveNumberValidator(), Validators.required]);
-    resolutionVertical = new FormControl<number>(1000, [this.positiveNumberValidator(), Validators.required]);
-    compression = new FormControl<string>('JPEG2000', Validators.required);
-    // compressionRatio = new FormControl<string>('');
-    // compressionValue = new FormControl<string>('');
+    resolutionHorizontal = new FormControl<number | null>(null, [this.positiveNumberValidator()]);
+    resolutionVertical = new FormControl<number | null>(null, [this.positiveNumberValidator()]);
+    compression = new FormControl<string>('');
     colorModel = new FormControl<string>('');
     colorDepth = new FormControl<string>('');
     iccProfile = new FormControl<string>('');
-    pictureSizeWidth = new FormControl<number>(1000, [this.positiveNumberValidator(), Validators.required]);
-    pictureSizeHeight = new FormControl<number>(1000, [this.positiveNumberValidator(), Validators.required]);
+    pictureSizeWidth = new FormControl<number | null>(null, [this.positiveNumberValidator()]);
+    pictureSizeHeight = new FormControl<number | null>(null, [this.positiveNumberValidator()]);
 
     // THESIS
     degreeAwardingInstitution = new FormControl<string>('');
@@ -564,14 +562,14 @@ export class ImportRecordComponent {
         this.formatValue.reset('image/jp2');
         this.formatVersion.reset('verze 1.0');
         this.extent.reset('');
-        this.resolutionHorizontal.reset(1000);
-        this.resolutionVertical.reset(1000);
-        this.compression.reset('JPEG2000');
+        this.resolutionHorizontal.reset();
+        this.resolutionVertical.reset();
+        this.compression.reset('');
         this.colorModel.reset('');
         this.colorDepth.reset('');
         this.iccProfile.reset('');
-        this.pictureSizeWidth.reset(1000);
-        this.pictureSizeHeight.reset(1000);
+        this.pictureSizeWidth.reset();
+        this.pictureSizeHeight.reset();
 
         // THESIS
         this.degreeAwardingInstitution.reset('');
