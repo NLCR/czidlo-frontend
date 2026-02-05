@@ -89,6 +89,8 @@ export class ProcessesComponent {
     selectedState = 'ALL';
     states = ['ALL', 'ACTIVE', 'DEACTIVATED'];
     selectedIncludeCount = false;
+    bornDigitalStates = ['all', 'digital', 'analog'];
+    selectedBornDigitalState: string = 'all';
 
     oaiBaseUrlControl = new FormControl('http://', [Validators.required]);
     oaiMetadataPrefixControl = new FormControl('', [Validators.required]);
@@ -576,6 +578,8 @@ export class ProcessesComponent {
             const deactivationStart = enabledDeactivationDates ? this.deactivationStartControl.value?.toISOString().split('T')[0] || null : null;
             const deactivationEnd = enabledDeactivationDates ? this.deactivationEndControl.value?.toISOString().split('T')[0] || null : null;
             const exportNumOfDigInstances = this.selectedIncludeCount || false;
+            const bornDigital = this.selectedBornDigitalState === 'digital' || this.selectedBornDigitalState === 'all';
+            const bornAnalog = this.selectedBornDigitalState === 'analog' || this.selectedBornDigitalState === 'all';
 
             let body = {
                 type: 'REGISTRARS_URN_NBN_CSV_EXPORT',
@@ -592,6 +596,8 @@ export class ProcessesComponent {
                     deactivationDateFrom: deactivationStart,
                     deactivationDateTo: deactivationEnd,
                     exportNumOfDigInstances: exportNumOfDigInstances,
+                    bornDigital: bornDigital,
+                    bornAnalog: bornAnalog,
                 },
             };
             console.log('REGISTRARS_URN_NBN_CSV_EXPORT', body);
@@ -754,6 +760,10 @@ export class ProcessesComponent {
             // this.deactivationEndControl.reset();
         }
     }
+    onBornDigitalChange(state: string) {
+        this.selectedBornDigitalState = state;
+    }
+
     toggleIncludeCount() {
         this.selectedIncludeCount = !this.selectedIncludeCount;
     }

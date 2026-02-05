@@ -246,7 +246,10 @@
             </div>
             <!-- <pre class="app-sidebar-content-item" *ngIf="activeProcess">{{ activeProcess | json }}</pre> -->
             <pre class="app-sidebar-content-item app-sidebar-log-content" *ngIf="activeProcess?.log">{{ activeProcess.log }}</pre>
-            <div class="app-sidebar-content-item" *ngIf="activeProcess?.logError && activeProcess?.state !== 'CANCELED' && activeProcess?.state !== 'SCHEDULED'">
+            <div
+                class="app-sidebar-content-item"
+                *ngIf="activeProcess?.logError && activeProcess?.state !== 'CANCELED' && activeProcess?.state !== 'SCHEDULED'"
+            >
                 <div class="app-base-input-hint app-base-input-error">
                     {{ activeProcess.logError?.error | translate }} ({{ displayLogError(activeProcess) | translate }})
                 </div>
@@ -258,10 +261,22 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.close' | translate }}</span>
                 </app-button>
-                <app-button *ngIf="activeProcess.state !== 'CANCELED' && activeProcess.state !== 'SCHEDULED'" variant="primary" size="l" iconRight="download.svg" (click)="downloadLog(activeProcess)">
+                <app-button
+                    *ngIf="activeProcess.state !== 'CANCELED' && activeProcess.state !== 'SCHEDULED'"
+                    variant="primary"
+                    size="l"
+                    iconRight="download.svg"
+                    (click)="downloadLog(activeProcess)"
+                >
                     <span>{{ 'buttons.download-log' | translate }}</span>
                 </app-button>
-                <app-button *ngIf="activeProcess.state !== 'CANCELED' && activeProcess.state !== 'SCHEDULED'" variant="primary" size="l" iconRight="download.svg" (click)="downloadProcessOutput(activeProcess.id)">
+                <app-button
+                    *ngIf="activeProcess.state !== 'CANCELED' && activeProcess.state !== 'SCHEDULED'"
+                    variant="primary"
+                    size="l"
+                    iconRight="download.svg"
+                    (click)="downloadProcessOutput(activeProcess.id)"
+                >
                     <span>{{ 'buttons.download-output' | translate }}</span>
                 </app-button>
                 <!-- <app-button variant="primary" size="l" iconRight="copy.svg" (click)="copyLog(activeProcess)">
@@ -416,9 +431,7 @@
                     <!-- REGISTRAR -->
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width">
-                            <div class="app-base-input-label">
-                                {{ 'processes.registrar' | translate }} *
-                            </div>
+                            <div class="app-base-input-label">{{ 'processes.registrar' | translate }} *</div>
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedRegistrar">
                                     @for (registrar of assignedRegistrars(); track registrar) {
@@ -473,9 +486,7 @@
                     <!-- RDD TRANSFORMATION -->
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width">
-                            <div class="app-base-input-label">
-                                {{ 'processes.transform-rdd-select' | translate }} *
-                            </div>
+                            <div class="app-base-input-label">{{ 'processes.transform-rdd-select' | translate }} *</div>
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedRddTransformationId">
                                     @for (tr of rddTransformations(); track tr) {
@@ -488,9 +499,7 @@
                     <!-- RDI TRANSFORMATION -->
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width">
-                            <div class="app-base-input-label">
-                                {{ 'processes.transform-rdi-select' | translate }} *
-                            </div>
+                            <div class="app-base-input-label">{{ 'processes.transform-rdi-select' | translate }} *</div>
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedIdsTransformationId">
                                     @for (tr of idsTransformations(); track tr) {
@@ -520,7 +529,10 @@
                     <div class="app-base-input-container">
                         <div class="app-base-input app-radio-toggle-checkboxes">
                             <!-- <div class="app-base-input-label">{{ 'processes.register-dd' | translate }}</div> -->
-                            <app-checkbox [(checked)]="mergeDigitalInstances" label="{{ 'processes.merge-digital-instances' | translate }}"></app-checkbox>
+                            <app-checkbox
+                                [(checked)]="mergeDigitalInstances"
+                                label="{{ 'processes.merge-digital-instances' | translate }}"
+                            ></app-checkbox>
                         </div>
                     </div>
                 </div>
@@ -673,6 +685,18 @@
                                 <app-checkbox [(checked)]="missingISSN" label="{{ 'processes.issn' | translate }}"></app-checkbox>
                                 <app-checkbox [(checked)]="missingISBN" label="{{ 'processes.isbn' | translate }}"></app-checkbox>
                             </div>
+                        </div>
+                    </div>
+                    <!-- BORN DIGITAL FILTER -->
+                     <div class="app-base-input-container">
+                        <div class="app-base-input app-radio-toggle-checkboxes">
+                            <div class="app-base-input-label">{{ 'statistics.filter-by-born-digital' | translate }}</div>
+
+                            <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedBornDigitalState" (valueChange)="onBornDigitalChange($event)">
+                                @for (state of bornDigitalStates; track state) {
+                                    <app-radio-button label="{{ 'statistics.' + state | translate }}" value="{{ state }}"></app-radio-button>
+                                }
+                            </app-radio-group>
                         </div>
                     </div>
                     <!-- STATES FILTER -->

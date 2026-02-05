@@ -44,8 +44,13 @@
                 align-self: stretch;
                 color: var(--Text-Light, #4c6580);
             }
-            .app-version {
+            .app-version a {
                 color: var(--Text-Light, #4c6580);
+                text-decoration: none;
+                &:hover {
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
             }
         }
     }
