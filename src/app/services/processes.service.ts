@@ -26,7 +26,6 @@ export class ProcessesService {
         return this.apiService.getProcesses().pipe(
             tap({
                 next: (data) => {
-                    console.log('Processes data received:', data);
                     this.processes.set(
                         data.items
                             .map((item: any) => ({
@@ -56,7 +55,6 @@ export class ProcessesService {
                             }))
                             .sort((a: any, b: any) => (a.id < b.id ? 1 : -1))
                     );
-                    console.log('Processes loaded:', this.processes());
                 },
                 error: (error) => {
                     console.error('Error loading processes:', error);
@@ -106,7 +104,7 @@ export class ProcessesService {
                                     1000
                                 ) + ' s'
                                 : Math.round((Date.now() - new Date(item.started?.replace(/\[UTC\]$/, '')).getTime()) / 1000) + ' s',
-                        }))
+                        })).sort((a: any, b: any) => (a.id < b.id ? 1 : -1))
                     );
                     console.log(`Processes for owner ${owner} loaded:`, this.processes());
                 },

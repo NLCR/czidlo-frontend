@@ -564,8 +564,8 @@ export class ProcessesComponent {
             const returnActive = this.selectedState === 'ALL' || this.selectedState === 'ACTIVE';
             const returnDeactivated = this.selectedState === 'ALL' || this.selectedState === 'DEACTIVATED';
             let enabledDeactivationDates = this.selectedState === 'DEACTIVATED';
-            const deactivationStart = enabledDeactivationDates ? this.deactivationStartControl.value?.toISOString().split('T')[0] || null : null;
-            const deactivationEnd = enabledDeactivationDates ? this.deactivationEndControl.value?.toISOString().split('T')[0] || null : null;
+            const deactivationStart = enabledDeactivationDates ? this.formatToLocal(this.deactivationStartControl.value) || null : null;
+            const deactivationEnd = enabledDeactivationDates ? this.formatToLocal(this.deactivationEndControl.value) || null : null;
             const exportNumOfDigInstances = this.selectedIncludeCount || false;
             const bornDigital = this.selectedBornDigitalState === 'digital' || this.selectedBornDigitalState === 'all';
             const bornAnalog = this.selectedBornDigitalState === 'analog' || this.selectedBornDigitalState === 'all';
@@ -573,8 +573,8 @@ export class ProcessesComponent {
             let body = {
                 type: 'REGISTRARS_URN_NBN_CSV_EXPORT',
                 params: {
-                    registrationDateFrom: registrationStart?.toISOString().split('T')[0], // jen datum YYYY-MM-DD
-                    registrationDateTo: registrationEnd?.toISOString().split('T')[0], // jen datum YYYY-MM-DD
+                    registrationDateFrom: this.formatToLocal(registrationStart), // jen datum YYYY-MM-DD
+                    registrationDateTo: this.formatToLocal(registrationEnd), // jen datum YYYY-MM-DD
                     registrarCodes: registrarCodes,
                     intEntTypes: entityTypes,
                     withMissingCnbOnly: withMissingCnbOnly,
@@ -612,8 +612,8 @@ export class ProcessesComponent {
             const urnNbnStatesIncludeDeactivated: boolean = this.selectedUrnNbnState === 'ALL' || this.selectedUrnNbnState === 'DEACTIVATED';
             const diStatesIncludeActive: boolean = this.selectedDIState === 'ALL' || this.selectedDIState === 'ACTIVE';
             const diStatesIncludeDeactivated: boolean = this.selectedDIState === 'ALL' || this.selectedDIState === 'DEACTIVATED';
-            const diDsFrom = this.startDateControl.value?.toISOString();
-            const diDsTo = this.endDateControl.value?.toISOString();
+            const diDsFrom = this.formatToLocal(this.startDateControl.value); // jen datum YYYY-MM-DD
+            const diDsTo = this.formatToLocal(this.endDateControl.value); // jen datum YYYY-MM-DD
 
             let body = {
                 type: 'DI_URL_AVAILABILITY_CHECK',
@@ -647,13 +647,14 @@ export class ProcessesComponent {
             console.log('Planning INDEXATION process...');
             const startDate = this.startDateControl.value;
             const endDate = this.endDateControl.value;
+            console.log('dates', 'start ' + this.formatToLocal(startDate), 'end ' + this.formatToLocal(endDate));
             let body = {};
             if (startDate && endDate) {
                 body = {
                     type: 'INDEXATION',
                     params: {
-                        mod_date_from: startDate?.toISOString().split('T')[0], // jen datum YYYY-MM-DD
-                        mod_date_to: endDate?.toISOString().split('T')[0], // jen datum YYYY-MM-DD
+                        mod_date_from: this.formatToLocal(startDate), // jen datum YYYY-MM-DD
+                        mod_date_to: this.formatToLocal(endDate), // jen datum YYYY-MM-DD
                     },
                 };
             }
@@ -757,24 +758,6 @@ export class ProcessesComponent {
         this.selectedIncludeCount = !this.selectedIncludeCount;
     }
 
-    formatDuration(seconds: number): string {
-        if (seconds === null || seconds === undefined || isNaN(seconds)) {
-            return '---';
-        }
-        if (seconds < 60) {
-            return `${seconds} s`;
-        }
-
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-
-        if (h > 0) {
-            return `${h} h ${m} min ${s} s`;
-        } else {
-            return `${m} min ${s} s`;
-        }
-    }
     // NEW TRANSFORMATION DIALOG
     openAddXslStylesheetDialog(context: string) {
         const dialogRef = this.dialog.open(AddXslStylesheetComponent, {
@@ -933,5 +916,33 @@ export class ProcessesComponent {
                 });
             }
         });
+    }
+
+    // DATE FORMATTING
+    private formatToLocal(d: Date | null): string | null {
+        if (!d) return null;
+        let localDate = new Date(d);
+        const yyyy = localDate.getFullYear();
+        const mm = String(localDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(localDate.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+    formatDuration(seconds: number): string {
+        if (seconds === null || seconds === undefined || isNaN(seconds)) {
+            return '---';
+        }
+        if (seconds < 60) {
+            return `${seconds} s`;
+        }
+
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+
+        if (h > 0) {
+            return `${h} h ${m} min ${s} s`;
+        } else {
+            return `${m} min ${s} s`;
+        }
     }
 }
