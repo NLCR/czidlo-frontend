@@ -423,18 +423,30 @@
                                     </div>
                                     <!-- PRECEDESSORS AND SUCCESSORS -->
                                     <div *ngIf="item.details.urnNbn.predecessors?.length > 0">
-                                        <div class="app-ie-field"  *ngFor="let pre of item.details.urnNbn.predecessors">
+                                        <div class="app-ie-field" *ngFor="let pre of item.details.urnNbn.predecessors">
                                             <div class="app-label">{{ 'search.predecessor' | translate }}:</div>
                                             <!-- <pre>{{ pre | json }}</pre> -->
-                                            <a class="app-value" [routerLink]="[]" [queryParams]="{ q: 'urn:nbn:cz:' + pre.registrarCode + '-' + pre.documentCode }">urn:nbn:cz:{{ pre.registrarCode }}-{{pre.documentCode}}</a>
+                                            <a
+                                                class="app-value"
+                                                [routerLink]="[]"
+                                                [queryParams]="{ q: 'urn:nbn:cz:' + pre.registrarCode + '-' + pre.documentCode }"
+                                            >
+                                                urn:nbn:cz:{{ pre.registrarCode }}-{{ pre.documentCode }}
+                                            </a>
                                             <div class="app-value-2">({{ pre.statusNote }})</div>
                                         </div>
                                     </div>
                                     <div *ngIf="item.details.urnNbn.successors?.length > 0">
-                                        <div class="app-ie-field"  *ngFor="let suc of item.details.urnNbn.successors">
+                                        <div class="app-ie-field" *ngFor="let suc of item.details.urnNbn.successors">
                                             <div class="app-label">{{ 'search.successor' | translate }}:</div>
                                             <!-- <pre>{{ suc | json }}</pre> -->
-                                            <a class="app-value" [routerLink]="[]" [queryParams]="{ q: 'urn:nbn:cz:' + suc.registrarCode + '-' + suc.documentCode }">urn:nbn:cz:{{ suc.registrarCode }}-{{suc.documentCode}}</a>
+                                            <a
+                                                class="app-value"
+                                                [routerLink]="[]"
+                                                [queryParams]="{ q: 'urn:nbn:cz:' + suc.registrarCode + '-' + suc.documentCode }"
+                                            >
+                                                urn:nbn:cz:{{ suc.registrarCode }}-{{ suc.documentCode }}
+                                            </a>
                                             <div class="app-value-2">({{ suc.statusNote }})</div>
                                         </div>
                                     </div>
@@ -1055,7 +1067,7 @@
                 <div class="app-part-content">
                     <!-- ARCHIVER ID -->
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-half-width app-primaryArchiverId">
+                        <div class="app-base-input app-full-width app-primaryArchiverId">
                             <div class="app-base-input-label">
                                 {{ 'import.archiverId' | translate }}
                             </div>
@@ -1065,6 +1077,14 @@
                                         <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
                                     }
                                 </mat-select>
+                                <mat-icon
+                                    class="app-prefix-icon"
+                                    matPrefix
+                                    *ngIf="selectedArchiverId"
+                                    (click)="selectedArchiverId = ''; $event.stopPropagation()"
+                                >
+                                    close
+                                </mat-icon>
                             </mat-form-field>
                         </div>
                     </div>

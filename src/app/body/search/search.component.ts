@@ -766,8 +766,11 @@ export class SearchComponent implements AfterViewInit {
 
         // REGISTRAR AND MODE
         record.registrarCode = this.registrarCode;
-        record.archiverId = this.selectedArchiverId;
         record.urnNbn = this.urnNbn.value;
+
+        if (this.selectedArchiverId && this.selectedArchiverId !== '') {
+            record.archiverId = this.selectedArchiverId;
+        }
 
         // INTELECTUAL ENTITY
         let intelectualEntity: any = {};
