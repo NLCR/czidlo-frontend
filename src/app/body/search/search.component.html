@@ -222,7 +222,9 @@
 
                     <!-- TITLE -->
                     <div class="app-ie-field" *ngIf="item.title">
-                        <div class="app-label">{{ 'search.title' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.entitytype !== 'PERIODICAL_ISSUE' && item.entitytype !== 'PERIODICAL_VOLUME' && item.entitytype !== 'MONOGRAPH_VOLUME'">{{ 'search.title' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.entitytype === 'PERIODICAL_ISSUE' || item.entitytype === 'PERIODICAL_VOLUME'">{{ 'search.title-per-volume' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.entitytype === 'MONOGRAPH_VOLUME'">{{ 'search.title-mon-volume' | translate }}:</div>
                         <div class="app-value">{{ item.title }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.subtitle">
@@ -230,7 +232,8 @@
                         <div class="app-value">{{ item.subtitle }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.volumetitle">
-                        <div class="app-label">{{ 'search.volumetitle' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.entitytype !== 'MONOGRAPH_VOLUME'">{{ 'search.volumetitle' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.entitytype === 'MONOGRAPH_VOLUME'">{{ 'search.volumetitle-mon' | translate }}:</div>
                         <div class="app-value">{{ item.volumetitle }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.issuetitle">
