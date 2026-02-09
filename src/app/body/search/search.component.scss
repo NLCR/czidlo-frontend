@@ -9,11 +9,10 @@
     overflow: hidden;
     .app-search-header {
         display: flex;
-        width: 800px;
+        width: 100%;
         align-items: center;
         gap: 12px;
-        align-self: stretch;
-        padding: 24px 0px 16px 16px;
+        padding: 24px 16px 16px 16px;
         box-sizing: border-box;
         .app-fields-filter {
             width: 155px;
@@ -30,7 +29,8 @@
     }
     .app-search-tags {
         display: flex;
-        width: 800px;
+        // width: 800px;
+        width: 100%;
         padding: 0px 16px 16px 16px;
         gap: 8px;
         box-sizing: border-box;
@@ -57,7 +57,8 @@
     }
     .app-action {
         display: flex;
-        width: 800px;
+        // width: 800px;
+        width: 100%;
         padding: 0px 16px 16px 16px;
         justify-content: space-between;
         gap: 8px;
@@ -73,8 +74,9 @@
         display: flex;
         flex-direction: column;
         gap: 16px;
-        width: 800px;
-        padding: 0px 0px 16px 16px;
+        // width: 800px;
+        // width: 100%;
+        padding: 0px 16px 16px 16px;
         box-sizing: border-box;
         .app-advanced-search-row {
             display: flex;
@@ -82,7 +84,7 @@
             gap: 16px;
         }
         .app-search-entity-type {
-            width: 190px;
+            width: 250px;
         }
         .app-search-registrar {
             width: 200px;
@@ -93,11 +95,12 @@
     }
     .app-search-results {
         display: flex;
-        width: 800px;
+        // width: 800px;
+        width: 100%;
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
-        padding: 0px 0px 40px 16px;
+        padding: 0px 16px 40px 16px;
         overflow: auto;
         box-sizing: border-box;
         .app-search-card {
@@ -193,6 +196,7 @@
                     align-items: center;
                     gap: 2px;
                     .app-label {
+                        align-self: flex-start;
                         color: var(--Text-Light, #4c6580);
                         /* Typesettings/M/Regular */
                         font-family: 'IBM Plex Sans';
@@ -297,6 +301,7 @@
                 img {
                     width: 16px;
                     height: 16px;
+                    user-select: none;
                 }
                 &:hover {
                     background: #0080a8;
