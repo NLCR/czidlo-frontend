@@ -20,7 +20,7 @@
 
         <!-- INSTANCES -->
         <div class="app-instances" *ngIf="isActive === 'instances'">
-            <div class="app-toggle">
+            <div class="app-toggle" *ngIf="isAdmin()">
                 <app-toggle [disabled]="loadingProcesses()" size="s" [checked]="showMyProcesses" (click)="toggleShowMyProcesses()"></app-toggle>
                 {{ 'processes.show-my-processes' | translate }}
             </div>

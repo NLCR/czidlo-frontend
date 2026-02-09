@@ -101,11 +101,11 @@ export class ProcessesService {
                             finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
                             duration: item.finished
                                 ? Math.round(
-                                    (new Date(item.finished.replace(/\[UTC\]$/, '')).getTime() -
-                                        new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) /
+                                    (new Date(item.finished?.replace(/\[UTC\]$/, '')).getTime() -
+                                        new Date(item.started?.replace(/\[UTC\]$/, '')).getTime()) /
                                     1000
                                 ) + ' s'
-                                : Math.round((Date.now() - new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) / 1000) + ' s',
+                                : Math.round((Date.now() - new Date(item.started?.replace(/\[UTC\]$/, '')).getTime()) / 1000) + ' s',
                         }))
                     );
                     console.log(`Processes for owner ${owner} loaded:`, this.processes());

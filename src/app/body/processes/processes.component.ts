@@ -23,6 +23,7 @@ import { TransformationDetailDialogComponent } from '../../dialogs/transformatio
 })
 export class ProcessesComponent {
     loggedIn = computed(() => this.authService.loggedIn());
+    isAdmin = computed(() => this.authService.isAdmin());
 
     processes = signal<Array<any>>([]);
     definitions = signal<Array<any>>([
@@ -143,8 +144,10 @@ export class ProcessesComponent {
             const isLoggedIn = this.loggedIn();
 
             if (isLoggedIn) {
+                this.loadProcesses();
                 this.loadAssignedRegistrars();
             } else {
+                this.processes.set([]);
                 this.resetRegistrars();
             }
         });
@@ -172,14 +175,11 @@ export class ProcessesComponent {
             // INSTANCES
             if (this.isActive === 'instances') {
                 if (this.processesService.processes().length === 0) {
-                    console.log('Loading processes from server...');
                     this.loadProcesses();
                 } else {
                     this.processes.set(this.processesService.processes());
-                    console.log('Processes loaded from service:', this.processes());
                 }
                 if (url.length === 3) {
-                    console.log('Loading process details...', this.processes());
                     const processId = url[2]?.path;
                     this.loadProcessDetails(processId);
                 }
@@ -200,18 +200,8 @@ export class ProcessesComponent {
                 }
             }
         });
-        // ======== TODO API FETCH =======
+        // TRANSFORMATIONS
         this.getTransformations();
-        // RDD TRANSFORMATIONS
-        // this.rddTransformations.set([
-        //     { name: 'Transformation 1', id: 'rdd_transf_1', description: 'Description of Transformation 1', created: '2023-10-01 10:00:00' },
-        //     { name: 'Transformation 2', id: 'rdd_transf_2', description: '', created: '2023-11-15 14:30:00' },
-        // ]);
-        // // IDS TRANSFORMATIONS
-        // this.idsTransformations.set([
-        //     { name: 'IDS Transformation A', id: 'ids_transf_a', description: 'Description of IDS Transformation A', created: '2024-01-20 09:15:00' },
-        //     { name: 'IDS Transformation B', id: 'ids_transf_b', description: '', created: '2024-02-10 16:45:00' },
-        // ]);
     }
 
     loadRegistrarCodes() {
@@ -490,8 +480,7 @@ export class ProcessesComponent {
     toggleShowMyProcesses() {
         this.showMyProcesses = !this.showMyProcesses;
         if (this.showMyProcesses) {
-            // TODO
-            const currentUserLogin = 'pavla'; // TODO: Nahradit skutečným přihlašovacím jménem
+            const currentUserLogin = this.authService.getUsername() || ''; // TODO: Nahradit skutečným přihlašovacím jménem
             this.processesService.getProcessesByOwner(currentUserLogin).subscribe({
                 next: () => {
                     this.processes.set(this.processesService.processes());

@@ -50,7 +50,6 @@ export class UsersComponent {
 
     ngOnInit() {
         this.route.url.subscribe((url) => {
-            console.log('users on init', this.usersService.users());
             if (this.usersService.users().length === 0) {
                 this.loadUsers();
             } else {
@@ -179,10 +178,8 @@ export class UsersComponent {
     }
 
     loadRightsDetails(userId: any) {
-        console.log('loading rights details for user:', userId);
         this.usersService.getUserRights(userId).subscribe({
             next: (response) => {
-                console.log(response, this.activeUser);
                 this.rightsDetails = response;
                 this.loadRegistrars(response);
                 this.isSidebarOpen.set(true);
@@ -213,7 +210,6 @@ export class UsersComponent {
         });
 
         dialogRef.afterClosed().subscribe((result) => {
-            console.log('Remove Registrar Right dialog closed:', result);
             if (result === true) {
                 this.confirmRemoveCurrentRegistrar(item);
             }
