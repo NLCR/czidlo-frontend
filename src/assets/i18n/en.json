@@ -124,7 +124,8 @@
         "confirm-deactivate": "Yes, deactivate",
         "save-record": "Save Record",
         "edit-instance": "Edit Instance",
-        "upload": "Upload"
+        "upload": "Upload",
+        "add-predecessor": "Add Predecessor"
     },
     "messages": {
         "user-saved": "User was saved",
@@ -192,7 +193,8 @@
         "archiver-edited-successfully": "Archiver was edited successfully",
         "archiver-editing-failed": "Error editing archiver: {{error}}",
         "archiver-created-successfully": "Archiver was created successfully",
-        "archiver-creation-failed": "Error creating archiver: {{error}}"
+        "archiver-creation-failed": "Error creating archiver: {{error}}",
+        "confirm-add-predecessor": "Add predecessor for"
     },
     "inputs": {
         "pick-start-date": "Pick from",
@@ -382,8 +384,8 @@
         "financed": "Financed",
         "contractNumber": "Contract number",
         "technicalMetadata": "Technical metadata",
-        "formatValue": "Format *",
-        "formatVersion": "Format version *",
+        "formatValue": "Format",
+        "formatVersion": "Format version",
         "extent": "Extent",
         "resolutionHorizontal": "Horizontal resolution",
         "resolutionVertical": "Vertical resolution",
@@ -546,6 +548,7 @@
         "successors": "successors",
         "predecessors": "predecessors",
         "successor": "successor",
-        "predecessor": "predecessor"
+        "predecessor": "predecessor",
+        "predecessor-urn": "URN:NBN predecessor"
     }
 }

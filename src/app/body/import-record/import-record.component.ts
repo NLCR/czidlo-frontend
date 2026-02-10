@@ -77,8 +77,8 @@ export class ImportRecordComponent {
     contractNumber = new FormControl<string>('');
 
     // TECHNICAL METADATA
-    formatValue = new FormControl<string>('image/jp2', [Validators.required]);
-    formatVersion = new FormControl<string>('verze 1.0', [Validators.required]);
+    formatValue = new FormControl<string>('image/jp2');
+    formatVersion = new FormControl<string>('verze 1.0');
     extent = new FormControl<string>('');
     resolutionHorizontal = new FormControl<number | null>(null, [this.positiveNumberValidator()]);
     resolutionVertical = new FormControl<number | null>(null, [this.positiveNumberValidator()]);
@@ -483,9 +483,9 @@ export class ImportRecordComponent {
         if (this.pictureSizeHeight.value) {
             technicalMetadata.pictureHeight = Number(this.pictureSizeHeight.value);
         }
-        if (Object.keys(technicalMetadata).length > 0) {
+        // if (Object.keys(technicalMetadata).length > 0) {
             record.digitalDocument = technicalMetadata;
-        }
+        // }
 
         record.intelectualEntity = intelectualEntity;
         console.log('record to import', record);

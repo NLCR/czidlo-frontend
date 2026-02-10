@@ -2,7 +2,14 @@
     <div class="app-dialog-header">
         <div class="app-dialog-title" *ngIf="data?.data">
             {{ data.title | translate }}
-            <span *ngIf="data.data.id || data.data.type || data.data.name || data.data.login">{{ data.data?.id }} - {{ data.data?.type || data.data?.name || data.data?.login }}"</span>
+            <div *ngIf="data.predecessor === undefined">
+                <span *ngIf="data.data.id || data.data.type || data.data.name || data.data.login">
+                    {{ data.data?.id }} - {{ data.data?.type || data.data?.name || data.data?.login }}"
+                </span>
+            </div>
+            <div *ngIf="data.predecessor !== undefined">
+                {{ data.data.urnnbn }}
+            </div>
             ?
         </div>
         <div class="app-close" (click)="onCancel()">
@@ -22,9 +29,19 @@
             </svg>
         </div>
     </div>
-    <div class="app-dialog-body" *ngIf="data?.message || data?.reason !== undefined">
-        <div class="app-dialog-message">
+    <div class="app-dialog-body" *ngIf="data?.message || data?.reason !== undefined || data?.predecessor !== undefined">
+        <div class="app-dialog-message" *ngIf="data?.message">
             {{ data.message }}
+        </div>
+        <div class="app-dialog-predecessor">
+            <div class="app-base-input-container" *ngIf="data?.predecessor !== undefined">
+                <div class="app-base-input app-half-width">
+                    <div class="app-base-input-label">
+                        {{ 'search.predecessor-urn' | translate }}
+                    </div>
+                    <input matInput type="text" [(ngModel)]="data.predecessor" />
+                </div>
+            </div>
         </div>
         <div class="app-dialog-reason" *ngIf="data?.reason !== undefined">
             <div class="app-base-input-container">

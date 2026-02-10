@@ -39,17 +39,17 @@
                     </div>
                 </div>
                 <!-- no registrars -->
-                <div class="no-processes" *ngIf="!loadingRegistrars() && registrars().length === 0">
+                <div class="no-processes" *ngIf="!loadingRegistrars() && registrarsService.registrars().length === 0">
                     {{ 'registrars.no-registrars' | translate }}
                 </div>
                 <!-- table body -->
                 <div class="app-table-body">
                     <div
-                        *ngFor="let registrar of registrars()"
+                        *ngFor="let registrar of registrarsService.registrars()"
                         class="app-row app-table-row app-row-clicable app-row-registrars"
                         [ngClass]="{
                             'app-row-hidden': registrar?.hidden === true && !isAdmin(),
-                            'app-row-active': activeRegistrar === registrar,
+                            'app-row-active': activeRegistrar?.code === registrar.code,
                             'app-actions-invisible': !isAdmin(),
                         }"
                         (click)="openSidebar(registrar)"

@@ -713,6 +713,8 @@ app-information {
         gap: 24px;
         align-self: stretch;
         .app-dialog-title {
+            display: flex;
+            gap: 4px;
             flex: 1 0 0;
             color: var(--Text-Base, #0a0d10);
 

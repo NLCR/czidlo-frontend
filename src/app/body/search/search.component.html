@@ -460,8 +460,8 @@
                                         <app-button variant="primary" size="s" (click)="reactivateURNNBN(item)" *ngIf="!item.details?.urnNbn.active">
                                             <span>{{ 'buttons.reactivate' | translate }}</span>
                                         </app-button>
-                                        <app-button variant="primary" size="s" (click)="addInstance(item)" *ngIf="item.details?.urnNbn.active">
-                                            <span>{{ 'buttons.add-instance' | translate }}</span>
+                                        <app-button variant="primary" size="s" (click)="addPredecessor(item)">
+                                            <span>{{ 'buttons.add-predecessor' | translate }}</span>
                                         </app-button>
                                     </div>
                                 </div>

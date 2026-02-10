@@ -125,7 +125,8 @@
         "save-record": "Uložit záznam",
         "edit-instance": "Upravit instanci",
         "upload": "Nahrát",
-        "choose-file": "Vybrat soubor"
+        "choose-file": "Vybrat soubor",
+        "add-predecessor": "Přidat předchůdce"
     },
     "messages": {
         "user-saved": "Uživatel byl uložen",
@@ -193,7 +194,8 @@
         "archiver-edited-successfully": "Archivátor byl úspěšně upraven",
         "archiver-editing-failed": "Chyba při úpravě archivátora",
         "archiver-created-successfully": "Archivátor byl úspěšně vytvořen",
-        "archiver-creation-failed": "Chyba při vytváření archivátora"
+        "archiver-creation-failed": "Chyba při vytváření archivátora",
+        "confirm-add-predecessor": "Přidat předchůdce pro"
 
     },
     "inputs": {
@@ -398,8 +400,8 @@
         "financed": "Financováno",
         "contractNumber": "Číslo zakázky",
         "technicalMetadata": "Technická metadata",
-        "formatValue": "Formát *",
-        "formatVersion": "Verze formátu *",
+        "formatValue": "Formát",
+        "formatVersion": "Verze formátu",
         "extent": "Rozsah",
         "resolutionHorizontal": "Rozlišení horizontální",
         "resolutionVertical": "Rozlišení vertikální",
@@ -562,6 +564,7 @@
         "successors": "následníci",
         "predecessors": "předchůdci",
         "successor": "následník",
-        "predecessor": "předchůdce"
+        "predecessor": "předchůdce",
+        "predecessor-urn": "URN:NBN Předchůdce"
     }
 }

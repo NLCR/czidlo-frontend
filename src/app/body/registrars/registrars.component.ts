@@ -36,7 +36,7 @@ export class RegistrarsComponent {
     constructor(
         private router: Router,
         private route: ActivatedRoute,
-        private registrarsService: RegistrarsService,
+        public registrarsService: RegistrarsService,
         private authService: AuthService,
         private dialog: MatDialog,
         private translate: TranslateService,
@@ -44,45 +44,90 @@ export class RegistrarsComponent {
     ) {}
 
     ngOnInit(): void {
-        this.route.url.subscribe((url) => {
-            this.isActive = url[1]?.path || 'registrars';
-            // REDIRECT TO REGISTRARS IF NO SUBPATH
-            if (url.length < 2) {
-                this.router.navigate(['/registrars', 'registrars']);
+        this.ensureListLoaded();
+
+        this.route.paramMap.subscribe((pm) => {
+            const tab = pm.get('tab') ?? 'registrars';
+            const id = pm.get('id'); // může být null
+            if (this.isActive !== tab) {
+                this.isActive = tab;
+                this.ensureListLoadedForTab(tab);
             }
-            // REGISTRARS
-            if (this.isActive === 'registrars') {
-                this.loadingRegistrars.set(true);
-                if (this.registrarsService.registrars().length === 0) {
-                    console.log('Loading registrars...');
-                    this.loadRegistrars();
-                } else {
-                    this.registrars.set(this.registrarsService.registrars());
-                    this.loadingRegistrars.set(false);
-                }
-                if (url.length === 3) {
-                    const registrarId = url[2]?.path;
-                    this.activeRegistrar = registrarId;
-                    this.loadRegistrarDetails(registrarId);
-                }
-            }
-            // ARCHIVERS
-            else if (this.isActive === 'archivers') {
-                this.loadingArchivers.set(true);
-                if (this.registrarsService.archivers().length === 0) {
-                    console.log('Loading archivers...');
-                    this.loadArchivers();
-                } else {
-                    this.archivers.set(this.registrarsService.archivers());
-                    this.loadingArchivers.set(false);
-                }
-                if (url.length === 3) {
-                    const archiverId = url[2]?.path;
-                    this.activeArchiver = archiverId;
-                    this.loadArchiverDetails(archiverId);
-                }
+            if (id) {
+                this.openDetail(tab, id);
+            } else {
+                this.closeDetail(tab);
             }
         });
+        // this.route.url.subscribe((url) => {
+        //     this.isActive = url[1]?.path || 'registrars';
+        //     // REDIRECT TO REGISTRARS IF NO SUBPATH
+        //     if (url.length < 2) {
+        //         this.router.navigate(['/registrars', 'registrars']);
+        //     }
+        //     // REGISTRARS
+        //     if (this.isActive === 'registrars') {
+        //         this.loadingRegistrars.set(true);
+        //         if (this.registrarsService.registrars().length === 0) {
+        //             console.log('Loading registrars...');
+        //             this.loadRegistrars();
+        //         } else {
+        //             this.registrars.set(this.registrarsService.registrars());
+        //             this.loadingRegistrars.set(false);
+        //         }
+        //         if (url.length === 3) {
+        //             const registrarId = url[2]?.path;
+        //             this.activeRegistrar = registrarId;
+        //             this.loadRegistrarDetails(registrarId);
+        //         }
+        //     }
+        //     // ARCHIVERS
+        //     else if (this.isActive === 'archivers') {
+        //         this.loadingArchivers.set(true);
+        //         if (this.registrarsService.archivers().length === 0) {
+        //             console.log('Loading archivers...');
+        //             this.loadArchivers();
+        //         } else {
+        //             this.archivers.set(this.registrarsService.archivers());
+        //             this.loadingArchivers.set(false);
+        //         }
+        //         if (url.length === 3) {
+        //             const archiverId = url[2]?.path;
+        //             this.activeArchiver = archiverId;
+        //             this.loadArchiverDetails(archiverId);
+        //         }
+        //     }
+        // });
+    }
+    ensureListLoaded(): void {
+        if (this.registrarsService.registrars().length === 0) this.loadRegistrars();
+        else this.registrars.set(this.registrarsService.registrars());
+
+        if (this.registrarsService.archivers().length === 0) this.loadArchivers();
+        else this.archivers.set(this.registrarsService.archivers());
+    }
+    private ensureListLoadedForTab(tab: string) {
+        if (tab === 'registrars') {
+            if (this.registrarsService.registrars().length === 0) this.loadRegistrars();
+            else this.registrars.set(this.registrarsService.registrars());
+        } else if (tab === 'archivers') {
+            if (this.registrarsService.archivers().length === 0) this.loadArchivers();
+            else this.archivers.set(this.registrarsService.archivers());
+        }
+    }
+    private openDetail(tab: string, id: string) {
+        if (tab === 'registrars') {
+            this.activeRegistrar = { code: id } as any;
+            this.loadRegistrarDetails(id);
+        } else {
+            this.activeArchiver = id;
+            this.loadArchiverDetails(id);
+        }
+    }
+
+    private closeDetail(tab: string) {
+        if (tab === 'registrars') this.activeRegistrar = null;
+        else this.activeArchiver = null;
     }
 
     loadArchivers(): void {
@@ -147,14 +192,11 @@ export class RegistrarsComponent {
     }
 
     openSidebar(institution: any): void {
-        if (this.isActive === 'archivers') {
-            this.router.navigate(['/registrars', 'archivers', institution.id]);
-        } else if (this.isActive === 'registrars') {
-            this.router.navigate(['/registrars', 'registrars', institution.code]);
-        }
+        const id = this.isActive === 'archivers' ? institution.id : institution.code;
+        this.router.navigate([id], { relativeTo: this.route });
     }
     closeSidebar(): void {
-        this.router.navigate(['/registrars', this.isActive]);
+        this.router.navigate(['../'], { relativeTo: this.route });
         this.isSidebarOpen.set(false);
         this.activeArchiver = null;
         this.activeRegistrar = null;

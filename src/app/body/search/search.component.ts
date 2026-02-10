@@ -703,6 +703,39 @@ export class SearchComponent implements AfterViewInit {
             }
         });
     }
+    addPredecessor(item: any) {
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: { data: item, title: 'messages.confirm-add-predecessor', confirm: 'buttons.add', predecessor: '', reason: '' },
+            maxWidth: '800px',
+            minWidth: '600px',
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                console.log('Adding predecessor for URNNBN:', item.urnnbn, result);
+                // this.searchService.addPredecessor(item.urnnbn).subscribe({
+                //     next: (response) => {
+                //         console.log('Predecessor added successfully:', response);
+                //         this.getDetails(item);
+                //     },
+                //     error: (error) => {
+                //         console.error('Error adding predecessor:', error);
+                //     },
+                // });
+                // "predecessors": [
+                //     {
+                //       "active": false,
+                //       "deactivated": "2016-11-29T12:21:01.593Z[UTC]",
+                //       "documentCode": "000o7s",
+                //       "registered": "2016-09-15T17:49:40.871Z[UTC]",
+                //       "registrarCode": "pna001",
+                //       "status": "DEACTIVATED",
+                //       "statusNote": "oprava čísla ročníku "
+                //     }
+                //   ],
+            }
+        });
+    }
     deactivateDigitalInstance(item: any, di: any) {
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
             data: { data: item, title: 'messages.confirm-deactivate-di', confirm: 'buttons.confirm-deactivate' },
