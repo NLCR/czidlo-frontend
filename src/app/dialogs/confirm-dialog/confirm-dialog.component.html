@@ -2,12 +2,12 @@
     <div class="app-dialog-header">
         <div class="app-dialog-title" *ngIf="data?.data">
             {{ data.title | translate }}
-            <div *ngIf="data.predecessor === undefined">
+            <div *ngIf="data.predecessor === undefined && data.reason === undefined">
                 <span *ngIf="data.data.id || data.data.type || data.data.name || data.data.login">
                     {{ data.data?.id }} - {{ data.data?.type || data.data?.name || data.data?.login }}"
                 </span>
             </div>
-            <div *ngIf="data.predecessor !== undefined">
+            <div *ngIf="data.predecessor !== undefined || data.reason !== undefined">
                 {{ data.data.urnnbn }}
             </div>
             ?

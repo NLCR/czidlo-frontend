@@ -677,6 +677,7 @@ export class SearchComponent implements AfterViewInit {
                     },
                     error: (error) => {
                         console.error('Error deactivating URNNBN:', error);
+                        this.snackBar.open(this.translate.instant('messages.urnnbn-deactivate-error'), error.error.message, { duration: 10000 });
                     },
                 });
             }
@@ -698,6 +699,7 @@ export class SearchComponent implements AfterViewInit {
                     },
                     error: (error) => {
                         console.error('Error reactivating URNNBN:', error);
+                        this.snackBar.open(this.translate.instant('messages.urnnbn-reactivate-error'), error.error.message, { duration: 10000 });
                     },
                 });
             }
@@ -705,7 +707,7 @@ export class SearchComponent implements AfterViewInit {
     }
     addPredecessor(item: any) {
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-            data: { data: item, title: 'messages.confirm-add-predecessor', confirm: 'buttons.add', predecessor: '', reason: '' },
+            data: { data: item, title: 'messages.confirm-add-predecessor', confirm: 'buttons.add', predecessor: 'urn:nbn:cz:', reason: '' },
             maxWidth: '800px',
             minWidth: '600px',
         });

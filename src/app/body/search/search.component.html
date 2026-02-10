@@ -222,8 +222,19 @@
 
                     <!-- TITLE -->
                     <div class="app-ie-field" *ngIf="item.title">
-                        <div class="app-label" *ngIf="item.entitytype !== 'PERIODICAL_ISSUE' && item.entitytype !== 'PERIODICAL_VOLUME' && item.entitytype !== 'MONOGRAPH_VOLUME'">{{ 'search.title' | translate }}:</div>
-                        <div class="app-label" *ngIf="item.entitytype === 'PERIODICAL_ISSUE' || item.entitytype === 'PERIODICAL_VOLUME'">{{ 'search.title-per-volume' | translate }}:</div>
+                        <div
+                            class="app-label"
+                            *ngIf="
+                                item.entitytype !== 'PERIODICAL_ISSUE' &&
+                                item.entitytype !== 'PERIODICAL_VOLUME' &&
+                                item.entitytype !== 'MONOGRAPH_VOLUME'
+                            "
+                        >
+                            {{ 'search.title' | translate }}:
+                        </div>
+                        <div class="app-label" *ngIf="item.entitytype === 'PERIODICAL_ISSUE' || item.entitytype === 'PERIODICAL_VOLUME'">
+                            {{ 'search.title-per-volume' | translate }}:
+                        </div>
                         <div class="app-label" *ngIf="item.entitytype === 'MONOGRAPH_VOLUME'">{{ 'search.title-mon-volume' | translate }}:</div>
                         <div class="app-value">{{ item.title }}</div>
                     </div>
@@ -385,7 +396,36 @@
                                 <div class="app-value">{{ item.details.archiver?.name }}</div>
                                 <div class="app-value-2" *ngIf="item.details.archiver?.description">({{ item.details.archiver?.description }})</div>
                             </div>
-                            <div class="app-button-part">
+                            <!-- PRECEDESSORS AND SUCCESSORS -->
+                            <div *ngIf="item.details.urnNbn.predecessors?.length > 0">
+                                <div class="app-ie-field" *ngFor="let pre of item.details.urnNbn.predecessors">
+                                    <div class="app-label">{{ 'search.predecessor' | translate }}:</div>
+                                    <!-- <pre>{{ pre | json }}</pre> -->
+                                    <a
+                                        class="app-value"
+                                        [routerLink]="[]"
+                                        [queryParams]="{ q: 'urn:nbn:cz:' + pre.registrarCode + '-' + pre.documentCode }"
+                                    >
+                                        urn:nbn:cz:{{ pre.registrarCode }}-{{ pre.documentCode }}
+                                    </a>
+                                    <div class="app-value-2">({{ pre.statusNote }})</div>
+                                </div>
+                            </div>
+                            <div *ngIf="item.details.urnNbn.successors?.length > 0">
+                                <div class="app-ie-field" *ngFor="let suc of item.details.urnNbn.successors">
+                                    <div class="app-label">{{ 'search.successor' | translate }}:</div>
+                                    <!-- <pre>{{ suc | json }}</pre> -->
+                                    <a
+                                        class="app-value"
+                                        [routerLink]="[]"
+                                        [queryParams]="{ q: 'urn:nbn:cz:' + suc.registrarCode + '-' + suc.documentCode }"
+                                    >
+                                        urn:nbn:cz:{{ suc.registrarCode }}-{{ suc.documentCode }}
+                                    </a>
+                                    <div class="app-value-2">({{ suc.statusNote }})</div>
+                                </div>
+                            </div>
+                            <div class="app-button-part" *ngIf="isAdmin() || (isLoggedIn() && hasRightToRegistrar(item.registrarcode))">
                                 <app-button variant="primary" size="s" (click)="addInstance(item)">
                                     <span>{{ 'buttons.add-instance' | translate }}</span>
                                 </app-button>

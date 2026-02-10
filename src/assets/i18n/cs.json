@@ -195,7 +195,9 @@
         "archiver-editing-failed": "Chyba při úpravě archivátora",
         "archiver-created-successfully": "Archivátor byl úspěšně vytvořen",
         "archiver-creation-failed": "Chyba při vytváření archivátora",
-        "confirm-add-predecessor": "Přidat předchůdce pro"
+        "confirm-add-predecessor": "Přidat předchůdce pro",
+        "urnnbn-deactivate-error": "Chyba při deaktivaci URN:NBN: ",
+        "urnnbn-reactivate-error": "Chyba při reaktivaci URN:NBN: "
 
     },
     "inputs": {

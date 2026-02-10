@@ -194,7 +194,9 @@
         "archiver-editing-failed": "Error editing archiver: {{error}}",
         "archiver-created-successfully": "Archiver was created successfully",
         "archiver-creation-failed": "Error creating archiver: {{error}}",
-        "confirm-add-predecessor": "Add predecessor for"
+        "confirm-add-predecessor": "Add predecessor for",
+        "urnnbn-deactivate-error": "Error deactivating URN:NBN: ",
+        "urnnbn-reactivate-error": "Error reactivating URN:NBN: "
     },
     "inputs": {
         "pick-start-date": "Pick from",
