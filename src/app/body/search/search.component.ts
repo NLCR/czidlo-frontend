@@ -751,6 +751,7 @@ export class SearchComponent implements AfterViewInit {
                 this.searchService.deletePredecessor(item.urnnbn, preUrnNbn).subscribe({
                     next: (response) => {
                         console.log('Predecessor deleted successfully:', response);
+                        this.snackBar.open(this.translate.instant('messages.delete-predecessor-successfully'), '', { duration: 3000 });
                         this.getDetails(item);
                     },
                     error: (error) => {

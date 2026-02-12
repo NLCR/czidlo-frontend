@@ -200,7 +200,8 @@
         "urnnbn-reactivate-error": "Chyba při reaktivaci URN:NBN: ",
         "add-predecessor-error": "Chyba při přidávání předchůdce: ",
         "delete-predecessor-error": "Chyba při mazání předchůdce: ",
-        "confirm-delete-predecessor": "Opravdu chcete odebrat tohoto předchůdce"
+        "confirm-delete-predecessor": "Opravdu chcete odebrat tohoto předchůdce",
+        "delete-predecessor-successfully": "Předchůdce byl úspěšně odebrán"
 
     },
     "inputs": {
