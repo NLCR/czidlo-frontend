@@ -156,7 +156,7 @@ export class SearchComponent implements AfterViewInit {
         private registrarsService: RegistrarsService,
         private dialog: MatDialog,
         private snackBar: MatSnackBar,
-        private authService: AuthService
+        private authService: AuthService,
     ) {}
 
     ngOnInit() {
@@ -231,7 +231,15 @@ export class SearchComponent implements AfterViewInit {
     onFilterSelected() {
         console.log(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar, this.dateFrom, this.dateTo, this.selectedState);
         this.currentPage = 1;
-        this.onSearch(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar, this.dateFrom, this.dateTo, this.selectedState);
+        this.onSearch(
+            this.searchQuery,
+            this.selectedType,
+            this.selectedField,
+            this.selectedRegistrar,
+            this.dateFrom,
+            this.dateTo,
+            this.selectedState,
+        );
     }
     onStateChange(newState: string) {
         console.log('State changed to:', newState);
@@ -244,7 +252,7 @@ export class SearchComponent implements AfterViewInit {
             this.selectedRegistrar,
             this.dateFrom,
             this.dateTo,
-            this.selectedState
+            this.selectedState,
         );
     }
 
@@ -409,8 +417,8 @@ export class SearchComponent implements AfterViewInit {
                                   urnopen: true,
                                   loading: false,
                               }
-                            : i
-                    )
+                            : i,
+                    ),
                 );
             },
             error: (error) => {
@@ -452,7 +460,7 @@ export class SearchComponent implements AfterViewInit {
         const resultRegistrars = new Set(
             results
                 .map((item: any) => item.registrarcode) // ⬅️ uprav podle skutečného pole
-                .filter((code: string | undefined) => !!code)
+                .filter((code: string | undefined) => !!code),
         );
 
         // filtruj seznam registrátorů
@@ -510,11 +518,11 @@ export class SearchComponent implements AfterViewInit {
         this.subTitle = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'SUB_TITLE')?.value || '');
         this.volumeTitle = new FormControl<string>(
             editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'VOLUME_TITLE')?.value || '',
-            [Validators.required]
+            [Validators.required],
         );
         this.issueTitle = new FormControl<string>(
             editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'ISSUE_TITLE')?.value || '',
-            [Validators.required]
+            [Validators.required],
         );
         this.ccnb = new FormControl<string>(editedItem.intelectualEntity?.ieIdentifiers?.find((id: any) => id.type === 'CCNB')?.value || '', [
             this.ccnbValidator(),
@@ -715,26 +723,41 @@ export class SearchComponent implements AfterViewInit {
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 console.log('Adding predecessor for URNNBN:', item.urnnbn, result);
-                // this.searchService.addPredecessor(item.urnnbn).subscribe({
-                //     next: (response) => {
-                //         console.log('Predecessor added successfully:', response);
-                //         this.getDetails(item);
-                //     },
-                //     error: (error) => {
-                //         console.error('Error adding predecessor:', error);
-                //     },
-                // });
-                // "predecessors": [
-                //     {
-                //       "active": false,
-                //       "deactivated": "2016-11-29T12:21:01.593Z[UTC]",
-                //       "documentCode": "000o7s",
-                //       "registered": "2016-09-15T17:49:40.871Z[UTC]",
-                //       "registrarCode": "pna001",
-                //       "status": "DEACTIVATED",
-                //       "statusNote": "oprava čísla ročníku "
-                //     }
-                //   ],
+                let body = { predecessorUrnNbn: result.predecessor, note: result.reason };
+                this.searchService.addPredecessor(item.urnnbn, body).subscribe({
+                    next: (response) => {
+                        console.log('Predecessor added successfully:', response);
+                        this.getDetails(item);
+                    },
+                    error: (error) => {
+                        console.error('Error adding predecessor:', error);
+                        this.snackBar.open(this.translate.instant('messages.add-predecessor-error'), error.error.message, { duration: 10000 });
+                    },
+                });
+            }
+        });
+    }
+    deletePredecessor(item: any, predecessor: any) {
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: { data: item, title: 'messages.confirm-delete-predecessor', confirm: 'buttons.remove' },
+            maxWidth: '800px',
+            minWidth: '600px',
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                console.log('Deleting predecessor for URNNBN:', item.urnnbn, predecessor);
+                let preUrnNbn = `urn:nbn:cz:${predecessor.registrarCode}-${predecessor.documentCode}`;
+                this.searchService.deletePredecessor(item.urnnbn, preUrnNbn).subscribe({
+                    next: (response) => {
+                        console.log('Predecessor deleted successfully:', response);
+                        this.getDetails(item);
+                    },
+                    error: (error) => {
+                        console.error('Error deleting predecessor:', error);
+                        this.snackBar.open(this.translate.instant('messages.delete-predecessor-error'), error.error.message, { duration: 10000 });
+                    },
+                });
             }
         });
     }

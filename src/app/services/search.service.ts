@@ -242,4 +242,10 @@ export class SearchService {
     deactivateDigitalInstance(instanceId: string): Observable<any> {
         return this.apiService.deactivateDigitalInstance(instanceId);
     }
+    addPredecessor(urnnbn: string, body: any): Observable<any> {
+        return this.apiService.addPredescessor(urnnbn, body);
+    }
+    deletePredecessor(urnnbn: string, predecessorUrnNbn: string): Observable<any> {
+        return this.apiService.deletePredescessor(urnnbn, predecessorUrnNbn);
+    }
 }

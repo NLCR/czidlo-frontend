@@ -359,6 +359,14 @@ export class ApiService {
         const url = `${this.apiUrl}/instances/${instanceId}/deactivation`;
         return this.http.post(url, null).pipe(catchError(this.handleError));
     }
+    addPredescessor(urnnbn: string, body: any): Observable<any> {
+        const url = `${this.apiUrl}/documents/${urnnbn}/predecessors`;
+        return this.http.put(url, body).pipe(catchError(this.handleError));
+    }
+    deletePredescessor(urnnbn: string, predecessorUrnNbn: string): Observable<any> {
+        const url = `${this.apiUrl}/documents/${urnnbn}/predecessors/${predecessorUrnNbn}`;
+        return this.http.delete(url).pipe(catchError(this.handleError));
+    }
 
     // ELASTICSEARCH
 

@@ -397,7 +397,7 @@
                                 <div class="app-value-2" *ngIf="item.details.archiver?.description">({{ item.details.archiver?.description }})</div>
                             </div>
                             <!-- PRECEDESSORS AND SUCCESSORS -->
-                            <div *ngIf="item.details.urnNbn.predecessors?.length > 0">
+                            <div *ngIf="item.details.urnNbn.predecessors?.length > 0 && !isAdmin()">
                                 <div class="app-ie-field" *ngFor="let pre of item.details.urnNbn.predecessors">
                                     <div class="app-label">{{ 'search.predecessor' | translate }}:</div>
                                     <!-- <pre>{{ pre | json }}</pre> -->
@@ -411,7 +411,7 @@
                                     <div class="app-value-2">({{ pre.statusNote }})</div>
                                 </div>
                             </div>
-                            <div *ngIf="item.details.urnNbn.successors?.length > 0">
+                            <div *ngIf="item.details.urnNbn.successors?.length > 0 && !isAdmin()">
                                 <div class="app-ie-field" *ngFor="let suc of item.details.urnNbn.successors">
                                     <div class="app-label">{{ 'search.successor' | translate }}:</div>
                                     <!-- <pre>{{ suc | json }}</pre> -->
@@ -477,6 +477,17 @@
                                                 urn:nbn:cz:{{ pre.registrarCode }}-{{ pre.documentCode }}
                                             </a>
                                             <div class="app-value-2">({{ pre.statusNote }})</div>
+                                            <div class="app-delete-pred">
+                                                <app-button
+                                                    *ngIf="isAdmin()"
+                                                    iconLeft="close.svg"
+                                                    variant="tertiary"
+                                                    size="xs"
+                                                    (click)="deletePredecessor(item, pre); $event.stopPropagation()"
+                                                >
+                                                    {{ 'buttons.remove' | translate }}
+                                                </app-button>
+                                            </div>
                                         </div>
                                     </div>
                                     <div *ngIf="item.details.urnNbn.successors?.length > 0">
