@@ -739,7 +739,7 @@ export class SearchComponent implements AfterViewInit {
     }
     deletePredecessor(item: any, predecessor: any) {
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-            data: { data: item, title: 'messages.confirm-delete-predecessor', confirm: 'buttons.remove' },
+            data: { title: 'messages.confirm-delete-predecessor', confirm: 'buttons.remove' },
             maxWidth: '800px',
             minWidth: '600px',
         });
