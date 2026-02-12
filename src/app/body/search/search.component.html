@@ -501,7 +501,7 @@
                                             >
                                                 urn:nbn:cz:{{ suc.registrarCode }}-{{ suc.documentCode }}
                                             </a>
-                                            <div class="app-value-2">({{ suc.statusNote }})</div>
+                                            <div class="app-value-2" *ngIf="suc.statusNote">({{ suc.statusNote }})</div>
                                         </div>
                                     </div>
                                     <div class="app-button-part">

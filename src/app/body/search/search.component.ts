@@ -731,7 +731,7 @@ export class SearchComponent implements AfterViewInit {
                     },
                     error: (error) => {
                         console.error('Error adding predecessor:', error);
-                        this.snackBar.open(this.translate.instant('messages.add-predecessor-error'), error.error.message, { duration: 10000 });
+                        this.snackBar.open(this.translate.instant('messages.add-predecessor-error') + error.error.message, this.translate.instant('buttons.close'), { duration: 14000 });
                     },
                 });
             }
@@ -751,12 +751,12 @@ export class SearchComponent implements AfterViewInit {
                 this.searchService.deletePredecessor(item.urnnbn, preUrnNbn).subscribe({
                     next: (response) => {
                         console.log('Predecessor deleted successfully:', response);
-                        this.snackBar.open(this.translate.instant('messages.delete-predecessor-successfully'), '', { duration: 3000 });
+                        this.snackBar.open(this.translate.instant('messages.delete-predecessor-successfully'), this.translate.instant('buttons.close'), { duration: 3000 });
                         this.getDetails(item);
                     },
                     error: (error) => {
                         console.error('Error deleting predecessor:', error);
-                        this.snackBar.open(this.translate.instant('messages.delete-predecessor-error'), error.error.message, { duration: 10000 });
+                        this.snackBar.open(this.translate.instant('messages.delete-predecessor-error') + error.error.message, this.translate.instant('buttons.close'), { duration: 10000 });
                     },
                 });
             }
