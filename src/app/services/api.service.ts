@@ -372,17 +372,8 @@ export class ApiService {
 
     // STATISTICS DATA FOR ASSIGNMENTS
     getStatisticsDataAssign(body: any): Observable<any> {
-        //const url = 'https://es8.dev-service.trinera.cloud/czidlo_assign_1/_search';
-        const url = this.envService.get('esBaseUrl') + '/' + this.envService.get('esIndexAssign') + '/_search';
-        const login = this.envService.get('esLogin');
-        const password = this.envService.get('esPassword');
-
-        const headers = new HttpHeaders({
-            Authorization: 'Basic ' + btoa(`${login}:${password}`),
-            'Content-Type': 'application/json',
-        });
-
-        return this.http.post(url, body, { headers }).pipe(
+        const url = `${this.apiUrl}/es/index_assign/_search`;
+        return this.http.post(url, body).pipe(
             tap({
                 next: (data) => {
                     console.log('Statistics data received:', data);
@@ -393,17 +384,8 @@ export class ApiService {
 
     // STATISTICS DATA FOR RESOLVATIONS
     getStatisticsDataResolve(body: any): Observable<any> {
-        //const url = 'https://es8.dev-service.trinera.cloud/czidlo_resolve_1/_search';
-        const url = this.envService.get('esBaseUrl') + '/' + this.envService.get('esIndexResolve') + '/_search';
-        const login = this.envService.get('esLogin');
-        const password = this.envService.get('esPassword');
-
-        const headers = new HttpHeaders({
-            Authorization: 'Basic ' + btoa(`${login}:${password}`),
-            'Content-Type': 'application/json',
-        });
-
-        return this.http.post(url, body, { headers }).pipe(
+        const url = `${this.apiUrl}/es/index_resolve/_search`;
+        return this.http.post(url, body).pipe(
             tap({
                 next: (data) => {
                     console.log('RESOLVED data received:', data);
@@ -414,17 +396,8 @@ export class ApiService {
 
     // SEARCH RECORDS
     getRecords(body: any): Observable<any> {
-        //const url = 'https://es8.dev-service.trinera.cloud/czidlo_search_1/_search';
-        const url = this.envService.get('esBaseUrl') + '/' + this.envService.get('esIndexSearch') + '/_search';
-        const login = this.envService.get('esLogin');
-        const password = this.envService.get('esPassword');
-
-        const headers = new HttpHeaders({
-            Authorization: 'Basic ' + btoa(`${login}:${password}`),
-            'Content-Type': 'application/json',
-        });
-
-        return this.http.post(url, body, { headers }).pipe(
+        const url = `${this.apiUrl}/es/index_search/_search`;
+        return this.http.post(url, body).pipe(
             tap({
                 next: (data) => {
                     console.log('Records data received:', data);
@@ -438,22 +411,11 @@ export class ApiService {
             })
         );
     }
+
+    // SEARCH RECORDS - COUNT
     getRecordCount(body?: any): Observable<number> {
-        //const url = 'https://es8.dev-service.trinera.cloud/czidlo_search_1/_search';
-        const url = this.envService.get('esBaseUrl') + '/' + this.envService.get('esIndexSearch') + '/_search';
-        const login = this.envService.get('esLogin');
-        const password = this.envService.get('esPassword');
-
-        const headers = new HttpHeaders({
-            Authorization: 'Basic ' + btoa(`${login}:${password}`),
-            'Content-Type': 'application/json',
-        });
-
-        if (!body) {
-            return this.http.get<any>(url, { headers });
-        } else {
-            return this.http.post<any>(url, body, { headers });
-        }
+        const url = `${this.apiUrl}/es/index_search/_count`;
+        return this.http.post<any>(url, body);
     }
 
     testRecord = {

@@ -26,11 +26,4 @@ export const environment = {
     pageEditInfoEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Information.md',
     pageEditRulesEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Rules.md',
     pageEditContactsEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Contacts.md',
-
-    esBaseUrl: '', // pro produkci ziskej z promenne APP_ES_BASE_URL (přes env.json)
-    esLogin: '', // pro produkci ziskej z promenne APP_ES_LOGIN (přes env.json)
-    esPassword: '', // pro produkci ziskej z promenne APP_ES_PASSWORD (přes env.json)
-    esIndexSearch: '', // pro produkci ziskej z promenne APP_ES_INDEX_SEARCH (přes env.json)
-    esIndexAssign: '', // pro produkci ziskej z promenne APP_ES_INDEX_ASSIGN (přes env.json)
-    esIndexResolve: '', // pro produkci ziskej z promenne APP_ES_INDEX_RESOLVE (přes env.json)
 }

@@ -22,13 +22,7 @@ const config = {
   
   czidloApiServiceBaseUrl: process.env.APP_CZIDLO_API_SERVICE_URL || '',
   czidloPublicApiBaseUrl: process.env.APP_CZIDLO_PUBLIC_API_URL || '',
-  esBaseUrl: process.env.APP_ES_BASE_URL || '',
-  esLogin: process.env.APP_ES_LOGIN || '',
-  esPassword: process.env.APP_ES_PASSWORD || '',
-  esIndexSearch: process.env.APP_ES_INDEX_SEARCH || '',
-  esIndexAssign: process.env.APP_ES_INDEX_ASSIGN || '',
-  esIndexResolve: process.env.APP_ES_INDEX_RESOLVE || '',
-
+  
 };
 
 fs.writeFileSync(outputPath, JSON.stringify(config, null, 2));
