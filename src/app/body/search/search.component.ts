@@ -58,6 +58,11 @@ export class SearchComponent implements AfterViewInit {
     to: number = 0;
     count: number = 0;
 
+    // SORTING
+    selectedSort: string = 'relevance';
+    sortOptionsList: any[] = [];
+
+
     isSidebarOpen = signal(false);
     loadingButton = signal(false);
 
@@ -178,6 +183,7 @@ export class SearchComponent implements AfterViewInit {
             this.dateFrom = params['dateFrom'] || '';
             this.dateTo = params['dateTo'] || '';
             this.selectedState = params['state'] || 'all';
+            this.selectedSort = params['sort'] || 'relevance';
 
             if (this.selectedType || this.selectedRegistrar || this.dateFrom || this.dateTo || this.selectedState !== 'all') {
                 this.advancedSearch.set(true);
@@ -185,7 +191,7 @@ export class SearchComponent implements AfterViewInit {
                 this.advancedSearch.set(false);
             }
 
-            this.searchService.search(q, type, filter, registrar, this.dateFrom, this.dateTo, this.selectedState, page).subscribe({
+            this.searchService.search(q, type, filter, registrar, this.dateFrom, this.dateTo, this.selectedState, page, this.selectedSort).subscribe({
                 next: () => {
                     this.updatePagination();
                     this.tryFilterRegistrars();
@@ -217,11 +223,11 @@ export class SearchComponent implements AfterViewInit {
             this.loadTranslations();
         });
 
-        this.apiService.getRecordCount().subscribe({
-            next: (response) => {
-                console.log('Vse v indexu:', response);
-            },
-        });
+        // this.apiService.getRecordCount().subscribe({
+        //     next: (response) => {
+        //         console.log('Vse v indexu:', response);
+        //     },
+        // });
     }
 
     ngAfterViewInit() {
@@ -229,7 +235,6 @@ export class SearchComponent implements AfterViewInit {
     }
 
     onFilterSelected() {
-        console.log(this.searchQuery, this.selectedType, this.selectedField, this.selectedRegistrar, this.dateFrom, this.dateTo, this.selectedState);
         this.currentPage = 1;
         this.onSearch(
             this.searchQuery,
@@ -239,10 +244,10 @@ export class SearchComponent implements AfterViewInit {
             this.dateFrom,
             this.dateTo,
             this.selectedState,
+            this.selectedSort
         );
     }
     onStateChange(newState: string) {
-        console.log('State changed to:', newState);
         this.selectedState = newState;
         this.currentPage = 1;
         this.onSearch(
@@ -253,10 +258,25 @@ export class SearchComponent implements AfterViewInit {
             this.dateFrom,
             this.dateTo,
             this.selectedState,
+            this.selectedSort
+        );
+    }
+    onSortChange(newSort: string) {
+        this.selectedSort = newSort;
+        this.currentPage = 1;
+        this.onSearch(
+            this.searchQuery,
+            this.selectedType,
+            this.selectedField,
+            this.selectedRegistrar,
+            this.dateFrom,
+            this.dateTo,
+            this.selectedState,
+            this.selectedSort
         );
     }
 
-    onSearch(query: string, type?: string, fields?: string, registrar?: string, dateFrom?: any, dateTo?: any, state?: string) {
+    onSearch(query: string, type?: string, fields?: string, registrar?: string, dateFrom?: any, dateTo?: any, state?: string, sort?: string) {
         this.currentPage = 1;
         let formattedDateFrom = this.formatDate(dateFrom);
         let formattedDateTo = this.formatDate(dateTo);
@@ -270,6 +290,7 @@ export class SearchComponent implements AfterViewInit {
                 dateFrom: formattedDateFrom,
                 dateTo: formattedDateTo,
                 state: stateParam,
+                sort: sort ? this.selectedSort || undefined : undefined,
                 page: 1,
             },
             queryParamsHandling: 'merge',
@@ -277,8 +298,8 @@ export class SearchComponent implements AfterViewInit {
     }
     removeFilter(value: string) {
         if (value === 'searchQuery') {
-            console.log(this.searchQuery);
             this.searchQuery = '';
+            this.selectedSort = 'relevance';
         }
         if (value === 'selectedType') {
             this.selectedType = '';
@@ -345,6 +366,11 @@ export class SearchComponent implements AfterViewInit {
         if (this.currentPage) {
             queryParams['page'] = this.currentPage;
         }
+        if (this.selectedSort && this.selectedSort !== 'relevance') {
+            queryParams['sort'] = this.selectedSort;
+        } else {
+            queryParams['sort'] = undefined; // odstraní parametr z URL
+        }
         this.router.navigate([], {
             queryParams: queryParams,
             queryParamsHandling: 'merge',
@@ -352,7 +378,6 @@ export class SearchComponent implements AfterViewInit {
     }
 
     getDetails(item: any) {
-        console.log('getDetail for item: ', item);
         this.searchService.getRecordDetails(item.urnnbn).subscribe({
             next: (response) => {
                 item.details = response;
@@ -722,7 +747,6 @@ export class SearchComponent implements AfterViewInit {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('Adding predecessor for URNNBN:', item.urnnbn, result);
                 let body = { predecessorUrnNbn: result.predecessor, note: result.reason };
                 this.searchService.addPredecessor(item.urnnbn, body).subscribe({
                     next: (response) => {
@@ -746,7 +770,6 @@ export class SearchComponent implements AfterViewInit {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('Deleting predecessor for URNNBN:', item.urnnbn, predecessor);
                 let preUrnNbn = `urn:nbn:cz:${predecessor.registrarCode}-${predecessor.documentCode}`;
                 this.searchService.deletePredecessor(item.urnnbn, preUrnNbn).subscribe({
                     next: (response) => {
@@ -797,7 +820,6 @@ export class SearchComponent implements AfterViewInit {
             console.error('Record is invalid, cannot import.');
             return;
         }
-        console.log('Updating record:', record);
         const urnNbn = `urn:nbn:cz:${record.urnNbn.registrarCode}-${record.urnNbn.documentCode}`;
         record.urnNbn = urnNbn;
         this.apiService.editRecordByUrnnbn(urnNbn, record).subscribe({
@@ -1023,7 +1045,6 @@ export class SearchComponent implements AfterViewInit {
         }
 
         record.intelectualEntity = intelectualEntity;
-        console.log('record to import', record);
         return record;
     }
 
@@ -1032,7 +1053,6 @@ export class SearchComponent implements AfterViewInit {
     }
 
     private formatDate(date: any): string | null {
-        console.log('format date', date);
         if (!date) return null;
         if (!date._d || !(date._d instanceof Date)) return date;
 
@@ -1113,6 +1133,11 @@ export class SearchComponent implements AfterViewInit {
                 'search.all-registrars',
                 'search.ids',
                 'search.help-text',
+                'search.title-sort_asc',
+                'search.title-sort_desc',
+                'search.relevance',
+                'search.originator-sort_asc',
+                'search.originator-sort_desc'
             ])
             .subscribe((t) => {
                 this.registrationMode = [
@@ -1146,6 +1171,14 @@ export class SearchComponent implements AfterViewInit {
                     { value: 'author', label: t['search.authors'] },
                     { value: 'titles', label: t['search.titles'] },
                     { value: 'ids', label: t['search.ids'] },
+                ];
+                this.sortOptionsList = [
+                    { value: 'relevance', label: t['search.relevance'] },
+                    { value: 'title_asc', label: t['search.title-sort_asc'] },
+                    { value: 'title_desc', label: t['search.title-sort_desc'] },
+                    { value: 'originator_asc', label: t['search.originator-sort_asc'] },
+                    { value: 'originator_desc', label: t['search.originator-sort_desc'] },
+
                 ];
                 this.helpText = t['search.help-text'];
             });

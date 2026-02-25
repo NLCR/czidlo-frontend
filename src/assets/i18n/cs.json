@@ -571,6 +571,12 @@
         "predecessors": "předchůdci",
         "successor": "následník",
         "predecessor": "předchůdce",
-        "predecessor-urn": "URN:NBN Předchůdce"
+        "predecessor-urn": "URN:NBN Předchůdce",
+        "sort-by": "Řazení",
+        "relevance": "relevance",
+        "title-sort_asc": "název A-Z",
+        "title-sort_desc": "název Z-A",
+        "originator-sort_asc": "autor A-Z",
+        "originator-sort_desc": "autor Z-A"
     }
 }

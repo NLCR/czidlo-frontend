@@ -83,6 +83,24 @@
             </div>
             <div class="app-too-many-records-info" *ngIf="searchService.recordsCount() === 10000">{{ 'search.too-many-records' | translate }}</div>
         </div>
+        <div
+            class="app-sort-wrapper"
+            *ngIf="
+                searchService.recordsCount() > 1 &&
+                (searchedQuery() || selectedType || selectedRegistrar || dateFrom || dateTo || (selectedState && selectedState !== 'all'))
+            "
+        >
+            <span class="app-sort-label">{{ 'search.sort-by' | translate }}:</span>
+            <mat-form-field appearance="outline" class="app-sort-field">
+                <mat-select [(ngModel)]="selectedSort" (selectionChange)="onSortChange($event.value)">
+                    @for (sortOption of sortOptionsList; track sortOption) {
+                        <mat-option [value]="sortOption.value">
+                            {{ sortOption.label }}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
     </div>
 
     <!-- ADVANCED SEARCH -->

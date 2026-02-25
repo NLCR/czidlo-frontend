@@ -555,6 +555,12 @@
         "predecessors": "predecessors",
         "successor": "successor",
         "predecessor": "predecessor",
-        "predecessor-urn": "URN:NBN predecessor"
+        "predecessor-urn": "URN:NBN predecessor",
+        "sort-by": "Sort by",
+        "relevance": "relevance",
+        "title-sort_asc": "title A-Z",
+        "title-sort_desc": "title Z-A",
+        "originator-sort_asc": "author A-Z",
+        "originator-sort_desc": "author Z-A"
     }
 }

@@ -23,6 +23,7 @@ export class SearchService {
         dateTo?: string,
         state?: string,
         page: number = 1,
+        sort?: string,
     ): Observable<any> {
         this.query.set(term);
 
@@ -36,6 +37,22 @@ export class SearchService {
                 },
             },
         };
+
+        let sortField: any = '';
+        let sortOrder: any = '';
+        if (sort) {
+            if (sort.includes('title')) sortField = 'title.keyword';
+            else if (sort.includes('originator')) sortField = 'originatorvalue.keyword';
+            else sortField = undefined;
+
+            if (sort.endsWith('_asc')) sortOrder = 'asc';
+            else if (sort.endsWith('_desc')) sortOrder = 'desc';
+            else sortOrder = undefined;
+
+            if (sortField && sortOrder) {
+                body.sort = [{ [sortField]: { order: sortOrder } }];
+            }
+        }
 
         if (term.length === 0) {
             body.query = { match_all: {} };

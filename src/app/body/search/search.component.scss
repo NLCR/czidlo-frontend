@@ -61,7 +61,8 @@
         width: 100%;
         padding: 0px 16px 16px 16px;
         justify-content: space-between;
-        gap: 8px;
+        align-items: center;
+        gap: 16px;
         box-sizing: border-box;
         .app-advanced-search-text {
             font-size: 16px;
@@ -555,4 +556,21 @@
         font-size: 12px;
         color: var(--Text-Light, #4c6580);
     }
+}
+
+// SORT
+.app-sort-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.app-sort-label {
+    font-weight: 400;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.app-sort-field {
+    width: auto;
 }
