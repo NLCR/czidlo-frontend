@@ -334,7 +334,9 @@
         "URL-prefix": "URL prefix",
         "url-prefix": "url prefix",
         "edit-digital-library-title": "Digital library – edit record",
-        "edit-catalogue-title": "Catalogue – edit record"
+        "edit-catalogue-title": "Catalogue – edit record",
+        "edit-registrar-title": "Registrar – edit record",
+        "undefined": ""
     },
     "logs": {
         "title": "List of the last 30 logs"

@@ -660,7 +660,7 @@
                                         <div class="app-ie-field" *ngIf="di.library">
                                             <div class="app-label">{{ 'search.digitalLibrary' | translate }}:</div>
                                             <div class="app-value">{{ di.library.name }}</div>
-                                            <app-button variant="tertiary" size="xs">{{ 'search.didetails' | translate }} →</app-button>
+                                            <app-button variant="tertiary" size="xs" (click)="openDiDetails(di.library); $event.stopPropagation()">{{ 'search.didetails' | translate }} →</app-button>
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.format">
                                             <div class="app-label">{{ 'search.format' | translate }}:</div>
@@ -682,7 +682,7 @@
                                             <div class="app-label">{{ 'search.deactivated' | translate }}:</div>
                                             <div class="app-value">{{ di.deactivated.split('[')[0] | date }}</div>
                                         </div>
-                                        <div class="app-buttons">
+                                        <div class="app-buttons" *ngIf="isAdmin()">
                                             <app-button variant="primary" size="s" (click)="editDigitalInstance(item, di)">
                                                 <span>{{ 'buttons.edit' | translate }}</span>
                                             </app-button>
@@ -696,7 +696,7 @@
                         </div>
                     </div>
                     <!-- DEV MODE - JSON VIEWER -->
-                    <div class="app-ie-digital-document" [ngClass]="{ opened: item.jsonOpen }" *ngIf="isDevMode()">
+                    <!-- <div class="app-ie-digital-document" [ngClass]="{ opened: item.jsonOpen }" *ngIf="isDevMode()">
                         <div class="app-ie-header app-ie-digital-document-header" (click)="item.jsonOpen = !item.jsonOpen">
                             <img [src]="item.jsonOpen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                             <div class="app-part-title">
@@ -704,7 +704,7 @@
                             </div>
                         </div>
                         <pre *ngIf="item.jsonOpen">{{ item | json }}</pre>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

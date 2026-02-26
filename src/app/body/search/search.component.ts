@@ -7,6 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { EnvironmentService } from '../../services/environment.service';
 import { RegistrarsService } from '../../services/registrars.service';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
+import { DetailDialogComponent } from '../../dialogs/detail-dialog/detail-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
@@ -61,7 +62,6 @@ export class SearchComponent implements AfterViewInit {
     // SORTING
     selectedSort: string = 'relevance';
     sortOptionsList: any[] = [];
-
 
     isSidebarOpen = signal(false);
     loadingButton = signal(false);
@@ -244,7 +244,7 @@ export class SearchComponent implements AfterViewInit {
             this.dateFrom,
             this.dateTo,
             this.selectedState,
-            this.selectedSort
+            this.selectedSort,
         );
     }
     onStateChange(newState: string) {
@@ -258,7 +258,7 @@ export class SearchComponent implements AfterViewInit {
             this.dateFrom,
             this.dateTo,
             this.selectedState,
-            this.selectedSort
+            this.selectedSort,
         );
     }
     onSortChange(newSort: string) {
@@ -272,7 +272,7 @@ export class SearchComponent implements AfterViewInit {
             this.dateFrom,
             this.dateTo,
             this.selectedState,
-            this.selectedSort
+            this.selectedSort,
         );
     }
 
@@ -755,7 +755,11 @@ export class SearchComponent implements AfterViewInit {
                     },
                     error: (error) => {
                         console.error('Error adding predecessor:', error);
-                        this.snackBar.open(this.translate.instant('messages.add-predecessor-error') + error.error.message, this.translate.instant('buttons.close'), { duration: 14000 });
+                        this.snackBar.open(
+                            this.translate.instant('messages.add-predecessor-error') + error.error.message,
+                            this.translate.instant('buttons.close'),
+                            { duration: 14000 },
+                        );
                     },
                 });
             }
@@ -774,12 +778,20 @@ export class SearchComponent implements AfterViewInit {
                 this.searchService.deletePredecessor(item.urnnbn, preUrnNbn).subscribe({
                     next: (response) => {
                         console.log('Predecessor deleted successfully:', response);
-                        this.snackBar.open(this.translate.instant('messages.delete-predecessor-successfully'), this.translate.instant('buttons.close'), { duration: 3000 });
+                        this.snackBar.open(
+                            this.translate.instant('messages.delete-predecessor-successfully'),
+                            this.translate.instant('buttons.close'),
+                            { duration: 3000 },
+                        );
                         this.getDetails(item);
                     },
                     error: (error) => {
                         console.error('Error deleting predecessor:', error);
-                        this.snackBar.open(this.translate.instant('messages.delete-predecessor-error') + error.error.message, this.translate.instant('buttons.close'), { duration: 10000 });
+                        this.snackBar.open(
+                            this.translate.instant('messages.delete-predecessor-error') + error.error.message,
+                            this.translate.instant('buttons.close'),
+                            { duration: 10000 },
+                        );
                     },
                 });
             }
@@ -1137,7 +1149,7 @@ export class SearchComponent implements AfterViewInit {
                 'search.title-sort_desc',
                 'search.relevance',
                 'search.originator-sort_asc',
-                'search.originator-sort_desc'
+                'search.originator-sort_desc',
             ])
             .subscribe((t) => {
                 this.registrationMode = [
@@ -1178,7 +1190,6 @@ export class SearchComponent implements AfterViewInit {
                     { value: 'title_desc', label: t['search.title-sort_desc'] },
                     { value: 'originator_asc', label: t['search.originator-sort_asc'] },
                     { value: 'originator_desc', label: t['search.originator-sort_desc'] },
-
                 ];
                 this.helpText = t['search.help-text'];
             });
@@ -1273,6 +1284,23 @@ export class SearchComponent implements AfterViewInit {
         const publicApiBaseUrl = this.envService.get('czidloPublicApiBaseUrl');
         const jsonUrl = `${publicApiBaseUrl}/digitalInstances/id/${diId}?format=json`;
         window.open(jsonUrl, '_blank');
+    }
+    openDiDetails(di: any) {
+        console.log(di);
+        const dialogRef = this.dialog.open(DetailDialogComponent, {
+            minWidth: '600px',
+            data: {
+                item: {
+                    id: di.id,
+                    name: di.name,
+                    url: di.url,
+                    urlPrefix: di.urlPrefix,
+                    description: di.description,
+                    created: di.created ? new Date(di.created.replace(/\[UTC\]$/, '')).toLocaleString() : '',
+                    modified: di.modified ? new Date(di.modified.replace(/\[UTC\]$/, '')).toLocaleString() : '',
+                },
+            },
+        });
     }
 
     isDevMode() {

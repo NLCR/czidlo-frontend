@@ -350,7 +350,9 @@
         "edit-digital-library-title": "Digitální knihovna – úprava záznamu",
         "edit-catalogue-title": "Katalog – úprava záznamu",
         "no-catalogues": "Žádné katalogy",
-        "no-libraries": "Žádné digitální knihovny"
+        "no-libraries": "Žádné digitální knihovny",
+        "edit-registrar-title": "úprava záznamu",
+        "undefined": ""
     },
     "logs": {
         "title": "Seznam posledních 30 logů"

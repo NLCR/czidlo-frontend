@@ -10,6 +10,7 @@
     .app-search-header {
         display: flex;
         width: 100%;
+        min-width: 800px;
         align-items: center;
         gap: 12px;
         padding: 24px 16px 16px 16px;
@@ -57,7 +58,7 @@
     }
     .app-action {
         display: flex;
-        // width: 800px;
+        min-width: 800px;
         width: 100%;
         padding: 0px 16px 16px 16px;
         justify-content: space-between;
