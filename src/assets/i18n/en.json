@@ -423,6 +423,7 @@
         "OTHER": "Other document",
         "SOUND_COLLECTION": "Sound document",
         "add-instance": "Digital instance – insert new record:",
+        "edit-instance": "Digital instance – edit record:",
         "digital-library": "Digital library",
         "url": "URL address",
         "access-restriction": "Access restriction",

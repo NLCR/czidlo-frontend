@@ -518,6 +518,7 @@ export class SearchComponent implements AfterViewInit {
     getDigitalLibrariesList(registrarCode: string) {
         return this.registrarsService.getDigitalLibrariesByRegistrar(registrarCode).subscribe({
             next: (response) => {
+                console.log('digitallibraries', response);
                 this.digitalLibrariesList.set(response.digitalLibraries || []);
                 this.selectedDigitalLibraryId = response.digitalLibraries.length > 0 ? response.digitalLibraries[0].id : '';
             },
@@ -622,13 +623,14 @@ export class SearchComponent implements AfterViewInit {
         this.isSidebarOpen.set(true);
     }
     editDigitalInstance(item: any, di: any) {
+        console.log(item, 'di', di);
         this.activeAction = 'edit-instance';
         this.title = new FormControl<string>(item.title);
         this.urnNbn = new FormControl<string>(item.urnnbn);
         let registrarCode = item.details.registrar.code;
         this.getDigitalLibrariesList(registrarCode);
         this.selectedDiId = di.id;
-        this.selectedDigitalLibraryId = di.digitalLibrary;
+        this.selectedDigitalLibraryId = di.library.id;
         this.diFormat = new FormControl<string>(di.format);
         this.diUrl = new FormControl<string>(di.url);
         this.diAccess = new FormControl<string>(di.accessibility);

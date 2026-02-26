@@ -834,8 +834,11 @@
             <div class="app-sidebar-title" *ngIf="activeAction === 'edit'">
                 {{ 'import.' + selectedEntity | translate }}
             </div>
-            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">
+            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance'">
                 {{ 'import.add-instance' | translate }} {{ title.value }}
+            </div>
+            <div class="app-sidebar-title" *ngIf="activeAction === 'edit-instance'">
+                {{ 'import.edit-instance' | translate }} {{ title.value }}
             </div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />

@@ -10,6 +10,7 @@ import { EditArchiverDialogComponent } from '../../dialogs/edit-archiver-dialog/
 import { EditRegistrarDialogComponent } from '../../dialogs/edit-registrar-dialog/edit-registrar-dialog.component';
 import { DetailDialogComponent } from '../../dialogs/detail-dialog/detail-dialog.component';
 import { EditDlCatalogDialogComponent } from '../../dialogs/edit-dl-catalog-dialog/edit-dl-catalog-dialog.component';
+import { ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 
 @Component({
     selector: 'app-registrars',
@@ -17,7 +18,10 @@ import { EditDlCatalogDialogComponent } from '../../dialogs/edit-dl-catalog-dial
     templateUrl: './registrars.component.html',
     styleUrl: './registrars.component.scss',
 })
-export class RegistrarsComponent {
+export class RegistrarsComponent implements AfterViewInit {
+    @ViewChild('registrarsBody') registrarsBody?: ElementRef<HTMLElement>;
+    @ViewChild('archiversBody') archiversBody?: ElementRef<HTMLElement>;
+
     isActive = 'registrars';
     loadingRegistrars = signal(false);
     loadingArchivers = signal(false);
@@ -30,8 +34,12 @@ export class RegistrarsComponent {
     archivers = signal<Array<any>>([]);
 
     isSidebarOpen = signal(false);
+    activeRegistrarCode: string | null = null;
+    activeArchiverId: string | null = null;
     activeRegistrar: any = null;
     activeArchiver: any = null;
+    trackByRegistrar = (_: number, item: any) => item.code;
+    trackByArchiver = (_: number, item: any) => item.id;
 
     constructor(
         private router: Router,
@@ -42,6 +50,10 @@ export class RegistrarsComponent {
         private translate: TranslateService,
         private snackBar: MatSnackBar,
     ) {}
+
+    ngAfterViewInit(): void {
+        this.scrollToActive();
+    }
 
     ngOnInit(): void {
         this.ensureListLoaded();
@@ -63,9 +75,10 @@ export class RegistrarsComponent {
                 }
                 if (url.length === 3) {
                     const registrarId = url[2]?.path;
-                    this.activeRegistrar = registrarId;
+                    this.activeRegistrarCode = registrarId;
                     this.loadRegistrarDetails(registrarId);
                     this.isSidebarOpen.set(true);
+                    this.scrollToActive();
                 }
             }
             // ARCHIVERS
@@ -80,11 +93,33 @@ export class RegistrarsComponent {
                 }
                 if (url.length === 3) {
                     const archiverId = url[2]?.path;
-                    this.activeArchiver = archiverId;
+                    this.activeArchiverId = archiverId;
                     this.loadArchiverDetails(archiverId);
                     this.isSidebarOpen.set(true);
+                    this.scrollToActive();
                 }
             }
+        });
+    }
+    private scrollToActive(): void {
+        const host = this.isActive === 'registrars' ? this.registrarsBody?.nativeElement : this.archiversBody?.nativeElement;
+
+        if (!host) return;
+
+        const targetId =
+            this.isActive === 'registrars'
+                ? this.activeRegistrarCode
+                    ? `reg-${this.activeRegistrarCode}`
+                    : null
+                : this.activeArchiverId
+                  ? `arch-${this.activeArchiverId}`
+                  : null;
+
+        if (!targetId) return;
+
+        requestAnimationFrame(() => {
+            const el = host.querySelector(`#${CSS.escape(targetId)}`) as HTMLElement | null;
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     }
     ensureListLoaded(): void {
@@ -99,6 +134,7 @@ export class RegistrarsComponent {
         this.registrarsService.getArchivers().subscribe({
             next: (data) => {
                 this.archivers.set(this.registrarsService.archivers());
+                this.scrollToActive();
             },
             error: (error) => {
                 console.error('Error loading archivers in component:', error);
@@ -130,6 +166,7 @@ export class RegistrarsComponent {
             next: (data) => {
                 this.registrars.set(this.registrarsService.registrars());
                 this.filteredRegistrars = this.registrars().filter((reg) => !reg.hidden);
+                this.scrollToActive();
             },
             error: (error) => {
                 console.error('Error loading registrars in component:', error);
@@ -162,20 +199,20 @@ export class RegistrarsComponent {
             } else {
                 this.router.navigate([`../${institution.code}`], { relativeTo: this.route });
             }
-            this.loadRegistrarDetails(institution.code);
         } else if (this.isActive === 'archivers') {
             if (!this.isSidebarOpen()) {
                 this.router.navigate([institution.id], { relativeTo: this.route });
             } else {
                 this.router.navigate([`../${institution.id}`], { relativeTo: this.route });
             }
-            this.loadArchiverDetails(institution.id);
         }
     }
     closeSidebar(): void {
         this.router.navigate(['../'], { relativeTo: this.route });
         this.isSidebarOpen.set(false);
         this.activeArchiver = null;
+        this.activeArchiverId = null;
+        this.activeRegistrarCode = null;
         this.activeRegistrar = null;
     }
     deleteArchiver(archiver: any): void {

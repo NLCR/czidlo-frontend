@@ -43,13 +43,14 @@
                     {{ 'registrars.no-registrars' | translate }}
                 </div>
                 <!-- table body -->
-                <div class="app-table-body">
+                <div class="app-table-body" #registrarsBody>
                     <div
-                        *ngFor="let registrar of registrarsService.registrars()"
+                        *ngFor="let registrar of registrarsService.registrars(); trackBy: trackByRegistrar"
+                        [attr.id]="'reg-' + registrar.code"
                         class="app-row app-table-row app-row-clicable app-row-registrars"
                         [ngClass]="{
                             'app-row-hidden': registrar?.hidden === true && !isAdmin(),
-                            'app-row-active': activeRegistrar?.code === registrar.code,
+                            'app-row-active': activeRegistrarCode === registrar.code,
                             'app-actions-invisible': !isAdmin(),
                         }"
                         (click)="openSidebar(registrar)"
@@ -95,13 +96,14 @@
                     {{ 'registrars.no-archivers' | translate }}
                 </div>
                 <!-- table body -->
-                <div class="app-table-body app-table-body-archivers">
+                <div class="app-table-body app-table-body-archivers" #archiversBody>
                     <div
-                        *ngFor="let archiver of archivers()"
+                        *ngFor="let archiver of archivers(); trackBy: trackByArchiver"
+                        [attr.id]="'arch-' + archiver.id"
                         class="app-row app-table-row app-row-clicable app-row-archivers"
                         [ngClass]="{
                             'app-row-hidden': archiver?.hidden === true && !isAdmin(),
-                            'app-row-active': activeArchiver?.id?.toString() === archiver.id.toString(),
+                            'app-row-active': activeArchiverId?.toString() === archiver.id.toString(),
                             'app-actions-invisible': !isAdmin(),
                         }"
                         (click)="openSidebar(archiver)"
@@ -132,7 +134,7 @@
 </div>
 
 <!-- Overlay -->
-<div class="app-overlay" *ngIf="isSidebarOpen() && loggedIn()" (click)="closeSidebar()"></div>
+<!-- <div class="app-overlay" *ngIf="isSidebarOpen() && loggedIn()" (click)="closeSidebar()"></div> -->
 
 <!-- Sidebar -->
 <div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
