@@ -1,6 +1,6 @@
 <div class="app-dialog app-add-archiver-dialog">
     <div class="app-dialog-header">
-        <div class="app-dialog-title">
+        <div class="app-dialog-title app-dialog-title-registrar">
             <span>{{ 'registrars.registrar' | translate }}</span>
             <span *ngIf="data.name">: {{ data.name }}</span>
             <span>– {{ data.title }}</span>
@@ -25,7 +25,7 @@
     <div class="app-dialog-body">
         <div class="app-part-content app-part-name">
             <div class="app-base-input-label">{{ 'registrars.Name' | translate }}</div>
-            <div class="app-base-input app-login-input">
+            <div class="app-base-input app-full-width">
                 <mat-form-field appearance="outline" class="app-base-input-field">
                     <input matInput [(ngModel)]="name" />
                 </mat-form-field>
@@ -34,7 +34,7 @@
         <div class="app-part-content app-part-code">
             <div class="app-base-input-label">{{ 'registrars.Code' | translate }}</div>
 
-            <div class="app-basic-input app-code-input">
+            <div class="app-base-input app-half-width">
                 <mat-form-field appearance="outline" class="app-base-input-field">
                     <input matInput [formControl]="codeControl" [maxlength]="6" />
                 </mat-form-field>

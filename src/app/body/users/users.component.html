@@ -27,10 +27,11 @@
             <div class="app-loading" *ngIf="loadingUsers()" >
                 <mat-spinner diameter="40"></mat-spinner>
             </div>
-            <div class="app-table-body app-table-body-users">
+            <div class="app-table-body app-table-body-users" #usersBody>
                 <div
                     class="app-row app-table-row app-row-clicable"
-                    *ngFor="let user of users()"
+                    *ngFor="let user of users(); trackBy: trackByUser"
+                    [attr.id]="'user-' + user.id"
                     [ngClass]="{ 'app-row-active': activeUser?.id.toString() === user.id.toString() }"
                     (click)="openSidebar(user)"
                 >
@@ -71,7 +72,7 @@
 </div>
 
 <!-- Overlay -->
-<div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div>
+<!-- <div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div> -->
 
 <!-- Sidebar -->
 <div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">

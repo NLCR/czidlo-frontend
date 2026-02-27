@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RegistrarsService } from '../../services/registrars.service';
 import { AuthService } from '../../services/auth.service';
@@ -10,7 +10,6 @@ import { EditArchiverDialogComponent } from '../../dialogs/edit-archiver-dialog/
 import { EditRegistrarDialogComponent } from '../../dialogs/edit-registrar-dialog/edit-registrar-dialog.component';
 import { DetailDialogComponent } from '../../dialogs/detail-dialog/detail-dialog.component';
 import { EditDlCatalogDialogComponent } from '../../dialogs/edit-dl-catalog-dialog/edit-dl-catalog-dialog.component';
-import { ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 
 @Component({
     selector: 'app-registrars',

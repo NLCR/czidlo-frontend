@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -19,13 +19,16 @@ import { catchError } from 'rxjs/operators';
     templateUrl: './users.component.html',
     styleUrl: './users.component.scss',
 })
-export class UsersComponent {
+export class UsersComponent implements AfterViewInit {
+    @ViewChild('usersBody') usersBody?: ElementRef<HTMLElement>;
+
     loggedIn = computed(() => this.authService.loggedIn());
     isAdmin = computed(() => this.authService.isAdmin());
     loadingUsers = signal<boolean>(false);
 
     users = signal<Array<any>>([]);
     activeUser: any = null;
+    trackByUser = (index: number, user: any) => user.id;
     rightsDetails: any = null;
 
     allRegistrars = signal<Array<any>>([]);
@@ -45,7 +48,7 @@ export class UsersComponent {
         private dialog: MatDialog,
         private _snackBar: MatSnackBar,
         private translate: TranslateService,
-        private registrarsService: RegistrarsService
+        private registrarsService: RegistrarsService,
     ) {}
 
     ngOnInit() {
@@ -63,9 +66,28 @@ export class UsersComponent {
                 const userId = url[1].path;
                 if (this.activeUser == null || this.activeUser.id !== userId) {
                     this.loadUserDetails(userId);
+                    this.scrollToActive();
                 }
                 this.loadRightsDetails(userId);
             }
+        });
+    }
+    ngAfterViewInit(): void {
+        this.scrollToActive();
+    }
+
+    private scrollToActive(): void {
+        const host = this.usersBody?.nativeElement;
+
+        if (!host) return;
+
+        const targetId = this.activeUser ? `user-${this.activeUser.id}` : null;
+
+        if (!targetId) return;
+
+        requestAnimationFrame(() => {
+            const el = host.querySelector(`#${CSS.escape(targetId)}`) as HTMLElement | null;
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     }
 
@@ -94,6 +116,7 @@ export class UsersComponent {
             next: (response) => {
                 this.activeUser = response;
                 this.isSidebarOpen.set(true);
+                this.scrollToActive();
             },
             error: (error) => {
                 console.error('Error loading user details:', error);
@@ -140,9 +163,9 @@ export class UsersComponent {
                         code,
                         success: false,
                         error: err,
-                    })
-                )
-            )
+                    }),
+                ),
+            ),
         );
         // 2) Spustíme všechny najednou
         forkJoin(requests).subscribe((results: any) => {

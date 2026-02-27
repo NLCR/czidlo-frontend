@@ -713,7 +713,7 @@ app-information {
         gap: 24px;
         align-self: stretch;
         .app-dialog-title {
-            // display: flex;
+            display: inline-flex;
             // gap: 4px;
             flex: 1 0 0;
             color: var(--Text-Base, #0a0d10);
@@ -724,6 +724,9 @@ app-information {
             font-style: normal;
             font-weight: 500;
             line-height: 32px;
+            &.app-dialog-title-registrar {
+                display: block;
+            }
         }
         .app-close {
             display: flex;
