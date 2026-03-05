@@ -286,8 +286,8 @@ export class ImportRecordComponent {
         if (this.selectedArchiverId) {
             record.archiverId = this.selectedArchiverId;
         }
-        if (record.urnNbn) {
-            record.urnNbn = this.urnNbn.value;
+        if (this.urnNbn.value) {
+            record.urnNbn = `urn:nbn:cz:${this.selectedRegistrar}-${this.urnNbn.value}`;
         }
 
         // INTELECTUAL ENTITY
@@ -539,6 +539,7 @@ export class ImportRecordComponent {
         this.subTitle.reset('');
         this.volumeTitle.reset('');
         this.issueTitle.reset('');
+        this.urnNbn.reset('');
 
         // IDENTIFIERS
         this.ccnb.reset('');
