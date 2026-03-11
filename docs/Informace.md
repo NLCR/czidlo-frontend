@@ -1,9 +1,3 @@
-## Aktuality
-- **14. 1. 2019** byla nasazena nová verze softwaru CZIDLO (verze 4.6) s novými funkcionalitami – viz projektová stránka.
-- **8. 10. 2017** byla nasazena nová verze softwaru CZIDLO (verze 4.3) s novými funkcionalitami – viz projektová stránka.
-
----
-
 ## Základní funkce nástroje
 - **přidělování identifikátorů URN:NBN** (automatizovaně prostřednictvím API nebo manuálně přes webové rozhraní),  
 - **správa identifikátorů** (např. jejich deaktivace) a přidružených metadat,  
