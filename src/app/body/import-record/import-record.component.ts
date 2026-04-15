@@ -300,7 +300,7 @@ export class ImportRecordComponent {
             intelectualEntity.documentType = this.documentType.value;
         }
 
-        intelectualEntity.bornDigital = this.bornDigital;
+        intelectualEntity.digitalBorn = this.bornDigital;
 
         let ieIdentifiers: any = [];
 
