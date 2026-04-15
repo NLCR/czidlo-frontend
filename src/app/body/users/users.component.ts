@@ -66,7 +66,6 @@ export class UsersComponent implements AfterViewInit {
                 const userId = url[1].path;
                 if (this.activeUser == null || this.activeUser.id !== userId) {
                     this.loadUserDetails(userId);
-                    this.scrollToActive();
                 }
                 this.loadRightsDetails(userId);
             }
@@ -81,13 +80,16 @@ export class UsersComponent implements AfterViewInit {
 
         if (!host) return;
 
-        const targetId = this.activeUser ? `user-${this.activeUser.id}` : null;
+        const restoredUserId = history.state?.restoreUserId;
+        console.log(history.state);
+
+        const targetId = this.activeUser ? `user-${this.activeUser.id}` : restoredUserId ? `user-${restoredUserId}` : null;
 
         if (!targetId) return;
 
         requestAnimationFrame(() => {
             const el = host.querySelector(`#${CSS.escape(targetId)}`) as HTMLElement | null;
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (el) el.scrollIntoView({ block: 'center' });
         });
     }
 
@@ -274,7 +276,9 @@ export class UsersComponent implements AfterViewInit {
         this.router.navigate(['/users', user.id]);
     }
     closeSidebar() {
-        this.router.navigate(['/users']);
+        const restoreUserId = this.activeUser ? this.activeUser.id : null;
+        console.log('restoreUserId', restoreUserId);
+        this.router.navigate(['../'], { relativeTo: this.route, state: { restoreUserId } });
     }
     openAddUserDialog() {
         this.dialog

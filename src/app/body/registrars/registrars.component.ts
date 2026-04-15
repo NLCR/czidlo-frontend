@@ -62,11 +62,12 @@ export class RegistrarsComponent implements AfterViewInit {
             if (url.length < 2) {
                 this.router.navigate(['/registrars', 'registrars']);
             }
+
             // REGISTRARS
             if (this.isActive === 'registrars') {
                 this.loadingRegistrars.set(true);
                 if (this.registrarsService.registrars().length === 0) {
-                    console.log('Loading registrars...');
+                    this.activeRegistrarCode = history.state.closedId;
                     this.loadRegistrars();
                 } else {
                     this.registrars.set(this.registrarsService.registrars());
@@ -77,14 +78,14 @@ export class RegistrarsComponent implements AfterViewInit {
                     this.activeRegistrarCode = registrarId;
                     this.loadRegistrarDetails(registrarId);
                     this.isSidebarOpen.set(true);
-                    this.scrollToActive();
+                    // this.scrollToActive();
                 }
             }
             // ARCHIVERS
             else if (this.isActive === 'archivers') {
                 this.loadingArchivers.set(true);
                 if (this.registrarsService.archivers().length === 0) {
-                    console.log('Loading archivers...');
+                    this.activeArchiverId = history.state.closedId;
                     this.loadArchivers();
                 } else {
                     this.archivers.set(this.registrarsService.archivers());
@@ -95,7 +96,7 @@ export class RegistrarsComponent implements AfterViewInit {
                     this.activeArchiverId = archiverId;
                     this.loadArchiverDetails(archiverId);
                     this.isSidebarOpen.set(true);
-                    this.scrollToActive();
+                    // this.scrollToActive();
                 }
             }
         });
@@ -105,20 +106,28 @@ export class RegistrarsComponent implements AfterViewInit {
 
         if (!host) return;
 
+        const stateCode = history.state?.restoreTargetId;
+
         const targetId =
             this.isActive === 'registrars'
                 ? this.activeRegistrarCode
                     ? `reg-${this.activeRegistrarCode}`
-                    : null
+                    : stateCode
+                      ? `reg-${stateCode}`
+                      : null
                 : this.activeArchiverId
                   ? `arch-${this.activeArchiverId}`
-                  : null;
+                  : stateCode
+                    ? `arch-${stateCode}`
+                    : null;
 
         if (!targetId) return;
 
         requestAnimationFrame(() => {
             const el = host.querySelector(`#${CSS.escape(targetId)}`) as HTMLElement | null;
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (el) {
+                el.scrollIntoView({ block: 'center' });
+            }
         });
     }
     ensureListLoaded(): void {
@@ -207,7 +216,8 @@ export class RegistrarsComponent implements AfterViewInit {
         }
     }
     closeSidebar(): void {
-        this.router.navigate(['../'], { relativeTo: this.route });
+        const restoreTargetId = this.isActive === 'registrars' ? `${this.activeRegistrarCode}` : `${this.activeArchiverId}`;
+        this.router.navigate(['../'], { relativeTo: this.route, state: { restoreTargetId } });
         this.isSidebarOpen.set(false);
         this.activeArchiver = null;
         this.activeArchiverId = null;
@@ -215,7 +225,6 @@ export class RegistrarsComponent implements AfterViewInit {
         this.activeRegistrar = null;
     }
     deleteArchiver(archiver: any): void {
-        console.log('Delete archiver:', archiver);
         this.dialog
             .open(ConfirmDialogComponent, {
                 data: {
@@ -246,7 +255,6 @@ export class RegistrarsComponent implements AfterViewInit {
     }
 
     deleteRegistrar(registrar: any): void {
-        console.log('Delete registrar:', registrar);
         this.dialog
             .open(ConfirmDialogComponent, {
                 data: {
@@ -288,7 +296,6 @@ export class RegistrarsComponent implements AfterViewInit {
     }
 
     openEditRegistrarDialog(registrar?: any): void {
-        console.log('Open edit registrar dialog');
         const dialogRef = this.dialog.open(EditRegistrarDialogComponent, {
             minWidth: '800px',
             data: {
@@ -307,7 +314,6 @@ export class RegistrarsComponent implements AfterViewInit {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('Registrar edited/added:', result);
                 if (registrar) {
                     // Edit existing registrar
                     this.registrarsService.editRegistrar(registrar.code, result).subscribe({
@@ -338,7 +344,6 @@ export class RegistrarsComponent implements AfterViewInit {
                     // Create new registrar
                     this.registrarsService.createRegistrar(result).subscribe({
                         next: () => {
-                            console.log('Registrar created successfully');
                             this.snackBar.open(
                                 this.translate.instant('messages.registrar-created-successfully'),
                                 this.translate.instant('buttons.close'),
@@ -368,7 +373,6 @@ export class RegistrarsComponent implements AfterViewInit {
     }
 
     openEditArchiverDialog(archiver?: any): void {
-        console.log('Open edit archiver dialog');
         this.dialog
             .open(EditArchiverDialogComponent, {
                 minWidth: '800px',
@@ -384,7 +388,6 @@ export class RegistrarsComponent implements AfterViewInit {
             .afterClosed()
             .subscribe((result) => {
                 if (result) {
-                    console.log('Archiver edited/added:', result);
                     if (archiver) {
                         // Edit existing archiver
                         this.registrarsService.editArchiver(archiver.id, result).subscribe({
@@ -414,7 +417,6 @@ export class RegistrarsComponent implements AfterViewInit {
                         // Create new archiver
                         this.registrarsService.createArchiver(result).subscribe({
                             next: () => {
-                                console.log('Archiver created successfully');
                                 this.snackBar.open(
                                     this.translate.instant('messages.archiver-created-successfully'),
                                     this.translate.instant('buttons.close'),
@@ -440,7 +442,6 @@ export class RegistrarsComponent implements AfterViewInit {
             });
     }
     addNewDigitalLibrary(registrarCode: string): void {
-        console.log('Add new digital library for registrar:', registrarCode);
         const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
             minWidth: '800px',
             data: {
@@ -453,10 +454,8 @@ export class RegistrarsComponent implements AfterViewInit {
         });
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('New digital library data:', result);
                 this.registrarsService.createDigitalLibrary(registrarCode, result).subscribe({
                     next: () => {
-                        console.log('Digital library created successfully');
                         this.loadRegistrarDetails(registrarCode);
                     },
                     error: (error) => {
@@ -474,7 +473,6 @@ export class RegistrarsComponent implements AfterViewInit {
         });
     }
     editDigitalLibrary(registrarCode: string, library: any): void {
-        console.log('Edit digital library:', library, 'for registrar:', registrarCode);
         const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
             minWidth: '800px',
             data: {
@@ -541,7 +539,6 @@ export class RegistrarsComponent implements AfterViewInit {
             });
     }
     addNewCatalogue(registrarCode: string): void {
-        console.log('Add new catalogue for registrar:', registrarCode);
         const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
             minWidth: '800px',
             data: {
@@ -554,10 +551,8 @@ export class RegistrarsComponent implements AfterViewInit {
         });
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('New catalogue data:', result);
                 this.registrarsService.createCatalogue(registrarCode, result).subscribe({
                     next: () => {
-                        console.log('Catalogue created successfully');
                         this.loadRegistrarDetails(registrarCode);
                     },
                     error: (error) => {
@@ -575,7 +570,6 @@ export class RegistrarsComponent implements AfterViewInit {
         });
     }
     editCatalogue(registrarCode: string, catalog: any): void {
-        console.log('Edit catalogue:', catalog, 'for registrar:', registrarCode);
         const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
             minWidth: '800px',
             data: {
@@ -588,7 +582,6 @@ export class RegistrarsComponent implements AfterViewInit {
         });
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('Edited catalogue data:', result);
                 let body = { name: result.name, description: result.description, urlPrefix: result.urlPrefix };
                 this.registrarsService.editCatalogue(registrarCode, catalog.id, body).subscribe({
                     next: () => {
@@ -610,7 +603,6 @@ export class RegistrarsComponent implements AfterViewInit {
         });
     }
     deleteCatalogue(registrarCode: string, catalog: any): void {
-        console.log('Delete catalogue:', catalog, 'for registrar:', registrarCode);
         this.dialog
             .open(ConfirmDialogComponent, {
                 data: {
@@ -643,7 +635,6 @@ export class RegistrarsComponent implements AfterViewInit {
             });
     }
     showDetails(registrarCode: string, item: any, context: string): void {
-        console.log('Show details for registrar:', registrarCode, 'and library or catalogue:', item);
         const dialogRef = this.dialog.open(DetailDialogComponent, {
             minWidth: '600px',
             data: {
