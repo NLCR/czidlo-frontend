@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, effect } from '@angular/core';
 import { FormControl, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { ImportRecordService } from '../../services/import-record.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -7,6 +7,8 @@ import { RegistrarsService } from '../../services/registrars.service';
 import { AuthService } from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
 import { ApiService } from '../../services/api.service';
+import { Observable, of } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
     selector: 'app-import-record',
@@ -15,8 +17,9 @@ import { ApiService } from '../../services/api.service';
     styleUrl: './import-record.component.scss',
 })
 export class ImportRecordComponent {
+    loadingRegistrars = signal(false);
     loggedIn = computed(() => this.authService.loggedIn());
-    assignedRegistars = [];
+    assignedRegistrars = signal<any>([]);
     selectedRegistrar: string = '';
     registrationMode: Array<{ value: string; label: string }> = [];
     selectedMode: string = '';
@@ -26,6 +29,7 @@ export class ImportRecordComponent {
     selectedEntity: string = '';
 
     isSidebarOpen = signal(false);
+    progressBar = signal({ state: false, value: '', error: '', urnnbn: '' });
 
     // FORM CONTROLS
     // BASIC DETAILS
@@ -40,11 +44,20 @@ export class ImportRecordComponent {
     issn = new FormControl<string>('', [this.issnValidator()]);
     otherId = new FormControl<string>('');
 
-    documentType = new FormControl<string>('', [Validators.required]);
+    documentType = new FormControl<string>('', { nonNullable: true });
+    documentTypeOptions: string[] = [];
+    filteredDocumentTypeOptions$: Observable<string[]> = of([]);
+
+    documentTypeMap: Record<string, string[]> = {
+        MONOGRAPH: ['', 'cartographic', 'graphic', 'sheetmusic'],
+        MONOGRAPH_VOLUME: ['', 'cartographic', 'graphic', 'sheetmusic'],
+        SOUND_COLLECTION: ['', 'sound recording', 'audio cylinder', 'audio disc', 'digital audio'],
+        OTHER: ['', 'data_disc', 'Clipping', 'Clipping index', 'Card index'],
+    };
     bornDigital: boolean = false;
 
     // ORIGINATORS
-    selectedOriginatorType: string = 'author';
+    selectedOriginatorType: string = 'AUTHOR';
     primaryOriginatorTypes: Array<{ value: string; label: string }> = [];
     primaryOriginatorValue = new FormControl<string>('', [Validators.required]);
     otherOriginator = new FormControl<string>('');
@@ -64,19 +77,17 @@ export class ImportRecordComponent {
     contractNumber = new FormControl<string>('');
 
     // TECHNICAL METADATA
-    formatValue = new FormControl<string>('');
-    formatVersion = new FormControl<string>('');
+    formatValue = new FormControl<string>('image/jp2');
+    formatVersion = new FormControl<string>('verze 1.0');
     extent = new FormControl<string>('');
-    resolutionHorizontal = new FormControl<string>('');
-    resolutionVertical = new FormControl<string>('');
+    resolutionHorizontal = new FormControl<number | null>(null, [this.positiveNumberValidator()]);
+    resolutionVertical = new FormControl<number | null>(null, [this.positiveNumberValidator()]);
     compression = new FormControl<string>('');
-    // compressionRatio = new FormControl<string>('');
-    // compressionValue = new FormControl<string>('');
     colorModel = new FormControl<string>('');
     colorDepth = new FormControl<string>('');
     iccProfile = new FormControl<string>('');
-    pictureSizeWidth = new FormControl<string>('');
-    pictureSizeHeight = new FormControl<string>('');
+    pictureSizeWidth = new FormControl<number | null>(null, [this.positiveNumberValidator()]);
+    pictureSizeHeight = new FormControl<number | null>(null, [this.positiveNumberValidator()]);
 
     // THESIS
     degreeAwardingInstitution = new FormControl<string>('');
@@ -93,7 +104,6 @@ export class ImportRecordComponent {
     sourceDocumentPublisher = new FormControl<string>('');
     sourceDocumentYear = new FormControl<string>('');
 
-    importRecordSnackBarVisible = signal(false);
     isButtonDisabled = signal(true);
 
     constructor(
@@ -104,8 +114,18 @@ export class ImportRecordComponent {
         private registrarsService: RegistrarsService,
         private authService: AuthService,
         private usersService: UsersService,
-        private apiService: ApiService
-    ) {}
+        private apiService: ApiService,
+    ) {
+        effect(() => {
+            const isLoggedIn = this.loggedIn();
+
+            if (isLoggedIn) {
+                this.loadRegistrarsAfterLogin();
+            } else {
+                this.resetRegistrars();
+            }
+        });
+    }
 
     ngOnInit(): void {
         this.translate
@@ -118,97 +138,169 @@ export class ImportRecordComponent {
                 ];
             });
 
+        const controlsToWatch: FormControl[] = [
+            this.title,
+            this.ccnb,
+            this.isbn,
+            this.issn,
+            this.formatValue,
+            this.formatVersion,
+            this.resolutionHorizontal,
+            this.resolutionVertical,
+            this.pictureSizeWidth,
+            this.pictureSizeHeight,
+        ];
+        controlsToWatch.forEach((ctrl) => {
+            ctrl.statusChanges.subscribe(() => {
+                this.importButtonState();
+            });
+            ctrl.valueChanges.subscribe(() => {
+                this.importButtonState();
+            });
+        });
+
+        // inicializace při startu
+        this.importButtonState();
+
+        this.intellectualEntitiesList.set(this.importRecordService.intellectualEntities() || []);
+        this.selectedRegistrar = this.assignedRegistrars()[0];
+        this.selectedEntity = this.intellectualEntitiesList()[0];
+
+        console.log('selected', this.selectedMode, this.selectedEntity, this.selectedMode);
+    }
+
+    private loadRegistrarsAfterLogin() {
+        this.loadingRegistrars.set(true);
+        const userId = this.authService.getUserId();
+        if (!userId) {
+            console.error('User ID is null despite being logged in.');
+            this.loadingRegistrars.set(false);
+            return;
+        }
+
         this.registrarsService.getArchivers().subscribe({
             next: (data) => {
                 this.archiverIdsList.set(this.registrarsService.archivers() || []);
-                console.log('Archiver IDs for selection:', this.archiverIdsList());
             },
             error: (error) => {
                 console.error('Error fetching archiver IDs:', error);
             },
         });
-        this.usersService.getUserRights(this.authService.userInfo().id).subscribe({
+
+        this.usersService.getUserRights(userId).subscribe({
             next: (data) => {
-                this.assignedRegistars = data || [];
-                console.log('Assigned registrars:', this.assignedRegistars);
-                if (this.assignedRegistars.length > 0) {
-                    this.selectedRegistrar = this.assignedRegistars[0];
-                    this.registrarsService.getRegistrar(this.selectedRegistrar).subscribe({
-                        next: (registrarData) => {
-                            console.log('Selected registrar data:', registrarData);
-                            if (registrarData.allowedRegistrationModeByRegistrar) {
-                                this.registrationMode.push({ value: 'BY_REGISTRAR', label: this.translate.instant('import.by-registrar') });
-                            }
-                            if (registrarData.allowedRegistrationModeByReservation) {
-                                this.registrationMode.push({ value: 'BY_RESERVATION', label: this.translate.instant('import.by-reservation') });
-                            }
-                            if (registrarData.allowedRegistrationModeByResolver) {
-                                this.registrationMode.push({ value: 'BY_RESOLVER', label: this.translate.instant('import.by-resolver') });
-                            }
-                            if (this.registrationMode.length > 0) {
-                                this.selectedMode = this.registrationMode[0].value;
-                            } else {
-                                this.selectedMode = '';
-                            }
-                        },
-                        error: (error) => {
-                            console.error('Error fetching selected registrar data:', error);
-                        },
-                    });
+                this.assignedRegistrars.set(data || []);
+                console.log('Assigned registrars:', this.assignedRegistrars());
+
+                if (this.assignedRegistrars().length > 0) {
+                    if (this.assignedRegistrars().includes('nk')) {
+                        this.selectedRegistrar = 'nk';
+                    } else {
+                        this.selectedRegistrar = this.assignedRegistrars()[0];
+                    }
+                    this.loadRegistrarModes(this.selectedRegistrar);
                 }
+                this.loadingRegistrars.set(false);
             },
             error: (error) => {
                 console.error('Error fetching assigned registrars:', error);
+                this.loadingRegistrars.set(false);
             },
         });
+    }
+    private loadRegistrarModes(registrarCode: string) {
+        this.registrationMode = [];
 
-        const controlsToWatch = [this.title, this.ccnb, this.isbn, this.issn];
-        controlsToWatch.forEach((ctrl) => {
-            ctrl.statusChanges.subscribe(() => {
-                this.updateButtonState();
-            });
-            ctrl.valueChanges.subscribe(() => {
-                this.updateButtonState();
-            });
+        this.registrarsService.getRegistrar(registrarCode).subscribe({
+            next: (registrarData) => {
+                if (registrarData.allowedRegistrationModeByResolver) {
+                    this.registrationMode.push({
+                        value: 'BY_RESOLVER',
+                        label: this.translate.instant('import.by-resolver'),
+                    });
+                }
+                if (registrarData.allowedRegistrationModeByReservation) {
+                    this.registrationMode.push({
+                        value: 'BY_RESERVATION',
+                        label: this.translate.instant('import.by-reservation'),
+                    });
+                }
+                if (registrarData.allowedRegistrationModeByRegistrar) {
+                    this.registrationMode.push({
+                        value: 'BY_REGISTRAR',
+                        label: this.translate.instant('import.by-registrar'),
+                    });
+                }
+
+                this.selectedMode = this.registrationMode[0]?.value ?? '';
+            },
+            error: (error) => {
+                console.error('Error fetching registrar data:', error);
+            },
         });
-
-        // inicializace při startu
-        this.updateButtonState();
-
-        this.intellectualEntitiesList.set(this.importRecordService.intellectualEntities() || []);
-        this.selectedRegistrar = this.assignedRegistars[0];
-        this.selectedEntity = this.intellectualEntitiesList()[0];
-
-        console.log('selected', this.selectedMode, this.selectedEntity, this.selectedMode);
+    }
+    private resetRegistrars() {
+        this.assignedRegistrars.set([]);
+        this.selectedRegistrar = '';
+        this.registrationMode = [];
+        this.selectedMode = '';
     }
 
     compareMode(a: string, b: string) {
         return a === b;
     }
     openSidebar() {
+        this.loadDocumentTypeOptions();
         this.isSidebarOpen.set(true);
     }
     closeSidebar() {
         this.isSidebarOpen.set(false);
     }
+    loadDocumentTypeOptions() {
+        this.documentType.setValue('');
+        this.documentTypeOptions = this.documentTypeMap[this.selectedEntity] || [];
+        this.setupDocumentTypeFiltering();
+    }
+    private setupDocumentTypeFiltering() {
+        this.filteredDocumentTypeOptions$ = this.documentType.valueChanges.pipe(
+            startWith(this.documentType.value ?? ''),
+            map((value) => this.filterDocTypes(value ?? '')),
+        );
+    }
+    private filterDocTypes(value: string): string[] {
+        const v = (value || '').toLowerCase().trim();
+        if (!v) return this.documentTypeOptions.slice();
+        return this.documentTypeOptions.filter((opt) => opt.toLowerCase().includes(v));
+    }
+    normalizeDocTypeValue() {
+        const v = (this.documentType.value || '').trim();
+        this.documentType.setValue(v, { emitEvent: false });
+    }
+
     buildRecordToImport() {
         let record: any = {};
 
         // REGISTRAR AND MODE
         record.registrarCode = this.selectedRegistrar;
         record.registrationMode = this.selectedMode;
-        record.archiverId = this.selectedArchiverId;
-
-        record.urnNbn = this.urnNbn.value;
+        if (this.selectedArchiverId) {
+            record.archiverId = this.selectedArchiverId;
+        }
+        if (this.urnNbn.value) {
+            record.urnNbn = `urn:nbn:cz:${this.selectedRegistrar}-${this.urnNbn.value}`;
+        }
 
         // INTELECTUAL ENTITY
         let intelectualEntity: any = {};
+
+        intelectualEntity.id = 0; // nová IE
+        intelectualEntity.entityType = this.selectedEntity;
 
         if (this.documentType.value) {
             intelectualEntity.documentType = this.documentType.value;
         }
 
-        intelectualEntity.bornDigital = this.bornDigital;
+        intelectualEntity.digitalBorn = this.bornDigital;
 
         let ieIdentifiers: any = [];
 
@@ -258,6 +350,16 @@ export class ImportRecordComponent {
             ieIdentifiers.push(identifier);
         }
         if (this.otherId.value) {
+            // let otherIdValues = this.otherId.value
+            //     .split(',')
+            //     .map((id) => id.trim())
+            //     .filter((id) => id.length > 0);
+            // for (let oid of otherIdValues) {
+            //     let identifier: any = {};
+            //     identifier.type = 'OTHER';
+            //     identifier.value = oid;
+            //     ieIdentifiers.push(identifier);
+            // }
             let identifier: any = {};
             identifier.type = 'OTHER';
             identifier.value = this.otherId.value;
@@ -268,8 +370,8 @@ export class ImportRecordComponent {
         // ORIGINATORS
         let originator: any = {};
         if (this.primaryOriginatorValue.valid && this.primaryOriginatorValue.value) {
-            originator.type = this.selectedOriginatorType;
-            originator.value = this.primaryOriginatorValue.value;
+            originator.type = this.selectedOriginatorType.toUpperCase() || 'AUTHOR';
+            originator.value = this.primaryOriginatorValue.value || ' ';
             intelectualEntity.originator = originator;
         }
         if (this.otherOriginator.value) {
@@ -285,7 +387,7 @@ export class ImportRecordComponent {
             publication.publisher = this.publisher.value;
         }
         if (this.year.value) {
-            publication.year = this.year.value;
+            publication.year = Number(this.year.value);
         }
         if (Object.keys(publication).length > 0) {
             intelectualEntity.publication = publication;
@@ -355,10 +457,10 @@ export class ImportRecordComponent {
         }
         // RESOLUTION
         if (this.resolutionHorizontal.value) {
-            technicalMetadata.resolutionHorizontal = this.resolutionHorizontal.value;
+            technicalMetadata.resolutionHorizontal = Number(this.resolutionHorizontal.value);
         }
         if (this.resolutionVertical.value) {
-            technicalMetadata.resolutionVertical = this.resolutionVertical.value;
+            technicalMetadata.resolutionVertical = Number(this.resolutionVertical.value);
         }
         // COMPRESSION
         if (this.compression.value) {
@@ -376,14 +478,14 @@ export class ImportRecordComponent {
         }
         // PICTURE SIZE
         if (this.pictureSizeWidth.value) {
-            technicalMetadata.pictureSizeWidth = this.pictureSizeWidth.value;
+            technicalMetadata.pictureWidth = Number(this.pictureSizeWidth.value);
         }
         if (this.pictureSizeHeight.value) {
-            technicalMetadata.pictureSizeHeight = this.pictureSizeHeight.value;
+            technicalMetadata.pictureHeight = Number(this.pictureSizeHeight.value);
         }
-        if (Object.keys(technicalMetadata).length > 0) {
+        // if (Object.keys(technicalMetadata).length > 0) {
             record.digitalDocument = technicalMetadata;
-        }
+        // }
 
         record.intelectualEntity = intelectualEntity;
         console.log('record to import', record);
@@ -391,10 +493,16 @@ export class ImportRecordComponent {
     }
 
     importRecord() {
+        this.progressBar.set({ state: true, value: 'edit-running', error: '', urnnbn: '' });
         const record = this.buildRecordToImport();
-        console.log(record.urnnbn);
+        console.log('urnnbn', record.urnnbn);
         if (!record) {
             console.error('Record is invalid, cannot import.');
+            this.progressBar.set({ state: true, value: '', error: 'no-record', urnnbn: '' });
+            setTimeout(() => {
+                this.progressBar.set({ state: false, value: '', error: '', urnnbn: '' });
+                this.closeSidebar();
+            }, 1000);
             return;
         }
 
@@ -404,16 +512,82 @@ export class ImportRecordComponent {
                 //TODO: vyčistit formulář pro nové vkládání a nabídnout vytvořený přes odkaz v snackbaru
                 //přes přiřazené/potvrezené urnnbn v odpovědi
                 //(protože to nebude zaindexované úplně hned, tak proto ne hned router.navigate)
-                this.importRecordSnackBarVisible.set(true);
+                let urnnbn = 'urn:nbn:cz:' + data.urnNbn.registrarCode + '-' + data.urnNbn.documentCode;
+                this.progressBar.set({ state: true, value: 'import-completed', error: '', urnnbn: urnnbn });
                 setTimeout(() => {
-                    this.importRecordSnackBarVisible.set(false);
-                }, 3000);
+                    this.progressBar.set({ state: false, value: '', error: '', urnnbn: '' });
+                    this.closeSidebar();
+                }, 100000);
             },
             error: (error) => {
                 //TODO: snackbar s chybou
                 console.error('Error importing record:', error);
+                this.progressBar.set({ state: true, value: 'edit-error', error: error.error.message, urnnbn: '' });
+                setTimeout(() => {
+                    this.progressBar.set({ state: false, value: '', error: '', urnnbn: '' });
+                }, 10000);
             },
         });
+    }
+    cancelImport() {
+        this.resetForm();
+        this.closeSidebar();
+    }
+    private resetForm() {
+        // BASIC DETAILS
+        this.title.reset('');
+        this.subTitle.reset('');
+        this.volumeTitle.reset('');
+        this.issueTitle.reset('');
+        this.urnNbn.reset('');
+
+        // IDENTIFIERS
+        this.ccnb.reset('');
+        this.isbn.reset('');
+        this.issn.reset('');
+        this.otherId.reset('');
+
+        this.documentType.reset('');
+
+        // ORIGINATORS
+        this.selectedOriginatorType = 'AUTHOR';
+        this.primaryOriginatorValue.reset('');
+        this.otherOriginator.reset('');
+
+        // PUBLICATION DETAILS
+        this.place.reset('');
+        this.publisher.reset('');
+        this.year.reset('');
+
+        // TECHNICAL METADATA
+        this.formatValue.reset('image/jp2');
+        this.formatVersion.reset('verze 1.0');
+        this.extent.reset('');
+        this.resolutionHorizontal.reset();
+        this.resolutionVertical.reset();
+        this.compression.reset('');
+        this.colorModel.reset('');
+        this.colorDepth.reset('');
+        this.iccProfile.reset('');
+        this.pictureSizeWidth.reset();
+        this.pictureSizeHeight.reset();
+
+        // THESIS
+        this.degreeAwardingInstitution.reset('');
+
+        // ANALYTICAL
+        this.sourceDocumentTitle.reset('');
+        this.sourceDocumentVolumeTitle.reset('');
+        this.sourceDocumentIssueTitle.reset('');
+        this.sourceDocumentCcnb.reset('');
+        this.sourceDocumentIsbn.reset('');
+        this.sourceDocumentIssn.reset('');
+        this.sourceDocumentOtherId.reset('');
+        this.sourceDocumentPlace.reset('');
+        this.sourceDocumentPublisher.reset('');
+        this.sourceDocumentYear.reset('');
+
+        this.importButtonState();
     }
 
     onRegistrarChange() {
@@ -422,14 +596,14 @@ export class ImportRecordComponent {
         this.registrarsService.getRegistrar(this.selectedRegistrar).subscribe({
             next: (registrarData) => {
                 console.log('Selected registrar data:', registrarData);
+                if (registrarData.allowedRegistrationModeByResolver) {
+                    this.registrationMode.push({ value: 'BY_RESOLVER', label: this.translate.instant('import.by-resolver') });
+                }
                 if (registrarData.allowedRegistrationModeByRegistrar) {
                     this.registrationMode.push({ value: 'BY_REGISTRAR', label: this.translate.instant('import.by-registrar') });
                 }
                 if (registrarData.allowedRegistrationModeByReservation) {
                     this.registrationMode.push({ value: 'BY_RESERVATION', label: this.translate.instant('import.by-reservation') });
-                }
-                if (registrarData.allowedRegistrationModeByResolver) {
-                    this.registrationMode.push({ value: 'BY_RESOLVER', label: this.translate.instant('import.by-resolver') });
                 }
                 if (this.registrationMode.length > 0) {
                     this.selectedMode = this.registrationMode[0].value;
@@ -444,7 +618,7 @@ export class ImportRecordComponent {
     }
 
     // VALIDACNI FUNKCE
-    updateButtonState() {
+    importButtonState() {
         // tlačítko se aktivuje jen když:
         // - title je validní (required)
         // - ccnb, isbn a issn jsou validní (nebo prázdné)
@@ -452,8 +626,24 @@ export class ImportRecordComponent {
         const ccnbValid = this.ccnb.valid;
         const isbnValid = this.isbn.valid;
         const issnValid = this.issn.valid;
+        const formatValueValid = this.formatValue.valid;
+        const formatVersionValid = this.formatVersion.valid;
+        const resolutionHorizontalValid = this.resolutionHorizontal.valid;
+        const resolutionVerticalValid = this.resolutionVertical.valid;
+        const pictureSizeWidthValid = this.pictureSizeWidth.valid;
+        const pictureSizeHeightValid = this.pictureSizeHeight.valid;
 
-        const isDisabled = !titleValid || !ccnbValid || !isbnValid || !issnValid;
+        const isDisabled =
+            !titleValid ||
+            !ccnbValid ||
+            !isbnValid ||
+            !issnValid ||
+            !formatValueValid ||
+            !formatVersionValid ||
+            !resolutionHorizontalValid ||
+            !resolutionVerticalValid ||
+            !pictureSizeWidthValid ||
+            !pictureSizeHeightValid;
         this.isButtonDisabled.set(isDisabled);
     }
     /** Validátor CCNB: musí začínat "cnb" a mít přesně 9 číslic */
@@ -483,6 +673,20 @@ export class ImportRecordComponent {
             if (!value) return null;
             const regex = /^(97(8|9))?\d{9}(\d|X)$/; // ISBN-10 nebo ISBN-13
             return regex.test(value.replace(/[-\s]/g, '')) ? null : { invalidIsbn: true };
+        };
+    }
+
+    positiveNumberValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+            if (value === null || value === undefined || value === '') {
+                return null; // prázdné pole je OK
+            }
+            const num = Number(value);
+            if (isNaN(num) || num <= 0) {
+                return { invalidPositiveNumber: true };
+            }
+            return null;
         };
     }
 }

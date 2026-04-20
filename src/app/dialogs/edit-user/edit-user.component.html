@@ -169,7 +169,7 @@
 
     <!-- DIALOG FOOTER -->
     <div class="app-dialog-footer">
-        <div class="app-dialog-footer-part app-dialog-footer-warning" *ngIf="!passwordCopied">
+        <div class="app-dialog-footer-part app-dialog-footer-warning" *ngIf="data.password && !passwordCopied">
             <div class="app-footer-info-icon">
                 <img src="assets/icons/snack-warning-icon.png" />
             </div>
@@ -177,7 +177,7 @@
                 {{ 'users.hints.password-hint' | translate }}
             </div>
         </div>
-        <div class="app-dialog-footer-part app-dialog-footer-check" *ngIf="passwordCopied">
+        <div class="app-dialog-footer-part app-dialog-footer-check" *ngIf="data.password && passwordCopied">
             <div class="app-footer-info-icon">
                 <img src="assets/icons/snack-check-icon.png" />
             </div>

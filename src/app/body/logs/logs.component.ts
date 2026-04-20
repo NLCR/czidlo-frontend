@@ -12,6 +12,7 @@ import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 })
 export class LogsComponent implements OnInit {
     loggedIn = computed(() => this.authService.loggedIn());
+    isAdmin = computed(() => this.authService.isAdmin());
 
     logs: any = null;
     datePickerOpened: boolean = false;
@@ -30,6 +31,10 @@ export class LogsComponent implements OnInit {
     }
 
     loadLogs() {
+        if (!this.isAdmin()) {
+            console.warn('User is not an administrator. Cannot load users.');
+            return;
+        }
         this.apiService.getLogs(30).subscribe({
             next: (response) => {
                 this.logs = response;

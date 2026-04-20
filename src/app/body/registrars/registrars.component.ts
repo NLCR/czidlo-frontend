@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RegistrarsService } from '../../services/registrars.service';
 import { AuthService } from '../../services/auth.service';
@@ -17,42 +17,57 @@ import { EditDlCatalogDialogComponent } from '../../dialogs/edit-dl-catalog-dial
     templateUrl: './registrars.component.html',
     styleUrl: './registrars.component.scss',
 })
-export class RegistrarsComponent {
+export class RegistrarsComponent implements AfterViewInit {
+    @ViewChild('registrarsBody') registrarsBody?: ElementRef<HTMLElement>;
+    @ViewChild('archiversBody') archiversBody?: ElementRef<HTMLElement>;
+
     isActive = 'registrars';
     loadingRegistrars = signal(false);
     loadingArchivers = signal(false);
 
     loggedIn = computed(() => this.authService.loggedIn());
+    isAdmin = computed(() => this.authService.isAdmin());
 
     registrars = signal<Array<any>>([]);
+    filteredRegistrars: Array<any> = [];
     archivers = signal<Array<any>>([]);
 
     isSidebarOpen = signal(false);
+    activeRegistrarCode: string | null = null;
+    activeArchiverId: string | null = null;
     activeRegistrar: any = null;
     activeArchiver: any = null;
+    trackByRegistrar = (_: number, item: any) => item.code;
+    trackByArchiver = (_: number, item: any) => item.id;
 
     constructor(
         private router: Router,
         private route: ActivatedRoute,
-        private registrarsService: RegistrarsService,
+        public registrarsService: RegistrarsService,
         private authService: AuthService,
         private dialog: MatDialog,
         private translate: TranslateService,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
     ) {}
 
+    ngAfterViewInit(): void {
+        this.scrollToActive();
+    }
+
     ngOnInit(): void {
+        this.ensureListLoaded();
         this.route.url.subscribe((url) => {
             this.isActive = url[1]?.path || 'registrars';
             // REDIRECT TO REGISTRARS IF NO SUBPATH
             if (url.length < 2) {
                 this.router.navigate(['/registrars', 'registrars']);
             }
+
             // REGISTRARS
             if (this.isActive === 'registrars') {
                 this.loadingRegistrars.set(true);
                 if (this.registrarsService.registrars().length === 0) {
-                    console.log('Loading registrars...');
+                    this.activeRegistrarCode = history.state.closedId;
                     this.loadRegistrars();
                 } else {
                     this.registrars.set(this.registrarsService.registrars());
@@ -60,15 +75,17 @@ export class RegistrarsComponent {
                 }
                 if (url.length === 3) {
                     const registrarId = url[2]?.path;
-                    this.activeRegistrar = registrarId;
+                    this.activeRegistrarCode = registrarId;
                     this.loadRegistrarDetails(registrarId);
+                    this.isSidebarOpen.set(true);
+                    // this.scrollToActive();
                 }
             }
             // ARCHIVERS
             else if (this.isActive === 'archivers') {
                 this.loadingArchivers.set(true);
                 if (this.registrarsService.archivers().length === 0) {
-                    console.log('Loading archivers...');
+                    this.activeArchiverId = history.state.closedId;
                     this.loadArchivers();
                 } else {
                     this.archivers.set(this.registrarsService.archivers());
@@ -76,17 +93,56 @@ export class RegistrarsComponent {
                 }
                 if (url.length === 3) {
                     const archiverId = url[2]?.path;
-                    this.activeArchiver = archiverId;
+                    this.activeArchiverId = archiverId;
                     this.loadArchiverDetails(archiverId);
+                    this.isSidebarOpen.set(true);
+                    // this.scrollToActive();
                 }
             }
         });
+    }
+    private scrollToActive(): void {
+        const host = this.isActive === 'registrars' ? this.registrarsBody?.nativeElement : this.archiversBody?.nativeElement;
+
+        if (!host) return;
+
+        const stateCode = history.state?.restoreTargetId;
+
+        const targetId =
+            this.isActive === 'registrars'
+                ? this.activeRegistrarCode
+                    ? `reg-${this.activeRegistrarCode}`
+                    : stateCode
+                      ? `reg-${stateCode}`
+                      : null
+                : this.activeArchiverId
+                  ? `arch-${this.activeArchiverId}`
+                  : stateCode
+                    ? `arch-${stateCode}`
+                    : null;
+
+        if (!targetId) return;
+
+        requestAnimationFrame(() => {
+            const el = host.querySelector(`#${CSS.escape(targetId)}`) as HTMLElement | null;
+            if (el) {
+                el.scrollIntoView({ block: 'center' });
+            }
+        });
+    }
+    ensureListLoaded(): void {
+        if (this.registrarsService.registrars().length === 0) this.loadRegistrars();
+        else this.registrars.set(this.registrarsService.registrars());
+
+        if (this.registrarsService.archivers().length === 0) this.loadArchivers();
+        else this.archivers.set(this.registrarsService.archivers());
     }
 
     loadArchivers(): void {
         this.registrarsService.getArchivers().subscribe({
             next: (data) => {
                 this.archivers.set(this.registrarsService.archivers());
+                this.scrollToActive();
             },
             error: (error) => {
                 console.error('Error loading archivers in component:', error);
@@ -117,6 +173,8 @@ export class RegistrarsComponent {
         this.registrarsService.getRegistrars().subscribe({
             next: (data) => {
                 this.registrars.set(this.registrarsService.registrars());
+                this.filteredRegistrars = this.registrars().filter((reg) => !reg.hidden);
+                this.scrollToActive();
             },
             error: (error) => {
                 console.error('Error loading registrars in component:', error);
@@ -131,7 +189,6 @@ export class RegistrarsComponent {
     loadRegistrarDetails(registrarId: any): void {
         this.registrarsService.getRegistrar(registrarId).subscribe({
             next: (data) => {
-                console.log(data);
                 data.created = data.created ? new Date(data.created.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
                 data.modified = data.modified ? new Date(data.modified.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
                 this.activeRegistrar = data;
@@ -144,20 +201,30 @@ export class RegistrarsComponent {
     }
 
     openSidebar(institution: any): void {
-        if (this.isActive === 'archivers') {
-            this.router.navigate(['/registrars', 'archivers', institution.id]);
-        } else if (this.isActive === 'registrars') {
-            this.router.navigate(['/registrars', 'registrars', institution.code]);
+        if (this.isActive === 'registrars') {
+            if (!this.isSidebarOpen()) {
+                this.router.navigate([institution.code], { relativeTo: this.route });
+            } else {
+                this.router.navigate([`../${institution.code}`], { relativeTo: this.route });
+            }
+        } else if (this.isActive === 'archivers') {
+            if (!this.isSidebarOpen()) {
+                this.router.navigate([institution.id], { relativeTo: this.route });
+            } else {
+                this.router.navigate([`../${institution.id}`], { relativeTo: this.route });
+            }
         }
     }
     closeSidebar(): void {
-        this.router.navigate(['/registrars', this.isActive]);
+        const restoreTargetId = this.isActive === 'registrars' ? `${this.activeRegistrarCode}` : `${this.activeArchiverId}`;
+        this.router.navigate(['../'], { relativeTo: this.route, state: { restoreTargetId } });
         this.isSidebarOpen.set(false);
         this.activeArchiver = null;
+        this.activeArchiverId = null;
+        this.activeRegistrarCode = null;
         this.activeRegistrar = null;
     }
     deleteArchiver(archiver: any): void {
-        console.log('Delete archiver:', archiver);
         this.dialog
             .open(ConfirmDialogComponent, {
                 data: {
@@ -188,7 +255,6 @@ export class RegistrarsComponent {
     }
 
     deleteRegistrar(registrar: any): void {
-        console.log('Delete registrar:', registrar);
         this.dialog
             .open(ConfirmDialogComponent, {
                 data: {
@@ -205,21 +271,31 @@ export class RegistrarsComponent {
                     this.registrarsService.deleteRegistrar(registrar.code).subscribe({
                         next: () => {
                             console.log('Registrar deleted successfully');
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-deleted-successfully'),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 3000,
+                                },
+                            );
                             this.loadRegistrars();
                         },
                         error: (error) => {
                             console.error('Error deleting registrar:', error);
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-deletion-failed', error),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 10000,
+                                },
+                            );
                         },
-                    });
-                    this.snackBar.open(this.translate.instant('messages.registrar-deleted-successfully'), this.translate.instant('buttons.close'), {
-                        duration: 3000,
                     });
                 }
             });
     }
 
     openEditRegistrarDialog(registrar?: any): void {
-        console.log('Open edit registrar dialog');
         const dialogRef = this.dialog.open(EditRegistrarDialogComponent, {
             minWidth: '800px',
             data: {
@@ -232,12 +308,12 @@ export class RegistrarsComponent {
                 resolverMode: registrar?.allowedRegistrationModeByResolver || false,
                 reserveMode: registrar?.allowedRegistrationModeByReservation || false,
                 registrarMode: registrar?.allowedRegistrationModeByRegistrar || false,
+                hidden: registrar?.hidden || false,
             },
         });
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('Registrar edited/added:', result);
                 if (registrar) {
                     // Edit existing registrar
                     this.registrarsService.editRegistrar(registrar.code, result).subscribe({
@@ -248,24 +324,47 @@ export class RegistrarsComponent {
                                 this.translate.instant('buttons.close'),
                                 {
                                     duration: 3000,
-                                }
+                                },
                             );
                             this.loadRegistrarDetails(registrar.code);
                             this.loadRegistrars();
                         },
                         error: (error) => {
                             console.error('Error editing registrar:', error);
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-edit-failed', error),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 10000,
+                                },
+                            );
                         },
                     });
                 } else {
                     // Create new registrar
                     this.registrarsService.createRegistrar(result).subscribe({
                         next: () => {
-                            console.log('Registrar created successfully');
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-created-successfully'),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 3000,
+                                },
+                            );
                             this.loadRegistrars();
                         },
                         error: (error) => {
                             console.error('Error creating registrar:', error);
+                            this.snackBar.open(
+                                this.translate.instant('messages.registrar-creation-failed', error),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 10000,
+                                },
+                            );
+                        },
+                        complete: () => {
+                            this.loadRegistrars();
                         },
                     });
                 }
@@ -274,7 +373,6 @@ export class RegistrarsComponent {
     }
 
     openEditArchiverDialog(archiver?: any): void {
-        console.log('Open edit archiver dialog');
         this.dialog
             .open(EditArchiverDialogComponent, {
                 minWidth: '800px',
@@ -290,28 +388,53 @@ export class RegistrarsComponent {
             .afterClosed()
             .subscribe((result) => {
                 if (result) {
-                    console.log('Archiver edited/added:', result);
                     if (archiver) {
                         // Edit existing archiver
-                        // result.hidden = archiver.hidden; // preserve history
                         this.registrarsService.editArchiver(archiver.id, result).subscribe({
                             next: () => {
                                 console.log('Archiver edited successfully');
+                                this.snackBar.open(
+                                    this.translate.instant('messages.archiver-edited-successfully'),
+                                    this.translate.instant('buttons.close'),
+                                    {
+                                        duration: 3000,
+                                    },
+                                );
                                 this.loadArchivers();
                             },
                             error: (error) => {
                                 console.error('Error editing archiver:', error);
+                                this.snackBar.open(
+                                    this.translate.instant('messages.archiver-editing-failed', error),
+                                    this.translate.instant('buttons.close'),
+                                    {
+                                        duration: 10000,
+                                    },
+                                );
                             },
                         });
                     } else {
                         // Create new archiver
                         this.registrarsService.createArchiver(result).subscribe({
                             next: () => {
-                                console.log('Archiver created successfully');
+                                this.snackBar.open(
+                                    this.translate.instant('messages.archiver-created-successfully'),
+                                    this.translate.instant('buttons.close'),
+                                    {
+                                        duration: 3000,
+                                    },
+                                );
                                 this.loadArchivers();
                             },
                             error: (error) => {
                                 console.error('Error creating archiver:', error);
+                                this.snackBar.open(
+                                    this.translate.instant('messages.archiver-creation-failed', error),
+                                    this.translate.instant('buttons.close'),
+                                    {
+                                        duration: 10000,
+                                    },
+                                );
                             },
                         });
                     }
@@ -319,7 +442,6 @@ export class RegistrarsComponent {
             });
     }
     addNewDigitalLibrary(registrarCode: string): void {
-        console.log('Add new digital library for registrar:', registrarCode);
         const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
             minWidth: '800px',
             data: {
@@ -332,10 +454,8 @@ export class RegistrarsComponent {
         });
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('New digital library data:', result);
                 this.registrarsService.createDigitalLibrary(registrarCode, result).subscribe({
                     next: () => {
-                        console.log('Digital library created successfully');
                         this.loadRegistrarDetails(registrarCode);
                     },
                     error: (error) => {
@@ -345,15 +465,14 @@ export class RegistrarsComponent {
                             this.translate.instant('buttons.close'),
                             {
                                 duration: 3000,
-                            }
+                            },
                         );
                     },
                 });
-           }
+            }
         });
     }
     editDigitalLibrary(registrarCode: string, library: any): void {
-        console.log('Edit digital library:', library, 'for registrar:', registrarCode);
         const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
             minWidth: '800px',
             data: {
@@ -379,7 +498,7 @@ export class RegistrarsComponent {
                             this.translate.instant('buttons.close'),
                             {
                                 duration: 3000,
-                            }
+                            },
                         );
                     },
                 });
@@ -403,24 +522,23 @@ export class RegistrarsComponent {
                     this.registrarsService.deleteDigitalLibrary(registrarCode, library.id).subscribe({
                         next: () => {
                             console.log('Digital library deleted successfully');
+                            this.snackBar.open(
+                                this.translate.instant('messages.digital-library-deleted-successfully'),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 3000,
+                                },
+                            );
                             this.loadRegistrarDetails(registrarCode);
                         },
                         error: (error) => {
                             console.error('Error deleting digital library:', error);
                         },
                     });
-                    this.snackBar.open(
-                        this.translate.instant('messages.digital-library-deleted-successfully'),
-                        this.translate.instant('buttons.close'),
-                        {
-                            duration: 3000,
-                        }
-                    );
                 }
             });
     }
     addNewCatalogue(registrarCode: string): void {
-        console.log('Add new catalogue for registrar:', registrarCode);
         const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
             minWidth: '800px',
             data: {
@@ -433,10 +551,8 @@ export class RegistrarsComponent {
         });
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('New catalogue data:', result);
                 this.registrarsService.createCatalogue(registrarCode, result).subscribe({
                     next: () => {
-                        console.log('Catalogue created successfully');
                         this.loadRegistrarDetails(registrarCode);
                     },
                     error: (error) => {
@@ -445,8 +561,8 @@ export class RegistrarsComponent {
                             this.translate.instant('messages.' + error?.error?.message || 'catalogue-creation-failed'),
                             this.translate.instant('buttons.close'),
                             {
-                                duration: 3000,
-                            }
+                                duration: 20000,
+                            },
                         );
                     },
                 });
@@ -454,7 +570,6 @@ export class RegistrarsComponent {
         });
     }
     editCatalogue(registrarCode: string, catalog: any): void {
-        console.log('Edit catalogue:', catalog, 'for registrar:', registrarCode);
         const dialogRef = this.dialog.open(EditDlCatalogDialogComponent, {
             minWidth: '800px',
             data: {
@@ -467,8 +582,7 @@ export class RegistrarsComponent {
         });
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                console.log('Edited catalogue data:', result);
-                let body = {name: result.name, description: result.description, urlPrefix: result.urlPrefix};
+                let body = { name: result.name, description: result.description, urlPrefix: result.urlPrefix };
                 this.registrarsService.editCatalogue(registrarCode, catalog.id, body).subscribe({
                     next: () => {
                         console.log('Catalogue edited successfully');
@@ -481,7 +595,7 @@ export class RegistrarsComponent {
                             this.translate.instant('buttons.close'),
                             {
                                 duration: 3000,
-                            }
+                            },
                         );
                     },
                 });
@@ -489,7 +603,6 @@ export class RegistrarsComponent {
         });
     }
     deleteCatalogue(registrarCode: string, catalog: any): void {
-        console.log('Delete catalogue:', catalog, 'for registrar:', registrarCode);
         this.dialog
             .open(ConfirmDialogComponent, {
                 data: {
@@ -505,24 +618,23 @@ export class RegistrarsComponent {
                     this.registrarsService.deleteCatalogue(registrarCode, catalog.id).subscribe({
                         next: () => {
                             console.log('Catalogue deleted successfully');
+                            this.snackBar.open(
+                                this.translate.instant('messages.catalogue-deleted-successfully'),
+                                this.translate.instant('buttons.close'),
+                                {
+                                    duration: 3000,
+                                },
+                            );
                             this.loadRegistrarDetails(registrarCode);
                         },
                         error: (error) => {
                             console.error('Error deleting catalogue:', error);
                         },
                     });
-                    this.snackBar.open(
-                        this.translate.instant('messages.catalogue-deleted-successfully'),
-                        this.translate.instant('buttons.close'),
-                        {
-                            duration: 3000,
-                        }
-                    );
                 }
             });
     }
     showDetails(registrarCode: string, item: any, context: string): void {
-        console.log('Show details for registrar:', registrarCode, 'and library or catalogue:', item);
         const dialogRef = this.dialog.open(DetailDialogComponent, {
             minWidth: '600px',
             data: {

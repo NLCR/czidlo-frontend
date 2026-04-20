@@ -40,7 +40,7 @@
         </div>
         <div class="app-part-content app-part-url">
             <div class="app-base-input app-full-width">
-                <div class="app-base-input-label">{{ data.context === 'dl' ? 'registrars.URL' : ('registrars.URL-prefix' | translate) }}</div>
+                <div class="app-base-input-label">{{ data.context === 'dl' ? ('registrars.URL' | translate) : ('registrars.URL-prefix' | translate) }}</div>
                 <input matInput [formControl]="urlControl" placeholder="https://digitalni-knihovna.cz" />
                 <!-- CHYBA – povinné pole -->
                 <mat-error *ngIf="urlControl.hasError('required') && (urlControl.touched || urlControl.dirty)">

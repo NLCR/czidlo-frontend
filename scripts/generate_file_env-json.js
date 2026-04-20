@@ -22,7 +22,7 @@ const config = {
   
   czidloApiServiceBaseUrl: process.env.APP_CZIDLO_API_SERVICE_URL || '',
   czidloPublicApiBaseUrl: process.env.APP_CZIDLO_PUBLIC_API_URL || '',
-
+  
 };
 
 fs.writeFileSync(outputPath, JSON.stringify(config, null, 2));

@@ -20,32 +20,41 @@ export class ProcessesService {
     ]);
     public identifiers = signal<Array<string>>(['CNB', 'ISSN', 'ISBN']);
 
-    constructor(private apiService: ApiService) {}
+    constructor(private apiService: ApiService) { }
 
     getProcesses(): Observable<any> {
         return this.apiService.getProcesses().pipe(
             tap({
                 next: (data) => {
-                    console.log('Processes data received:', data);
                     this.processes.set(
-                        data.items.map((item: any) => ({
-                            id: item.id,
-                            type: item.type,
-                            ownerLogin: item.ownerLogin,
-                            state: item.state,
-                            scheduled: item.scheduled ? new Date(item.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                            started: item.started ? new Date(item.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                            finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
-                            duration: item.finished
-                                ? Math.round(
-                                      (new Date(item.finished.replace(/\[UTC\]$/, '')).getTime() -
-                                          new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) /
-                                          1000
-                                  ) + ' s'
-                                : '---',
-                        }))
+                        data.items
+                            .map((item: any) => ({
+                                id: item.id,
+                                type: item.type,
+                                ownerLogin: item.ownerLogin,
+                                state: item.state,
+                                scheduled: item.scheduled ? new Date(item.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                                started: item.started ? new Date(item.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                                finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
+                                duration: item.state === 'FINISHED'
+                                    ? (() => {
+                                        const start = new Date(item.started.replace(/\[UTC\]$/, '')).getTime();
+                                        const end = new Date(item.finished.replace(/\[UTC\]$/, '')).getTime();
+                                        const diffSec = Math.round((end - start) / 1000);
+                                        return diffSec;
+                                    })()
+                                    : (() => {
+                                        const start = item.started ? new Date(item.started.replace(/\[UTC\]$/, '')).getTime() : 0;
+                                        const end = new Date().getTime();
+                                        const diffSec = Math.round((end - start) / 1000);
+                                        if (!item.started) {
+                                            return '---';
+                                        }
+                                        return diffSec;
+                                    })(),
+                            }))
+                            .sort((a: any, b: any) => (a.id < b.id ? 1 : -1))
                     );
-                    console.log('Processes loaded:', this.processes());
                 },
                 error: (error) => {
                     console.error('Error loading processes:', error);
@@ -90,12 +99,12 @@ export class ProcessesService {
                             finished: item.finished ? new Date(item.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
                             duration: item.finished
                                 ? Math.round(
-                                      (new Date(item.finished.replace(/\[UTC\]$/, '')).getTime() -
-                                          new Date(item.started.replace(/\[UTC\]$/, '')).getTime()) /
-                                          1000
-                                  ) + ' s'
-                                : '---',
-                        }))
+                                    (new Date(item.finished?.replace(/\[UTC\]$/, '')).getTime() -
+                                        new Date(item.started?.replace(/\[UTC\]$/, '')).getTime()) /
+                                    1000
+                                ) + ' s'
+                                : Math.round((Date.now() - new Date(item.started?.replace(/\[UTC\]$/, '')).getTime()) / 1000) + ' s',
+                        })).sort((a: any, b: any) => (a.id < b.id ? 1 : -1))
                     );
                     console.log(`Processes for owner ${owner} loaded:`, this.processes());
                 },
@@ -126,7 +135,7 @@ export class ProcessesService {
         );
     }
     killProcess(id: string): Observable<any> {
-        return this.apiService.cancelProcess(id).pipe(
+        return this.apiService.killProcess(id).pipe(
             tap({
                 next: () => {
                     console.log(`Process ${id} kill requested`);
@@ -159,15 +168,35 @@ export class ProcessesService {
         return this.apiService.createProcess(body).pipe(
             tap({
                 next: (data) => {
-                    console.log(`Indexation process planned:`, data);
+                    console.log(`process planned:`, data);
                 },
                 error: (error) => {
-                    console.error(`Error planning indexation process:`, error);
+                    console.error(`Error planning process:`, error);
                 },
                 complete: () => {
-                    console.log(`Indexation process planning complete`);
+                    console.log(`Process planning complete`);
                 },
             })
         );
+    }
+
+    // OAI TRANSFORMATIONS
+    getTransformations(): Observable<any> {
+        return this.apiService.getTransformations();
+    }
+    getTransformation(id: string): Observable<any> {
+        return this.apiService.getTransformation(id);
+    }
+    deleteTransformation(id: string): Observable<any> {
+        return this.apiService.deleteTransformation(id);
+    }
+    createTransformation(body: any): Observable<any> {
+        return this.apiService.createTransformation(body);
+    }
+    uploadTransformationFile(id: string, file: File): Observable<any> {
+        return this.apiService.uploadTransformationFile(id, file);
+    }
+    downloadTransformationFile(id: string): Observable<any> {
+        return this.apiService.downloadTransformationFile(id);
     }
 }

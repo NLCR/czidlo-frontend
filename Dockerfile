@@ -1,23 +1,29 @@
-FROM node:alpine as builder
-EXPOSE 80
+# node lts/iron (20.19.6)
+FROM node:20.19.6-alpine AS builder
 
 WORKDIR /app
 
-# přidej git do builderu kvůli collect-build-info.js
+# kvůli collect-build-info.js
 RUN apk add --no-cache git
 
+# nejdřív jen manifesty (cache)
+COPY package.json package-lock.json ./
+# nainstaluj závislosti (nahrazuje npm install)
+RUN npm ci
+
+# potom zdrojáky
 COPY . /app
 
 # zkopíruj .git kvůli collect-build-info.js
 COPY .git /app/.git
 
-RUN npm install -g @angular/cli && \
-  npm install && \
-  npm run build
+RUN npm run build
+
 
 FROM nginx:alpine
-COPY --from=builder \
-   /app/dist/czidlo-frontend/browser/ /usr/share/nginx/html
+EXPOSE 80
+
+COPY --from=builder /app/dist/czidlo-frontend/browser/ /usr/share/nginx/html
 COPY docker/etc/nginx/conf.d/default.conf /etc/nginx/conf.d/
 
 # ⬇️ nový entrypoint skript

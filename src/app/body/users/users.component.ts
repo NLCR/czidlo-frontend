@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -19,12 +19,16 @@ import { catchError } from 'rxjs/operators';
     templateUrl: './users.component.html',
     styleUrl: './users.component.scss',
 })
-export class UsersComponent {
+export class UsersComponent implements AfterViewInit {
+    @ViewChild('usersBody') usersBody?: ElementRef<HTMLElement>;
+
     loggedIn = computed(() => this.authService.loggedIn());
     isAdmin = computed(() => this.authService.isAdmin());
+    loadingUsers = signal<boolean>(false);
 
     users = signal<Array<any>>([]);
     activeUser: any = null;
+    trackByUser = (index: number, user: any) => user.id;
     rightsDetails: any = null;
 
     allRegistrars = signal<Array<any>>([]);
@@ -44,20 +48,16 @@ export class UsersComponent {
         private dialog: MatDialog,
         private _snackBar: MatSnackBar,
         private translate: TranslateService,
-        private registrarsService: RegistrarsService
+        private registrarsService: RegistrarsService,
     ) {}
 
     ngOnInit() {
-        console.log('users', this.loggedIn(), this.isAdmin());
-        // this.loadUsers();
         this.route.url.subscribe((url) => {
-            console.log('users on init', this.usersService.users());
             if (this.usersService.users().length === 0) {
                 this.loadUsers();
             } else {
                 this.users.set(this.usersService.users());
             }
-            console.log('Route URL changed:', url);
             if (url.length === 2) {
                 const userId = url[1].path;
                 this.loadUserDetails(userId);
@@ -71,15 +71,44 @@ export class UsersComponent {
             }
         });
     }
+    ngAfterViewInit(): void {
+        this.scrollToActive();
+    }
+
+    private scrollToActive(): void {
+        const host = this.usersBody?.nativeElement;
+
+        if (!host) return;
+
+        const restoredUserId = history.state?.restoreUserId;
+        console.log(history.state);
+
+        const targetId = this.activeUser ? `user-${this.activeUser.id}` : restoredUserId ? `user-${restoredUserId}` : null;
+
+        if (!targetId) return;
+
+        requestAnimationFrame(() => {
+            const el = host.querySelector(`#${CSS.escape(targetId)}`) as HTMLElement | null;
+            if (el) el.scrollIntoView({ block: 'center' });
+        });
+    }
 
     loadUsers() {
+        this.loadingUsers.set(true);
         console.log('Loading users...');
+        if (!this.isAdmin()) {
+            console.warn('User is not an administrator. Cannot load users.');
+            this.loadingUsers.set(false);
+            return;
+        }
         this.usersService.getUsers().subscribe({
             next: (response) => {
                 this.users.set(this.usersService.users());
+                this.loadingUsers.set(false);
             },
             error: (error) => {
                 console.error('Error loading users:', error);
+                this.loadingUsers.set(false);
             },
         });
     }
@@ -89,6 +118,7 @@ export class UsersComponent {
             next: (response) => {
                 this.activeUser = response;
                 this.isSidebarOpen.set(true);
+                this.scrollToActive();
             },
             error: (error) => {
                 console.error('Error loading user details:', error);
@@ -135,9 +165,9 @@ export class UsersComponent {
                         code,
                         success: false,
                         error: err,
-                    })
-                )
-            )
+                    }),
+                ),
+            ),
         );
         // 2) Spustíme všechny najednou
         forkJoin(requests).subscribe((results: any) => {
@@ -173,10 +203,8 @@ export class UsersComponent {
     }
 
     loadRightsDetails(userId: any) {
-        console.log('loading rights details for user:', userId);
         this.usersService.getUserRights(userId).subscribe({
             next: (response) => {
-                console.log(response, this.activeUser);
                 this.rightsDetails = response;
                 this.loadRegistrars(response);
                 this.isSidebarOpen.set(true);
@@ -207,7 +235,6 @@ export class UsersComponent {
         });
 
         dialogRef.afterClosed().subscribe((result) => {
-            console.log('Remove Registrar Right dialog closed:', result);
             if (result === true) {
                 this.confirmRemoveCurrentRegistrar(item);
             }
@@ -249,7 +276,9 @@ export class UsersComponent {
         this.router.navigate(['/users', user.id]);
     }
     closeSidebar() {
-        this.router.navigate(['/users']);
+        const restoreUserId = this.activeUser ? this.activeUser.id : null;
+        console.log('restoreUserId', restoreUserId);
+        this.router.navigate(['../'], { relativeTo: this.route, state: { restoreUserId } });
     }
     openAddUserDialog() {
         this.dialog

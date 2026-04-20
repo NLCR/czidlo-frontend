@@ -101,3 +101,10 @@
     background: rgba(0, 0, 0, 0.4);
     z-index: 100;
 }
+.app-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}

@@ -1,11 +1,17 @@
-<div class="app-not-logged-in" *ngIf="!loggedIn()">
-    <div class="app-not-logged-in-content">
+<div class="app-not-logged-in" *ngIf="!loggedIn() || !isAdmin()">
+    <div class="app-not-logged-in-content" *ngIf="!loggedIn()">
         <div class="app-not-logged-in-message">
             {{ 'not-logged-in-message' | translate }}
         </div>
     </div>
+    <div class="app-not-logged-in-content" *ngIf="loggedIn() && !isAdmin()">
+        <div class="app-not-logged-in-message">
+            {{ 'not-admin-message' | translate }}
+        </div>
+    </div>
 </div>
-<div class="app-logs-container" *ngIf="loggedIn()">
+
+<div class="app-logs-container" *ngIf="loggedIn() && isAdmin()">
     <div class="app-logs-header">
         <div class="app-logs-title">
             {{ 'logs.title' | translate }}
@@ -76,12 +82,7 @@
                 </mat-error>
             </mat-form-field>
         </div>
-        <app-button
-            size="s"
-            variant="primary"
-            (click)="onDownloadLogsWithDateRange()"
-            [disabled]="!startDateControl.valid || !endDateControl.valid"
-        >
+        <app-button size="s" variant="primary" (click)="onDownloadLogsWithDateRange()" [disabled]="!startDateControl.valid || !endDateControl.valid">
             {{ 'buttons.download-logs' | translate }}
         </app-button>
     </div>

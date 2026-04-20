@@ -1,54 +1,221 @@
 <div class="app-search-container">
     <div class="app-search-header">
+        <mat-form-field class="app-fields-filter" appearance="outline">
+            <mat-select [(ngModel)]="selectedField" (selectionChange)="onFilterSelected()">
+                @for (entity of filterFieldsList; track entity) {
+                    <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
         <input
+            class="app-fields-input"
             #searchInput
             id="search-input"
             type="text"
-            placeholder="Hledat..."
+            placeholder="{{ 'search.search-placeholder' | translate }}"
             [(ngModel)]="searchQuery"
-            (keyup.enter)="onSearch(searchInput.value)"
+            (keyup.enter)="onFilterSelected()"
         />
-        <app-button variant="primary" size="l" iconLeft="" iconRight="" (click)="onSearch(searchInput.value)">
+        <div class="app-help-icon" [matTooltip]="helpText">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M12 1.25C6.08579 1.25 1.25 6.08579 1.25 12C1.25 17.9142 6.08579 22.75 12 22.75C17.9142 22.75 22.75 17.9142 22.75 12C22.75 6.08579 17.9142 1.25 12 1.25ZM2.75 12C2.75 6.91421 6.91421 2.75 12 2.75C17.0858 2.75 21.25 6.91421 21.25 12C21.25 17.0858 17.0858 21.25 12 21.25C6.91421 21.25 2.75 17.0858 2.75 12ZM11.0828 12.0582V14.4806H12.5172V13.0789C12.8299 13.018 13.1333 12.9114 13.4276 12.759C13.7218 12.5965 13.9839 12.3883 14.2138 12.1343C14.4529 11.8804 14.6414 11.5757 14.7793 11.2202C14.9264 10.8546 15 10.4432 15 9.98615C15 9.53924 14.931 9.13296 14.7931 8.76731C14.6552 8.3915 14.4575 8.07664 14.2 7.82271C13.9425 7.55863 13.6299 7.35549 13.2621 7.2133C12.8943 7.0711 12.4851 7 12.0345 7C11.5931 7 11.2023 7.0711 10.8621 7.2133C10.5218 7.34534 10.2276 7.52816 9.97931 7.76177C9.73103 7.98523 9.52414 8.24423 9.35862 8.53878C9.2023 8.83333 9.08276 9.13804 9 9.45291L10.3103 10.0319C10.4115 9.57479 10.6 9.19898 10.8759 8.90443C11.1517 8.60988 11.5195 8.4626 11.9793 8.4626C12.4115 8.4626 12.7563 8.59464 13.0138 8.85873C13.2713 9.11265 13.4 9.47322 13.4 9.94044V10.1537C13.4 10.7632 13.1977 11.2253 12.7931 11.5402C12.3977 11.8449 11.8276 12.0175 11.0828 12.0582ZM11.0414 17.7258C11.2069 17.9086 11.4644 18 11.8138 18C12.1632 18 12.4161 17.9086 12.5724 17.7258C12.7379 17.5328 12.8207 17.289 12.8207 16.9945V16.7355C12.8207 16.4409 12.7379 16.2022 12.5724 16.0194C12.4161 15.8264 12.1632 15.7299 11.8138 15.7299C11.4644 15.7299 11.2069 15.8264 11.0414 16.0194C10.8851 16.2022 10.8069 16.4409 10.8069 16.7355V16.9945C10.8069 17.289 10.8851 17.5328 11.0414 17.7258Z"
+                    fill="#8099B3"
+                />
+                <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M12 1.25C6.08579 1.25 1.25 6.08579 1.25 12C1.25 17.9142 6.08579 22.75 12 22.75C17.9142 22.75 22.75 17.9142 22.75 12C22.75 6.08579 17.9142 1.25 12 1.25ZM2.75 12C2.75 6.91421 6.91421 2.75 12 2.75C17.0858 2.75 21.25 6.91421 21.25 12C21.25 17.0858 17.0858 21.25 12 21.25C6.91421 21.25 2.75 17.0858 2.75 12ZM11.0828 12.0582V14.4806H12.5172V13.0789C12.8299 13.018 13.1333 12.9114 13.4276 12.759C13.7218 12.5965 13.9839 12.3883 14.2138 12.1343C14.4529 11.8804 14.6414 11.5757 14.7793 11.2202C14.9264 10.8546 15 10.4432 15 9.98615C15 9.53924 14.931 9.13296 14.7931 8.76731C14.6552 8.3915 14.4575 8.07664 14.2 7.82271C13.9425 7.55863 13.6299 7.35549 13.2621 7.2133C12.8943 7.0711 12.4851 7 12.0345 7C11.5931 7 11.2023 7.0711 10.8621 7.2133C10.5218 7.34534 10.2276 7.52816 9.97931 7.76177C9.73103 7.98523 9.52414 8.24423 9.35862 8.53878C9.2023 8.83333 9.08276 9.13804 9 9.45291L10.3103 10.0319C10.4115 9.57479 10.6 9.19898 10.8759 8.90443C11.1517 8.60988 11.5195 8.4626 11.9793 8.4626C12.4115 8.4626 12.7563 8.59464 13.0138 8.85873C13.2713 9.11265 13.4 9.47322 13.4 9.94044V10.1537C13.4 10.7632 13.1977 11.2253 12.7931 11.5402C12.3977 11.8449 11.8276 12.0175 11.0828 12.0582ZM11.0414 17.7258C11.2069 17.9086 11.4644 18 11.8138 18C12.1632 18 12.4161 17.9086 12.5724 17.7258C12.7379 17.5328 12.8207 17.289 12.8207 16.9945V16.7355C12.8207 16.4409 12.7379 16.2022 12.5724 16.0194C12.4161 15.8264 12.1632 15.7299 11.8138 15.7299C11.4644 15.7299 11.2069 15.8264 11.0414 16.0194C10.8851 16.2022 10.8069 16.4409 10.8069 16.7355V16.9945C10.8069 17.289 10.8851 17.5328 11.0414 17.7258Z"
+                    fill="#8099B3"
+                />
+            </svg>
+        </div>
+        <app-button variant="primary" size="l" iconLeft="" iconRight="" (click)="onFilterSelected()">
             <span>{{ 'buttons.search' | translate }}</span>
         </app-button>
     </div>
+
+    <!-- SEARCH TAGS -->
+    <div class="app-search-tags">
+        <div class="app-search-tag" *ngIf="searchQuery && searchQuery.length > 0">
+            <div class="app-tag-label">{{ searchQuery }}</div>
+            <div class="app-tag-remove-icon" (click)="removeFilter('searchQuery')">&#10005;</div>
+        </div>
+        <div class="app-search-tag" *ngIf="selectedType">
+            <div class="app-tag-label">{{ selectedTypeLabel() }}</div>
+            <div class="app-tag-remove-icon" *ngIf="selectedType" (click)="removeFilter('selectedType')">&#10005;</div>
+        </div>
+        <div class="app-search-tag" *ngIf="selectedRegistrar">
+            <div class="app-tag-label">{{ selectedRegistrar }}</div>
+            <div class="app-tag-remove-icon" *ngIf="selectedRegistrar" (click)="removeFilter('selectedRegistrar')">&#10005;</div>
+        </div>
+        <div class="app-search-tag" *ngIf="dateFrom">
+            <div class="app-tag-label">{{ 'search.from' | translate }}: {{ dateFrom | date }}</div>
+            <div class="app-tag-remove-icon" *ngIf="dateFrom" (click)="removeFilter('dateFrom')">&#10005;</div>
+        </div>
+        <div class="app-search-tag" *ngIf="dateTo">
+            <div class="app-tag-label">{{ 'search.to' | translate }}: {{ dateTo | date }}</div>
+            <div class="app-tag-remove-icon" *ngIf="dateTo" (click)="removeFilter('dateTo')">&#10005;</div>
+        </div>
+        <div class="app-search-tag" *ngIf="selectedState && selectedState !== 'all'">
+            <div class="app-tag-label">{{ 'statistics.' + selectedState | translate }}</div>
+            <div class="app-tag-remove-icon" *ngIf="selectedState" (click)="removeFilter('selectedState')">&#10005;</div>
+        </div>
+    </div>
+
+    <!-- ACTION ROW -->
     <div class="app-action">
-        <div class="app-select-type">
-            <mat-form-field appearance="outline">
-                <mat-label>Typ dokumentu</mat-label>
-                <mat-select [(ngModel)]="selectedType" (selectionChange)="onTypeSelected()">
-                    <mat-option value="">Vše</mat-option>
-                    <mat-option value="MONOGRAPH">Monografie</mat-option>
-                    <mat-option value="MONOGRAPH_VOLUME">Svazek monografie</mat-option>
-                    <mat-option value="PERIODICAL">Periodikum</mat-option>
-                    <mat-option value="PERIODICAL_VOLUME">Ročník periodika</mat-option>
-                    <mat-option value="PERIODICAL_ISSUE">Číslo periodika</mat-option>
-                    <mat-option value="ANALYTICAL">Článek</mat-option>
-                    <mat-option value="THESIS">Thesis</mat-option>
-                    <mat-option value="OTHER">Ostatní</mat-option>
+        <div class="app-advanced-search-text" (click)="advancedSearch.set(!advancedSearch())">
+            {{ advancedSearch() ? ('search.hide-advanced-search' | translate) : ('search.show-advanced-search' | translate) }}
+        </div>
+        <div
+            class="app-records-count"
+            *ngIf="
+                searchService.recordsCount() > 0 &&
+                (searchedQuery() || selectedType || selectedRegistrar || dateFrom || dateTo || (selectedState && selectedState !== 'all'))
+            "
+        >
+            <div class="app-records-found">
+                {{ 'search.records-found' | translate }}: {{ searchService.recordsCount() }}
+                <span *ngIf="searchService.recordsCount() === 10000">+</span>
+            </div>
+            <div class="app-too-many-records-info" *ngIf="searchService.recordsCount() === 10000">{{ 'search.too-many-records' | translate }}</div>
+        </div>
+        <div
+            class="app-sort-wrapper"
+            *ngIf="
+                searchService.recordsCount() > 1 &&
+                (searchedQuery() || selectedType || selectedRegistrar || dateFrom || dateTo || (selectedState && selectedState !== 'all'))
+            "
+        >
+            <span class="app-sort-label">{{ 'search.sort-by' | translate }}:</span>
+            <mat-form-field appearance="outline" class="app-sort-field">
+                <mat-select [(ngModel)]="selectedSort" (selectionChange)="onSortChange($event.value)">
+                    @for (sortOption of sortOptionsList; track sortOption) {
+                        <mat-option [value]="sortOption.value">
+                            {{ sortOption.label }}
+                        </mat-option>
+                    }
                 </mat-select>
             </mat-form-field>
         </div>
-        <div class="app-records-count" *ngIf="searchService.recordsCount() > 0">
-            {{ 'search.records-found' | translate }}: {{ searchService.recordsCount() }}
+    </div>
+
+    <!-- ADVANCED SEARCH -->
+    <div class="app-advanced-search" *ngIf="advancedSearch()">
+        <!-- STATE -->
+        <div class="app-base-input-label">
+            {{ 'search.filter-by-state' | translate }}
+        </div>
+        <app-radio-group orientation="horizontal" [gap]="16" [(value)]="selectedState" (valueChange)="onStateChange($event)">
+            @for (state of states; track state) {
+                <app-radio-button label="{{ 'statistics.' + state | translate }}" value="{{ state }}"></app-radio-button>
+            }
+        </app-radio-group>
+        <div class="app-advanced-search-row">
+            <!-- ENTITY TYPE -->
+            <div class="app-base-input-container">
+                <div class="app-base-input app-search-entity-type">
+                    <div class="app-base-input-label">
+                        {{ 'search.filter-by-type' | translate }}
+                    </div>
+                    <mat-form-field appearance="outline">
+                        <mat-select [(ngModel)]="selectedType" (selectionChange)="onFilterSelected()">
+                            @for (entity of entityTypesList; track entity) {
+                                <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <!-- REGISTRAR -->
+            <div class="app-base-input-container">
+                <div class="app-base-input app-search-registrar">
+                    <div class="app-base-input-label">
+                        {{ 'search.filter-by-registrar' | translate }}
+                    </div>
+                    <mat-form-field appearance="outline">
+                        <mat-select [(ngModel)]="selectedRegistrar" (selectionChange)="onFilterSelected()">
+                            <mat-option [value]="''">{{ 'search.all-registrars' | translate }}</mat-option>
+                            @for (entity of registrarCodeList; track entity) {
+                                <mat-option [value]="entity.code">{{ entity.code }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <!-- DATES -->
+            <div class="app-base-input-container">
+                <div class="app-base-input app-search-date">
+                    <div class="app-base-input-label">
+                        {{ 'search.filter-by-date-from' | translate }}
+                    </div>
+                    <mat-form-field appearance="outline">
+                        <input
+                            matInput
+                            [matDatepicker]="pickerFrom"
+                            placeholder="{{ 'search.from' | translate }}"
+                            [(ngModel)]="dateFrom"
+                            [min]="minDate"
+                            [max]="maxDate"
+                            (dateChange)="onFilterSelected()"
+                        />
+                        <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerFrom></mat-datepicker>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="app-base-input-container">
+                <div class="app-base-input app-search-date">
+                    <div class="app-base-input-label">
+                        {{ 'search.filter-by-date-to' | translate }}
+                    </div>
+                    <mat-form-field appearance="outline">
+                        <input
+                            matInput
+                            [matDatepicker]="pickerTo"
+                            placeholder="{{ 'search.to' | translate }}"
+                            [(ngModel)]="dateTo"
+                            [min]="minDate"
+                            [max]="maxDate"
+                            (dateChange)="onFilterSelected()"
+                        />
+                        <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerTo></mat-datepicker>
+                    </mat-form-field>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- SEARCH RESULTS -->
-    <div class="app-search-results" *ngIf="searchService.searchResults().length > 0">
+    <div
+        #resultsContainer
+        class="app-search-results"
+        *ngIf="
+            searchService.searchResults().length > 0 &&
+            !loadingResults() &&
+            (searchedQuery() || selectedType || selectedRegistrar || dateFrom || dateTo || (selectedState && selectedState !== 'all'))
+        "
+    >
         <div class="app-search-card" *ngFor="let item of searchService.searchResults()">
             <div class="app-card-header" [ngClass]="{ opened: item.opened }" (click)="onSelectItem(item)">
                 <div class="app-card-header-left">
                     <img *ngIf="!item.loading" [src]="item.opened ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                     <div *ngIf="item.loading" class="loader"><mat-spinner diameter="24"></mat-spinner></div>
                     <div class="app-card-title">
-                        <div class="app-title-part">{{ item.title }}</div>
+                        <div class="app-title-part">{{ getLabel(item) }}</div>
+                        <!-- <div class="app-title-part">{{ item.title }}</div>
                         <div class="app-title-part" *ngIf="item.volumetitle">- {{ item.volumetitle }}</div>
                         <div class="app-title-part" *ngIf="item.sdtitle">({{ item.sdtitle }})</div>
-                        <div class="app-title-part" *ngIf="item.entitytype">({{ item.entitytype }})</div>
+                        <div class="app-title-part" *ngIf="item.originatorvalue">({{ item.originatorvalue }})</div> -->
                     </div>
                 </div>
-                <div class="app-card-header-right">
+                <div class="app-card-header-right" (click)="$event.stopPropagation()">
                     <div
                         class="app-urn-nbn"
                         *ngIf="item.documentcode && item.registrarcode"
@@ -56,6 +223,7 @@
                     >
                         urn:nbn:cz:{{ item.registrarcode }}-{{ item.documentcode }}
                     </div>
+                    <div class="app-title-part" *ngIf="item.entitytype">{{ item.entitytype | translate }}</div>
                 </div>
             </div>
             <div class="app-card-content" [ngClass]="{ opened: item.opened }" *ngIf="item.opened && !item.loading">
@@ -72,7 +240,20 @@
 
                     <!-- TITLE -->
                     <div class="app-ie-field" *ngIf="item.title">
-                        <div class="app-label">{{ 'search.title' | translate }}:</div>
+                        <div
+                            class="app-label"
+                            *ngIf="
+                                item.entitytype !== 'PERIODICAL_ISSUE' &&
+                                item.entitytype !== 'PERIODICAL_VOLUME' &&
+                                item.entitytype !== 'MONOGRAPH_VOLUME'
+                            "
+                        >
+                            {{ 'search.title' | translate }}:
+                        </div>
+                        <div class="app-label" *ngIf="item.entitytype === 'PERIODICAL_ISSUE' || item.entitytype === 'PERIODICAL_VOLUME'">
+                            {{ 'search.title-per-volume' | translate }}:
+                        </div>
+                        <div class="app-label" *ngIf="item.entitytype === 'MONOGRAPH_VOLUME'">{{ 'search.title-mon-volume' | translate }}:</div>
                         <div class="app-value">{{ item.title }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.subtitle">
@@ -80,7 +261,8 @@
                         <div class="app-value">{{ item.subtitle }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.volumetitle">
-                        <div class="app-label">{{ 'search.volumetitle' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.entitytype !== 'MONOGRAPH_VOLUME'">{{ 'search.volumetitle' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.entitytype === 'MONOGRAPH_VOLUME'">{{ 'search.volumetitle-mon' | translate }}:</div>
                         <div class="app-value">{{ item.volumetitle }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.issuetitle">
@@ -89,16 +271,22 @@
                     </div>
 
                     <!-- AUTHORS -->
+                    <div class="app-ie-field" *ngIf="item.originatorvalue">
+                        <div class="app-label" *ngIf="item.originatortype === 'AUTHOR'">{{ 'search.author' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.originatortype === 'EVENT'">{{ 'search.event' | translate }}:</div>
+                        <div class="app-label" *ngIf="item.originatortype === 'CORPORATION'">{{ 'search.corporation' | translate }}:</div>
+                        <div class="app-value">{{ item.originatorvalue }}</div>
+                    </div>
                     <div class="app-ie-field" *ngIf="item.author?.length > 0">
                         <div class="app-label">{{ 'search.author' | translate }}:</div>
                         <div class="app-value">{{ item.author }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.corporation?.length > 0">
-                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-label">{{ 'search.corporation' | translate }}:</div>
                         <div class="app-value">{{ item.corporation }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.event?.length > 0">
-                        <div class="app-label">{{ 'search.author' | translate }}:</div>
+                        <div class="app-label">{{ 'search.event' | translate }}:</div>
                         <div class="app-value">{{ item.event }}</div>
                     </div>
                     <div class="app-ie-field" *ngIf="item.otheroriginator">
@@ -149,22 +337,24 @@
                         <div class="app-label">{{ 'search.isbn' | translate }}:</div>
                         <div class="app-value">{{ item.isbn }}</div>
                     </div>
-                    <div class="app-ie-fields" *ngIf="item.details.intelectualEntity?.ieIdentifiers?.length > 0">
+                    <!-- <div class="app-ie-fields" *ngIf="item.details.intelectualEntity?.ieIdentifiers?.length > 0">
                         <div class="app-ie-field" *ngFor="let id of item.details.intelectualEntity?.ieIdentifiers">
-                            <div class="app-label">{{ 'search.' + id.type.toLowerCase() | translate }}:</div>
-                            <div class="app-value">{{ id.value }}</div>
+                            <div class="app-label" *ngIf="id.type !== 'TITLE' && id.type !== 'SUB_TITLE'">
+                                {{ 'search.' + id.type.toLowerCase() | translate }}:
+                            </div>
+                            <div class="app-value" *ngIf="id.type !== 'TITLE' && id.type !== 'SUB_TITLE'">{{ id.value }}</div>
                         </div>
-                    </div>
-                    <div class="app-ie-field" *ngIf="item.details.intelectualEntity?.created">
+                    </div> -->
+                    <div class="app-ie-field" *ngIf="item.details?.intelectualEntity?.created">
                         <div class="app-label">{{ 'search.created' | translate }}:</div>
-                        <div class="app-value">{{ item.details.intelectualEntity?.created.split('[')[0] | date }}</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.created.split('[')[0] | date }}</div>
                     </div>
-                    <div class="app-ie-field" *ngIf="item.details.intelectualEntity?.modified">
+                    <div class="app-ie-field" *ngIf="item.details?.intelectualEntity?.modified">
                         <div class="app-label">{{ 'search.modified' | translate }}:</div>
-                        <div class="app-value">{{ item.details.intelectualEntity?.modified.split('[')[0] | date }}</div>
+                        <div class="app-value">{{ item.details?.intelectualEntity?.modified.split('[')[0] | date }}</div>
                     </div>
 
-                    <div class="app-button-part" *ngIf="isAdmin()">
+                    <div class="app-button-part" *ngIf="hasRightToRegistrar(item.registrarcode)">
                         <app-button variant="primary" size="s" (click)="editItem(item)">
                             <span>{{ 'buttons.edit' | translate }}</span>
                         </app-button>
@@ -203,12 +393,16 @@
                             <div class="app-ie-field" *ngIf="item.details.urnNbn && !isAdmin()">
                                 <!-- <div class="app-label">{{ 'search.urnNbn' | translate }}:</div> -->
                                 <div class="app-value">urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}</div>
-                                <div class="app-value-2">({{ 'search.registered' | translate }} {{ item.details.urnNbn.registered | date }})</div>
+                                <div class="app-value-2">
+                                    ({{ 'search.registered' | translate }} {{ item.details.urnNbn.registered.split('[')[0] | date }})
+                                </div>
                             </div>
                             <div class="app-ie-field" *ngIf="item.details.urnNbn?.status === 'DEACTIVATED' && !isAdmin()">
                                 <div class="app-label">{{ 'search.status' | translate }}:</div>
                                 <div class="app-value">{{ item.details.urnNbn.status }}</div>
-                                <div class="app-value-2">({{ 'search.deactivated' | translate }} {{ item.details.urnNbn.deactivated | date }})</div>
+                                <div class="app-value-2">
+                                    ({{ 'search.deactivated' | translate }} {{ item.details.urnNbn.deactivated.split('[')[0] | date }})
+                                </div>
                             </div>
                             <div class="app-ie-field" *ngIf="item.details?.registrar">
                                 <div class="app-label">{{ 'search.registrar' | translate }}:</div>
@@ -220,7 +414,36 @@
                                 <div class="app-value">{{ item.details.archiver?.name }}</div>
                                 <div class="app-value-2" *ngIf="item.details.archiver?.description">({{ item.details.archiver?.description }})</div>
                             </div>
-                            <div class="app-button-part">
+                            <!-- PRECEDESSORS AND SUCCESSORS -->
+                            <div *ngIf="item.details.urnNbn.predecessors?.length > 0 && !isAdmin()">
+                                <div class="app-ie-field" *ngFor="let pre of item.details.urnNbn.predecessors">
+                                    <div class="app-label">{{ 'search.predecessor' | translate }}:</div>
+                                    <!-- <pre>{{ pre | json }}</pre> -->
+                                    <a
+                                        class="app-value"
+                                        [routerLink]="[]"
+                                        [queryParams]="{ q: 'urn:nbn:cz:' + pre.registrarCode + '-' + pre.documentCode }"
+                                    >
+                                        urn:nbn:cz:{{ pre.registrarCode }}-{{ pre.documentCode }}
+                                    </a>
+                                    <div class="app-value-2" *ngIf="pre.statusNote">({{ pre.statusNote }})</div>
+                                </div>
+                            </div>
+                            <div *ngIf="item.details.urnNbn.successors?.length > 0 && !isAdmin()">
+                                <div class="app-ie-field" *ngFor="let suc of item.details.urnNbn.successors">
+                                    <div class="app-label">{{ 'search.successor' | translate }}:</div>
+                                    <!-- <pre>{{ suc | json }}</pre> -->
+                                    <a
+                                        class="app-value"
+                                        [routerLink]="[]"
+                                        [queryParams]="{ q: 'urn:nbn:cz:' + suc.registrarCode + '-' + suc.documentCode }"
+                                    >
+                                        urn:nbn:cz:{{ suc.registrarCode }}-{{ suc.documentCode }}
+                                    </a>
+                                    <div class="app-value-2" *ngIf="suc.statusNote">({{ suc.statusNote }})</div>
+                                </div>
+                            </div>
+                            <div class="app-button-part" *ngIf="isAdmin() || (isLoggedIn() && hasRightToRegistrar(item.registrarcode))">
                                 <app-button variant="primary" size="s" (click)="addInstance(item)">
                                     <span>{{ 'buttons.add-instance' | translate }}</span>
                                 </app-button>
@@ -234,18 +457,10 @@
                                         <div class="app-label-2">
                                             urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}
                                         </div>
-                                        <app-button
-                                            variant="tertiary"
-                                            size="xs"
-                                            (click)="openUrnnbnXml(item.urnnbn); $event.stopPropagation()"
-                                        >
+                                        <app-button variant="tertiary" size="xs" (click)="openUrnnbnXml(item.urnnbn); $event.stopPropagation()">
                                             XML →
                                         </app-button>
-                                        <app-button
-                                            variant="tertiary"
-                                            size="xs"
-                                            (click)="openUrnnbnJson(item.urnnbn); $event.stopPropagation()"
-                                        >
+                                        <app-button variant="tertiary" size="xs" (click)="openUrnnbnJson(item.urnnbn); $event.stopPropagation()">
                                             JSON →
                                         </app-button>
                                     </div>
@@ -267,7 +482,46 @@
                                         <div class="app-label">{{ 'search.deactivation-note' | translate }}:</div>
                                         <div class="app-value">{{ item.details.urnNbn.deactivationNote }}</div>
                                     </div>
-                                    <!-- TODO PRECEDESSORS AND SUCCESSORS -->
+                                    <!-- PRECEDESSORS AND SUCCESSORS -->
+                                    <div *ngIf="item.details.urnNbn.predecessors?.length > 0">
+                                        <div class="app-ie-field" *ngFor="let pre of item.details.urnNbn.predecessors">
+                                            <div class="app-label">{{ 'search.predecessor' | translate }}:</div>
+                                            <!-- <pre>{{ pre | json }}</pre> -->
+                                            <a
+                                                class="app-value"
+                                                [routerLink]="[]"
+                                                [queryParams]="{ q: 'urn:nbn:cz:' + pre.registrarCode + '-' + pre.documentCode }"
+                                            >
+                                                urn:nbn:cz:{{ pre.registrarCode }}-{{ pre.documentCode }}
+                                            </a>
+                                            <div class="app-value-2" *ngIf="pre.statusNote">({{ pre.statusNote }})</div>
+                                            <div class="app-delete-pred">
+                                                <app-button
+                                                    *ngIf="isAdmin()"
+                                                    iconLeft="close.svg"
+                                                    variant="tertiary"
+                                                    size="xs"
+                                                    (click)="deletePredecessor(item, pre); $event.stopPropagation()"
+                                                >
+                                                    {{ 'buttons.remove' | translate }}
+                                                </app-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="item.details.urnNbn.successors?.length > 0">
+                                        <div class="app-ie-field" *ngFor="let suc of item.details.urnNbn.successors">
+                                            <div class="app-label">{{ 'search.successor' | translate }}:</div>
+                                            <!-- <pre>{{ suc | json }}</pre> -->
+                                            <a
+                                                class="app-value"
+                                                [routerLink]="[]"
+                                                [queryParams]="{ q: 'urn:nbn:cz:' + suc.registrarCode + '-' + suc.documentCode }"
+                                            >
+                                                urn:nbn:cz:{{ suc.registrarCode }}-{{ suc.documentCode }}
+                                            </a>
+                                            <div class="app-value-2" *ngIf="suc.statusNote">({{ suc.statusNote }})</div>
+                                        </div>
+                                    </div>
                                     <div class="app-button-part">
                                         <app-button variant="primary" size="s" (click)="deactivateURNNBN(item)" *ngIf="item.details?.urnNbn.active">
                                             <span>{{ 'buttons.deactivate' | translate }}</span>
@@ -275,8 +529,8 @@
                                         <app-button variant="primary" size="s" (click)="reactivateURNNBN(item)" *ngIf="!item.details?.urnNbn.active">
                                             <span>{{ 'buttons.reactivate' | translate }}</span>
                                         </app-button>
-                                        <app-button variant="primary" size="s" (click)="addInstance(item)" *ngIf="item.details?.urnNbn.active">
-                                            <span>{{ 'buttons.add-instance' | translate }}</span>
+                                        <app-button variant="primary" size="s" (click)="addPredecessor(item)">
+                                            <span>{{ 'buttons.add-predecessor' | translate }}</span>
                                         </app-button>
                                     </div>
                                 </div>
@@ -293,7 +547,7 @@
                                 <div class="app-ie-content" *ngIf="item.tmopen">
                                     <div class="app-ie-field" *ngIf="item.details?.digitalDocument?.format">
                                         <div class="app-label">{{ 'search.format' | translate }}:</div>
-                                        <div class="app-value">{{ item.details?.digitalDocument?.technicalMetadata?.format }}</div>
+                                        <div class="app-value">{{ item.details?.digitalDocument?.format }}</div>
                                         <div class="app-value-2">
                                             ({{ 'search.version' | translate }} {{ item.details?.digitalDocument?.formatVersion }})
                                         </div>
@@ -356,9 +610,17 @@
                                     </div>
                                 </div>
                                 <div class="app-ie-content" *ngIf="item.rsiopen">
-                                    <div class="app-ie-field" *ngFor="let rsi of item.details?.registrarScopeIdentifiers">
-                                        <div class="app-label">{{ rsi?.type }}:</div>
-                                        <div class="app-value">{{ rsi?.value }}</div>
+                                    <div *ngFor="let rsi of item.details?.registrarScopeIdentifiers">
+                                        <div class="app-ie-field">
+                                            <div class="app-label">{{ rsi?.type }}:</div>
+                                            <div class="app-value">{{ rsi?.value }}</div>
+                                        </div>
+                                        <div class="app-ie-field">
+                                            <div class="app-value-2">
+                                                ({{ 'search.created' | translate }} {{ rsi.created.split(['['])[0] | date }},
+                                                {{ 'search.modified' | translate }} {{ rsi.modified.split(['['])[0] | date }})
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -366,37 +628,39 @@
                             <!--DIGITAL INSTANCES -->
                             <div class="app-ie-di" *ngIf="item.details?.digitalInstances?.length > 0">
                                 <div *ngFor="let di of item.details?.digitalInstances">
-                                    <div class="app-ie-header" (click)="di.diopen = !di.diopen">
-                                        <img [src]="di.diopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                                    <div class="app-ie-header">
+                                        <img
+                                            [src]="di.diopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'"
+                                            (click)="di.diopen = !di.diopen"
+                                        />
                                         <div class="app-part-title app-part-title-di">
                                             <div class="app-label-2 app-di-url-label">
-                                                <a [ngClass]="{ 'app-not-active': di.active === false }" href="{{ di.url }}" target="_blank" rel="noopener noreferrer">{{ di.url }}</a>
+                                                <a
+                                                    [ngClass]="{ 'app-not-active': di.active === false }"
+                                                    href="{{ di.url }}"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {{ di.url }}
+                                                </a>
                                             </div>
-                                            <app-button
-                                                variant="tertiary"
-                                                size="xs"
-                                                (click)="openDiXml(di.id); $event.stopPropagation()"
-                                            >
+                                            <app-button variant="tertiary" size="xs" (click)="openDiXml(di.id); $event.stopPropagation()">
                                                 XML →
                                             </app-button>
-                                            <app-button
-                                                variant="tertiary"
-                                                size="xs"
-                                                (click)="openDiJson(di.id); $event.stopPropagation()"
-                                            >
+                                            <app-button variant="tertiary" size="xs" (click)="openDiJson(di.id); $event.stopPropagation()">
                                                 JSON →
                                             </app-button>
                                         </div>
                                     </div>
                                     <div class="app-ie-content" *ngIf="di.diopen">
-                                        <div class="app-ie-field" *ngIf="di.active && di.active === true || di.active === false">
+                                        <div class="app-ie-field" *ngIf="(di.active && di.active === true) || di.active === false">
                                             <div class="app-label">{{ 'search.active' | translate }}:</div>
                                             <div class="app-value">{{ 'search.' + di.active | translate }}</div>
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.library">
                                             <div class="app-label">{{ 'search.digitalLibrary' | translate }}:</div>
                                             <div class="app-value">{{ di.library.name }}</div>
-                                            <app-button variant="tertiary" size="xs">{{ 'search.didetails' | translate }} →</app-button>
+                                            <app-button variant="tertiary" size="xs" (click)="openDiDetails(di.library); $event.stopPropagation()">{{ 'search.didetails' | translate }} →</app-button>
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.format">
                                             <div class="app-label">{{ 'search.format' | translate }}:</div>
@@ -408,7 +672,7 @@
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.accessRestriction">
                                             <div class="app-label">{{ 'search.access_restriction' | translate }}:</div>
-                                            <div class="app-value">{{ di.accessRestriction }}</div>
+                                            <div class="app-value">{{ 'search.' + di.accessRestriction | translate }}</div>
                                         </div>
                                         <div class="app-ie-field" *ngIf="di.created">
                                             <div class="app-label">{{ 'search.created' | translate }}:</div>
@@ -418,7 +682,7 @@
                                             <div class="app-label">{{ 'search.deactivated' | translate }}:</div>
                                             <div class="app-value">{{ di.deactivated.split('[')[0] | date }}</div>
                                         </div>
-                                        <div class="app-buttons">
+                                        <div class="app-buttons" *ngIf="isAdmin()">
                                             <app-button variant="primary" size="s" (click)="editDigitalInstance(item, di)">
                                                 <span>{{ 'buttons.edit' | translate }}</span>
                                             </app-button>
@@ -431,14 +695,69 @@
                             </div>
                         </div>
                     </div>
-                    <pre *ngIf="isDevMode()">{{ item | json }}</pre>
+                    <!-- DEV MODE - JSON VIEWER -->
+                    <!-- <div class="app-ie-digital-document" [ngClass]="{ opened: item.jsonOpen }" *ngIf="isDevMode()">
+                        <div class="app-ie-header app-ie-digital-document-header" (click)="item.jsonOpen = !item.jsonOpen">
+                            <img [src]="item.jsonOpen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
+                            <div class="app-part-title">
+                                <div class="app-label">json (DEV mode)</div>
+                            </div>
+                        </div>
+                        <pre *ngIf="item.jsonOpen">{{ item | json }}</pre>
+                    </div> -->
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- NO QUERY -->
+    <div
+        class="app-no-results app-no-query"
+        *ngIf="!loadingResults() && !searchedQuery() && !selectedType && !selectedRegistrar && selectedState === 'all' && !dateFrom && !dateTo"
+    >
+        <h3 class="app-no-query-title">{{ 'search.no-query-title' | translate }}</h3>
+        <div class="app-no-query-text">{{ 'search.no-query-text-1' | translate }}</div>
+        <!-- <div class="app-no-query-text">{{ 'search.no-query-text-2' | translate }}</div> -->
+        <div class="app-no-query-text app-example">
+            <div class="app-example-label">{{ 'search.for-example' | translate }}</div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'babička' }">babička</span>
+                <span>({{ 'search.title' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'babička', type: 'MONOGRAPH' }">babička + MONOGRAPH</span>
+                <span>({{ 'search.title-type' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'urn:nbn:cz:aba001-000ovg' }">urn:nbn:cz:aba001-000ovg</span>
+                <span>({{ 'search.urn' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: '2f58bcf0-f6ae-11dd-8224-000d606f5dc6' }">
+                    2f58bcf0-f6ae-11dd-8224-000d606f5dc6
+                </span>
+                <span>({{ 'search.uuid' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: 'cnb001642268' }">cnb001642268</span>
+                <span>({{ 'search.ccnb-search' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: '9788024228723' }">9788024228723</span>
+                <span>({{ 'search.isbn-search' | translate }})</span>
+            </div>
+            <div class="app-example-value-wrapper">
+                <span class="app-example-value" [routerLink]="[]" [queryParams]="{ q: '0023-5849' }">0023-5849</span>
+                <span>({{ 'search.issn-search' | translate }})</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="app-loading" *ngIf="loadingResults()"><mat-spinner diameter="40"></mat-spinner></div>
+
     <!-- NO RESULTS -->
-    <div class="app-no-results" *ngIf="searchService.recordsCount() === 0">
+    <div class="app-no-results" *ngIf="searchService.recordsCount() === 0 && !loadingResults()">
         <h1 class="app-no-results-title">{{ 'search.no-results-title' | translate }}</h1>
         <div class="app-no-results-text">{{ 'search.no-results-text-1' | translate }}</div>
         <div class="app-no-results-text">
@@ -449,7 +768,14 @@
     </div>
 
     <!-- PAGINATOR -->
-    <div class="app-search-footer" *ngIf="pages.length > 1">
+    <div
+        class="app-search-footer"
+        *ngIf="
+            pages.length > 1 &&
+            (searchedQuery() || selectedType || selectedRegistrar || selectedState !== 'all' || dateFrom || dateTo) &&
+            !loadingResults()
+        "
+    >
         <div class="app-paginator">
             <div class="app-pages">
                 <div class="app-page-items">
@@ -508,7 +834,12 @@
             <div class="app-sidebar-title" *ngIf="activeAction === 'edit'">
                 {{ 'import.' + selectedEntity | translate }}
             </div>
-            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">{{ 'import.add-instance' | translate }} {{ title.value }}</div>
+            <div class="app-sidebar-title" *ngIf="activeAction === 'add-instance'">
+                {{ 'import.add-instance' | translate }} {{ title.value }}
+            </div>
+            <div class="app-sidebar-title" *ngIf="activeAction === 'edit-instance'">
+                {{ 'import.edit-instance' | translate }} {{ title.value }}
+            </div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
             </div>
@@ -672,7 +1003,7 @@
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect app-primaryOriginatorType" [(value)]="selectedOriginatorType">
                                     @for (entity of primaryOriginatorTypes; track entity) {
-                                    <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                                        <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
@@ -811,16 +1142,24 @@
                 <div class="app-part-content">
                     <!-- ARCHIVER ID -->
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-half-width app-primaryArchiverId">
+                        <div class="app-base-input app-full-width app-primaryArchiverId">
                             <div class="app-base-input-label">
                                 {{ 'import.archiverId' | translate }}
                             </div>
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedArchiverId">
                                     @for (entity of archiverIdsList(); track entity) {
-                                    <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
+                                        <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
                                     }
                                 </mat-select>
+                                <mat-icon
+                                    class="app-prefix-icon"
+                                    matPrefix
+                                    *ngIf="selectedArchiverId"
+                                    (click)="selectedArchiverId = ''; $event.stopPropagation()"
+                                >
+                                    close
+                                </mat-icon>
                             </mat-form-field>
                         </div>
                     </div>
@@ -956,7 +1295,7 @@
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedDigitalLibraryId">
                                     @for (entity of digitalLibrariesList(); track entity) {
-                                    <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
+                                        <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
@@ -998,7 +1337,7 @@
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedDiAccessRestrictionId">
                                     @for (entity of diAccessRestrictionsList; track entity) {
-                                    <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                                        <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
@@ -1009,18 +1348,24 @@
         </div>
 
         <!-- FOOTER -->
-        <div class="app-sidebar-footer" [ngClass]="{ 'snack-bar-visible': importRecordSnackBarVisible() }">
-            <div class="app-record-imported-snack-bar" *ngIf="importRecordSnackBarVisible()">
-                {{ 'messages.record-imported-successfully' | translate }}
+        <div class="app-sidebar-footer" [ngClass]="{ 'progress-bar-visible': progressBar().state }">
+            <div class="app-record-progress-bar" [ngClass]="progressBar().value" *ngIf="progressBar().state">
+                {{ 'messages.' + progressBar().value | translate }} {{ progressBar().error }}
             </div>
             <div class="app-button-container">
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
                 <app-button variant="primary" size="l" (click)="onEditRecordConfirm()" *ngIf="activeAction === 'edit'">
-                    <span>{{ 'buttons.save-record' | translate }}</span>
+                    <span *ngIf="!loadingButton()">{{ 'buttons.save-record' | translate }}</span>
+                    <mat-spinner diameter="25" color="primary" *ngIf="loadingButton()"></mat-spinner>
                 </app-button>
-                <app-button variant="primary" size="l" (click)="onAddInstanceConfirm()" *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'">
+                <app-button
+                    variant="primary"
+                    size="l"
+                    (click)="onAddInstanceConfirm()"
+                    *ngIf="activeAction === 'add-instance' || activeAction === 'edit-instance'"
+                >
                     <span *ngIf="activeAction === 'add-instance'">{{ 'buttons.add-instance' | translate }}</span>
                     <span *ngIf="activeAction === 'edit-instance'">{{ 'buttons.edit-instance' | translate }}</span>
                 </app-button>

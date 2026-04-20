@@ -1,5 +1,5 @@
 // basic-auth.interceptor.ts
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, computed } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvironmentService } from './environment.service';
@@ -11,17 +11,16 @@ export class BasicAuthInterceptor implements HttpInterceptor {
     authService = inject(AuthService);
 
     // TODO: in production use AuthService to get logged in user credentials
-    private readonly loggedIn = this.authService.loggedIn();
+    private readonly loggedIn = computed(() => this.authService.loggedIn());
     // private readonly loggedIn = false;
     private readonly login = 'testUser';
     private readonly password = 'testPassword';
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const credentials = this.authService.getCredentials();
-        console.log(this.loggedIn);
 
         // ignore if user not logged in
-        if (!this.loggedIn) {
+        if (!this.loggedIn() || !credentials) {
             return next.handle(req);
         }
 
@@ -32,7 +31,7 @@ export class BasicAuthInterceptor implements HttpInterceptor {
         }
 
         const basic = btoa(`${credentials?.username}:${credentials?.password}`);
-        console.log(`Basic ${basic}`);
+        // console.log(`Basic ${basic}`, credentials?.username, credentials?.password);
 
         const authReq = req.clone({
             setHeaders: {

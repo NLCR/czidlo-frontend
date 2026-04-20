@@ -4,6 +4,17 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## Development
 
+### Prepare
+```shell
+#preferably use nvm to select proper version of node (and npm) from .nvmrc 
+#alternatively use another supported version of npm (see package.json engines)
+nvm use
+#use "npm clean install" or npm ci to update all dependences
+npm ci
+#or install libraries with "nvm install" (only if you're missing some dependencies)
+npm install
+```
+
 ### Run
 
 `npm run start`
@@ -19,8 +30,8 @@ First define configuration in environment variables
 
 ```shell
 export APP_DEV_MODE=false
-export APP_CZIDLO_API_SERVICE_URL="https://czidlo-web-api.trinera.cloud/web-api/api"
-export APP_CZIDLO_PUBLIC_API_URL="https://resolver.nkp.cz/api/v6"
+export APP_CZIDLO_API_SERVICE_URL="https://resolver-dev.nkp.cz/web-api/api"
+export APP_CZIDLO_PUBLIC_API_URL="https://resolver-dev.nkp.cz/api/v6"
 ```
 
 Now run `npm run build` to build the project. 
@@ -48,12 +59,12 @@ docker build -t czidlo-frontend .
 
 possibly including version tag  
 ```
-docker build -t trinera/czidlo-frontend:0.0.0 .
+docker build -t trinera/czidlo-frontend:6.0 .
 ```
 
 or including version tag and tag `latest`
 ```
-docker build -t trinera/czidlo-frontend:latest -t trinera/czidlo-frontend:0.0.0 .
+docker build -t trinera/czidlo-frontend:latest -t trinera/czidlo-frontend:6.0 .
 ```
 
 ### Push to Dockerhub
@@ -62,7 +73,7 @@ Only if you have write access to Dockerhub repository trinera/czidlo-frontend.
 You don't need this to run localy built Docker image.
 
 ```
-docker push trinera/czidlo-frontend:0.0.0
+docker push trinera/czidlo-frontend:6.0
 docker push trinera/czidlo-frontend:latest
 ```
 
@@ -73,6 +84,14 @@ docker push trinera/czidlo-frontend:latest
 Run locally built Docker image
 
 ##### Run
+```
+docker run -p 1234:80 \
+  -e APP_DEV_MODE=false \
+  -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/web-api/api \
+  -e APP_CZIDLO_PUBLIC_API_URL=https://resolver.nkp.cz/api/v6 \
+trinera/czidlo-frontend
+```
+
 ```
 docker run -p 1234:80 \
   -e APP_DEV_MODE=false \
@@ -96,7 +115,7 @@ docker run -p 1234:80 \
   -e APP_DEV_MODE=false \
   -e APP_CZIDLO_API_SERVICE_URL=https://czidlo-web-api.trinera.cloud/web-api/api \
   -e APP_CZIDLO_PUBLIC_API_URL=https://resolver.nkp.cz/api/v6 \  
-trinera/czidlo-frontend:0.0.0
+trinera/czidlo-frontend:6.0
 ```
 
 #### Image pulled from Docker Hub

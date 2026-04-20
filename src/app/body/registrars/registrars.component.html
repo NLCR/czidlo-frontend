@@ -25,39 +25,49 @@
             </div>
             <div class="app-table app-table-registrars">
                 <!-- table header -->
-                <div class="app-row app-row-header">
+                <div class="app-row app-row-header app-row-registrars">
                     <div class="app-col app-col-name app-table-header-item">
                         {{ 'registrars.Name' | translate }}
                     </div>
-                    <div class="app-col app-col-code app-table-header-item">
-                        {{ 'registrars.Code' | translate }}
-                    </div>
-                    <div class="app-col app-col-actions app-col-reg-actions app-table-header-item">
-                        {{ 'registrars.Actions' | translate }}
+                    <div class="app-right">
+                        <div class="app-col app-col-code app-table-header-item">
+                            {{ 'registrars.Code' | translate }}
+                        </div>
+                        <div class="app-col app-col-actions app-col-reg-actions app-table-header-item" *ngIf="isAdmin()">
+                            {{ 'registrars.Actions' | translate }}
+                        </div>
                     </div>
                 </div>
                 <!-- no registrars -->
-                <div class="no-processes" *ngIf="!loadingRegistrars() && registrars().length === 0">
+                <div class="no-processes" *ngIf="!loadingRegistrars() && registrarsService.registrars().length === 0">
                     {{ 'registrars.no-registrars' | translate }}
                 </div>
                 <!-- table body -->
-                <div class="app-table-body">
+                <div class="app-table-body" #registrarsBody>
                     <div
-                        *ngFor="let registrar of registrars()"
-                        class="app-row app-table-row app-row-clicable"
-                        [ngClass]="{ 'app-row-active': activeRegistrar === registrar }"
+                        *ngFor="let registrar of registrarsService.registrars(); trackBy: trackByRegistrar"
+                        [attr.id]="'reg-' + registrar.code"
+                        class="app-row app-table-row app-row-clicable app-row-registrars"
+                        [ngClass]="{
+                            'app-row-hidden': registrar?.hidden === true && !isAdmin(),
+                            'app-row-active': activeRegistrarCode === registrar.code,
+                            'app-actions-invisible': !isAdmin(),
+                        }"
                         (click)="openSidebar(registrar)"
                     >
                         <div class="app-col app-col-name">{{ registrar.name }}</div>
-                        <div class="app-col app-col-code">{{ registrar.code }}</div>
-                        <div class="app-col app-col-actions app-col-reg-actions">
-                            <app-button
-                                variant="tertiary"
-                                size="s"
-                                [icon]="true"
-                                iconLeft="trash-blue.svg"
-                                (click)="deleteRegistrar(registrar); $event.stopPropagation()"
-                            ></app-button>
+                        <div class="app-right">
+                            <div class="app-invisible-button" *ngIf="!isAdmin()"></div>
+                            <div class="app-col app-col-code">{{ registrar.code }}</div>
+                            <div class="app-col app-col-actions app-col-reg-actions" *ngIf="isAdmin()">
+                                <app-button
+                                    variant="tertiary"
+                                    size="s"
+                                    [icon]="true"
+                                    iconLeft="trash-blue.svg"
+                                    (click)="deleteRegistrar(registrar); $event.stopPropagation()"
+                                ></app-button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -73,12 +83,12 @@
             </div>
             <div class="app-table app-table-archivers">
                 <!-- table header -->
-                <div class="app-row app-row-header">
+                <div class="app-row app-row-header app-row-archivers">
                     <div class="app-col app-col-name app-table-header-item">
                         {{ 'registrars.Name' | translate }}
                     </div>
-                    <div class="app-col app-col-actions app-table-header-item" *ngIf="loggedIn()">
-                        {{ 'registrars.actions' | translate }}
+                    <div class="app-col app-col-actions app-table-header-item" *ngIf="isAdmin()">
+                        {{ 'registrars.Actions' | translate }}
                     </div>
                 </div>
                 <!-- no archivers -->
@@ -86,19 +96,20 @@
                     {{ 'registrars.no-archivers' | translate }}
                 </div>
                 <!-- table body -->
-                <div class="app-table-body app-table-body-archivers">
+                <div class="app-table-body app-table-body-archivers" #archiversBody>
                     <div
-                        *ngFor="let archiver of archivers()"
-                        class="app-row app-table-row app-row-clicable"
+                        *ngFor="let archiver of archivers(); trackBy: trackByArchiver"
+                        [attr.id]="'arch-' + archiver.id"
+                        class="app-row app-table-row app-row-clicable app-row-archivers"
                         [ngClass]="{
-                            'app-row-hidden': archiver?.hidden === true && !loggedIn(),
-                            'app-row-active': activeArchiver?.id?.toString() === archiver.id.toString(),
-                            'app-actions-invisible': !loggedIn()
+                            'app-row-hidden': archiver?.hidden === true && !isAdmin(),
+                            'app-row-active': activeArchiverId?.toString() === archiver.id.toString(),
+                            'app-actions-invisible': !isAdmin(),
                         }"
                         (click)="openSidebar(archiver)"
                     >
                         <div class="app-col app-col-name">{{ archiver.name }}</div>
-                        <div class="app-col app-col-code">{{ archiver.code }}</div>
+                        <div class="app-invisible-button" *ngIf="!isAdmin()"></div>
                         <div class="app-col app-col-actions" *ngIf="loggedIn()">
                             <app-button
                                 variant="tertiary"
@@ -123,7 +134,7 @@
 </div>
 
 <!-- Overlay -->
-<div class="app-overlay" *ngIf="isSidebarOpen() && loggedIn()" (click)="closeSidebar()"></div>
+<!-- <div class="app-overlay" *ngIf="isSidebarOpen() && loggedIn()" (click)="closeSidebar()"></div> -->
 
 <!-- Sidebar -->
 <div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
@@ -196,7 +207,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="app-section-part">
+                        <div class="app-section-part" *ngIf="isAdmin()">
                             <app-button variant="primary" size="s" (click)="openEditRegistrarDialog(activeRegistrar)">
                                 {{ 'buttons.edit' | translate }}
                             </app-button>
@@ -218,6 +229,7 @@
                                     {{ 'buttons.details' | translate }}
                                 </app-button>
                                 <app-button
+                                    *ngIf="isAdmin()"
                                     variant="tertiary"
                                     size="xs"
                                     [icon]="true"
@@ -226,6 +238,7 @@
                                     (click)="editDigitalLibrary(activeRegistrar.code, library); $event.stopPropagation()"
                                 ></app-button>
                                 <app-button
+                                    *ngIf="isAdmin()"
                                     variant="tertiary"
                                     size="xs"
                                     [icon]="true"
@@ -236,7 +249,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="app-section-part">
+                    <div class="app-section-part" *ngIf="!isAdmin() && (!activeRegistrar?.digitalLibraries || activeRegistrar?.digitalLibraries.length === 0)">
+                        <div class="no-catalogues-or-libraries">{{ 'registrars.no-libraries' | translate }}</div>
+                    </div>
+                    <div class="app-section-part" *ngIf="isAdmin()">
                         <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="addNewDigitalLibrary(activeRegistrar.code)">
                             {{ 'buttons.add' | translate }}
                         </app-button>
@@ -257,6 +273,7 @@
                                     {{ 'buttons.details' | translate }}
                                 </app-button>
                                 <app-button
+                                    *ngIf="isAdmin()"
                                     variant="tertiary"
                                     size="xs"
                                     [icon]="true"
@@ -265,6 +282,7 @@
                                     (click)="editCatalogue(activeRegistrar.code, catalog); $event.stopPropagation()"
                                 ></app-button>
                                 <app-button
+                                    *ngIf="isAdmin()"
                                     variant="tertiary"
                                     size="xs"
                                     [icon]="true"
@@ -275,7 +293,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="app-section-part">
+                    <div class="app-section-part" *ngIf="!isAdmin() && (!activeRegistrar?.catalogues || activeRegistrar?.catalogues.length === 0)">
+                        <div class="no-catalogues-or-libraries">{{ 'registrars.no-catalogues' | translate }}</div>
+                    </div>
+                    <div class="app-section-part" *ngIf="isAdmin()">
                         <app-button variant="primary" size="s" iconLeft="add-white.svg" (click)="addNewCatalogue(activeRegistrar.code)">
                             {{ 'buttons.add' | translate }}
                         </app-button>

@@ -10,7 +10,7 @@ import { EnvironmentService } from './services/environment.service';
 export class AppComponent {
     title = 'czidlo-frontend';
 
-    constructor(private envService: EnvironmentService) {}
+    constructor(private envService: EnvironmentService) { }
 
     ngOnInit() {
         this.logDevInfo();
@@ -22,9 +22,14 @@ export class AppComponent {
             devMode: this.envService.get('devMode'),
             environmentCode: this.envService.get('environmentCode'),
             environmentName: this.envService.get('environmentName'),
-
+            //build info
+            gitCommitHash: this.envService.get('git_commit_hash'),
+            gitTag: this.envService.get('git_tag'),
+            buildDate: this.envService.get('build_date'),
+            //apis
             czidloApiServiceBaseUrl: this.envService.get('czidloApiServiceBaseUrl'),
-
+            czidloPublicApiBaseUrl: this.envService.get('czidloPublicApiBaseUrl'),
+            //info pages
             pageInfoCzUrl: this.envService.get('pageInfoCzUrl'),
             pageRulesCzUrl: this.envService.get('pageRulesCzUrl'),
             pageContactsCzUrl: this.envService.get('pageContactsCzUrl'),
@@ -32,10 +37,6 @@ export class AppComponent {
             pageInfoEnUrl: this.envService.get('pageInfoEnUrl'),
             pageRulesEnUrl: this.envService.get('pageRulesEnUrl'),
             pageContactsEnUrl: this.envService.get('pageContactsEnUrl'),
-
-            gitCommitHash: this.envService.get('git_commit_hash'),
-            gitTag: this.envService.get('git_tag'),
-            buildDate: this.envService.get('build_date'),
         };
         console.log('Dev Info:', devInfo);
         if (devInfo.gitCommitHash) {

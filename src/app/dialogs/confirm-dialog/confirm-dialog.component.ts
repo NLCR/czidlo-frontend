@@ -15,7 +15,7 @@ export class ConfirmDialogComponent {
         // Close the dialog, return true
         if (this.data?.reason !== undefined) {
             console.log('Reason provided:', this.data.reason);
-            this.dialogRef.close({ confirmed: true, reason: this.data.reason });
+            this.dialogRef.close({ confirmed: true, reason: this.data.reason, predecessor: this.data.predecessor });
         } else {
             this.dialogRef.close(true);
         }

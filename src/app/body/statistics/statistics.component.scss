@@ -69,23 +69,135 @@
                 flex-direction: column;
                 gap: 24px;
                 overflow: auto;
+                width: 100%;
+                padding: 0 24px 0 0;
+                box-sizing: border-box;
+                .app-chart-wrapper {
+                    display: flex;
+                    gap: 24px;
+                    height: 100%;
+                    // overflow: auto;
+                }
                 .app-chart {
                     display: flex;
                     flex-direction: column;
-                    width: 100%;
+                    width: 50%;
+                    // height: 400px;
                     // height: 300px;
+                    &.app-chart-years {
+                        width: 100%;
+                    }
                     .app-chart-header {
                         display: flex;
-
+                        align-items: center;
+                        gap: 16px;
                         .app-chart-header-item {
                             display: flex;
                             align-items: center;
                             gap: 16px;
-                            margin-bottom: 8px;
+                            .app-chart-header-title {
+                                /* Typesettings/M/Medium */
+                                font-family: 'IBM Plex Sans';
+                                font-size: 20px;
+                                font-style: normal;
+                                font-weight: 500;
+                                line-height: 24px; /* 150% */
+                            }
+                        }
+                    }
+                    .app-chart-table {
+                        width: 100%;
+                        font-size: 12px;
+                        margin-bottom: 40px;
+                        padding: 0 24px 0 0;
+                        box-sizing: border-box;
+                        .app-chart-row {
+                            display: flex;
+                            justify-content: space-between;
+                            padding: 4px 16px;
+                            background-color: white;
+                            border-bottom: 1px solid var(--Border-Strong, #dfe3e6);
+                            cursor: pointer;
+                            &:hover {
+                                background-color: var(--Background-Secondary, #f5f7f9);
+                            }
+                            &.app-header-row {
+                                font-weight: 600;
+                                border-bottom: 1px solid var(--Border-Strong, #dfe3e6);
+                            }
+                            .app-chart-col {
+                                display: flex;
+                                .app-col-registrar-code {
+                                    width: 65px;
+                                }
+                                .app-col-registrar-name {
+                                    flex: 1;
+                                }
+                                .app-col-count {
+                                    width: 100px;
+                                    text-align: right;
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
+}
+.app-statistic-filters {
+    display: flex;
+    gap: 48px;
+    .app-statistics-filter {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+.app-filter-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .app-download-statistics {
+        display: flex;
+        width: 120px;
+    }
+}
+.app-filter-tags {
+    display: flex;
+    align-items: center;
+    width: 800px;
+    gap: 8px;
+    box-sizing: border-box;
+    .app-filter-title {
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--Text-Light, #4c6580);
+    }
+    .app-filter-tag {
+        display: flex;
+        align-items: center;
+        background: var(--BG-Main-Light, #f6f7f9);
+        border-radius: 16px;
+        padding: 4px 12px;
+        gap: 8px;
+        .app-tag-label {
+            font-size: 14px;
+            color: var(--Text-Secondary, #263340);
+        }
+        .app-tag-remove-icon {
+            font-size: 14px;
+            color: var(--Text-Light, #4c6580);
+            cursor: pointer;
+            &:hover {
+                color: var(--Text-Secondary, #263340);
+            }
+        }
+    }
+}
+.app-no-data {
+    margin: 32px 0;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--Text-Light, #4c6580);
 }

@@ -99,6 +99,9 @@ input {
     &::placeholder {
         color: var(--Text-Disable, #9fb2c6);
     }
+    &.app-input-autocomplete {
+        padding: 0;
+    }
 }
 
 textarea {
@@ -198,8 +201,12 @@ h4 {
         // align-self: stretch;
         overflow-x: hidden;
         overflow-y: auto; /* ⬅️ vertikální scroll */
-        &.app-table-body-users, &.app-table-body-definitions {
+        &.app-table-body-users,
+        &.app-table-body-definitions {
             width: 800px;
+        }
+        &.app-rdd-table-body {
+            width: 100%;
         }
     }
     .app-row {
@@ -209,7 +216,6 @@ h4 {
         padding: 8px 24px;
         align-items: center;
         gap: 16px;
-        align-self: stretch;
         border-radius: 4px;
         border: 1px solid var(--Boarder-Primary-Default, #f6f7f9);
         background: var(--BG-Main-Light, #f6f7f9);
@@ -233,12 +239,14 @@ h4 {
             padding: 12px 24px;
             // width: fit-content;
             line-height: 16px;
-            align-self: stretch;
             background: var(--BG-Main-Contrast, #dfe5ec);
             border: none;
             app-button {
                 display: flex;
                 align-items: flex-start;
+            }
+            &:not(.app-row-processes) {
+                align-self: stretch;
             }
         }
         &.app-row-header-with-button {
@@ -298,8 +306,11 @@ h4 {
             }
         }
         &.app-col-actions {
-            width: 300px;
-            justify-content: flex-end;
+            width: 75px;
+            justify-content: flex-start;
+        }
+        &.app-col-actions-users {
+            justify-content: flex-start;
         }
         &.app-col-actions-title {
             width: 290px;
@@ -314,15 +325,15 @@ h4 {
         }
         &.app-col-name {
             flex: 1 1 auto;
-            min-width: 250px;
-            max-width: 586px;
+            // min-width: 250px;
+            // max-width: 586px;
         }
         &.app-col-reg-actions {
             width: 32px;
             justify-content: flex-end;
         }
         &.app-col-code {
-            width: 100px;
+            width: 80px;
         }
         &.app-col-40px {
             width: 40px;
@@ -341,6 +352,18 @@ h4 {
         }
         &.app-col-300px {
             width: 300px;
+        }
+        &.app-rdd-title {
+            width: 230px;
+        }
+        &.app-rdd-description {
+            flex: 1;
+        }
+        &.app-rdd-created {
+            width: 120px;
+        }
+        &.app-rdd-action {
+            width: 72px;
         }
     }
 }
@@ -428,7 +451,7 @@ h4 {
     padding: 0 24px 24px 24px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 32px;
+    gap: 24px;
     flex: 1 0 0;
     align-self: stretch;
     color: var(--Text-Base, #0a0d10);
@@ -441,6 +464,9 @@ h4 {
     overflow: auto;
     .app-sidebar-content-item {
         font-size: 14px;
+    }
+    .app-sidebar-log-content {
+        font-size: 12px;
     }
 
     // PARTS - pro formulare v sidebaru
@@ -455,7 +481,12 @@ h4 {
             padding-bottom: 32px;
             // border-bottom: 1px solid var(--Boarder-Bright, #dfe5ec);
         }
+        &.app-oai-part {
+            padding-bottom: 0;
+        }
         .app-part-title {
+            display: flex;
+            gap: 4px;
             color: var(--Text-Link, #0080a8);
 
             /* Typesettings/L/Medium */
@@ -467,9 +498,9 @@ h4 {
             align-self: stretch;
         }
         &.app-set-oai-adapter {
-            border: 1px solid var(--Boarder-Bright, #dfe5ec);
+            // border: 1px solid var(--Boarder-Bright, #dfe5ec);
             display: flex;
-            padding: 16px;
+            // padding: 16px;
             flex-direction: column;
             align-items: flex-start;
             gap: 16px;
@@ -484,6 +515,9 @@ h4 {
             gap: 32px;
             &.app-part-import-record {
                 width: 460px;
+            }
+            &.app-oai-part-content {
+                gap: 20px;
             }
             .app-datepicker-container {
                 display: flex;
@@ -585,10 +619,9 @@ h4 {
 }
 .app-sidebar-footer {
     display: flex;
-    padding: 12px 24px;
     justify-content: center;
     align-items: center;
-    gap: 56px;
+    // gap: 56px;
     flex-shrink: 0;
     align-self: stretch;
     border-top: 1px solid var(--Boarder-Bright, #dfe5ec);
@@ -599,8 +632,36 @@ h4 {
     }
     .app-button-container {
         display: flex;
+        padding: 12px 24px;
         align-items: center;
         gap: 16px;
+    }
+    &.progress-bar-visible {
+        flex-direction: column;
+        .app-record-progress-bar {
+            display: flex;
+            padding: 16px 24px;
+            justify-content: center;
+            align-self: stretch;
+            color: var(--Text-Secondary, #263340);
+            /* Typesettings/S big/Medium */
+            font-family: Karla;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 20px; /* 142.857% */
+            &.edit-completed,
+            &.add-completed {
+                background-color: var(--States-available-BG-default, #dff1c3);
+            }
+            &.edit-error,
+            &.add-error {
+                background: var(--States-high-efford-BG-default, #fde5e4);
+            }
+            &.import-completed {
+                background-color: var(--States-available-BG-default, #dff1c3);
+            }
+        }
     }
 }
 
@@ -652,6 +713,8 @@ app-information {
         gap: 24px;
         align-self: stretch;
         .app-dialog-title {
+            display: inline-flex;
+            // gap: 4px;
             flex: 1 0 0;
             color: var(--Text-Base, #0a0d10);
 
@@ -661,6 +724,9 @@ app-information {
             font-style: normal;
             font-weight: 500;
             line-height: 32px;
+            &.app-dialog-title-registrar {
+                display: block;
+            }
         }
         .app-close {
             display: flex;
@@ -792,7 +858,7 @@ app-information {
     .app-selected-items {
         display: flex;
         padding: 8px;
-        margin: 0 0 24px 0;
+        margin: 24px 0 0 0;
         align-items: center;
         align-content: center;
         gap: 8px;
@@ -801,6 +867,9 @@ app-information {
         flex-wrap: wrap;
         border-radius: 4px;
         background: var(--BG-Main-Light, #f6f7f9);
+        &.app-selected-users {
+            margin: 0;
+        }
         .app-selected-item {
             display: flex;
             padding: var(--Spacing-x1, 4px) var(--Spacing-x3, 12px);
@@ -835,6 +904,10 @@ app-information {
     .app-checkbox-container {
         display: flex;
         gap: 16px;
+        &.app-checkbox-oai {
+            flex-direction: column;
+            margin-left: 32px;
+        }
     }
 }
 .app-base-input {
@@ -1030,7 +1103,7 @@ app-information {
     font-family: 'IBM Plex Sans' !important;
     color: var(--Text-Secondary, #263340);
 }
-.mat-mdc-select-panel {
+.mat-mdc-select-panel, .mat-mdc-autocomplete-panel {
     background-color: #fff !important;
 }
 .mat-mdc-option {

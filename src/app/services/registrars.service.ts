@@ -3,6 +3,7 @@ import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
+
 @Injectable({ providedIn: 'root' })
 export class RegistrarsService {
     public registrars = signal<Array<any>>([]);
@@ -16,16 +17,15 @@ export class RegistrarsService {
             tap({
                 next: (data) => {
                     console.log('Archivers data received:', data);
-                    console.log(data.items);
                     let sortedItems = data.items.sort((a: any, b: any) => a.name.localeCompare(b.name));
                     this.archivers.set(sortedItems);
-                    console.log('Archivers loaded:', this.archivers());
+                    // console.log('Archivers loaded:', this.archivers());
                 },
                 error: (error) => {
                     console.error('Error loading archivers:', error);
                 },
                 complete: () => {
-                    console.log('Archivers loading complete');
+                    // console.log('Archivers loading complete');
                 },
             })
         );
@@ -49,10 +49,8 @@ export class RegistrarsService {
         return this.apiService.getRegistrars().pipe(
             tap({
                 next: (data) => {
-                    console.log('Registrars data received:', data);
                     let sortedItems = data.items.sort((a: any, b: any) => a.code.localeCompare(b.code));
                     this.registrars.set(sortedItems);
-                    console.log('Registrars loaded:', this.registrars());
                 },
                 error: (error) => {
                     console.error('Error loading registrars:', error);

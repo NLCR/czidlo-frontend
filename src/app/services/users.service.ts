@@ -22,7 +22,6 @@ export class UsersService {
                         created: item.created ? new Date(item.created.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
                         modified: item.modified ? new Date(item.modified.replace(/\[UTC\]$/, '')).toLocaleString() : '---',
                     })));
-                    console.log('Users loaded:', this.users());
                 },
                 error: (error) => {
                     console.error('Error loading users:', error);
@@ -32,6 +31,9 @@ export class UsersService {
                 },
             })
         );
+    }
+    getCurrentUser(): Observable<any> {
+        return this.apiService.getCurrentUser();
     }
     getUser(userId: string): Observable<any> {
         return this.apiService.getUser(userId);

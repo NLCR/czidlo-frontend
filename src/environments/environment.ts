@@ -26,5 +26,4 @@ export const environment = {
     pageEditInfoEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Information.md',
     pageEditRulesEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Rules.md',
     pageEditContactsEnUrl: 'https://github.com/NLCR/czidlo-frontend/edit/main/docs/Contacts.md',
-
 }

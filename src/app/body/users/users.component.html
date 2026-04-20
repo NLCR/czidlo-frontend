@@ -1,12 +1,10 @@
-<div class="app-not-logged-in" *ngIf="!loggedIn()">
-    <div class="app-not-logged-in-content">
+<div class="app-not-logged-in" *ngIf="!loggedIn() || !isAdmin()">
+    <div class="app-not-logged-in-content" *ngIf="!loggedIn()">
         <div class="app-not-logged-in-message">
             {{ 'not-logged-in-message' | translate }}
         </div>
     </div>
-</div>
-<div class="app-not-logged-in" *ngIf="!isAdmin()">
-    <div class="app-not-logged-in-content">
+    <div class="app-not-logged-in-content" *ngIf="loggedIn() && !isAdmin()">
         <div class="app-not-logged-in-message">
             {{ 'not-admin-message' | translate }}
         </div>
@@ -21,19 +19,24 @@
                     {{ 'users.list-of-users' | translate }}
                     <app-button size="s" [icon]="true" iconLeft="add.png" (click)="openAddUserDialog()"></app-button>
                 </div>
-                <div class="app-col app-col-actions app-col-actions-title">
+                <div class="app-col app-col-actions-users app-col-actions-title">
                     <div>{{ 'actions' | translate }}</div>
                 </div>
             </div>
-            <div class="app-table-body app-table-body-users">
+            <div class="app-no-users" *ngIf="users().length === 0 && !loadingUsers()">{{ 'users.no-users' | translate }}</div>
+            <div class="app-loading" *ngIf="loadingUsers()" >
+                <mat-spinner diameter="40"></mat-spinner>
+            </div>
+            <div class="app-table-body app-table-body-users" #usersBody>
                 <div
                     class="app-row app-table-row app-row-clicable"
-                    *ngFor="let user of users()"
+                    *ngFor="let user of users(); trackBy: trackByUser"
+                    [attr.id]="'user-' + user.id"
                     [ngClass]="{ 'app-row-active': activeUser?.id.toString() === user.id.toString() }"
                     (click)="openSidebar(user)"
                 >
                     <div class="app-col app-col-user">{{ user?.login }}</div>
-                    <div class="app-col app-col-actions">
+                    <div class="app-col app-col-actions-users">
                         <app-button size="s" variant="tertiary" iconRight="setting.png" (click)="openRightsSidebar(user); $event.stopPropagation()">
                             {{ 'buttons.rights' | translate }}
                         </app-button>
@@ -69,7 +72,7 @@
 </div>
 
 <!-- Overlay -->
-<div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div>
+<!-- <div class="app-overlay" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div> -->
 
 <!-- Sidebar -->
 <div class="app-sidebar" [ngClass]="{ 'app-sidebar-active': isSidebarOpen() }">
@@ -138,11 +141,7 @@
                     <div class="app-items app-registrars-items" *ngIf="enrichedCurrentRegistrars().length > 0">
                         <div class="app-item app-registrar-item" *ngFor="let item of enrichedCurrentRegistrars()">
                             <span class="app-item-value">{{ item.code }} - {{ item.name }}</span>
-                            <app-button
-                                size="xs"
-                                variant="tertiary"
-                                (click)="removeCurrentRegistrar(item)"
-                            >
+                            <app-button size="xs" variant="tertiary" (click)="removeCurrentRegistrar(item)">
                                 {{ 'buttons.remove-rights' | translate }}
                             </app-button>
                         </div>
@@ -172,7 +171,7 @@
                                     </mat-select>
                                 </mat-form-field>
                             </div>
-                            <div class="app-selected-items" *ngIf="registrarsControl.value?.length > 0">
+                            <div class="app-selected-items app-selected-users" *ngIf="registrarsControl.value?.length > 0">
                                 <div class="app-selected-item" *ngFor="let item of registrarsControl.value">
                                     {{ item.code }}
                                     <div class="app-selected-item-remove" (click)="removeSelectedRegistrar(item)">
@@ -193,7 +192,12 @@
                 <app-button variant="tertiary" size="l" (click)="closeSidebar()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
-                <app-button variant="primary" size="l" (click)="addSelectedRegistrars()" [disabled]="!registrarsControl.value || registrarsControl.value.length === 0">
+                <app-button
+                    variant="primary"
+                    size="l"
+                    (click)="addSelectedRegistrars()"
+                    [disabled]="!registrarsControl.value || registrarsControl.value.length === 0"
+                >
                     {{ 'buttons.add' | translate }}
                 </app-button>
             </div>

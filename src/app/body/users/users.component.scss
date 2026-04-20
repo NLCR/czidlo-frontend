@@ -57,3 +57,18 @@
 .app-buttons {
     display: flex;
 }
+.app-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+.app-no0-users {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-size: 16px;
+    color: #666;
+}

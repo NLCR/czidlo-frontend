@@ -18,7 +18,10 @@ export class EditDlCatalogDialogComponent {
     urlPrefix: string = this.data.urlPrefix;
     description: string = this.data.description;
 
-    urlControl = new FormControl(this.context === 'dl' ? this.url : this.urlPrefix, [Validators.required, Validators.pattern(/^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/\S*)?$/)]);
+    urlControl = new FormControl(this.normalizeUrl(this.context === 'dl' ? this.url : this.urlPrefix || ''), [
+        Validators.required,
+        Validators.pattern(/^(https?:\/\/)([\w.-]+)\.([a-z]{2,})(\/\S*)?$/),
+    ]);
     nameControl = new FormControl(this.name, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]);
     descriptionControl = new FormControl(this.description, [Validators.maxLength(200)]);
 
@@ -29,7 +32,7 @@ export class EditDlCatalogDialogComponent {
 
     onConfirm(): void {
         // Logic to handle confirmation (e.g., save changes)
-        let result = {name: '', description: '', url: '', urlPrefix: ''};
+        let result = { name: '', description: '', url: '', urlPrefix: '' };
         if (this.context === 'dl') {
             result.name = this.nameControl.value as string;
             result.description = this.descriptionControl.value as string;
@@ -41,5 +44,8 @@ export class EditDlCatalogDialogComponent {
             result.urlPrefix = this.urlControl.value as string;
         }
         this.dialogRef.close(result);
+    }
+    private normalizeUrl(url: string): string {
+        return /^https?:\/\//i.test(url) ? url : `https://${url}`;
     }
 }

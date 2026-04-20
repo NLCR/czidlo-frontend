@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -20,6 +21,8 @@ export class EditRegistrarDialogComponent {
     registrarMode: boolean = false;
     hidden: boolean = false;
 
+    codeControl = new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(6)]);
+
     ngOnInit(): void {
         this.name = this.data.name || '';
         this.code = this.data.code || '';
@@ -28,6 +31,7 @@ export class EditRegistrarDialogComponent {
         this.reservationMode = this.data.reserveMode || false;
         this.registrarMode = this.data.registrarMode || false;
         this.hidden = this.data.hidden || false;
+        this.codeControl.setValue(this.code);
     }
     toggleResolverMode(): void {
         this.resolverMode = !this.resolverMode;
@@ -44,7 +48,7 @@ export class EditRegistrarDialogComponent {
     onConfirm(): void {
         this.dialogRef.close({
             name: this.name,
-            code: this.code,
+            code: this.codeControl.value,
             description: this.description,
             allowedRegistrationModeByResolver: this.resolverMode,
             allowedRegistrationModeByReservation: this.reservationMode,

@@ -12,9 +12,19 @@ export class SearchService {
     recordsCount = signal<number>(0);
     isLoading = signal<boolean>(false);
 
-    constructor(private apiService: ApiService) { }
+    constructor(private apiService: ApiService) {}
 
-    search(term: string, docType?: string, page: number = 1): Observable<any> {
+    search(
+        term: string,
+        docType?: string,
+        filter?: string,
+        registrar?: string,
+        dateFrom?: string,
+        dateTo?: string,
+        state?: string,
+        page: number = 1,
+        sort?: string,
+    ): Observable<any> {
         this.query.set(term);
 
         const body: any = {
@@ -28,8 +38,27 @@ export class SearchService {
             },
         };
 
-        // 🔍 1) Hledání URNNBN – speciální režim
-        if (term.toLowerCase().startsWith('urn:nbn')) {
+        let sortField: any = '';
+        let sortOrder: any = '';
+        if (sort) {
+            if (sort.includes('title')) sortField = 'title.keyword';
+            else if (sort.includes('originator')) sortField = 'originatorvalue.keyword';
+            else sortField = undefined;
+
+            if (sort.endsWith('_asc')) sortOrder = 'asc';
+            else if (sort.endsWith('_desc')) sortOrder = 'desc';
+            else sortOrder = undefined;
+
+            if (sortField && sortOrder) {
+                body.sort = [{ [sortField]: { order: sortOrder } }];
+            }
+        }
+
+        if (term.length === 0) {
+            body.query = { match_all: {} };
+
+            // 🔍 1) Hledání URNNBN
+        } else if (term.toLowerCase().startsWith('urn:nbn')) {
             let parts = term.split(':');
             let code = parts[parts.length - 1].split('-')[1];
             let registratorCode = parts[parts.length - 1].split('-')[0];
@@ -46,26 +75,118 @@ export class SearchService {
         } else if (term.startsWith('cnb')) {
             // 🔍 2) Hledání CNB – speciální režim
             body.query.bool.must.push({
+                //TODO: opravit. Nefunguje, viz urn:nbn:cz:ope301-00038f s cnb000358651
                 match_phrase: {
                     ccnb: term,
                 },
             });
-        } else {
+        } else if (filter === 'author') {
+            // 🔍 3) Hledání podle autora
             body.query.bool.must.push({
                 multi_match: {
                     query: term,
-                    fields: ['title', 'subtitle', 'volumetitle', 'issuetitle'],
+                    fields: ['originatorvalue', 'otheroriginator', 'publisher'],
+                    type: 'cross_fields',
+                    operator: 'and',
+                },
+            });
+        } else if (filter === 'titles') {
+            // 🔍 4) Hledání podle názvových údajů
+            body.query.bool.must.push({
+                multi_match: {
+                    query: term,
+                    fields: ['title', 'subtitle', 'volumetitle', 'issuetitle', 'sdtitle', 'sdvolumetitle', 'sdissuetitle'],
+                    type: 'cross_fields',
+                    operator: 'and',
+                },
+            });
+        } else if (filter === 'ids') {
+            // 🔍 5) Hledání podle identifikátorů
+            body.query.bool.must.push({
+                multi_match: {
+                    query: term,
+                    fields: ['issn', 'isbn', 'ccnb', 'otherid', 'rsidvalues', 'rsidkeyvalues'],
+                    type: 'cross_fields',
+                    operator: 'and',
+                },
+            });
+        } else {
+            // 🔍 6) Obecné hledání ve všech relevantních polích
+            body.query.bool.must.push({
+                multi_match: {
+                    query: term,
+                    fields: [
+                        'title',
+                        'subtitle',
+                        'volumetitle',
+                        'issuetitle',
+                        'originatorvalue',
+                        'otheroriginator',
+                        'sdtitle',
+                        'sdvolumetitle',
+                        'sdissuetitle',
+                        'rsidvalues',
+                        'rsidkeyvalues',
+                        'publisher',
+                        'registrarcode',
+                        'issn',
+                        'isbn',
+                        'ccnb',
+                        'otherid',
+                    ],
                     type: 'cross_fields',
                     operator: 'and',
                 },
             });
         }
 
+        // 🎯 Filtry (musí fungovat i pro match_all)
+        const addFilter = (f: any) => {
+            if (body.query?.bool?.filter) body.query.bool.filter.push(f);
+            else body.query = { bool: { must: [{ match_all: {} }], filter: [f] } };
+        };
+
         // 🎯 Filtr typu dokumentu
         if (docType) {
-            body.query.bool.filter.push({
+            addFilter({
                 term: {
                     'entitytype.keyword': docType,
+                },
+            });
+        }
+        // 🎯 Filtr registrátora
+        if (registrar) {
+            addFilter({
+                term: {
+                    'registrarcode.keyword': registrar,
+                },
+            });
+        }
+        // 🎯 Filtr podle data registrace od
+        if (dateFrom) {
+            addFilter({
+                range: {
+                    registered: {
+                        gte: dateFrom,
+                    },
+                },
+            });
+        }
+        // 🎯 Filtr podle data registrace do
+        if (dateTo) {
+            addFilter({
+                range: {
+                    registered: {
+                        lte: dateTo,
+                    },
+                },
+            });
+        }
+        // 🎯 Filtr podle stavu
+        if (state && state !== 'all') {
+            addFilter({
+                term: {
+                    active: state === 'active' ? true : false,
                 },
             });
         }
@@ -79,11 +200,12 @@ export class SearchService {
                     let recordsCount = data.hits.total.value;
                     let results = data.hits.hits.map((hit: any) => ({
                         ...hit._source,
+                        id: hit._id,
+                        // opened: recordsCount === 1,
                         urnnbn:
                             hit._source.registrarcode && hit._source.documentcode
                                 ? `urn:nbn:cz:${hit._source.registrarcode}-${hit._source.documentcode}`
                                 : null,
-
                     }));
 
                     this.searchResults.set(results);
@@ -94,7 +216,7 @@ export class SearchService {
                     console.error('Error during search:', error);
                     this.isLoading.set(false);
                 },
-            })
+            }),
         );
     }
     getRecordDetails(urnnbn: string): Observable<any> {
@@ -106,7 +228,7 @@ export class SearchService {
                 error: (error) => {
                     console.error('Error fetching record details for', urnnbn, ':', error);
                 },
-            })
+            }),
         );
         return this.apiService.getRecordByUrnnbn(urnnbn);
     }
@@ -119,14 +241,14 @@ export class SearchService {
                 error: (error) => {
                     console.error('Error adding new instance to', urnnbn, ':', error);
                 },
-            })
+            }),
         );
     }
     editInstance(instanceId: string, updatedInstance: any): Observable<any> {
-        return this.apiService.editDigitalInstance(instanceId, updatedInstance)
+        return this.apiService.editDigitalInstance(instanceId, updatedInstance);
     }
     deactivateInstance(instanceId: string): Observable<any> {
-        return this.apiService.deactivateInstance(instanceId)
+        return this.apiService.deactivateInstance(instanceId);
     }
     deactivateUrnnbn(urnnbn: string, reason: string): Observable<any> {
         return this.apiService.deactivateUrnNbn(urnnbn, reason);
@@ -136,5 +258,11 @@ export class SearchService {
     }
     deactivateDigitalInstance(instanceId: string): Observable<any> {
         return this.apiService.deactivateDigitalInstance(instanceId);
+    }
+    addPredecessor(urnnbn: string, body: any): Observable<any> {
+        return this.apiService.addPredescessor(urnnbn, body);
+    }
+    deletePredecessor(urnnbn: string, predecessorUrnNbn: string): Observable<any> {
+        return this.apiService.deletePredescessor(urnnbn, predecessorUrnNbn);
     }
 }

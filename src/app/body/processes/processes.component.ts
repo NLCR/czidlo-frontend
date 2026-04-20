@@ -1,15 +1,19 @@
-import { Component, signal, inject, computed, Inject } from '@angular/core';
+import { Component, signal, inject, computed, Inject, effect } from '@angular/core';
 import { ProcessesService } from '../../services/processes.service';
+import { RegistrarsService } from '../../services/registrars.service';
+import { UsersService } from '../../services/users.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 import { FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { switchMap, catchError, map } from 'rxjs/operators';
+import { switchMap, catchError, map, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+import { AddXslStylesheetComponent } from '../../dialogs/add-xsl-stylesheet/add-xsl-stylesheet.component';
+import { TransformationDetailDialogComponent } from '../../dialogs/transformation-detail-dialog/transformation-detail-dialog.component';
 
 @Component({
     selector: 'app-processes',
@@ -19,6 +23,7 @@ import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 })
 export class ProcessesComponent {
     loggedIn = computed(() => this.authService.loggedIn());
+    isAdmin = computed(() => this.authService.isAdmin());
 
     processes = signal<Array<any>>([]);
     definitions = signal<Array<any>>([
@@ -35,6 +40,20 @@ export class ProcessesComponent {
     activeDefinition = signal<string | null>(null);
     activeAction: string | null = null;
 
+    // TRANSFORMATIONS
+    loadingTransformations = signal(false);
+    rddTransformations = signal<Array<any>>([]);
+    activeRddTransformation: any = null;
+    selectedRddTransformationId: string = '';
+    idsTransformations = signal<Array<any>>([]);
+    activeIdsTransformation: any = null;
+    selectedIdsTransformationId: string = '';
+    transformWithUrnNbn = true;
+    transformWithoutUrnNbn = false;
+    mergeDigitalInstances = true;
+    ignoreDiffInAccess = true;
+    ignoreDiffInFormat = true;
+
     startDateControl = new FormControl<Date | null>(null, [Validators.required, this.dateValidator]);
     endDateControl = new FormControl<Date | null>(null, [Validators.required, this.dateValidator]);
 
@@ -46,6 +65,9 @@ export class ProcessesComponent {
     endDateValue = signal<Date | null>(null);
     deactivationStartValue = signal<Date | null>(null);
     deactivationEndValue = signal<Date | null>(null);
+    oaiBaseUrlValue = signal<string>('');
+    oaiMetadataPrefixValue = signal<string>('');
+    oaiSetValue = signal<string>('');
 
     private _snackBar = inject(MatSnackBar);
     // private _dialog = inject(MatDialog);
@@ -53,7 +75,11 @@ export class ProcessesComponent {
     showMyProcesses = false;
 
     registrars = new FormControl();
-    registrarList = signal(<Array<string>>[]);
+    registrarList = signal(<Array<any>>[]);
+    assignedRegistrars = signal(<Array<any>>[]);
+    loadingRegistrars = signal(false);
+    selectedRegistrar: any = null;
+
     intellectualEntities = new FormControl();
     intellectualEntitiesList = signal(<Array<string>>[]);
     missingCNB = false;
@@ -64,6 +90,12 @@ export class ProcessesComponent {
     selectedState = 'ALL';
     states = ['ALL', 'ACTIVE', 'DEACTIVATED'];
     selectedIncludeCount = false;
+    bornDigitalStates = ['all', 'digital', 'analog'];
+    selectedBornDigitalState: string = 'all';
+
+    oaiBaseUrlControl = new FormControl('http://', [Validators.required]);
+    oaiMetadataPrefixControl = new FormControl('', [Validators.required]);
+    oaiSetControl = new FormControl('', [Validators.required]);
 
     isPlanButtonDisabled = computed(() => {
         const def = this.activeDefinition();
@@ -73,7 +105,14 @@ export class ProcessesComponent {
         const startInvalid = this.startDateControl.invalid || !start;
         const endInvalid = this.endDateControl.invalid || !end;
 
+        const selectedRegistrarInvalid = !this.selectedRegistrar;
+        const oaiBaseUrlInvalid = this.oaiBaseUrlControl.invalid || !this.oaiBaseUrlValue();
+        const oaiMetadataPrefixInvalid = this.oaiMetadataPrefixControl.invalid || !this.oaiMetadataPrefixValue();
+        const rddTransformationInvalid = !this.selectedRddTransformationId;
+        const idsTransformationInvalid = !this.selectedIdsTransformationId;
+
         if (def === 'OAI_ADAPTER') return false;
+
         if (def === 'REGISTRARS_URN_NBN_CSV_EXPORT' || def === 'DI_URL_AVAILABILITY_CHECK') {
             return startInvalid || endInvalid;
         }
@@ -85,19 +124,33 @@ export class ProcessesComponent {
 
     constructor(
         private processesService: ProcessesService,
+        private registrarsService: RegistrarsService,
+        private usersService: UsersService,
         private route: ActivatedRoute,
         private router: Router,
         private translate: TranslateService,
         private dialog: MatDialog,
         private authService: AuthService,
         private dateAdapter: DateAdapter<Date>,
-        @Inject(MAT_DATE_FORMATS) private dateFormats: any
+        @Inject(MAT_DATE_FORMATS) private dateFormats: any,
     ) {
         // 🧩 Propojení valueChanges → signal
         this.startDateControl.valueChanges.subscribe((value) => this.startDateValue.set(value));
         this.endDateControl.valueChanges.subscribe((value) => this.endDateValue.set(value));
         this.deactivationStartControl.valueChanges.subscribe((value) => this.deactivationStartValue.set(value));
         this.deactivationEndControl.valueChanges.subscribe((value) => this.deactivationEndValue.set(value));
+
+        effect(() => {
+            const isLoggedIn = this.loggedIn();
+
+            if (isLoggedIn) {
+                this.loadProcesses();
+                this.loadAssignedRegistrars();
+            } else {
+                this.processes.set([]);
+                this.resetRegistrars();
+            }
+        });
     }
 
     ngOnInit() {
@@ -110,8 +163,8 @@ export class ProcessesComponent {
         this.deactivationStartControl.disable();
         this.deactivationEndControl.disable();
 
-        this.registrarList.set(this.processesService.registrars() || []);
         this.intellectualEntitiesList.set(this.processesService.intellectualEntities() || []);
+        this.loadRegistrarCodes();
 
         this.route.url.subscribe((url) => {
             this.isActive = url[1]?.path || 'instances';
@@ -122,14 +175,11 @@ export class ProcessesComponent {
             // INSTANCES
             if (this.isActive === 'instances') {
                 if (this.processesService.processes().length === 0) {
-                    console.log('Loading processes...');
                     this.loadProcesses();
                 } else {
                     this.processes.set(this.processesService.processes());
-                    console.log('Processes loaded from service:', this.processes());
                 }
                 if (url.length === 3) {
-                    console.log('Loading process details...', this.processes());
                     const processId = url[2]?.path;
                     this.loadProcessDetails(processId);
                 }
@@ -150,19 +200,69 @@ export class ProcessesComponent {
                 }
             }
         });
+        // TRANSFORMATIONS
+        this.getTransformations();
+    }
+
+    loadRegistrarCodes() {
+        this.registrarsService.getRegistrars().subscribe({
+            next: (response) => {
+                this.registrarList.set(
+                    response.items.map((r: any) => ({
+                        code: r.code,
+                        name: r.name,
+                    })),
+                );
+            },
+        });
+    }
+    loadAssignedRegistrars() {
+        this.loadingRegistrars.set(true);
+        const userId = this.authService.getUserId();
+        if (!userId) {
+            console.error('User ID is null despite being logged in.');
+            this.loadingRegistrars.set(false);
+            return;
+        }
+
+        this.usersService.getUserRights(userId).subscribe({
+            next: (data) => {
+                this.assignedRegistrars.set(data || []);
+                console.log('Assigned registrars:', this.assignedRegistrars());
+
+                if (this.assignedRegistrars().length > 0) {
+                    if (this.assignedRegistrars().includes('nk')) {
+                        this.selectedRegistrar = 'nk';
+                    } else {
+                        this.selectedRegistrar = this.assignedRegistrars()[0];
+                    }
+                }
+                this.loadingRegistrars.set(false);
+            },
+            error: (error) => {
+                console.error('Error fetching assigned registrars:', error);
+                this.loadingRegistrars.set(false);
+            },
+        });
+    }
+    resetRegistrars() {
+        this.assignedRegistrars.set([]);
     }
 
     loadProcesses() {
+        this.loadingProcesses.set(true);
         this.processesService.getProcesses().subscribe({
             next: () => {
-                console.log('Processes loaded:', this.processesService.processes());
+                // console.log('Processes loaded:', this.processesService.processes());
                 this.processes.set(this.processesService.processes());
             },
             error: (error) => {
                 console.error('Error loading processes:', error);
+                this.loadingProcesses.set(false);
             },
             complete: () => {
-                console.log('Processes loading complete');
+                // console.log('Processes loading complete');
+                this.loadingProcesses.set(false);
             },
         });
     }
@@ -171,18 +271,45 @@ export class ProcessesComponent {
         this.processesService
             .getProcess(id)
             .pipe(
+                tap((data) => {
+                    console.log('Process data received for', id, ':', data);
+                    data.id = data.id;
+                    data.type = data.type;
+                    data.ownerLogin = data.ownerLogin;
+                    data.state = data.state;
+                    data.duration =
+                        data.state === 'FINISHED'
+                            ? (() => {
+                                  const start = new Date(data.started.replace(/\[UTC\]$/, '')).getTime();
+                                  const end = new Date(data.finished.replace(/\[UTC\]$/, '')).getTime();
+                                  const diffSec = Math.round((end - start) / 1000);
+                                  return diffSec;
+                              })()
+                            : (() => {
+                                  const start = data.started ? new Date(data.started.replace(/\[UTC\]$/, '')).getTime() : 0;
+                                  const end = new Date().getTime();
+                                  const diffSec = Math.round((end - start) / 1000);
+                                  if (!data.started) {
+                                      return '---';
+                                  }
+                                  return diffSec;
+                              })();
+                    data.scheduled = data.scheduled ? new Date(data.scheduled?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
+                    data.started = data.started ? new Date(data.started?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
+                    data.finished = data.finished ? new Date(data.finished?.replace(/\[UTC\]$/, '')).toLocaleString() : '---';
+                }),
                 switchMap((data) =>
                     this.processesService.getLog(id).pipe(
                         map((logData) => ({ ...data, log: logData })),
-                        catchError((error) => of({ ...data, logError: error || 'Error loading log' }))
-                    )
-                )
+                        catchError((error) => of({ ...data, logError: error || 'Error loading log' })),
+                    ),
+                ),
             )
             .subscribe({
                 next: (combinedData) => {
                     console.log('Process + log loaded:', combinedData);
                     this.activeProcess = combinedData;
-                    console.log('Current processes:', this.processes());
+                    // console.log('Current processes:', this.processes());
                     this.isSidebarOpen.set(true);
                 },
                 error: (error) => {
@@ -196,14 +323,14 @@ export class ProcessesComponent {
             next: (response) => {
                 // Název souboru z hlavičky
                 const contentDisposition = response.headers.get('content-disposition');
-                let filename = 'download';
+                console.log(contentDisposition);
+                let filename = '';
 
                 if (contentDisposition) {
                     const match = contentDisposition.match(/filename="?([^"]+)"?/);
-                    if (match) filename = match[1];
+                    if (match) filename = 'process_' + id + '_' + match[1];
                 }
 
-                // Blob a odkaz pro stažení
                 const blob = new Blob([response.body!], { type: response.body!.type || 'application/octet-stream' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -212,12 +339,13 @@ export class ProcessesComponent {
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
+                URL.revokeObjectURL(url);
 
                 console.log(`File downloaded: ${filename}`);
             },
             error: (err) => {
                 console.error('Error downloading file:', err);
+                this._snackBar.open(this.translate.instant('messages.error-downloading-file') + ': ' + err.error.message, 'OK');
             },
         });
     }
@@ -236,12 +364,23 @@ export class ProcessesComponent {
 
     downloadLog(process: any) {
         console.log('Downloading process log:', process);
-        const jsonStr = JSON.stringify(process, null, 2);
-        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const logText = process.log ?? process.logError ?? 'No log available';
+        const blob = new Blob([logText], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
 
-        // otevře v novém okně
-        window.open(url, '_blank');
+        // Jméno souboru – např. process_430_log.txt
+        const filename = `process_${process.id || 'id'}_log.txt`;
+
+        // Vytvoření <a> elementu
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+
+        // Klik pro stažení
+        a.click();
+
+        // Uvolnění URL
+        URL.revokeObjectURL(url);
     }
 
     copyLog(process: any) {
@@ -341,8 +480,7 @@ export class ProcessesComponent {
     toggleShowMyProcesses() {
         this.showMyProcesses = !this.showMyProcesses;
         if (this.showMyProcesses) {
-            // TODO
-            const currentUserLogin = 'pavla'; // TODO: Nahradit skutečným přihlašovacím jménem
+            const currentUserLogin = this.authService.getUsername() || ''; // TODO: Nahradit skutečným přihlašovacím jménem
             this.processesService.getProcessesByOwner(currentUserLogin).subscribe({
                 next: () => {
                     this.processes.set(this.processesService.processes());
@@ -371,14 +509,54 @@ export class ProcessesComponent {
         console.log('Planning process:', activeProcess);
         if (activeProcess === 'OAI_ADAPTER') {
             console.log('Planning OAI_ADAPTER process...');
-            this.processPlannedSnackBarVisible.set(true);
+            const registrarCode = this.selectedRegistrar;
+            const oaiBaseUrl = this.oaiBaseUrlControl.value;
+            const oaiMetadataPrefix = this.oaiMetadataPrefixControl.value;
+            const oaiSet = this.oaiSetControl.value;
+            const ddRegTransId = this.selectedRddTransformationId || null;
+            const diImportTransId = this.selectedIdsTransformationId || null;
+            const registerDDsWithUrn = this.transformWithUrnNbn;
+            const registerDDsWithoutUrn = this.transformWithoutUrnNbn;
+            const diImportMergeDis = this.mergeDigitalInstances;
+            const ignoreDifferenceInAccessibility = this.ignoreDiffInAccess;
+            const ignoreDifferenceInFormat = this.ignoreDiffInFormat;
+
+            let body = {
+                type: 'OAI_ADAPTER',
+                params: {
+                    registrarCode: registrarCode,
+                    oaiBaseUrl: oaiBaseUrl,
+                    oaiMetadataPrefix: oaiMetadataPrefix,
+                    oaiSet: oaiSet,
+                    ddRegTransId: ddRegTransId,
+                    diImportTransId: diImportTransId,
+                    registerDDsWithUrn: registerDDsWithUrn,
+                    registerDDsWithoutUrn: registerDDsWithoutUrn,
+                    diImportMergeDis: diImportMergeDis,
+                    ignoreDifferenceInAccessibility: ignoreDifferenceInAccessibility,
+                    ignoreDifferenceInFormat: ignoreDifferenceInFormat,
+                },
+            };
+            console.log('OAI_ADAPTER', body);
+            this.processesService.planProcess(body).subscribe({
+                next: (data) => {
+                    console.log('OAI Adapter process planned successfully:', data);
+                    this.openSnackBar(this.translate.instant('messages.process-planned-successfully'), 'OK');
+                    this.closeSidebar();
+                    this.loadProcesses();
+                },
+                error: (error) => {
+                    console.error('Error planning OAI Adapter process:', error);
+                    this.openSnackBar(this.translate.instant('messages.error-planning-process'), 'OK');
+                },
+            });
         }
         // PLAN REGISTRARS URN NBN CSV EXPORT
         if (activeProcess === 'REGISTRARS_URN_NBN_CSV_EXPORT') {
             console.log('Planning REGISTRARS_URN_NBN_CSV_EXPORT process...');
             const registrationStart = this.startDateControl.value;
             const registrationEnd = this.endDateControl.value;
-            const registrars = this.registrars.value?.join(',');
+            const registrarCodes = this.registrars.value?.join(',');
             const entityTypes = this.intellectualEntities.value?.join(',');
             const withMissingCnbOnly = this.missingCNB;
             const withMissingIssnOnly = this.missingISSN;
@@ -386,16 +564,18 @@ export class ProcessesComponent {
             const returnActive = this.selectedState === 'ALL' || this.selectedState === 'ACTIVE';
             const returnDeactivated = this.selectedState === 'ALL' || this.selectedState === 'DEACTIVATED';
             let enabledDeactivationDates = this.selectedState === 'DEACTIVATED';
-            const deactivationStart = enabledDeactivationDates ? this.deactivationStartControl.value?.toISOString() || null : null;
-            const deactivationEnd = enabledDeactivationDates ? this.deactivationEndControl.value?.toISOString() || null : null;
+            const deactivationStart = enabledDeactivationDates ? this.formatToLocal(this.deactivationStartControl.value) || null : null;
+            const deactivationEnd = enabledDeactivationDates ? this.formatToLocal(this.deactivationEndControl.value) || null : null;
             const exportNumOfDigInstances = this.selectedIncludeCount || false;
+            const bornDigital = this.selectedBornDigitalState === 'digital' || this.selectedBornDigitalState === 'all';
+            const bornAnalog = this.selectedBornDigitalState === 'analog' || this.selectedBornDigitalState === 'all';
 
             let body = {
                 type: 'REGISTRARS_URN_NBN_CSV_EXPORT',
                 params: {
-                    registrationDateFrom: registrationStart?.toISOString(),
-                    registrationDateTo: registrationEnd?.toISOString(),
-                    registrars: registrars,
+                    registrationDateFrom: this.formatToLocal(registrationStart), // jen datum YYYY-MM-DD
+                    registrationDateTo: this.formatToLocal(registrationEnd), // jen datum YYYY-MM-DD
+                    registrarCodes: registrarCodes,
                     intEntTypes: entityTypes,
                     withMissingCnbOnly: withMissingCnbOnly,
                     withMissingIssnOnly: withMissingIssnOnly,
@@ -405,6 +585,8 @@ export class ProcessesComponent {
                     deactivationDateFrom: deactivationStart,
                     deactivationDateTo: deactivationEnd,
                     exportNumOfDigInstances: exportNumOfDigInstances,
+                    bornDigital: bornDigital,
+                    bornAnalog: bornAnalog,
                 },
             };
             console.log('REGISTRARS_URN_NBN_CSV_EXPORT', body);
@@ -430,8 +612,8 @@ export class ProcessesComponent {
             const urnNbnStatesIncludeDeactivated: boolean = this.selectedUrnNbnState === 'ALL' || this.selectedUrnNbnState === 'DEACTIVATED';
             const diStatesIncludeActive: boolean = this.selectedDIState === 'ALL' || this.selectedDIState === 'ACTIVE';
             const diStatesIncludeDeactivated: boolean = this.selectedDIState === 'ALL' || this.selectedDIState === 'DEACTIVATED';
-            const diDsFrom = this.startDateControl.value?.toISOString();
-            const diDsTo = this.endDateControl.value?.toISOString();
+            const diDsFrom = this.formatToLocal(this.startDateControl.value); // jen datum YYYY-MM-DD
+            const diDsTo = this.formatToLocal(this.endDateControl.value); // jen datum YYYY-MM-DD
 
             let body = {
                 type: 'DI_URL_AVAILABILITY_CHECK',
@@ -465,13 +647,14 @@ export class ProcessesComponent {
             console.log('Planning INDEXATION process...');
             const startDate = this.startDateControl.value;
             const endDate = this.endDateControl.value;
+            console.log('dates', 'start ' + this.formatToLocal(startDate), 'end ' + this.formatToLocal(endDate));
             let body = {};
             if (startDate && endDate) {
                 body = {
                     type: 'INDEXATION',
                     params: {
-                        mod_date_from: startDate.toISOString(),
-                        mod_date_to: endDate.toISOString(),
+                        mod_date_from: this.formatToLocal(startDate), // jen datum YYYY-MM-DD
+                        mod_date_to: this.formatToLocal(endDate), // jen datum YYYY-MM-DD
                     },
                 };
             }
@@ -567,7 +750,199 @@ export class ProcessesComponent {
             // this.deactivationEndControl.reset();
         }
     }
+    onBornDigitalChange(state: string) {
+        this.selectedBornDigitalState = state;
+    }
+
     toggleIncludeCount() {
         this.selectedIncludeCount = !this.selectedIncludeCount;
+    }
+
+    // NEW TRANSFORMATION DIALOG
+    openAddXslStylesheetDialog(context: string) {
+        const dialogRef = this.dialog.open(AddXslStylesheetComponent, {
+            width: '800px',
+            maxWidth: '800px',
+            data: {
+                // předání dat do dialogu, pokud je potřeba
+            },
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                console.log('Dialog result:', result);
+                // Zpracování výsledku z dialogu
+                let body = {};
+                if (context === 'rdd') {
+                    body = {
+                        type: 'DIGITAL_DOCUMENT_REGISTRATION',
+                        name: result.name,
+                        description: result.description,
+                    };
+                }
+                if (context === 'ids') {
+                    body = {
+                        type: 'DIGITAL_INSTANCE_IMPORT',
+                        name: result.name,
+                        description: result.description,
+                    };
+                }
+                let xsltContent = result.file;
+                this.processesService.createTransformation(body).subscribe({
+                    next: (data) => {
+                        console.log('Transformation created successfully:', data);
+                        result.id = data.id;
+                        this.processesService.uploadTransformationFile(data.id, xsltContent).subscribe({
+                            next: (uploadData) => {
+                                console.log('Transformation file uploaded successfully:', uploadData);
+                            },
+                            error: (uploadError) => {
+                                console.error('Error uploading transformation file:', uploadError);
+                            },
+                        });
+                    },
+                    error: (error) => {
+                        console.error('Error creating transformation:', error);
+                    },
+                    complete: () => {
+                        if (context === 'ids') {
+                            this.idsTransformations.set([...this.idsTransformations(), result]);
+                        }
+                        if (context === 'rdd') {
+                            this.rddTransformations.set([...this.rddTransformations(), result]);
+                        }
+                    },
+                });
+            }
+        });
+    }
+    downloadTransformationFile(transformation: any) {
+        console.log('Downloading transformation:', transformation);
+        this.processesService.downloadTransformationFile(transformation.id).subscribe({
+            next: (xsltText: string) => {
+                const blob = new Blob([xsltText], { type: 'application/xml;charset=utf-8' });
+                const url = window.URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `transformation-${transformation.id}.xslt`; // nebo .xsl
+                a.click();
+
+                window.URL.revokeObjectURL(url);
+            },
+            error: (err) => console.error(err),
+        });
+    }
+    openRddTransformation(transformation: any) {
+        console.log('Opening RDD transformation:', transformation);
+        this.activeRddTransformation = transformation;
+        const dialogRef = this.dialog.open(TransformationDetailDialogComponent, {
+            data: {
+                data: transformation,
+                title: transformation.name,
+                confirmButtonText: this.translate.instant('buttons.close'),
+            },
+            maxWidth: '800px',
+        });
+
+        dialogRef.afterClosed().subscribe(() => {
+            this.activeRddTransformation = null;
+        });
+    }
+    getTransformations() {
+        this.loadingTransformations.set(true);
+        let userId = String(this.authService.getUserId() || '');
+        // let userId = 'pavla-admin';
+        this.processesService.getTransformations().subscribe({
+            next: (data) => {
+                console.log('Transformations loaded for user:', data);
+                this.rddTransformations.set(data.transformations.filter((tr: any) => tr.type === 'DIGITAL_DOCUMENT_REGISTRATION') || []);
+                this.idsTransformations.set(data.transformations.filter((tr: any) => tr.type === 'DIGITAL_INSTANCE_IMPORT') || []);
+                this.selectedRddTransformationId = this.rddTransformations()[0]?.id || '';
+                this.selectedIdsTransformationId = this.idsTransformations()[0]?.id || '';
+                // Zpracování načtených transformací
+            },
+            error: (error) => {
+                console.error('Error loading transformations for user:', error);
+                this.rddTransformations.set([]);
+                this.idsTransformations.set([]);
+            },
+            complete: () => {
+                this.loadingTransformations.set(false);
+            },
+        });
+        console.log('Fetching transformations for user ID:', userId);
+        // Implement the logic to fetch transformations by user
+    }
+    getTransformationDescription(transformation: any) {
+        this.processesService.getTransformation(transformation.id).subscribe({
+            next: (data) => {
+                console.log('Transformation details loaded:', data);
+                transformation.description = data.description || '';
+            },
+            error: (error) => {
+                console.error('Error loading transformation details:', error);
+            },
+        });
+    }
+    removeTransformation(context: string, transformation: any) {
+        console.log('Removing transformation:', transformation);
+        // Implement the removal logic here
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: {
+                data: transformation,
+                title: this.translate.instant('messages.confirm-delete-transformation-title'),
+                message: this.translate.instant('messages.confirm-delete-transformation-message', { name: transformation.name }),
+                warning: 'buttons.confirm-delete',
+            },
+            maxWidth: '800px',
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.processesService.deleteTransformation(transformation.id).subscribe({
+                    next: () => {
+                        console.log('Transformation deleted successfully');
+                        if (context === 'rdd') {
+                            this.rddTransformations.set(this.rddTransformations().filter((tr) => tr.id !== transformation.id));
+                        }
+                        if (context === 'ids') {
+                            this.idsTransformations.set(this.idsTransformations().filter((tr) => tr.id !== transformation.id));
+                        }
+                    },
+                    error: (error) => {
+                        console.error('Error deleting transformation:', error);
+                    },
+                });
+            }
+        });
+    }
+
+    // DATE FORMATTING
+    private formatToLocal(d: Date | null): string | null {
+        if (!d) return null;
+        let localDate = new Date(d);
+        const yyyy = localDate.getFullYear();
+        const mm = String(localDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(localDate.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+    formatDuration(seconds: number): string {
+        if (seconds === null || seconds === undefined || isNaN(seconds)) {
+            return '---';
+        }
+        if (seconds < 60) {
+            return `${seconds} s`;
+        }
+
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+
+        if (h > 0) {
+            return `${h} h ${m} min ${s} s`;
+        } else {
+            return `${m} min ${s} s`;
+        }
     }
 }

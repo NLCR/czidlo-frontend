@@ -5,7 +5,7 @@
         </div>
     </div>
 </div>
-<div class="app-import-record-container" *ngIf="assignedRegistars.length > 0 && loggedIn()">
+<div class="app-import-record-container" *ngIf="!loadingRegistrars() && assignedRegistrars().length > 0 && loggedIn()">
     <div class="app-import-record-header">
         {{ 'import.import-record-title' | translate }}
     </div>
@@ -21,7 +21,7 @@
                         <mat-form-field appearance="outline">
                             <mat-select class="app-singleselect" [(value)]="selectedEntity">
                                 @for (entity of intellectualEntitiesList(); track entity) {
-                                <mat-option [value]="entity">{{ entity }}</mat-option>
+                                    <mat-option [value]="entity">{{ entity }}</mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
@@ -36,8 +36,8 @@
                         </div>
                         <mat-form-field appearance="outline">
                             <mat-select class="app-singleselect" [(value)]="selectedRegistrar" (valueChange)="onRegistrarChange()">
-                                @for (registrar of assignedRegistars; track registrar) {
-                                <mat-option [value]="registrar">{{ registrar }}</mat-option>
+                                @for (registrar of assignedRegistrars(); track registrar) {
+                                    <mat-option [value]="registrar">{{ registrar }}</mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
@@ -53,7 +53,7 @@
                         <mat-form-field appearance="outline">
                             <mat-select class="app-singleselect" [(value)]="selectedMode" [compareWith]="compareMode">
                                 @for (mode of registrationMode; track mode) {
-                                <mat-option [value]="mode.value">{{ mode.label | translate }}</mat-option>
+                                    <mat-option [value]="mode.value">{{ mode.label | translate }}</mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
@@ -76,9 +76,12 @@
         </div>
     </div>
 </div>
+<div class="app-loading" *ngIf="loadingRegistrars()">
+    <mat-spinner diameter="40"></mat-spinner>
+</div>
 
 <!-- No Registrars -->
-<div class="app-no-registrars" *ngIf="assignedRegistars.length === 0">
+<div class="app-no-registrars" *ngIf="!loadingRegistrars() && assignedRegistrars().length === 0 && loggedIn()">
     <div class="app-no-registrars-header">
         <div class="app-no-registrars-header-title">{{ 'import.no-registrar-title' | translate }}</div>
         <div class="app-no-registrars-header-subtitle">{{ 'import.no-registrar-subtitle' | translate }}</div>
@@ -123,7 +126,7 @@
         <!-- HEADER -->
         <div class="app-sidebar-header">
             <div class="app-sidebar-title">
-                {{ 'import.' + selectedEntity | translate }}
+                {{ 'import.' + selectedEntity | translate }} - {{ selectedRegistrar }} - {{ 'import.' + selectedMode.toLowerCase() | translate }}
             </div>
             <div class="app-sidebar-close" (click)="closeSidebar()">
                 <img src="assets/icons/close.svg" />
@@ -185,8 +188,11 @@
                         "
                     >
                         <div class="app-base-input app-full-width app-volumeTitle">
-                            <div class="app-base-input-label">
+                            <div class="app-base-input-label" *ngIf="selectedEntity === 'MONOGRAPH_VOLUME'">
                                 {{ 'import.volumeTitle' | translate }}
+                            </div>
+                            <div class="app-base-input-label" *ngIf="selectedEntity === 'PERIODICAL_VOLUME' || selectedEntity === 'PERIODICAL_ISSUE'">
+                                {{ 'import.periodicalVolumeTitle' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="volumeTitle" />
                         </div>
@@ -195,7 +201,7 @@
                     <div class="app-base-input-container" *ngIf="selectedEntity === 'PERIODICAL_ISSUE'">
                         <div class="app-base-input app-full-width app-issueTitle">
                             <div class="app-base-input-label">
-                                {{ 'import.issueTitle' | translate }}
+                                {{ 'import.periodicalIssueTitle' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="issueTitle" />
                         </div>
@@ -266,13 +272,31 @@
                 </div>
                 <div class="app-part-content">
                     <!-- DOCUMENT TYPE & BORN DIGITAL -->
+                    <!-- DOCUMENT TYPE -->
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width app-documentType">
                             <div class="app-base-input-label">
                                 {{ 'import.documentType' | translate }}
                             </div>
-                            <input matInput type="text" [formControl]="documentType" />
+
+                            <mat-form-field appearance="outline">
+                                <input
+                                    matInput
+                                    type="text"
+                                    class="app-input-autocomplete"
+                                    [formControl]="documentType"
+                                    [matAutocomplete]="docTypeAuto"
+                                    (blur)="normalizeDocTypeValue()"
+                                />
+
+                                <mat-autocomplete #docTypeAuto="matAutocomplete" autoActiveFirstOption>
+                                    <mat-option *ngFor="let option of filteredDocumentTypeOptions$ | async" [value]="option">
+                                        {{ option }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
                         </div>
+
                         <div class="app-base-input app-toggle-container app-bornDigital" *ngIf="selectedEntity !== 'ANALYTICAL'">
                             <app-toggle size="s" [checked]="bornDigital" (click)="bornDigital = !bornDigital"></app-toggle>
                             <div class="app-toggle-label">{{ 'import.bornDigital' | translate }}</div>
@@ -288,7 +312,7 @@
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect app-primaryOriginatorType" [(value)]="selectedOriginatorType">
                                     @for (entity of primaryOriginatorTypes; track entity) {
-                                    <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
+                                        <mat-option [value]="entity.value">{{ entity.label }}</mat-option>
                                     }
                                 </mat-select>
                             </mat-form-field>
@@ -427,25 +451,31 @@
                 <div class="app-part-content">
                     <!-- ARCHIVER ID -->
                     <div class="app-base-input-container">
-                        <div class="app-base-input app-half-width app-primaryArchiverId">
+                        <div class="app-base-input app-full-width app-primaryArchiverId">
                             <div class="app-base-input-label">
                                 {{ 'import.archiverId' | translate }}
                             </div>
                             <mat-form-field appearance="outline">
                                 <mat-select class="app-singleselect" [(value)]="selectedArchiverId">
                                     @for (entity of archiverIdsList(); track entity) {
-                                    <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
+                                        <mat-option [value]="entity.id">{{ entity.name }}</mat-option>
                                     }
                                 </mat-select>
+                                <!-- CLEAR BUTTON -->
+                                <mat-icon class="app-prefix-icon" matPrefix *ngIf="selectedArchiverId" (click)="selectedArchiverId = ''; $event.stopPropagation()">
+                                    close
+                                </mat-icon>
                             </mat-form-field>
                         </div>
                     </div>
+                    <!-- URNNBN -->
                     <div class="app-base-input-container" *ngIf="selectedMode === 'BY_RESERVATION' || selectedMode === 'BY_REGISTRAR'">
                         <div class="app-base-input app-half-width app-urnNbn">
                             <div class="app-base-input-label">{{ 'import.urnNbn' | translate }}{{ selectedRegistrar }}-</div>
                             <input matInput type="text" [formControl]="urnNbn" />
                         </div>
                     </div>
+                    <!-- FINANCED -->
                     <div class="app-base-input-container">
                         <div class="app-base-input app-half-width app-financed">
                             <div class="app-base-input-label">
@@ -462,6 +492,7 @@
                     </div>
                 </div>
             </div>
+            <!-- TECHNICAL METADATA -->
             <div class="app-part">
                 <div class="app-part-title">
                     {{ 'import.technicalMetadata' | translate }}
@@ -495,12 +526,41 @@
                                 {{ 'import.resolutionHorizontal' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="resolutionHorizontal" />
+                            <mat-error
+                                class="app-error-message"
+                                *ngIf="resolutionHorizontal.invalid && (resolutionHorizontal.dirty || resolutionHorizontal.touched)"
+                            >
+                                {{ 'messages.required-field' | translate }}
+                            </mat-error>
+                            <mat-error
+                                class="app-error-message"
+                                *ngIf="
+                                    resolutionHorizontal.hasError('invalidPositiveNumber') &&
+                                    (resolutionHorizontal.dirty || resolutionHorizontal.touched)
+                                "
+                            >
+                                {{ 'messages.field-must-be-number' | translate }}
+                            </mat-error>
                         </div>
                         <div class="app-base-input app-half-width app-resolutionVertical">
                             <div class="app-base-input-label">
                                 {{ 'import.resolutionVertical' | translate }}
                             </div>
                             <input matInput type="text" [formControl]="resolutionVertical" />
+                            <mat-error
+                                class="app-error-message"
+                                *ngIf="resolutionVertical.invalid && (resolutionVertical.dirty || resolutionVertical.touched)"
+                            >
+                                {{ 'messages.required-field' | translate }}
+                            </mat-error>
+                            <mat-error
+                                class="app-error-message"
+                                *ngIf="
+                                    resolutionVertical.hasError('invalidPositiveNumber') && (resolutionVertical.dirty || resolutionVertical.touched)
+                                "
+                            >
+                                {{ 'messages.field-must-be-number' | translate }}
+                            </mat-error>
                         </div>
                     </div>
                     <div class="app-base-input-container">
@@ -564,12 +624,16 @@
         </div>
 
         <!-- FOOTER -->
-        <div class="app-sidebar-footer" [ngClass]="{ 'snack-bar-visible': importRecordSnackBarVisible() }">
-            <div class="app-record-imported-snack-bar" *ngIf="importRecordSnackBarVisible()">
-                {{ 'messages.record-imported-successfully' | translate }}
+        <div class="app-sidebar-footer" [ngClass]="{ 'progress-bar-visible': progressBar().state }">
+            <div class="app-record-progress-bar" [ngClass]="progressBar().value" *ngIf="progressBar().state">
+                {{ 'messages.' + progressBar().value | translate }} {{ progressBar().error }}
+                <a class="app-link" *ngIf="progressBar().urnnbn" [routerLink]="['/search']" [queryParams]="{ q: progressBar().urnnbn }">
+                    {{ 'messages.display-record' | translate }}: {{ progressBar().urnnbn }}
+                </a>
+                <div *ngIf="progressBar().urnnbn" class="app-link app-close-sidebar" (click)="cancelImport()">{{ 'buttons.close' | translate }}</div>
             </div>
             <div class="app-button-container">
-                <app-button variant="tertiary" size="l" (click)="closeSidebar()">
+                <app-button variant="tertiary" size="l" (click)="cancelImport()">
                     <span>{{ 'buttons.cancel' | translate }}</span>
                 </app-button>
                 <app-button variant="primary" size="l" (click)="importRecord()" [disabled]="isButtonDisabled()">

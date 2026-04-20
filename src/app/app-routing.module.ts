@@ -32,10 +32,16 @@ const routes: Routes = [
     { path: 'processes/:tab/:id', component: ProcessesComponent },
     { path: 'processes/:tab/:id/:action', component: ProcessesComponent },
     { path: 'logs', component: LogsComponent },
+    // fallback route
+    { path: '**', redirectTo: '', pathMatch: 'full' },
 ];
 
 @NgModule({
-    imports: [RouterModule.forRoot(routes)],
+    imports: [
+        RouterModule.forRoot(routes, {
+            scrollPositionRestoration: 'enabled',
+        }),
+    ],
     exports: [RouterModule],
 })
 export class AppRoutingModule {}
