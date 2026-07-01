@@ -37,7 +37,7 @@ Softwarové řešení je založeno na **opensource technologiích** (Java, Postg
 ---
 
 ## Financování
-Projekt byl financován Evropskou unií – NextGenerationEU v rámci Národního plánu obnovy České republiky.
+Webová aplikace systému ČIDLO ve verzi 6.0 je výsledkem projektu r. č. 0444000005 Optimalizace a vylepšení systému ČIDLO, který byl financován Evropskou unií – NextGenerationEU v rámci Národního plánu obnovy České republiky.
 
 <p>
   <img width="284" height="85" alt="CS Financováno Evropskou unií_POS_POS" src="https://github.com/user-attachments/assets/bf53dbb7-df2a-4118-b876-d33a7b3a8a09" />
