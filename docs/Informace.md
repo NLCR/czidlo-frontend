@@ -10,16 +10,9 @@
 
 ---
 
-## Výzkum a vývoj
-Nástroj CZIDLO byl vyvinut v letech 2011–2012 v rámci programu *Koncepce rozvoje Národní knihovny České republiky jako výzkumné organizace na léta 2010–2015*, financovaného Ministerstvem kultury ČR.
-
-Softwarové řešení je založeno na **opensource technologiích** (Java, PostgreSQL, Spring security, GWT aj.) a **standardech** (XML, XSD, XSLT, HTTP, REST aj.).  
-
-- Licence: **GNU GPL v3**  
-- Zdrojové kódy, instalační balíky, dokumentace: [CZIDLO na GitHubu](https://github.com/NLCR/CZIDLO)
-- Autor koncepce: PhDr. Ladislav Cubr, Ph.D. (2011–2014)  
-- Garant vývoje: PhDr. Zdeněk Vašek, Ph.D. (2014–2017)  
-- Vývoj softwaru: Mgr. Martin Řehánek (2011–2013, 2017–2019), Mgr. Václav Rosecký (2013) 
+## Metodika
+Podrobná pravidla pro využívání služby ČIDLO a návody na resolver jsou popsány v certifikované metodice.
+- Aktualizovaná verze: [Metodika (resolver.nkp.cz)](https://standardy.ndk.cz/ndk/archivace/Certifik_metodika_urnnbn_2018.pdf)
 
 ---
 
@@ -30,9 +23,16 @@ Softwarové řešení je založeno na **opensource technologiích** (Java, Postg
 
 ---
 
-## Metodika
-Podrobná pravidla pro využívání služby ČIDLO a návody na resolver jsou popsány v certifikované metodice.
-- Aktualizovaná verze: [Metodika (resolver.nkp.cz)](https://standardy.ndk.cz/ndk/archivace/Certifik_metodika_urnnbn_2018.pdf)
+## Výzkum a vývoj
+Nástroj CZIDLO byl vyvinut v letech 2011–2012 v rámci programu *Koncepce rozvoje Národní knihovny České republiky jako výzkumné organizace na léta 2010–2015*, financovaného Ministerstvem kultury ČR.
+
+Softwarové řešení je založeno na **opensource technologiích** (Java, PostgreSQL, Spring security, GWT aj.) a **standardech** (XML, XSD, XSLT, HTTP, REST aj.).  
+
+- Licence: **GNU GPL v3**  
+- Zdrojové kódy, instalační balíky, dokumentace: [CZIDLO na GitHubu](https://github.com/NLCR/CZIDLO)
+- Autor koncepce: PhDr. Ladislav Cubr, Ph.D. (2011–2014)  
+- Garant vývoje: PhDr. Zdeněk Vašek, Ph.D. (2014–2017)  
+- Vývoj softwaru: Mgr. Martin Řehánek (2011–2013, 2017–2019), Mgr. Václav Rosecký (2013) 
 
 ---
 
