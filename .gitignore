@@ -45,3 +45,6 @@ Thumbs.db
 /src/environments/environment.local.ts
 src/assets/env.json
 build-info.json
+
+# Notes
+/TODO.md

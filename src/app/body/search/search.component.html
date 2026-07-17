@@ -390,14 +390,14 @@
                         </div>
                         <div class="app-ie-content app-ie-digital-document-content" *ngIf="item.ddopen">
                             <!-- URNNBN USER -->
-                            <div class="app-ie-field" *ngIf="item.details.urnNbn && !isAdmin()">
+                            <div class="app-ie-field" *ngIf="item.details.urnNbn && !hasRightToRegistrar(item.registrarcode)">
                                 <!-- <div class="app-label">{{ 'search.urnNbn' | translate }}:</div> -->
                                 <div class="app-value">urn:nbn:cz:{{ item.details.urnNbn.registrarCode }}-{{ item.details.urnNbn.documentCode }}</div>
                                 <div class="app-value-2">
                                     ({{ 'search.registered' | translate }} {{ item.details.urnNbn.registered.split('[')[0] | date }})
                                 </div>
                             </div>
-                            <div class="app-ie-field" *ngIf="item.details.urnNbn?.status === 'DEACTIVATED' && !isAdmin()">
+                            <div class="app-ie-field" *ngIf="item.details.urnNbn?.status === 'DEACTIVATED' && !hasRightToRegistrar(item.registrarcode)">
                                 <div class="app-label">{{ 'search.status' | translate }}:</div>
                                 <div class="app-value">{{ item.details.urnNbn.status }}</div>
                                 <div class="app-value-2">
@@ -415,7 +415,7 @@
                                 <div class="app-value-2" *ngIf="item.details.archiver?.description">({{ item.details.archiver?.description }})</div>
                             </div>
                             <!-- PRECEDESSORS AND SUCCESSORS -->
-                            <div *ngIf="item.details.urnNbn.predecessors?.length > 0 && !isAdmin()">
+                            <div *ngIf="item.details.urnNbn.predecessors?.length > 0 && !hasRightToRegistrar(item.registrarcode)">
                                 <div class="app-ie-field" *ngFor="let pre of item.details.urnNbn.predecessors">
                                     <div class="app-label">{{ 'search.predecessor' | translate }}:</div>
                                     <!-- <pre>{{ pre | json }}</pre> -->
@@ -429,7 +429,7 @@
                                     <div class="app-value-2" *ngIf="pre.statusNote">({{ pre.statusNote }})</div>
                                 </div>
                             </div>
-                            <div *ngIf="item.details.urnNbn.successors?.length > 0 && !isAdmin()">
+                            <div *ngIf="item.details.urnNbn.successors?.length > 0 && !hasRightToRegistrar(item.registrarcode)">
                                 <div class="app-ie-field" *ngFor="let suc of item.details.urnNbn.successors">
                                     <div class="app-label">{{ 'search.successor' | translate }}:</div>
                                     <!-- <pre>{{ suc | json }}</pre> -->
@@ -450,7 +450,7 @@
                             </div>
 
                             <!-- URNNBN ADMIN -->
-                            <div class="app-ie-urnnbn" *ngIf="isAdmin()">
+                            <div class="app-ie-urnnbn" *ngIf="item.details.urnNbn && hasRightToRegistrar(item.registrarcode)">
                                 <div class="app-ie-header" (click)="item.urnopen = !item.urnopen">
                                     <img [src]="item.urnopen ? 'assets/icons/arrow-up2.svg' : 'assets/icons/arrow-down2.svg'" />
                                     <div class="app-part-title">
@@ -497,7 +497,6 @@
                                             <div class="app-value-2" *ngIf="pre.statusNote">({{ pre.statusNote }})</div>
                                             <div class="app-delete-pred">
                                                 <app-button
-                                                    *ngIf="isAdmin()"
                                                     iconLeft="close.svg"
                                                     variant="tertiary"
                                                     size="xs"
@@ -526,7 +525,7 @@
                                         <app-button variant="primary" size="s" (click)="deactivateURNNBN(item)" *ngIf="item.details?.urnNbn.active">
                                             <span>{{ 'buttons.deactivate' | translate }}</span>
                                         </app-button>
-                                        <app-button variant="primary" size="s" (click)="reactivateURNNBN(item)" *ngIf="!item.details?.urnNbn.active">
+                                        <app-button variant="primary" size="s" (click)="reactivateURNNBN(item)" *ngIf="!item.details?.urnNbn.active && isAdmin()">
                                             <span>{{ 'buttons.reactivate' | translate }}</span>
                                         </app-button>
                                         <app-button variant="primary" size="s" (click)="addPredecessor(item)">
