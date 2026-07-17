@@ -44,6 +44,9 @@
                     </div>
                     <input matInput type="text" [(ngModel)]="data.predecessor" />
                 </div>
+                <div class="app-input-error" *ngIf="predecessorError()">
+                    {{ predecessorError() | translate: { code: predecessorRegistrarCode() } }}
+                </div>
             </div>
         </div>
         <div class="app-dialog-reason" *ngIf="data?.reason !== undefined">
@@ -64,7 +67,7 @@
             <app-button size="l" variant="tertiary" (click)="onCancel()">
                 {{ 'buttons.cancel' | translate }}
             </app-button>
-            <app-button *ngIf="data.confirm" size="l" variant="primary" (click)="onConfirm()">
+            <app-button *ngIf="data.confirm" size="l" variant="primary" [disabled]="!!predecessorError()" (click)="onConfirm()">
                 {{ data.confirm | translate }}
             </app-button>
             <app-button *ngIf="data.warning" size="l" variant="primary" [warning]="true" (click)="onConfirm()">

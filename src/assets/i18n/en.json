@@ -559,6 +559,8 @@
         "successor": "successor",
         "predecessor": "predecessor",
         "predecessor-urn": "URN:NBN predecessor",
+        "predecessor-invalid": "Enter a valid predecessor URN:NBN (e.g. urn:nbn:cz:tst01-000001).",
+        "predecessor-no-rights": "You don't have curator rights to registrar \"{{code}}\" that registers this predecessor. Adding a predecessor deactivates it, so rights to its registrar are required.",
         "sort-by": "Sort by",
         "relevance": "relevance",
         "title-sort_asc": "title A-Z",

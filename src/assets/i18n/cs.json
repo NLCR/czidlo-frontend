@@ -575,6 +575,8 @@
         "successor": "následník",
         "predecessor": "předchůdce",
         "predecessor-urn": "URN:NBN Předchůdce",
+        "predecessor-invalid": "Zadejte platný URN:NBN předchůdce (např. urn:nbn:cz:tst01-000001).",
+        "predecessor-no-rights": "Nemáte kurátorská práva k registrátorovi „{{code}}“, který registruje tohoto předchůdce. Přidání předchůdce ho deaktivuje, proto jsou práva k jeho registrátorovi nutná.",
         "sort-by": "Řazení",
         "relevance": "relevance",
         "title-sort_asc": "název A-Z",

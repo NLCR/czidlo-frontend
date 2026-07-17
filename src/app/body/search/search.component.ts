@@ -742,7 +742,15 @@ export class SearchComponent implements AfterViewInit {
     }
     addPredecessor(item: any) {
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-            data: { data: item, title: 'messages.confirm-add-predecessor', confirm: 'buttons.add', predecessor: 'urn:nbn:cz:', reason: '' },
+            data: {
+                data: item,
+                title: 'messages.confirm-add-predecessor',
+                confirm: 'buttons.add',
+                predecessor: 'urn:nbn:cz:',
+                reason: '',
+                // předchůdce se přidáním deaktivuje, proto vyžadujeme práva k jeho registrátorovi
+                predecessorRegistrarValidator: (code: string) => this.hasRightToRegistrar(code),
+            },
             maxWidth: '800px',
             minWidth: '600px',
         });
