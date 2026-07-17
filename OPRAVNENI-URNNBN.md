@@ -1,8 +1,8 @@
 # Oprávnění k operacím nad urn:nbn
 
-Stav k 2026-07-17. Týká se čtyř operací nad urn:nbn: deaktivace, reaktivace,
-přidání předchůdce a odebrání předchůdce. Dotčená repozitáře: `czidlo-frontend`
-(zobrazení tlačítek) a `CZIDLO` (skutečné vynucení práv).
+Týká se čtyř operací nad urn:nbn: deaktivace, reaktivace, přidání předchůdce
+a odebrání předchůdce. Dotčené repozitáře: `czidlo-frontend` (zobrazení
+tlačítek a validace formuláře) a `CZIDLO` (skutečné vynucení práv).
 
 ## Značení
 
@@ -82,32 +82,31 @@ nemůže, ale zrušit ji na svém dokumentu smí.
 - U přidání předchůdce se autorizuje **před** zápisem relace, aby při odmítnutí
   nezůstal částečný zápis.
 
-**Frontend** (`czidlo-frontend`) — jen skrývá tlačítka, nic nevynucuje:
+**Frontend** (`czidlo-frontend`) — brání akci předem, ale není to bezpečnostní
+hranice; tou zůstává backend.
 
 - `src/app/body/search/search.component.html`, blok urn:nbn se otevře na
   `hasRightToRegistrar(item.registrarcode)`; Reaktivovat má navíc `isAdmin()`.
+  Tím se řídí viditelnost tlačítek.
 - `AuthService.hasRightToRegistrar(code)` čte `registrarRights` a sám ORuje
   `isAdmin()`.
+- Dialog přidání předchůdce (`confirm-dialog.component.*`, otevřený ze
+  `search.component.ts` metodou `addPredecessor`) parsuje kód registrátora
+  z vloženého urn:nbn a bez práv k němu zablokuje odeslání a zobrazí hlášku —
+  kurátor tak nenarazí na 403 až ze serveru. Neplatný/neúplný urn:nbn odeslání
+  taky blokuje. Validace se zapíná jen předáním `predecessorRegistrarValidator`,
+  ostatní použití dialogu (deaktivace, mazání) se nemění.
 
-## Co ještě chybí
+## Testy
 
-- **Validace předchůdce ve formuláři.** Tlačítko „Přidat předchůdce" se řídí
-  právy k X, ale pravidlo závisí i na registrátorovi předchůdce, kterého
-  uživatel teprve zadá. Formulář si má z vloženého urn:nbn odvodit kód
-  registrátora a bez práv k němu neumožnit odeslání — jinak kurátor X narazí
-  na 403 až ze serveru.
+Maven unit testy pro tuto autorizaci nejsou (`web-api` nemá `src/test`).
+Manuální integrační testy proti běžícímu serveru jsou v
+`CZIDLO/scripts/manual-tests/` (viz jejich README):
 
-- **Opravené bugy** (2026-07-17, ověřeno proti běžícímu backendu):
-  1. `deactivateUrnNbn` a `reactivateUrnNbn` v `DataUpdateServiceImpl` volaly
-     striktní `checkRegistrarRights` místo `checkRegistrarRightsOrAdmin`.
-     Protože `getAdminsOfRegistrar` čte jen tabulku `user_registrar`, globální
-     admin bez záznamu k danému registrátorovi dostával 403 — u deaktivace,
-     reaktivace i přidání předchůdce (to předchůdce deaktivuje). **Opraveno**
-     záměnou za `checkRegistrarRightsOrAdmin` (stejný vzor jako zbytek souboru).
-  2. Kvůli bodu 1 mohl u přidání předchůdce zůstat **částečný zápis**: relace
-     se vložila a teprve deaktivace předchůdce spadla na 403. **Opraveno**
-     důsledkem bodu 1 — obě kontroly nad týmž registrátorem teď dopadnou
-     stejně, takže se k deaktivaci vůbec nedojde, když nemá projít.
+- `setup_test_users.sh` — založí testovací kurátory pro `tst01` / `tst02`.
+- `test_matrix.py` — projede celou matici oprávnění přes API.
+- `test_ui.js` — viditelnost tlačítek na frontendu podle role.
+- `test_mirror.js` — read-only blok a admin panel se vzájemně vylučují.
 
-- **Testy.** Modul `web-api` nemá `src/test` vůbec; autorizace těchto endpointů
-  není krytá žádným testem ani v jednom směru.
+Přihlašovací údaje se předávají přes proměnné prostředí, testy mění data,
+takže jen proti testovací instanci.
